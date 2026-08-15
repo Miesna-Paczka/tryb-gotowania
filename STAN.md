@@ -2979,6 +2979,90 @@ cokolwiek nowego.
 
 Znacznik produktu (przeb. 36): tryb-gotowania.js 1a0af8f15968cccc… · tryb-gotowania.min.js 00d1de55ba7aaa66… · przepis-parser.js 5f3c3ca858a0686b… · przepis-parser.min.js 6481c8d102682ac8…
 
+### Jednostka 8 — GIT: commit `37cc7b8` + tag `v1.0.0-rc.1`. PUSH NIEWYKONANY (brak klucza)
+
+Operator autoryzował imiennie, tylko na tę sesję: push i tag. **Zakaz w promptcie
+harmonogramu ZOSTAJE** — zgoda dotyczyła sesji, nie łańcucha; kolejne ogniwo gita nie rusza.
+
+**Trzecia dziś przesłanka odziedziczona i sprawdzona: `CLAUDE.md` miał RACJĘ co do
+`index.lock`, ale nie co do wniosku.** `git add` faktycznie zostawia `.git/index.lock`,
+którego nie umie odlinkować — ale **`mv` w tym katalogu DZIAŁA**, więc lock da się
+odsunąć na bok i git jedzie dalej. Recepta dla następnych: przed i po każdej komendie
+`[ -f .git/index.lock ] && mv .git/index.lock .git/zl-$RANDOM`. Git zostawia też
+nieusuwalne `tmp_obj_*` w `.git/objects` i pliki `zl-*` — śmieci wewnątrz `.git`,
+nieszkodliwe i niewersjonowane.
+
+**Zrobione:** `git add -A` (21 plików), commit `37cc7b8` obejmujący zaległość 30–36,
+tag `v1.0.0-rc.1` (adnotowany).
+
+**Dlaczego `rc.1`, a nie `v1.0.0`:** matryca lokalna jest 207/207, ale **bramka
+stagingowa (sekcja S) jest niezmierzona**, a reguła łańcucha mówi, że `v1.0.0` znaczy
+zamknięcie CAŁEJ matrycy. Tag oznaczający więcej, niż zmierzono, jest tą samą klasą
+fałszu co zielony wiersz bez asercji.
+
+**PUSH NIEWYKONANY — blokada twarda, nie proceduralna.** `git push` zwraca
+`Host key verification failed`: piaskownica nie ma ani klucza SSH operatora, ani wpisu
+`known_hosts` dla GitHuba. **Dorabianie jednego ani drugiego nie wchodzi w grę** —
+to jest obchodzenie kontroli dostępu, a nie rozwiązywanie problemu. Commit i tag
+istnieją w kopii roboczej na dysku operatora; wypchnięcie to dwie komendy po jego stronie:
+`git push origin main` oraz `git push origin v1.0.0-rc.1`.
+
+### Jednostka 8b — PUSH WYKONANY przez operatora, jsDelivr serwuje tag
+
+Remote przestawiony na HTTPS (SSH odpadł: piaskownica nie ma żadnego klucza, a Windows
+operatora nie miał gita w PATH). Operator zainstalował Git for Windows i wypchnął.
+**Potwierdzone przez operatora: `https://cdn.jsdelivr.net/gh/lukaszwerecik/tryb-gotowania@v1.0.0-rc.1/tryb-gotowania.min.js` odpowiada.**
+Commit `37cc7b8`, tag `v1.0.0-rc.1` są na GitHubie.
+
+**Recepta na gita w tym katalogu, do powtarzania:** `mv` działa, `rm` nie — więc lock
+odsuwa się na bok: `[ -f .git/index.lock ] && mv .git/index.lock .git/zl-$RANDOM`
+przed i po każdej komendzie. Git zostawia też nieusuwalne `tmp_obj_*` i `zl-*` w `.git`;
+są nieszkodliwe i niewersjonowane.
+
+**Adresy do wklejenia w Webflow (Before `</body>` szablonu przepisu), kolejność wiążąca:**
+parser → runtime → skrypt wiążący przycisk (delegacja na `document`, selektor
+`.recipe-floating-cta`, `preventDefault` konieczny, bo CTA to `<a href="#">`).
+
+### Jednostka 9 — PIERWSZE DZIAŁAJĄCE URUCHOMIENIE NA STAGINGU. S1, S2, S4(cz.) zielone
+
+Operator wkleił skrypty i związał pola CMS; zmierzone na
+`miesna-paczka-ea5c01.webflow.io/przepisy/wolowina-teriyaki-z-brokulami-przepis`.
+
+- **S1 ZIELONE — klik w `.recipe-floating-cta` OTWIERA overlay** [V]: `#mp-tryb`
+  z `data-otwarty`, ekran `start`, wysokość 791, `MP.tryb.ostrzezenia()` puste.
+  **Byczek renderuje się na stronie** — `.mp-tryb__znak svg` = 1, czyli inline SVG
+  przeżył drogę repo → jsDelivr → Webflow.
+- **S2 ZIELONE** — dwa skrypty z jsDelivr, **parser PRZED runtime'em** [V];
+  `MP`, `MP.przepis`, `MP.tryb` to obiekty.
+- **S4 CZĘŚCIOWO** — wszystkie cztery węzły kontraktu istnieją, wiązania CMS
+  DZIAŁAJĄ (`data-tytul` = „Wołowina teriyaki z brokułami"), ale **pola w rekordzie
+  są PUSTE**: `mp-skladniki`, `mp-kroki`, `mp-wartosci-porcja` po 0 znaków,
+  `data-porcje-bazowe` i `data-czas` puste. Model: 0 składników, 0 kroków, 1 błąd.
+  **To jest robota pipeline'u treści, nie kodu.**
+- **Pułapka pośrednia, warta zapisania:** pierwsza publikacja miała klamry
+  `{{skladniki}}` jako DOSŁOWNY TEKST (13/9/19 znaków) — w Webflow nie da się wpisać
+  pola z klawiatury, trzeba kliknąć „+ Add Field" w edytorze Embeda. Wygląda
+  identycznie jak puste pole, a znaczy co innego. Rozpoznanie: długość treści
+  równa długości nazwy placeholdera.
+
+**NIEZMIERZONE w tej jednostce** (kontekst sesji na wyczerpaniu): S3 (konsola
+gospodarza), S6 (próg 500 px trikiem same-origin), S7 (rozjazd wobec harnessu),
+oraz dług z jednostki 7: `mutacja.html` ×2, `pokrycie.html`, `prog.html`, `qr.html`
+po zmianie runtime'u.
+
+### Jednostka 10 — `allow_cowork_file_delete` PRZYZNANE. Recepta z `mv` jest już ZBĘDNA
+
+Operator udzielił zgody w czacie (2026-08-15). Zakres: cały folder `Claude`.
+Zmierzone natychmiast: `rm` działa, usunięte `.proba-rm-31`, `.proba-rm-32`,
+`.test-rename-b`, `harness/_katalog_tmp.js` oraz wszystkie śmieci z `.git`
+(`zl-*`, `tmp_obj_*`). **Po `git status` NIE zostaje `index.lock`** [V].
+
+**Skreśl obejście z jednostki 8** (`mv .git/index.lock .git/zl-$RANDOM` przed i po
+każdej komendzie). Było poprawne dla stanu bez uprawnienia i jest zapisane jako
+historia, ale od teraz git w tym katalogu zachowuje się normalnie. Zostawianie
+obejścia „na wszelki wypadek" to dokładnie ta klasa zapisu, która przeżywa swoją
+przesłankę — cztery takie potknięcia były treścią tego przebiegu.
+
 ### Następny krok dla ogniwa nr 37
 
 **MATRYCA 207/207 LOKALNIE — zero czerwieni w sekcjach A–I i W.** Sekcja `S` (bramka stagingowa) NIE jest zielona: S3 i S5 zielone, S1/S2/S4/S6/S7 czerwone i wszystkie wymagają czynności operatora. **Warunek wyjścia 2 obejmuje sekcję S, więc łańcuch NIE jest skończony** — ale warunek 8 (wszystkie czerwienie czekają na operatora) jest od tej chwili spełniony i to on zamyka łańcuch. `I11` zamknięte na zielono w jednostce 4 tego samego przebiegu (50 = 50, zero rozjazdów inwariantu 0aa na artefakcie).
