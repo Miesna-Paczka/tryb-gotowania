@@ -1652,6 +1652,24 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     var cz = MP.tryb.czesci();
     var pxN = function (e, w) { return parseFloat(getComputedStyle(e)[w]); };
     var pr = function (e) { return e.getBoundingClientRect(); };
+    /* WĘZEŁ ZASTĘPCZY (przeb. 38, wiersz `I13`) — jeden zastępnik dla TRZECH ostatnich
+       miejsc z sita dereferencji (`M41`, `M42`, `M43`). Wzór wzięty z bloku S4
+       (przeb. 36) i z naprawy `M44` (przeb. 37): zamiast `null` idzie ODCZEPIONY `div`,
+       więc brak węzła kończy się PADNIĘCIEM asercji, a nie wyjątkiem, który zabija
+       wszystko stojące po nim. Zmierzone, nie założone: `M41` kosztował 160 asercji,
+       `M42` 143, `M43` 121 przy bazie 427 — do 37 % matrycy przestawało zabierać głos.
+       Odczepiony `div` gwarantuje FAŁSZ z trzech niezależnych powodów naraz:
+       (a) `getBoundingClientRect()` daje same zera, więc każdy pomiar wymiaru,
+           odstępu i położenia przegrywa porównanie z liczbą z Figmy;
+       (b) `getComputedStyle()` na węźle poza dokumentem nie ma z czego wziąć wartości
+           z arkusza — pola wracają puste, więc żadne `=== '600'`, `=== '16px'`
+           ani `barwa(...)` nie może trafić;
+       (c) `.click()` na węźle bez nasłuchu jest CICHYM no-opem — stan produktu się
+           nie zmienia, więc każda asercja pytająca o SKUTEK kliknięcia wychodzi fałsz.
+       Wykaz per asercja stoi przy każdym z trzech miejsc niżej. */
+    var wezelLub = function (rodzic, sel) {
+      return (rodzic && rodzic.querySelector(sel)) || document.createElement('div');
+    };
 
     /* B15 — overlay to `position: fixed` w TYM dokumencie, nie iframe */
     sprawdz('B15: overlay w tym samym dokumencie', korzen.ownerDocument === document &&
@@ -2644,7 +2662,14 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     var glowa = tt2.querySelector('.mp-tryb__tooltip-glowa');
     var pytanie = tt2.querySelector('.mp-tryb__tooltip-pytanie');
     var wyjasnienie = tt2.querySelector('.mp-tryb__tooltip-tekst');
-    var zamknijX = tt2.querySelector('.mp-tryb__tooltip-zamknij');
+    /* `I13` / `M41` — WYKAZ dla dwóch asercji `E10` mierzących geometrię `×`:
+       przy zastępniku `pr(zamknijX).width` = 0 (nie 16), `.height` = 0 (nie 19),
+       cel dotyku jest drugim zastępnikiem, więc jego `width`/`height` też = 0
+       (nie 44), a różnica środków wynosi tyle, ile środek tooltipa — czyli
+       na pewno nie < 1. Druga asercja: `pr(cel).right` = 0 nie jest większe
+       od `pr(tt2).right - 14`. Każdy człon osobno przewraca koniunkcję. */
+    var zamknijX = wezelLub(tt2, '.mp-tryb__tooltip-zamknij');
+    var zamknijCel = wezelLub(zamknijX, '.mp-tryb__cel');
     /* W43/W44/W45 — wykończenie tooltipa `7468:103138`, odczytane w przeb. 24.
        Trzy własności, o które nikt nie pytał, bo dwa komentarze w runtimie twierdziły,
        że plik ich nie podaje. Podaje: `get_metadata` i INTERAKCJE nie rozkładają
@@ -2675,16 +2700,16 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             ' · tekst ' + Math.round(pr(wyjasnienie).height));
     sprawdz('E10: `×` glif 16 px w celu dotyku 44×44, wyśrodkowanym na glifie',
             Math.round(pr(zamknijX).width) === 16 && Math.round(pr(zamknijX).height) === 19 &&
-            Math.round(pr(zamknijX.querySelector('.mp-tryb__cel')).width) === 44 &&
-            Math.round(pr(zamknijX.querySelector('.mp-tryb__cel')).height) === 44 &&
-            Math.abs((pr(zamknijX.querySelector('.mp-tryb__cel')).left +
-                      pr(zamknijX.querySelector('.mp-tryb__cel')).right) -
+            Math.round(pr(zamknijCel).width) === 44 &&
+            Math.round(pr(zamknijCel).height) === 44 &&
+            Math.abs((pr(zamknijCel).left +
+                      pr(zamknijCel).right) -
                      (pr(zamknijX).left + pr(zamknijX).right)) < 1,
-            Math.round(pr(zamknijX.querySelector('.mp-tryb__cel')).width));
+            Math.round(pr(zamknijCel).width));
     /* Cel 44 nie mieści się w pudełku o dopełnieniu 12 — musi z niego WYJŚĆ.
        Gdyby rozpychał, głowa przestałaby mieć 19 px i wysokość z E9 też by odjechała. */
     sprawdz('E10: cel 44 px wychodzi poza pudełko, nie rozpycha go (§3.14)',
-            pr(zamknijX.querySelector('.mp-tryb__cel')).right > pr(tt2).right - 14 &&
+            pr(zamknijCel).right > pr(tt2).right - 14 &&
             Math.round(pr(glowa).height) === Math.round(pr(pytanie).height) &&
             Math.round(pr(pytanie).right - pr(pytanie).left) ===
               Math.round(pr(glowa).width) - 24,
@@ -2772,7 +2797,12 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     cz.top.removeChild(atrapa);
     /* Zamknięcie `×` — I-25. Klikamy realny glif, nie API. */
     markeryW4[1].click();
-    MP.tryb.tooltip.el().querySelector('.mp-tryb__tooltip-zamknij').click();
+    /* `I13` / `M41` — WYKAZ dla `E10 / I-25` (cel mutacji): kliknięcie zastępnika
+       jest no-opem, więc tooltip ZOSTAJE. Trzy człony po kolei: `MP.tryb.tooltip.el()`
+       nie jest `null`, liczba `.mp-tryb__tooltip` w TOP-ie nie jest 0, a marker
+       ma `aria-expanded` = `true`, nie `false`. Asercja jest koniunkcją, więc
+       wychodzi FAŁSZ na każdym z nich. */
+    wezelLub(MP.tryb.tooltip.el(), '.mp-tryb__tooltip-zamknij').click();
     sprawdz('E10 / I-25: tap `×` zamyka tooltip i zdejmuje go z drzewa',
             MP.tryb.tooltip.el() === null &&
             cz.top.querySelectorAll('.mp-tryb__tooltip').length === 0 &&
@@ -2894,7 +2924,12 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
        wprost, żeby zieleń nie czytała się jako „zawsze było dobrze". */
     var dTyt = dlg.querySelector('.mp-tryb__dialog-tytul'),
         dCta = dlg.querySelector('.mp-tryb__dialog-cta'),
-        dLnk = dlg.querySelector('.mp-tryb__dialog-link');
+        /* `I13` / `M42` — WYKAZ dla `W58`: `getComputedStyle` odczepionego `div`-a
+           oddaje pola PUSTE, więc `color` nie równa się `rgb(62,43,34)`, `textAlign`
+           nie równa się `center`, `textDecorationLine` nie równa się `none`;
+           `pr(dLnk).width` = 0 nie równa się `dlg.clientWidth - 48`. Cztery człony,
+           każdy fałszywy z osobna. */
+        dLnk = wezelLub(dlg, '.mp-tryb__dialog-link');
     var sDlg = getComputedStyle(dlg), sTyt = getComputedStyle(dTyt),
         sCta = getComputedStyle(dCta), sLnk = getComputedStyle(dLnk);
     sprawdz('W55: pudełko dialogu — biel PEŁNA #FFFFFF i promień 16 (nie 12)',
@@ -2937,7 +2972,11 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             getComputedStyle(cz.scrimDialogu).zIndex);
     sprawdz('F3: „wyjdź mimo to" zamyka overlay (I-08)',
             (function () {
-              dlg.querySelector('.mp-tryb__dialog-link').click();
+              /* `I13` / `M42` — WYKAZ dla `F3` (cel mutacji): kliknięcie zastępnika
+                 nie zamyka niczego, więc overlay ZOSTAJE otwarty (`data-otwarty`
+                 nadal na korzeniu → pierwszy człon fałsz) i dialog ZOSTAJE
+                 w drzewie (`MP.tryb.dialog.el()` nie jest `null` → drugi człon fałsz). */
+              wezelLub(dlg, '.mp-tryb__dialog-link').click();
               return !korzen.hasAttribute('data-otwarty') && MP.tryb.dialog.el() === null;
             })(), korzen.hasAttribute('data-otwarty') ? 'overlay został otwarty' : 'zamknięty');
     MP.tryb.otworz(w2, { krok: 2 });
@@ -3130,7 +3169,15 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     MP.tryb.minutniki.wyczysc();
     var ban = MP.tryb.offline.pokaz();
     var banTresc = ban.querySelector('.mp-tryb__baner-tresc');
-    var banAkcja = ban.querySelector('.mp-tryb__baner-akcja');
+    /* `I13` / `M43` — WYKAZ dla asercji dotykających `banAkcja`.
+       `F10` (skład karty): `pr(banAkcja).top` = 0, więc odstęp od treści banera
+       wychodzi liczbą ujemną, nie 12; `pr(banAkcja).height` = 0, nie 20; suma
+       `32 + treść + 12 + 20` nie zgadza się z realną wysokością banera.
+       `F10` (glif i tekst akcji): `pr(banTekst).left - pr(banAkcja).left` liczy się
+       względem zera, więc daje bezwzględne `left` tekstu, nie 28.
+       `W51`: `getComputedStyle` zastępnika oddaje `alignItems` puste, nie `center`.
+       `F11` (cel mutacji) ma osobny wykaz przy samym kliknięciu, niżej. */
+    var banAkcja = wezelLub(ban, '.mp-tryb__baner-akcja');
     var banGlif = ban.querySelector('.mp-tryb__baner-glif');
     var banTekst = ban.querySelector('.mp-tryb__baner-tekst');
     sprawdz('F10: baner jest kaflem `stos` — to samo tło, promień i szerokość co pigułka',
@@ -3223,7 +3270,13 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     } catch (e) { udalo = false; }
     if (udalo) {
       MP.tryb.offline.pokaz();
-      MP.tryb.offline.el().querySelector('.mp-tryb__baner-akcja').click();
+      /* `I13` / `M43` — kontrola NEGATYWNA `F11`. Uwaga: tu zastępnik NIE przewraca
+         asercji i tak ma być. Wiersz pyta, czy przy zerwanej sieci baner ZOSTAJE;
+         no-op zostawia baner, więc asercja przechodzi. Celem `M43` jest `F11`
+         POZYTYWNE („zdejmuje baner"), które pada przez `banAkcja.click()` wyżej —
+         i to ono decyduje o werdykcie. Guard jest tu wyłącznie po to, żeby brak
+         węzła nie zabił asercji stojących PO tej linii. */
+      wezelLub(MP.tryb.offline.el(), '.mp-tryb__baner-akcja').click();
       sprawdz('F11: przy wciąż zerwanym połączeniu baner zostaje (kontrola negatywna)',
               MP.tryb.offline.el() !== null && hBottom() > 132, hBottom());
       /* kasujemy WŁASNĄ właściwość instancji — deskryptor na `Navigator.prototype`

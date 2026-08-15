@@ -3063,6 +3063,15 @@ historia, ale od teraz git w tym katalogu zachowuje się normalnie. Zostawianie
 obejścia „na wszelki wypadek" to dokładnie ta klasa zapisu, która przeżywa swoją
 przesłankę — cztery takie potknięcia były treścią tego przebiegu.
 
+### Jednostka 11 — HAND-OFF dla sesji treściowej
+
+`HANDOFF--tresc-przepisu--2026-08-15.md`. Zawiera stan zmierzony, listę pięciu
+pustych pól CMS, sposób samodzielnej weryfikacji (`MP.przepis.zaladuj()` → niepuste
+`skladniki`/`kroki`, pusta `bledy`) oraz dwie pułapki: klamry wpisane zamiast
+wstawione (rozpoznanie po długości równej nazwie placeholdera) i znaczenie
+`w-dyn-bind-empty`. **Składni celowo NIE przepisano** — stoi w
+`instrukcja-pisania-przepisow.md` §2–6 i druga kopia zestarzałaby się po cichu.
+
 ### Następny krok dla ogniwa nr 37
 
 **MATRYCA 207/207 LOKALNIE — zero czerwieni w sekcjach A–I i W.** Sekcja `S` (bramka stagingowa) NIE jest zielona: S3 i S5 zielone, S1/S2/S4/S6/S7 czerwone i wszystkie wymagają czynności operatora. **Warunek wyjścia 2 obejmuje sekcję S, więc łańcuch NIE jest skończony** — ale warunek 8 (wszystkie czerwienie czekają na operatora) jest od tej chwili spełniony i to on zamyka łańcuch. `I11` zamknięte na zielono w jednostce 4 tego samego przebiegu (50 = 50, zero rozjazdów inwariantu 0aa na artefakcie).
