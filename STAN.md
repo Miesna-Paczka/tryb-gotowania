@@ -56,8 +56,21 @@ Zakończenie v1.0 = `7195:11178`, BEZ mechaniki −70 zł. Dwa stany wiersza, ni
   na stagingu — pętla biegnie w całości lokalnie (patrz „Powierzchnia pomiaru").
   Integracja na stagingu = osobna faza wspólna, po zieleni obu łańcuchów,
   planowana przez operatora. Decyzja operatora 2026-08-12.
-- **Kanon do v1.0 = ten katalog.** Repo GitHub `lukaszwerecik/tryb-gotowania`
-  pozostaje puste do ukończenia v1.0; push + tag `v1.0.0` wykonuje operator po
+- **PIN ZDJĘTY 2026-08-15: repo NIE jest już puste.** Pierwszy commit `c1f99ae`
+  wypchnięty przez łańcuch na `main` (25 plików, 24 575 linii) — autoryzacja
+  operatora, deploy key z prawem zapisu zakresowany do tego jednego repo.
+  Kanonem jest od teraz GitHub; katalog lokalny jest kopią roboczą.
+  **Git w tym katalogu: `add`/`commit`/`push` wolno, `tag`/`reset --hard`/`force`
+  nadal wyłącznie operator** (`CLAUDE.md`, wersja z 2026-08-15).
+
+  **TAG `v1.0.0` DOPIERO PO ZAMKNIĘCIU MATRYCY** — potwierdzone przez operatora
+  2026-08-15. Nie ma tagów pośrednich. Uzasadnienie jest tej samej klasy co reguła
+  „zielony z lektury kodu nie jest zielony": wersja oznaczona na niezamkniętej
+  matrycy twierdzi o sobie coś, czego własny przyrząd pomiarowy nie potwierdza.
+  `main` może się w międzyczasie ruszać dowolnie — tag jest oświadczeniem, commit
+  nie jest. Warunek techniczny
+  sprawdzony i spełniony: `rm` działa, git posprzątał własne `.lock` [V].
+  Poprzedni zapis pinu: repo pozostaje puste do ukończenia v1.0; push + tag `v1.0.0` wykonuje operator po
   zielonej matrycy integracyjnej. Do testu integracyjnego przed pushem runtime
   wchodzi przez embed Webflow (limit 50 000 znaków — 22 KB mieści się), nie przez
   jsDelivr. Na produkcję wyłącznie z taga, nigdy `@main`.
