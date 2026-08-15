@@ -1605,6 +1605,13 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     var wezelLub = function (rodzic, sel) {
       return (rodzic && rodzic.querySelector(sel)) || document.createElement('div');
     };
+    /* Wariant dla węzła JUŻ POBRANEGO (element kolekcji, wynik indeksowania).
+       Ta sama zasada co przy `wezelLub`: brak węzła ma dawać PADNIĘCIE asercji,
+       nie wyjątek urywający blok. Dołożone 2026-08-15 po tym, jak przebudowa
+       bloku składników na rozwijany usunęła `.mp-tryb__lista` i urwała ramkę
+       187 asercji przed końcem — czyli `I13` dokładnie tam, gdzie sito nie
+       sięgało, bo sito zna tylko wzorzec `X.querySelector(...)`. */
+    var elLubZ = function (e) { return e || document.createElement('div'); };
 
     /* B15 — overlay to `position: fixed` w TYM dokumencie, nie iframe */
     sprawdz('B15: overlay w tym samym dokumencie', korzen.ownerDocument === document &&
@@ -2436,9 +2443,9 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
        ile sekcji, ile wierszy, jaki rytm, gdzie linia. Barw i wag nie sprawdzał nikt.
        Wszystkie trzy własności niżej były w runtimie niezgodne z plikiem przed
        poprawką z tego przebiegu; asercje powstały po niej i dlatego są zielone. */
-    var listaP = cz.top.querySelector('.mp-tryb__lista');
-    var sLis = getComputedStyle(listaP), sNag = getComputedStyle(naglowki[1]),
-        sLin = getComputedStyle(linie[0]);
+    var listaP = wezelLub(cz.top, '.mp-tryb__lista');
+    var sLis = getComputedStyle(listaP), sNag = getComputedStyle(elLubZ(naglowki[1])),
+        sLin = getComputedStyle(elLubZ(linie[0]));
     sprawdz('W59: ramka listy pełnej — OBRYS 1 px `beige-2`, bez wypełnienia, lico 16',
             String(sLis.backgroundColor).replace(/\s+/g, '') === 'rgba(0,0,0,0)' &&
             Math.abs(parseFloat(sLis.borderTopWidth) - 1) < 0.3 &&
@@ -4560,14 +4567,18 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
       /* Dolna granica 8 px zamiast `> 0`: glif ma szerokość rzędu stopnia pisma,
          a 0 px znaczy „element nie jest renderowany", nie „ikona jest wąska". */
       sprawdz('I4: ligatury runtime\'u renderują się jako JEDEN glif (kontrola ujemna: nazwa spoza subsetu = słowo)',
-              szerLig.length === 3 && szerLig.every(function (w) { return w >= 8 && w <= 24; }) &&
+              /* 5, nie 3, od 2026-08-15: `arrow_back` i `arrow_forward` przestały być
+                 substytutami Unicode i weszły do zbioru. Liczba jest tu ASERCJĄ, a nie
+                 wygodą — gdyby stało `szerLig.length > 0`, dopisanie ligatury bez subsetu
+                 przeszłoby bez słowa. */
+              szerLig.length === 5 && szerLig.every(function (w) { return w >= 8 && w <= 24; }) &&
               szerNieistniejacej > 100,
               'glify ' + szerLig.join('/') + ' px · nieistniejąca ' + szerNieistniejacej + ' px');
     };
     sprawdz('B16: brak glifu = zgłoszenie, NIE własny zastępnik (`|| \'·\'` zdjęte)',
             typeof MP.tryb.ostrzezenia === 'function' &&
             trescArkusza.indexOf('·') < 0 &&
-            MP.tryb.zbiorLigatur().join(',') === 'hourglass,local_dining,leaderboard',
+            MP.tryb.zbiorLigatur().join(',') === 'hourglass,local_dining,leaderboard,arrow_back,arrow_forward',
             'zbiór ' + MP.tryb.zbiorLigatur().join(',') +
             ' · ostrzeżeń ' + (MP.tryb.ostrzezenia ? MP.tryb.ostrzezenia().length : 'brak API'));
 

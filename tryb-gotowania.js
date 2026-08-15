@@ -54,7 +54,8 @@
      kropkę i wyglądała jak ikona, której nie ma. Teraz nieznana nazwa idzie
      do `ostrzezenie()` i renderuje się PUSTO — bo słowo w miejscu ikony widać
      natychmiast, a kropka udaje sukces. */
-  var LIGATURY = ['hourglass', 'local_dining', 'leaderboard'];
+  var LIGATURY = ['hourglass', 'local_dining', 'leaderboard',
+                'arrow_back', 'arrow_forward'];
 
   /* Font ikon — trzy wagi subsetu, hosting **Webflow** (D-15.1, rozstrzygnięte
      pomiarem w przeb. 31: `FontFace.load()` z obcego originu przechodzi, więc CORS
@@ -254,7 +255,26 @@
        dolny NIE MIAŁ TŁA — treść przewijała się pod nim i było to widać gołym
        okiem przy 113 zielonych wierszach. Biel PEŁNA, nie złamana: patrz nota
        przy `--mp-bialy-pelny`. */
+    /* SAFE AREA (poprawka 2026-08-15, zgłoszenie operatora). Wzorzec wzięty z ŻYWEJ
+       produkcji, nie wymyślony: `.mp-mnav__bar` na `miesnapaczka.pl` robi
+       `padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px))` [V, odczytane
+       z arkusza 2026-08-15]. Trzy rzeczy z tego wzorca są istotne i wszystkie trzy
+       przenoszę:
+       (a) inset idzie w DOPEŁNIENIE, nie w offset `bottom` — dzięki temu tło i cień
+           pasa dochodzą do fizycznej krawędzi ekranu, a treść nie wchodzi pod wskaźnik;
+       (b) `env(...)` ZAWSZE z fallbackiem `0px` — bez drugiego argumentu cała funkcja
+           jest nieznana starszym silnikom i unieważnia całą deklarację;
+       (c) BOTTOM nie dostaje przez to zadanej wysokości — reguła składania
+           (INTERAKCJE §4.1) zostaje nietknięta, bo `przeliczBottom()` mierzy
+           `getBoundingClientRect().height`, czyli razem z dopełnieniem. Publikowane
+           `--mp-bottom-h` rośnie samo, a TOP czyta je jako `padding-bottom`, więc
+           zapas pod wskaźnikiem dostaje też PRZEWIJANA treść, nie tylko pasek.
+       Czego NIE robię i dlaczego: `safe-area-inset-top` ani insetów bocznych nie
+       dokładam, bo produkcja ich nie ma (w całym arkuszu są DOKŁADNIE trzy reguły
+       z `env()`, wszystkie dolne). Symetria z produkcją jest tu ważniejsza niż moja
+       intuicja o notchu; jeśli belka ma dostać zapas u góry, to jest decyzja, nie fix. */
     '#' + ID + ' .mp-tryb__bottom{position:absolute;left:0;right:0;bottom:0;' +
+      'padding-bottom:env(safe-area-inset-bottom,0px);' +
       'background:var(--mp-bialy-pelny);' +
       'box-shadow:0 -1px 2px 0 rgba(62,43,34,.05),0 -4px 8px -2px rgba(62,43,34,.10)}' +
     /* W02 (przeb. 21): kreska 1 px `secondary-text (h1)` #487622 nad pasem dolnym.
@@ -516,6 +536,30 @@
        z DWÓCH narysowanych napisów; blok stał nago na tle strony, więc jego brak
        nie miał czym paść — dokładnie ta sama klasa braku co pas dolny (W01/W02). */
     '#' + ID + ' .mp-tryb__blok-skladnikow{display:flex;flex-direction:column;gap:8px}' +
+    /* ROZWIJANIE W MIEJSCU (poprawka 2026-08-15, decyzja operatora — zmienia §3.8).
+       Do tej poprawki „zobacz pozostałe" PODMIENIAŁO całą treść TOP-u na osobny
+       ekran listy. Stąd brały się DWA zgłoszone objawy naraz i oba były jednym
+       zachowaniem: rozwinięcie „skakało", bo nie było czego animować przy podmianie
+       dokumentu, a akapit kroku „znikał", bo ekran listy z założenia go nie miał.
+       Teraz pozostałe sekcje są RODZEŃSTWEM listy „w tym kroku" w tej samej ramce,
+       a `height` jest animowalne, bo idzie przez piksele, nie przez `auto`.
+       `overflow:hidden` jest warunkiem koniecznym, nie ozdobą: bez niego zwinięty
+       kontener o wysokości 0 dalej rysowałby treść poza swoim pudełkiem. */
+    '#' + ID + ' .mp-tryb__reszta{overflow:hidden;height:0;display:flex;' +
+      'flex-direction:column;gap:8px}' +
+    '#' + ID + ' .mp-tryb__reszta[data-otwarta]{height:auto}' +
+    /* `flex:0 0 auto` na DZIECIACH — bez tego akordeon nie otwiera się w ogóle
+       i objaw jest mylący. Kontener jest kolumną flex, więc przy `height:0`
+       domyślne `flex-shrink:1` ściska każde dziecko do zera; `scrollHeight`
+       liczy wtedy zawartość ŚCIŚNIĘTĄ i zwraca 0, czyli wysokość docelowa
+       animacji wychodzi zerowa. Zmierzone: etykieta i `aria-expanded`
+       przełączały się poprawnie, a wysokość zostawała 0 po 500 ms. */
+    '#' + ID + ' .mp-tryb__reszta>*{flex:0 0 auto}' +
+    /* Animacja WYŁĄCZNIE przy `no-preference`. Nie jest to uprzejmość: przy
+       `reduce` brak przejścia znaczy, że `transitionend` NIGDY nie przyjdzie,
+       więc kod niżej musi mieć osobną ścieżkę — i ma. */
+    '@media (prefers-reduced-motion:no-preference){#' + ID + ' .mp-tryb__reszta{' +
+      'transition:height 220ms cubic-bezier(.4,0,.2,1)}}' +
     '#' + ID + ' .mp-tryb__naglowek-skladnikow,#' + ID + ' .mp-tryb__etykieta-sekcji{' +
       'margin:0;height:16px;font-size:14px;line-height:16px;font-weight:500;' +
       'color:var(--mp-atrament)}' +
@@ -612,7 +656,6 @@
     '#' + ID + ' .mp-tryb__marker .mp-tryb__cel{left:0;right:0;top:50%;' +
       'width:auto;height:24px;transform:translateY(-50%);border-radius:0}' +
     '#' + ID + ' .mp-tryb__ptaszek{z-index:1}' +
-    '#' + ID + ' .mp-tryb__kryterium{margin:0;font-size:14px;line-height:20px;color:var(--mp-beige-3)}' +
 
     /* Wywoływacz pełnej listy w liście skróconej (§3.2): linia 1 px, rytm 12 px
        po obu jej stronach, wiersz 22 px = tekst 19 + glif 16×22.
@@ -1015,7 +1058,16 @@
     var wstecz = el('button', 'mp-tryb__wstecz', nawigacja);
     wstecz.type = 'button';
     wstecz.setAttribute('aria-label', 'poprzedni krok');
-    wstecz.textContent = '←';
+    /* IKONA, NIE ZNAK (poprawka 2026-08-15, zgłoszenie operatora: „strzałka zdecydowanie
+       za wielka"). Było `'←'` (U+2190) renderowane krojem tekstowym: jego pudełko nie ma
+       nic wspólnego z siatką ikony, więc przy `font-size:24px` wychodziło za duże i innej
+       wagi niż reszta interfejsu. Teraz PRAWDZIWA ligatura subsetu — `arrow_back` jest
+       w subsecie v4 (zweryfikowane sondą szerokości na foncie z CDN Webflow: 20,0 px
+       przy kontroli ujemnej 445,6 px). Nazwa dopisana do `LIGATURY`, żeby `I4` dalej
+       pytało o PEŁNY zbiór ligatur używanych przez runtime, a nie o trzy z pięciu. */
+    wstecz.className += ' mp-ikona';
+    wstecz.textContent = 'arrow_back';
+    wstecz.setAttribute('data-mp-ligatura', 'arrow_back');
     var dalej = el('button', 'mp-tryb__dalej', nawigacja);
     dalej.type = 'button';
     /* W07/W08: etykieta i glif to DWA węzły, bo `justify-content:space-between`
@@ -1026,7 +1078,12 @@
     var dalejEtykieta = el('span', 'mp-tryb__dalej-etykieta', dalej);
     dalejEtykieta.textContent = 'dalej';
     var dalejGlif = el('span', 'mp-tryb__dalej-glif', dalej);
-    dalejGlif.textContent = '→';
+    /* W07 zapowiadał tę migrację wprost: „brzmienie glifu to substytut Unicode `→`,
+       migracja na ligaturę subsetu należy do B16, nie tutaj". B16 jest zielone od przeb. 32,
+       więc zapowiedź jest wykonana. */
+    dalejGlif.className += ' mp-ikona';
+    dalejGlif.textContent = 'arrow_forward';
+    dalejGlif.setAttribute('data-mp-ligatura', 'arrow_forward');
     dalejGlif.setAttribute('aria-hidden', 'true');
 
     /* Scrim dialogów PO `bottom` w drzewie — F6: BOTTOM zostaje, tylko pod nim. */
@@ -1254,7 +1311,10 @@
     return uruchomMinutnik({
       nazwa: opcje.nazwa || krok.minutnik.nazwa,
       sekundy: krok.minutnik.sekundy,
-      podpowiedz: opcje.podpowiedz || null,
+      /* `krok.kryterium`, nie `kryteriumHtml`: pole idzie przez `textContent`,
+         więc znacznik i tak nie zostałby zrenderowany, a wpuszczanie HTML-a
+         w miejsce, które go nie potrzebuje, jest niepotrzebną powierzchnią. */
+      podpowiedz: opcje.podpowiedz || krok.kryterium || null,
       rozwinieta: !!opcje.rozwinieta
     });
   }
@@ -1684,18 +1744,43 @@
       /* D5: lista skrócona pokazuje WYŁĄCZNIE „w tym kroku"; reszta jest o jeden tap
          dalej. NIENARYSOWANE (G7) / D7: cel prowadzi do listy PEŁNEJ (wszystkie trzy sekcje) —
          zmieniamy etykietę, nie cel, więc tekst jest tu placeholderem. */
-      var wiecej = el('button', 'mp-tryb__wiecej', ramka);
-      wiecej.type = 'button';
-      el('span', 'mp-tryb__wiecej-tekst', wiecej).textContent = 'zobacz pozostałe';
-      var glif = el('span', 'mp-tryb__wiecej-glif', wiecej);
-      glif.textContent = '⌄';                  // NIENARYSOWANE (G5) / I-15: `down` = rozwiń
-      glif.setAttribute('aria-hidden', 'true');
-      wiecej.addEventListener('click', function () { przelaczListe(); });
+      /* Pozostałe sekcje wchodzą TU, jako rodzeństwo listy „w tym kroku", a nie na
+         osobny ekran. `data-mp-lista-pelna` zostaje na kontenerze, bo to po nim
+         pomiar rozpoznaje pełną listę — przeniosłem atrybut razem z treścią,
+         zamiast go gubić i zakładać nowy. */
+      var reszta = el('div', 'mp-tryb__reszta', ramka);
+      reszta.setAttribute('data-mp-lista-pelna', '');
+      var maReszte = sekcjePozostale(krok, reszta);
+      stan.czesci.reszta = maReszte ? reszta : null;
+
+      /* Przycisk istnieje tylko wtedy, gdy JEST co rozwijać. Wcześniej stał zawsze
+         i prowadził na ekran listy nawet wtedy, gdy poza „w tym kroku" nie było
+         ani jednej pozycji — czyli obiecywał treść, której nie ma. */
+      if (maReszte) {
+        var wiecej = el('button', 'mp-tryb__wiecej', ramka);
+        wiecej.type = 'button';
+        wiecej.setAttribute('aria-expanded', stan.listaOtwarta ? 'true' : 'false');
+        el('span', 'mp-tryb__wiecej-tekst', wiecej).textContent =
+          stan.listaOtwarta ? 'zwiń' : 'zobacz pozostałe';
+        var glif = el('span', 'mp-tryb__wiecej-glif', wiecej);
+        // NIENARYSOWANE (G5) / I-15 `down` = rozwiń · I-16 `up` = zwiń — dwa glify, nie obrót
+        glif.textContent = stan.listaOtwarta ? '⌃' : '⌄';
+        glif.setAttribute('aria-hidden', 'true');
+        stan.czesci.wiecej = wiecej;
+        wiecej.addEventListener('click', function () { przelaczListe(); });
+        /* Render świeżego kroku przy otwartej liście NIE animuje: animacja ma
+           komunikować akcję użytkownika, a nie stan zastany po zmianie kroku. */
+        if (stan.listaOtwarta) reszta.setAttribute('data-otwarta', '');
+      } else {
+        stan.czesci.wiecej = null;
+      }
     }
-    if (krok.kryteriumHtml) {
-      var kr = el('p', 'mp-tryb__kryterium', top);
-      kr.innerHTML = krok.kryteriumHtml;
-    }
+    /* KRYTERIUM GOTOWOŚCI NIE JEST TREŚCIĄ KROKU (decyzja operatora 2026-08-15).
+       Do tego przebiegu render był ZDUBLOWANY: ten akapit plus pole `podpowiedz`
+       na pigułce minutnika. Rysunek stawia je wyłącznie na WIDGECIE WŁĄCZONEGO
+       minutnika, więc akapit znika, a `uruchomZKroku()` bierze `krok.kryterium`
+       jako domyślną podpowiedź. Skutek uboczny wymieniony wprost: krok BEZ minutnika
+       traci kryterium całkowicie — to jest wybór operatora, nie przeoczenie. */
     top.scrollTop = 0;
   }
 
@@ -1703,52 +1788,93 @@
      kanoniczna ma w TOP wyłącznie wiersz nagłówka i listę. Dzięki temu przewijanie
      listy (D10) jest tym samym przewijaniem, co przewijanie kroku — natywnym,
      bez własnego toru. */
-  function rysujListe(krok) {
-    var top = stan.czesci.top;
-    top.textContent = '';
+  /* Sekcje „dalej" i „zużyte" — wydzielone z usuniętego `rysujListe()`, bo to
+     jedyna część tamtej funkcji, która niosła treść; reszta budowała OSOBNY EKRAN
+     i to ten ekran był usterką. Zwraca, czy cokolwiek dorysowała: przycisk
+     „zobacz pozostałe" ma nie istnieć, gdy nie ma czego pokazać.
 
-    var czas = el('span', 'mp-tryb__czas', top);
-    czas.textContent = krok.badge;
-    czas.setAttribute('data-stan',
-      krok.minutnik ? 'minutnik' : (krok.czas === 'bez minutnika' ? 'bez' : 'czas'));
-
-    var lista = el('div', 'mp-tryb__lista', top);
-    lista.setAttribute('data-mp-lista-pelna', '');
-
-    /* D2: przynależność do sekcji niesie NAGŁÓWEK + LINIA + KOLEJNOŚĆ, nie styl
-       wiersza. Dlatego sekcje różnią się tu tylko obudową, a `dalej` ma dokładnie
-       ten sam wygląd wiersza co `teraz` (D1 — dwa stany, nie trzy). */
+     D2 bez zmian: przynależność do sekcji niesie NAGŁÓWEK + LINIA + KOLEJNOŚĆ,
+     nie styl wiersza — `dalej` ma dokładnie ten sam wygląd wiersza co `teraz`
+     (D1 — dwa stany, nie trzy). Linia rozdzielająca stoi teraz PRZED każdą sekcją,
+     bo pierwsza sekcja kontenera i tak ma nad sobą listę „w tym kroku". */
+  function sekcjePozostale(krok, rodzic) {
     var sekcje = [
-      ['w tym kroku', krok.skladnikiTeraz || [], 'teraz'],
       ['dalej', krok.skladnikiDalej || [], 'dalej'],
       ['zużyte', krok.skladnikiZuzyte || [], 'zuzyty']
     ];
-    var pierwsza = true;
+    var dorysowane = 0;
     sekcje.forEach(function (sek) {
       if (!sek[1].length) return;
-      if (!pierwsza) el('div', 'mp-tryb__linia', lista);
-      pierwsza = false;
-      var h = el('p', 'mp-tryb__naglowek-sekcji', lista);
+      el('div', 'mp-tryb__linia', rodzic);
+      var h = el('p', 'mp-tryb__naglowek-sekcji', rodzic);
       h.textContent = sek[0];
-      var ul = el('ul', 'mp-tryb__skladniki', lista);
+      var ul = el('ul', 'mp-tryb__skladniki', rodzic);
       sek[1].forEach(function (s) { ul.appendChild(wierszSkladnika(s, krok, sek[2])); });
+      dorysowane++;
     });
-
-    // NIENARYSOWANE (G5) / D9: zamknięcie tym samym celem dotyku co otwarcie; glif obraca się
-    var wiecej = el('button', 'mp-tryb__wiecej', lista);
-    wiecej.type = 'button';
-    el('span', 'mp-tryb__wiecej-tekst', wiecej).textContent = 'zobacz pozostałe';
-    var glif = el('span', 'mp-tryb__wiecej-glif', wiecej);
-    glif.textContent = '⌃';                    // NIENARYSOWANE (G5) / I-16: `up` = zwiń
-    glif.setAttribute('aria-hidden', 'true');
-    wiecej.addEventListener('click', function () { przelaczListe(); });
-
-    top.scrollTop = 0;
+    return dorysowane > 0;
   }
 
   function przelaczListe(wartosc) {
-    stan.listaOtwarta = wartosc == null ? !stan.listaOtwarta : !!wartosc;
-    pokazKrok(stan.krok);
+    var nowa = wartosc == null ? !stan.listaOtwarta : !!wartosc;
+    var r = stan.czesci.reszta;
+    /* Uchwyt musi być ŻYWY, nie tylko niepusty. `rysujKrok` czyści TOP przez
+       `textContent = ''`, a ekrany bez nawigacji budują treść od zera — po każdym
+       z tych przejść `stan.czesci.reszta` wskazuje na węzeł-sierotę, który jest
+       prawdziwy w sensie JS i niewidoczny w sensie układu. Animowanie sieroty
+       kończy się ciszą: `transitionend` nie przychodzi, bo węzeł nie jest rysowany.
+       To ta sama klasa pomyłki co uchwyt tooltipa w `pokazKrok`. */
+    if (r && !(stan.czesci.top && stan.czesci.top.contains(r))) {
+      r = stan.czesci.reszta = null;
+      stan.czesci.wiecej = null;
+    }
+    stan.listaOtwarta = nowa;
+    /* Brak kontenera = jesteśmy poza ekranem kroku albo krok nie ma pozostałych
+       sekcji. Wtedy jedyne, co da się zrobić sensownie, to przerysować ekran —
+       i to jest ta sama ścieżka, którą szła cała funkcja przed poprawką. */
+    if (!r) { pokazKrok(stan.krok); return stan.listaOtwarta; }
+
+    if (stan.czesci.wiecej) {
+      stan.czesci.wiecej.setAttribute('aria-expanded', nowa ? 'true' : 'false');
+      var tekst = stan.czesci.wiecej.querySelector('.mp-tryb__wiecej-tekst');
+      var gl = stan.czesci.wiecej.querySelector('.mp-tryb__wiecej-glif');
+      if (tekst) tekst.textContent = nowa ? 'zwiń' : 'zobacz pozostałe';
+      if (gl) gl.textContent = nowa ? '⌃' : '⌄';
+    }
+
+    /* Animujemy PIKSELE, nie `auto`. Kolejność jest wiążąca: najpierw zapisujemy
+       wysokość bieżącą, potem przełączamy atrybut, potem wymuszamy przeliczenie
+       układu, i dopiero wtedy podajemy wysokość docelową. Bez wymuszenia
+       przeglądarka skleja obie zmiany w jedną klatkę i przejście nie powstaje —
+       czyli wracamy dokładnie do skoku, który ta poprawka usuwa. */
+    var start = r.getBoundingClientRect().height;
+    r.style.height = start + 'px';
+    if (nowa) r.setAttribute('data-otwarta', ''); else r.removeAttribute('data-otwarta');
+    var cel = nowa ? r.scrollHeight : 0;
+    void r.offsetHeight;                       // wymuszone przeliczenie układu
+
+    var trwanie = 0;
+    try {
+      trwanie = parseFloat(getComputedStyle(r).transitionDuration) || 0;
+    } catch (e) { trwanie = 0; }
+
+    /* `prefers-reduced-motion: reduce` — przejścia nie ma, więc `transitionend`
+       nigdy nie przyjdzie i czekanie na nie zostawiłoby kontener na sztywnej
+       wysokości w pikselach. Kończymy od razu. */
+    if (trwanie === 0) { r.style.height = nowa ? '' : '0px'; return stan.listaOtwarta; }
+
+    r.style.height = cel + 'px';
+    if (r._mpKoniec) r.removeEventListener('transitionend', r._mpKoniec);
+    r._mpKoniec = function (e) {
+      if (e.target !== r || e.propertyName !== 'height') return;
+      r.removeEventListener('transitionend', r._mpKoniec);
+      r._mpKoniec = null;
+      /* Po otwarciu oddajemy wysokość CSS-owi (`[data-otwarta]{height:auto}`):
+         zostawiona wartość w pikselach zamroziłaby kontener i pozycja
+         zaznaczona po rozwinięciu przestałaby zmieniać jego rozmiar. */
+      if (r.hasAttribute('data-otwarta')) r.style.height = '';
+    };
+    r.addEventListener('transitionend', r._mpKoniec);
     return stan.listaOtwarta;
   }
 
@@ -2033,7 +2159,10 @@
     zamknijTooltip();
     var krok = stan.widok.kroki[n - 1];
     stan.czesci.etykieta.textContent = 'krok ' + n + ' z ' + N;
-    if (stan.listaOtwarta) rysujListe(krok); else rysujKrok(krok);
+    /* Jeden renderer, nie dwa. `stan.listaOtwarta` jest teraz stanem ROZWINIĘCIA
+       bloku składników, a nie wyborem ekranu — ekran listy zniknął razem
+       z `rysujListe()`. */
+    rysujKrok(krok);
     przeliczBottom();
     ustawPostep(n, N);
     stan.czesci.wstecz.disabled = n === 1;
@@ -2063,8 +2192,19 @@
     if (poprzedniOverflow === null) poprzedniOverflow = document.documentElement.style.overflow;
     document.documentElement.style.overflow = 'hidden';
     stan.korzen.setAttribute('data-otwarty', '');
+    /* WEJŚCIEM DOMYŚLNYM JEST EKRAN STARTOWY (poprawka 2026-08-15, zgłoszenie operatora).
+       Do tej poprawki `else` szedł prosto w `pokazKrok(opcje.krok || 1)`, więc `ekranStart()`
+       był osiągalny WYŁĄCZNIE przez jawne `{ekran:'start'}` — a żaden wywołujący go nie podawał.
+       Skutek: „ugotuj" wrzucało użytkownika w środek przepisu, bez zdjęcia, makro, czasu
+       i selektora porcji. Reguła jest teraz trójdzielna i wyczerpuje przestrzeń opcji:
+         `{ekran:X}`  → ten ekran (nadrzędne, bo najbardziej jawne),
+         `{krok:N}`   → wznowienie / link do kroku, świadome ominięcie startu,
+         brak obu     → EKRAN STARTOWY.
+       Uwaga dla wywołującego: `{krok:1}` NIE jest tym samym co brak opcji i dalej omija
+       start — embed wiążący przycisk musi przestać je podawać, żeby poprawka była widoczna. */
     if (opcje.ekran) { stan.krok = opcje.krok || stan.krok; pokazEkran(opcje.ekran); }
-    else pokazKrok(opcje.krok || 1);
+    else if (opcje.krok) pokazKrok(opcje.krok);
+    else pokazEkran('start');
     /* NIENARYSOWANE (G11) / F4 / I-09: wpis historii dokładamy PO zbudowaniu widoku. Gdyby szedł przed,
        a budowa rzuciła, w historii zostałby wpis bez overlaya do zamknięcia. */
     wejdzDoHistorii();

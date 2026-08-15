@@ -1,6 +1,15 @@
 # STAN — łańcuch: embed trybu gotowania
 
-licznik przebiegów: 37/**40**
+licznik przebiegów: 38/**40**
+
+> **ŁAŃCUCH ZAMKNIĘTY 2026-08-15 w przebiegu 38, warunkiem wyjścia 8** (każda pozostała
+> czerwień wstrzymana czynnością albo decyzją operatora). Pętla lokalna: **209 🟢 / 0 🔴 / 5 ⏸**.
+> Sekcja `S`: 3 🟢, 4 🔴 — wszystkie cztery u operatora. Zadanie harmonogramu wyłączone.
+> Raport decyzji: rozdział „RAPORT DECYZJI" w sekcji PRZEBIEG 38.
+>
+> **PO ZAMKNIĘCIU była SESJA INTERAKTYWNA (2026-08-15): sześć poprawek operatora w produkcie,
+> MATRYCA nieprzebazowana i URWANA na 245/427.** Rozdział „SESJA INTERAKTYWNA" niżej.
+> Nie czytaj MATRYCY jako opisu stanu, dopóki nie zostanie przebazowana.
 
 **LIMIT PODNIESIONY 30 → 40, decyzja operatora 2026-08-15, 16:05.
 KONFLIKT ZAMKNIĘTY o 16:20 — prompt harmonogramu też mówi 40** (zweryfikowane
@@ -2270,6 +2279,372 @@ i pomiaru — nawigacja, klikanie, asercje `getComputedStyle`, konsola, GIF dzia
 stronie zdalnej tak samo jak na `localhost`. Brakuje trzech rzeczy, i wszystkie trzy
 są po Twojej stronie: zgody w promptcie, embeda na stagingu i widocznego okna.
 
+
+## SESJA INTERAKTYWNA (2026-08-15, po przeb. 38) — SZEŚĆ POPRAWEK OPERATORA. Produkt zmieniony, MATRYCA NIEPRZEBAZOWANA i urwana na 245/427
+
+**To nie jest przebieg łańcucha.** Łańcuch zamknął się warunkiem 8 i zadanie jest wyłączone.
+Operator załadował embed, zgłosił sześć usterek i pracowaliśmy nad nimi interaktywnie.
+Zapis istnieje po to, żeby następna sesja nie zaczynała od archeologii.
+
+**Git NIE URUCHAMIANY.** `rm` działa, przeszkody technicznej nie ma, ale zakaz z sekcji
+„Poza pętlą" promptu harmonogramu nie został zdjęty przez operatora, a ja go sam nie zdejmuję.
+**Zaległość obejmuje przebiegi 30–38 ORAZ całą tę sesję.**
+
+### Co zgłosił operator (sześć pozycji) i co z każdą zrobiono
+
+| # | zgłoszenie | rozstrzygnięcie |
+|---|---|---|
+| 1 | dopisek-wskazówka pod listą składników w kroku — w projekcie jest tylko na minutnikach | **ZROBIONE.** Akapit `.mp-tryb__kryterium` usunięty z `rysujKrok`; `uruchomZKroku()` bierze `krok.kryterium` jako domyślną `podpowiedz`. Skutek uboczny wymieniony wprost: krok BEZ minutnika traci kryterium całkowicie — wybór operatora |
+| 2 | brak safe-area na pasie dolnym | **ZROBIONE.** `padding-bottom:env(safe-area-inset-bottom,0px)` na `.mp-tryb__bottom`, wzorzec odczytany z ŻYWEJ produkcji [V] |
+| 3 | ikona „wstecz" za duża, „to nie ta ikona" | **CZĘŚCIOWO.** `←`→`arrow_back`, `→`→`arrow_forward`, `LIGATURY` 3→5. **Zostaje DZIEWIĘĆ substytutów Unicode** |
+| 4 | rozwijanie „zobacz pozostałe" skokowe zamiast animowanego | **ZROBIONE, NIEZWERYFIKOWANE WZROKOWO** — patrz „animacja" niżej |
+| 5 | brak przewijania; akapit znika po rozwinięciu | **ZROBIONE.** Ten sam defekt co 4 |
+| 6 | brak ekranu startowego po „ugotuj" | **ZROBIONE PO STRONIE RUNTIME'U.** Jedna zmiana została u operatora — patrz niżej |
+
+### Pozycja 6 — przyczyna była w runtimie, nie w embedzie, i hipoteza pośrednia była BŁĘDNA
+
+`otworz()` miał dwie gałęzie: `{ekran:X}` albo `pokazKrok(opcje.krok || 1)`. **Ekran startowy
+nie był wejściem domyślnym, tylko opcją, której żaden wywołujący nie podawał.** Reguła jest
+teraz trójdzielna: `{ekran}` → ten ekran, `{krok}` → wznowienie, brak obu → **start**.
+Zmierzone: zdjęcie, pasek `30 min · 417 kcal · B39 W26 T16`, „4 porcje", „zacznij gotować",
+`czesci()` wraca do 23 kluczy.
+
+**DO ZROBIENIA PRZEZ OPERATORA:** embed wiążący przycisk woła `MP.tryb.otworz(przepis, {krok: 1})`
+— zmierzone zaczepem na `otworz` na stagingu [V]. Dopóki podaje `{krok:1}`, poprawka będzie
+niewidoczna. Ma wołać `otworz(przepis)` bez opcji.
+
+**Obalona hipoteza `[I]` z przeb. 38:** rozjazd `czesci()` 16 vs 23 na stagingu tłumaczyłem
+pustym CMS-em. Nieprawda — to był nierenderowany ekran startowy. Zapisuję, bo to drugi raz
+w tym łańcuchu, gdy wniosek z niepełnego sprawdzenia trafił do dokumentu jako ustalenie.
+
+### Pozycja 3 — skala jest większa, niż wyglądała
+
+`←` był znakiem U+2190 renderowanym DM Sansem: jego pudełko nie ma nic wspólnego z siatką
+ikony, stąd „za wielka". **Zostaje DZIEWIĘĆ substytutów**: `×` (zamknij, 2 miejsca),
+`⌃`/`⌄` (szewrony, 3 miejsca), `✓` (ptaszek), `↻` (odśwież), `−`/`+` (porcje).
+Subset v4 ma na nie komplet ligatur — zweryfikowane sondą szerokości NA FONCIE Z CDN WEBFLOW:
+dwanaście nazw po 20,0 px przy kontroli ujemnej 445,6 px [V].
+**Nie migrowałem ich, bo rozmiary docelowe każdej ikony są w Figmie, a MCP Figmy wymaga OAuth,
+którego sesja nie przeprowadzi.** `wstecz` dostał 24 px z istniejącego CSS-u, `dalej` ma 20 px
+z W07 — ta asymetria może być zamierzona albo nie i nie mam jak tego rozstrzygnąć.
+
+### Pozycje 4 i 5 — jedna przyczyna, `rysujListe()` USUNIĘTE
+
+Oba objawy były jednym zachowaniem: „zobacz pozostałe" PODMIENIAŁO całą treść TOP-u na osobny
+ekran listy (§3.8). Rozwinięcie „skakało", bo przy podmianie dokumentu nie ma czego animować;
+akapit „znikał", bo ekran listy z założenia go nie miał.
+
+Teraz sekcje „dalej" i „zużyte" są rodzeństwem listy „w tym kroku" w tej samej ramce,
+w kontenerze `.mp-tryb__reszta` animowanym po `height` w pikselach. `rysujListe()` usunięte
+w całości, `sekcjePozostale()` wydzielone, `pokazKrok` ma jeden renderer zamiast dwóch.
+Przycisk istnieje tylko wtedy, gdy jest co rozwijać.
+
+**Zmierzone przy wyłączonym przejściu (ścieżka `prefers-reduced-motion`):** rozwinięcie daje
+11 wierszy zamiast 7, **akapit kroku zostaje we wszystkich stanach**, TOP staje się przewijalny
+(`scrollHeight` 816 wobec `clientHeight` 780), zwinięcie wraca do 0 [V].
+
+**Własny błąd złapany pomiarem, wart zapamiętania:** kontener jest kolumną flex, więc przy
+`height:0` dzieci kurczyły się do zera (domyślne `flex-shrink:1`) i `scrollHeight` zwracał 0.
+Objaw był mylący — etykieta i `aria-expanded` przełączały się poprawnie, a wysokość stała.
+Naprawa: `flex:0 0 auto` na dzieciach kontenera.
+
+**ANIMACJI NIE DA SIĘ ZWERYFIKOWAĆ W TEJ SESJI.** Karta jest `visibilityState: hidden`,
+więc przejścia CSS nie postępują: wysokość inline ustawia się na 158 px, a computed stoi na 0.
+To ta sama przyczyna, która blokuje etap 0a od przeb. 24 — tyle że dotąd kosztowała wyłącznie
+zrzuty ekranu, a teraz blokuje weryfikację funkcji. **Szesnasta prośba o widoczne okno Chrome.**
+
+### STAN PRZYRZĄDU — matryca URWANA, decyzja operatora: nie przebazowywać teraz
+
+**245 asercji z 427. Pozostałe 182 nie zabierają głosu.** Sekcja `D` i wiersze `W59`–`W61`
+pytają o ekran pełnej listy, którego nie ma. Zmierzone jako padające przed urwaniem:
+`B25`, `D5`, `D6` ×2, `D7`, `D11` ×3, `E6`, `W59`, plus `I4` meldujące „blok przerwał się
+przed definicją sondy".
+
+**Operator wybrał (b): najpierw obejrzeć akordeon na żywo, przebazować dopiero po potwierdzeniu**
+— bo jeśli w akordeonie coś jeszcze się zmieni, przebazowanie trzeba by robić dwa razy.
+
+**Do przebazowania, policzone:** 7 żywych selektorów `.mp-tryb__lista`, 22 asercje sekcji `D`,
+3 wiersze `W59`–`W61`, 5 użyć `przelaczListe`/`listaOtwarta`, co najmniej jeden dalszy punkt
+urwania poza zabezpieczonym w linii ~2446. W harnessie dołożono helper `elLubZ()` obok
+`wezelLub()` — dla węzła JUŻ POBRANEGO (element kolekcji), bo sito zna tylko wzorzec
+`X.querySelector(...)` i tej klasy nie widzi.
+
+**Przebazowane już (bo zbiór faktycznie się zmienił, nie dla wygody):** `B16` i `I4` z trzech
+ligatur na pięć, z zachowaniem liczby jako ASERCJI — `szerLig.length === 5`, nie `> 0`.
+
+### Rozmiar artefaktu — zapas topnieje
+
+`tryb-gotowania.min.js`: **43 702 znaki**, zapas **1 298** do progu miękkiego 45 000
+(WYM v1.7) i 6 298 do twardego 50 000. Dziewięć pozostałych ikon Unicode się zmieści,
+ale zapasu na dużo więcej nie ma. Pozycja do obserwacji, nie alarm.
+
+Znacznik produktu (sesja interaktywna): tryb-gotowania.js 0ed7ea4d26583650… · tryb-gotowania.min.js 45e034e31adde7d4… · przepis-parser.js 5f3c3ca858a0686b… · przepis-parser.min.js 6481c8d102682ac8…
+(parser NIETKNIĘTY — oba jego hashe zgodne z markerem przeb. 38)
+
+### Co następna sesja ma zrobić, w kolejności
+
+1. **Poczekać na werdykt operatora o wyglądzie akordeonu.** Przebazowanie przed tym werdyktem
+   może pójść do kosza.
+2. Przebazować sekcję `D` i `W59`–`W61` na strukturę akordeonu; miarą jest **długość ramki
+   równa 427**, nie sam brak padnięć — wnioski z przeb. 37 i 38 obowiązują.
+3. Dopiero potem: pozostałe dziewięć ikon, razem, po autoryzacji MCP Figmy.
+4. Sekcja `S` do przemiaru w całości — mierzona na `@v1.0.0-rc.1`, produkt jest o sześć
+   poprawek do przodu. `S4` na pewno się ruszyło (CMS uzupełniony).
+
+### Do operatora
+
+- **Widoczne okno Chrome** — szesnasta prośba; teraz blokuje już nie zrzuty, tylko weryfikację.
+- **Autoryzacja MCP Figmy** — bez niej dziewięciu ikon nie da się zwymiarować.
+- **Embed: `otworz(przepis)` bez `{krok:1}`** — inaczej ekran startowy zostaje niewidoczny.
+- **Push i tag** — żeby zobaczyć te poprawki na stagingu, bo embed jedzie z `@v1.0.0-rc.1`.
+  Szybsza droga do obejrzenia: harness lokalny w WIDOCZNYM oknie, `fixture.html` przy 360 px.
+- **Git w tej sesji nie ruszany** — jeśli mam commitować, powiedz wprost.
+
+## PRZEBIEG 38 (2026-08-15) — KONIEC ŁAŃCUCHA, warunek wyjścia 8. Pętla lokalna 209/209 BEZ CZERWIENI: `I9`, `I10`, `I13` zamknięte jedną naprawą. Sekcja `S` zmierzona na ŻYWYM embedzie — cztery czerwienie, wszystkie u operatora
+
+**Wejście:** trzy hashe zgodne [V] (`6ab07c4f…`, `cd23f958…` — WYMAGANIA v1.7,
+`194a604d…`), `STOP` brak, blokada przebiegu przeterminowana (`1970-01-01`),
+`chrome.lock` wolny (`1970-01-01`, właściciel `-`), wzięta **21:30**, zwolniona
+**21:37 zaraz po serii**, zero sekund czekania. Serwer stał pod adresem z D-15.2
+(`MP_MATRYCA` zdefiniowane, więc pomiar nie ruszył na stronie 404).
+
+**`rm` DZIAŁA w tej sesji** — sonda na istniejącym `.proba-rm-31`: exit 0, plik zniknął [V].
+Uprawnienie `allow_cowork_file_delete` z przeb. 36 jest w mocy; przeb. 37 go nie miał
+i to jest różnica MIĘDZY SESJAMI, nie zmiana stanu katalogu. **Gita mimo to nie
+uruchamiałem ani razu**: prompt harmonogramu wymienia go w sekcji „Poza pętlą",
+a ta sekcja wygrywa ze STAN.md z nazwy (rozdział „GIT — kadencja commitów" niżej
+opisuje stan sprzed tego zakazu). **Zaległość obejmuje przebiegi 30–38 i należy do operatora.**
+
+### Jednostka 1 — `I13` ZAMKNIĘTE. Trzy ostatnie miejsca z sita, jedna naprawa, zero urwań
+
+Pozycja nr 1 kolejki z przeb. 37, wykonana w całości. Trzy miejsca dostały **wspólny
+zastępnik `wezelLub(rodzic, sel)`** — odczepiony `div` zamiast `null` — zadeklarowany
+raz, obok `pr()`, i użyty w siedmiu punktach.
+
+| miejsce | co dereferencjonowało `null` | dotknięte asercje |
+|---|---|---|
+| `.mp-tryb__tooltip-zamknij` (`M41`) | `zamknijX`, sześć użyć `.mp-tryb__cel`, `.click()` | `E10` ×2 + `E10 / I-25` |
+| `.mp-tryb__dialog-link` (`M42`) | `dLnk` → `getComputedStyle`, `.click()` | `W58`, `F3` |
+| `.mp-tryb__baner-akcja` (`M43`) | `banAkcja` → `pr()` ×4, `getComputedStyle`, `.click()` | `F10` ×2, `W51`, `F11` |
+
+**Reguła z przeb. 36 dotrzymana bez skrótu: przy KAŻDYM z trzech miejsc stoi w kodzie
+wykaz, dlaczego zastępnik daje FAŁSZ, a nie przypadkową PRAWDĘ.** Zastępnik przewraca
+asercje z trzech niezależnych powodów naraz — prostokąt zerowy, pusty `getComputedStyle`
+poza dokumentem, `.click()` bez nasłuchu — i każdy z nich osobno wystarcza, bo asercje
+są koniunkcjami.
+
+**Potwierdzenie wniosku z przeb. 37, że jedno miejsce z sita to NIE jedna dereferencja:**
+`M41` miał ich trzy, a jedna (`.mp-tryb__cel` w sześciu użyciach) wymagała założenia
+nowej zmiennej `zamknijCel`. Gdyby naprawa poszła tylko na `.click()`, werdykt wyszedłby
+poprawny przy ramce krótszej — dokładnie tak, jak przy `M44` w przeb. 37.
+
+**Jeden wyjątek zapisany JAWNIE, a nie przemilczany:** przy kontroli negatywnej `F11`
+(linia z `MP.tryb.offline.el()`) zastępnik asercji NIE przewraca — wiersz pyta, czy przy
+zerwanej sieci baner ZOSTAJE, a no-op go zostawia. Celem `M43` jest `F11` POZYTYWNE
+(„zdejmuje baner"), które pada przez `banAkcja.click()` 20 linii wyżej. Guard jest tam
+wyłącznie po to, żeby brak węzła nie zabił asercji stojących PO nim.
+
+**Weryfikacja statyczna PRZED uzbrojeniem przeglądarki** (trzeci przebieg z rzędu, w którym
+się to zwraca): `node --check` na wszystkich blokach skryptu obu powierzchni — OK; kontrola
+zasięgu deklaracji względem siedmiu użyć — OK; `sprawdz-katalog-mutacji.py` — ZGODNE, 44 = 44 = 44;
+`sito-dereferencji.py` — **39 → 30 miejsc**, czyli patch zdjął dziewięć, a nie trzy.
+
+**Zmierzone, obie powierzchnie:**
+- `mutacja.html` — **44/44 ZABITYCH, `urwania: []`, `tautologie: []`, `bezEfektu: []`,
+  `celeWielokrotne: []`, `ok: true`**, kontrola dodatnia i falsyfikowalność `true` [V].
+- **Wszystkie 44 ramki po 427 asercji** (pełna) i **po 432** (zminifikowana) —
+  **jedna wartość długości na powierzchnię, czyli zero urwań** [V]. To jest miara
+  naprawy, nie werdykt.
+- `M41`–`M44`: ZABITA / ZABITA / ZABITA / ZABITA, uboczne **2 / 1 / 3 / 1**,
+  **identycznie co do sztuki na obu powierzchniach**.
+
+**`I9`, `I10` i `I13` zamknięte jedną naprawą** — bo to od początku był jeden defekt
+przyrządu widziany z trzech stron.
+
+### Jednostka 2 — regresja pełna na zmienionym harnessie: zero dryfu
+
+- `matrix.html` — **427 × 7 ramek, 7 padnięć: wyłącznie `I5`** (powierzchnia źródłowa
+  mierzy nieskompresowane 125 329 znaków i ma prawo tam być czerwona), pokrycie **193**
+  na każdej ramce, **50** kluczy odległości, konsola **0** [V].
+- `matrix-min.html` — **432 × 7, ZERO PADNIĘĆ**, pokrycie 193, odległości 50, konsola 0 [V].
+- `pokrycie.html` (`I8`, `I11`) — **193 = 193**, **50 = 50**, `brakWMin: []`,
+  `tylkoPelna`/`tylkoMin`/`tylkoWMin` puste, `falsyfikowalny: true`, kontrola dodatnia OK [V].
+- `prog.html` — 499 widoczny / 500 ukryty, `zgodne: true` na obu progach [V].
+- `qr.html` — `ok: true`, `h4Falsyfikowalny: true`; 991 nie rysuje przy dostępnym dublerze,
+  992 i 1024 rysują `<svg>`, `wywolan: 0`, zero ostrzeżeń na desktopie [V].
+- **SZÓSTA pułapka `javascript_tool` potwierdzona TRZECI raz**: `qr.html` znowu oddaje
+  `"wersja": "[BLOCKED: JWT token]"` przy nietkniętym `deklaracjaTresc` = `qrcode-generator@2.0.4 MIT`.
+
+### Jednostka 3 — `B24` NIE jest niedeterministyczne. Obserwacja z przeb. 37 nieodtwarzalna
+
+Zadanie postawione ogniwu 38 wprost: dwa przebiegi tej samej powierzchni pod rząd.
+Wykonane, i wyszło szerzej.
+
+**28 obserwacji ramkowych w tym przebiegu, ZERO padnięć `B24`**: `matrix.html` dwa razy
+pod rząd (7 + 7 ramek, obie asercje `B24` zielone, detal identyczny
+`slot 51×40 · svg 1 · img 0`), `matrix-min.html` 7 ramek, plus linie bazowe obu
+powierzchni `mutacja.html`. Przeb. 37 raportował `B24` jako padające na **wszystkich
+siedmiu** ramkach `matrix.html`, a w obrębie jednego przebiegu widział je raz padające,
+raz nie — czyli anomalia była w SESJI, nie w kodzie.
+
+**Znaleziony przyrząd, który by to rozstrzygnął, i on już istnieje: detal `I5`.**
+Wiersz raportuje `125329 zn.`, a plik na dysku ma **dokładnie 125 329 znaków** [V] —
+czyli ramka mierzy BIEŻĄCY artefakt, nie kopię z cache'u przeglądarki. Najtańsza
+dostępna hipoteza o przeb. 37 (ramka z zapamiętanym runtime'em sprzed wstawienia byczka)
+byłaby przez tę liczbę natychmiast falsyfikowalna — gdyby ktoś ją wtedy zapisał.
+**Wniosek do powtarzania: liczba w detalu `I5` jest darmową sondą świeżości artefaktu
+i należy ją notować przy każdej regresji, nie tylko przy pomiarze rozmiaru.**
+Nie zakładam z tego wiersza (limit D-36.1: jeden własny wiersz na przebieg, a ten
+przebieg nie potrzebował ani jednego) — to jest pozycja do rozstrzygnięcia przez operatora.
+
+### Jednostka 4 — BRAMKA STAGINGOWA na ŻYWYM embedzie. Dwie zielenie, cztery czerwienie z nazwanym właścicielem
+
+**Rozjazd zapisów rozstrzygnięty pomiarem, nie lekturą.** Przeb. 36 (jednostka 9) twierdził,
+że embed jest wklejony i działa; przeb. 37 pisał, że go nie ma. **Prawdę ma przeb. 36** [V]:
+na stronie stoją oba skrypty z jsDelivr, parser PRZED runtime'em, `MP`/`MP.przepis`/`MP.tryb`
+to obiekty. **SHA pomiaru: tag `v1.0.0-rc.1` = commit `37cc7b8`**, wzięty z `src`, więc wynik
+jest przypisany do wersji, a nie do ruchomego `main`.
+
+**`S2` i `S3` ZIELONE. `S5` potwierdzone ponownie z kontrolą ujemną.** `S3` jest przy tym
+zielone **nietrywialnie**, w odróżnieniu od przeb. 35: wtedy „zero błędów" znaczyło „nie ma
+czego zgłaszać", dziś runtime działa, overlay był otwierany i zamykany, a konsola gospodarza
+ma zero błędów i zero ostrzeżeń (dwa wpisy `log`, oba cudze: GTM i `[mp-mnav]`).
+
+**Najważniejsze znalezisko przebiegu — `S1` rozszczepia się na dwa fakty i tylko jeden jest zły:**
+
+1. **Okablowanie DZIAŁA** [V]. `[data-mp-gotowanie-start].click()` w ramce 360 px otwiera
+   overlay: `#mp-tryb` wchodzi do drzewa z `data-otwarty`, dzieci `body` 39 → 41,
+   `MP.tryb.ostrzezenia()` puste. **Diagnoza z przeb. 35 („CTA to `<a href="#">` bez nasłuchu,
+   cichy no-op") jest NIEAKTUALNA** — element jest dziś `<div data-mp-gotowanie-cta>`
+   z `<a data-mp-gotowanie-start>` w środku i odpowiada.
+2. **Element jest NIEOSIĄGALNY dla użytkownika** [V], z przyczyny odczytanej z arkusza,
+   nie zgadniętej: `.recipe-floating-cta` ma `display:none` w regule BAZOWEJ
+   `-ea5c01.webflow.shared.*.min.css`, powtórzone w `@media (max-width:991px)`
+   i `@media (max-width:767px)`; `@media (max-width:479px)` nie ustawia `display` wcale.
+   **Zmierzone na dziewiętnastu szerokościach 320–1024: `display:none` na KAŻDEJ.**
+   Przewijanie tego nie zmienia (siedem pozycji, 0–4000 px).
+
+**Skutek dla `S6`: próg 500 px jest dziś NIEMIERZALNY, i to ustalenie jest ostrzejsze
+niż rozjazd 1 px z przeb. 35.** Funkcja widoczności jest STAŁĄ, nie schodkiem — nie ma
+progu do porównania. Pomiar z przeb. 35 (498/499/500 `flex`, od 501 `none`) przestał być
+odtwarzalny: element zmieniono w sesji równoległej między przeb. 35 a 38. Harness w tym
+samym przebiegu: 499 widoczny / 500 ukryty, `zgodne: true`. **Pozycja decyzyjna D-35.1
+(500 czy 501) jest przez to BEZPRZEDMIOTOWA do czasu przywrócenia widoczności CTA.**
+
+**`S7` — pierwsze porównanie na żywym runtimie, więc pierwsze, które w ogóle mogło coś
+powiedzieć.** Ramka 360×780, trik same-origin. **Zgodne co do wartości, jedenaście
+wielkości wymienionych z nazwy:** `position` overlaya `fixed` · `z-index` 2147483000 ·
+tło overlaya `rgb(255,253,251)` · tło belki `color(srgb 1 0.992157 0.984314 / 0.8)` ·
+`position` BOTTOM-u `absolute` · tło BOTTOM-u `rgb(255,255,255)` · dopełnienie TOP-u 88/80 px ·
+`--mp-bottom-h` = 80px na korzeniu overlaya (`B26`) · `--mp-beige-1` #F1ECDF ·
+`--mp-beige-2` #C5B18A · rodzina kroju etykiety `"DM Sans", system-ui, sans-serif`.
+**Znak marki przeżył drogę repo → jsDelivr → Webflow: slot 51×40, `svg` 1, `img` 0 —
+identycznie jak `B24` lokalnie** [V].
+
+**Dwa rozjazdy, obydwa opisane, żaden „naprawiony":**
+
+- **`MP.tryb.czesci()` oddaje 16 kluczy zamiast 23.** Brakuje `porcjeIle`, `porcjeMinus`,
+  `porcjePlus`, `kartaS1Tor`, `kartaS1Wyp`, `kartaS1`, `kartaKoniec`. Hipoteza `[I]`:
+  skutek PUSTEGO rekordu CMS (`S4`) — węzły ekranu startowego i selektora porcji nigdy
+  nie powstały. **Nierozstrzygalne przed uzupełnieniem pól**, więc nie wolno tego zapisać
+  ani jako zgodność, ani jako defekt runtime'u.
+- **Strona gospodarza definiuje własną `--mp-belka-h: 64px` na `documentElement`.**
+  Harness nie ma tej zmiennej wcale, a belka mierzy 72 px po obu stronach. To jest
+  **kolizja przestrzeni nazw `--mp-*` między embedem a serwisem**: dziś nieszkodliwa,
+  bo runtime jej nie konsumuje, ale **`I7` pilnuje czystości `--mp-*` wyłącznie WEWNĄTRZ
+  artefaktu i takiej kolizji z definicji nie zobaczy**. Pozycja decyzyjna dla operatora.
+
+**`S4` bez zmian i przemierzone:** `data-mp-skladniki` i `data-mp-kroki` obecne, ale puste
+(0 znaków, klasa `w-dyn-bind-empty` — wiązanie CMS jest, pole w rekordzie puste);
+brak w ogóle, wymienione nazwami: `data-mp-pole`, `data-mp-surowe`, `data-mp-przepis`,
+`data-mp-id`, `data-mp-porcje`.
+
+**Po sobie posprzątane:** wstrzyknięty iframe usunięty ze strony stagingowej przed wyjściem,
+overlay zamknięty, zakładka zamknięta, `chrome.lock` zwolniony. Zero zapisów w Webflow,
+zero publikacji, zero formularzy — zakres wyłącznie odczytowy, zgodnie z D-32.2.
+
+### TRZYNASTA pułapka `javascript_tool`
+
+`MP.tryb.tokeny()` wraca jako `"[BLOCKED: Sensitive key]"` — **blokadę wyzwala samo SŁOWO
+„token" w nazwie pola**, nie zawartość. Ta sama rodzina co piąta, szósta i dwunasta:
+narzędzie podmienia WYNIK bez zgłoszenia błędu. Obejście to samo co zawsze: pytać o rzecz
+po innej nazwie albo czytać strukturę zamiast wartości.
+
+### ETAP 0a — PIĘTNASTY przebieg bez wykonania, ta sama przyczyna
+
+`document.visibilityState: 'hidden'` na stronie stagingowej i w ramce, sprawdzone na starcie
+serii. Porównanie ekranowe 1:1 z Figmą wymaga widocznego okna; MCP Figmy dodatkowo wymaga
+OAuth, którego sesja zadaniowa nie przeprowadzi. **Do operatora, piętnaste powtórzenie.**
+
+Znacznik produktu (przeb. 38): tryb-gotowania.js 1a0af8f15968cccc… · tryb-gotowania.min.js 00d1de55ba7aaa66… · przepis-parser.js 5f3c3ca858a0686b… · przepis-parser.min.js 6481c8d102682ac8…
+
+**Produkt STOI trzeci przebieg z rzędu i jest to zgodne z zapisami:** hashe identyczne
+z markerem przeb. 36, a przeb. 37 zapisał wprost „przebieg nie tknął runtime'u ani parsera"
+— **ale markera nie zostawił**, więc warunek 7 nie ma z czym porównywać w wymaganym oknie
+trzech przebiegów. **Przebieg zamyka się warunkiem 8, nie 7**, i to jest różnica warta
+odnotowania: warunek 8 mówi o WARTOŚCI dalszej pracy, a nie o tym, że produkt akurat stoi.
+
+### KONIEC ŁAŃCUCHA — warunek wyjścia 8
+
+**Pętla lokalna: 214 wierszy, 209 🟢, ZERO 🔴, 5 ⏸** (wstrzymane decyzją operatora:
+`W18`, `W46`, `W47`, `W77`, `W79`). Bilans przeliczony maszynowo, nie utrzymywany ręcznie.
+
+**Sekcja `S`: 3 🟢 (`S2`, `S3`, `S5`), 4 🔴 (`S1`, `S4`, `S6`, `S7`) — i każda z czterech
+czeka na czynność, której łańcuchowi nie wolno wykonać:**
+
+| wiersz | na czym stoi | u kogo |
+|---|---|---|
+| `S1` | `.recipe-floating-cta` ma `display:none` na każdej szerokości — reguła bazowa + dwa media | operator / sesja równoległa, Webflow Designer |
+| `S6` | konsekwencja `S1`: nie ma progu do zmierzenia | jw. |
+| `S4` | pola CMS puste (`w-dyn-bind-empty`), pięć węzłów kontraktu nie istnieje w szablonie | operator + pipeline treści |
+| `S7` | rozjazd 1 zależy od `S4`; rozjazd 2 (`--mp-belka-h` gospodarza) jest pozycją decyzyjną | operator |
+
+**Każdy kolejny przebieg zmierzyłby dokładnie to samo.** Zadanie wyłączone.
+
+### RAPORT DECYZJI — wszystko, co czeka na operatora po zamknięciu łańcucha
+
+**Blokujące zieleń sekcji `S` (i przez to tag `v1.0.0`):**
+
+1. **Przywrócić widoczność `.recipe-floating-cta`** w Webflow Designerze. Dziś `display:none`
+   w regule bazowej i w dwóch media queries; okablowanie po stronie embedu DZIAŁA i jest
+   zmierzone, więc jedyną przeszkodą jest ta reguła. Zamyka `S1` i odblokowuje `S6`.
+2. **Uzupełnić pola CMS rekordu przepisu** — `mp-skladniki`, `mp-kroki`, `mp-wartosci-porcja`,
+   `data-porcje-bazowe`, `data-czas` — oraz **dodać do szablonu pięć brakujących węzłów
+   kontraktu §5**: `data-mp-pole`, `data-mp-surowe`, `data-mp-przepis`, `data-mp-id`,
+   `data-mp-porcje`. Zamyka `S4` i połowę `S7`.
+3. **Rozstrzygnąć kolizję `--mp-belka-h`** — strona gospodarza definiuje własną zmienną
+   w przestrzeni `--mp-*`. Dziś nieszkodliwa; decyzja dotyczy tego, czy embed ma przejść
+   na prefiks odporny na kolizje, czy serwis ma zwolnić tę nazwę.
+
+**Nierozstrzygnięte od wcześniejszych przebiegów:**
+
+4. **`D-35.1` — próg ukrycia CTA 500 czy 501.** BEZPRZEDMIOTOWE do czasu punktu 1.
+5. **Pięć pozycji `⏸` sekcji `W`**: `W18`, `W46`, `W47`, `W77`, `W79`.
+6. **`A1`** — wiersz obiecuje panel błędów przy zerze błędów, `pokazPanelBledow()` robi
+   `return` przy pustych listach. Rozbieżność WYMAGANIA vs kod, nie do zamknięcia asercją.
+7. **`D-31.1`, `D-31.2`** — bez odpowiedzi.
+8. **Beżowe wypełnienie slotu znaku** (zdjęte w przeb. 36 jako `[I]`, nie `[V]`) — do
+   potwierdzenia odczytem wypełnienia ramki w Figmie.
+
+**Techniczne, poza zakresem łańcucha:**
+
+9. **GIT — zaległość przebiegów 30–38 niescommitowana.** `rm` działa, więc przeszkody
+   technicznej nie ma; przeszkodą jest zakaz w promptcie harmonogramu („Poza pętlą").
+   Jeśli git ma wrócić do łańcucha, zmiana należy do promptu, nie do STAN.md.
+10. **Autoryzacja MCP Figmy** (`plugin:figma:figma`) — sesje zadaniowe są nieinteraktywne,
+    więc każdy przyszły wiersz sekcji `W` byłby w nich blokadą twardą. Do zrobienia raz.
+11. **Widoczne okno Chrome** — piętnasta prośba; etap 0a (porównanie ekranowe 1:1 z Figmą)
+    stoi od przeb. 24 wyłącznie z tego powodu.
+12. **Sonda świeżości artefaktu** — czy liczba z detalu `I5` ma stać się osobnym wierszem
+    matrycy, czy zostać konwencją raportową. Nie zakładałem wiersza: limit D-36.1 to jeden
+    własny wiersz na przebieg, a ten przebieg nie potrzebował żadnego.
+
+**Duplikaty nazw asercji (pozycja nr 2 kolejki z przeb. 37) — NIEWYKONANE i to jest decyzja.**
+`fixture.html` ma 6 par o wspólnej etykiecie, `fixture-min.html` 13, przy 429 unikalnych
+po obu stronach. Rozróżnienie nazw jest zmianą PYTANIA, więc kończy się przemiarem obu
+powierzchni i wszystkich 44 mutacji — a żaden wiersz matrycy nie jest z tego powodu dziś
+czerwony. Wedle listy zamkniętej z D-36.1 nie wolno tego brać jako jednostki: to praca,
+która nie zdejmuje żadnej istniejącej czerwieni. **Pozycja dla operatora, nie dla ogniwa.**
 
 ## PRZEBIEG 37 (2026-08-15) — MATRYCA 207/208. Batch 5 (WEJŚCIE USZKODZONE) zamknięty 40/40 na obu powierzchniach. `I12` zamienia UWAGĘ narzędzia w asercję. Dwie nowe pułapki `javascript_tool`. Git ÓSMY przebieg niedostępny
 
