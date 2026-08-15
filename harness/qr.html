@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>QR — bramka 992 px, wiersze I3 i H4</title>
+
+<!--
+  harness/qr.html — powierzchnia poza matrycą szerokości, jak `nojs.html` i `prog.html`.
+
+  Mierzy dwie rzeczy, których matryca zmierzyć nie może, bo jej najszersza ramka
+  ma 844 px:
+
+  · H4 (test negatywny „nie renderuje QR poniżej 992 px") — do przebiegu 15 zielony
+    na powierzchni, na której NIE MÓGŁ PAŚĆ: biblioteki QR nie ma nigdzie, więc
+    `rysujQR()` kończył na strażniku biblioteki niezależnie od szerokości, a asercja
+    „kontener pusty" wychodziła prawdziwa z niewłaściwego powodu. Tu wchodzi
+    test-double biblioteki: przy dostępnej bibliotece bramka szerokości musi zatrzymać
+    rysowanie na 991 i przepuścić je na 992.
+
+  · I3 („zależność QR ZADEKLAROWANA w kodzie i ładowana, nie zakładana") — wiersz
+    nigdy nie mierzony (kreska w kolumnie „przeb." do przebiegu 15). Pomiar odpowiada
+    na trzy pytania osobno: czy biblioteka jest obecna ≥992 (nie), czy kod ją ładuje
+    (nie — sprawdza `global.QrCreator` i ostrzega), i co dokładnie widzi konsola
+    użytkownika desktopowego.
+
+  Nie wchodzi do liczenia ramek matrycy i nie rusza `matrix.html`.
+-->
+
+<style>
+  :root{--tlo:#12100e;--panel:#1c1915;--ok:#3ddc84;--zle:#ff6b5e;--tekst:#eee}
+  html,body{margin:0;background:var(--tlo);color:var(--tekst);
+            font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
+  header{position:sticky;top:0;z-index:5;background:var(--panel);padding:10px 14px;
+         border-bottom:1px solid #333}
+  header b{font-size:15px}
+  .rzad{padding:14px;overflow-x:auto}
+  .komorka{margin:0 0 14px}
+  .etykieta{padding:0 0 4px;font-size:12px;color:#aaa}
+  iframe{border:1px solid #444;background:#fff;display:block}
+  #wynik{white-space:pre-wrap;padding:0 14px 14px;color:#bbb}
+  .ok{color:var(--ok)} .zle{color:var(--zle)}
+</style>
+</head>
+<body>
+
+<header>
+  <b>QR — bramka 992 px</b>
+  <span id="podsumowanie">ładowanie…</span>
+</header>
+
+<div class="rzad" id="ramki"></div>
+<div id="wynik"></div>
+
+<script>
+/* Trzy szerokości, nie dwie. 991 i 992 to sama bramka (`min-width: 992px`), a 1024
+   to szerokość, przy której blok QR realnie stoi w kolumnie desktopowej — gdyby
+   bramka działała tylko dokładnie na progu, wynik z 1024 by to pokazał.
+   Wysokość mała i `overflow:hidden` w ramce: pasek przewijania odjąłby ~15 px od
+   viewportu i ramka „992" odpowiadałaby na media query jak 977. */
+var RAMKI = [
+  { nazwa: 'qr991',  w: 991,  h: 90 },
+  { nazwa: 'qr992',  w: 992,  h: 90 },
+  { nazwa: 'qr1024', w: 1024, h: 90 }
+];
+
+window.MP_PIECZEC = String(Date.now());
+window.MP_QR = { ramki: RAMKI, pieczec: MP_PIECZEC, gotowe: 0 };
+
+RAMKI.forEach(function (r) {
+  var kom = document.createElement('div');
+  kom.className = 'komorka';
+  kom.innerHTML = '<div class="etykieta">' + r.w + ' × ' + r.h + '</div>';
+  var f = document.createElement('iframe');
+  f.src = 'qr-ramka.html?pieczec=' + MP_PIECZEC;
+  f.name = r.nazwa;
+  f.width = r.w; f.height = r.h;
+  f.setAttribute('title', 'qr ' + r.nazwa);
+  kom.appendChild(f);
+  document.getElementById('ramki').appendChild(kom);
+});
+
+window.addEventListener('message', function (e) {
+  if (!e.data || !e.data.mpQrRamka) return;
+  MP_QR.gotowe++;
+  document.getElementById('podsumowanie').textContent =
+    '— ramek gotowych: ' + MP_QR.gotowe + '/' + RAMKI.length;
+});
+
+function ramka(n) {
+  return Array.prototype.find.call(document.querySelectorAll('iframe'),
+                                   function (x) { return x.name === n; });
+}
+
+/* ---- I3 · H4 -----------------------------------------------------------------
+   Sekwencja na każdej ramce, w tej kolejności i bez skrótów:
+
+   PRZEBIEG 28 — sekwencja ta sama, znaczenie kroków inne, bo D-13.1 (wariant B)
+   jest wykonane: biblioteka jest WBUDOWANA w artefakt parsera.
+
+   (1) LINIA BAZOWA — stan produkcyjny, czyli biblioteka JEST, bo jedzie w pliku.
+       `rysujQR()` woła się tak, jak zawołałby go szablon. Na 991 kontener ma zostać
+       pusty, na 992 i 1024 ma dostać SVG. To jest dziś pełny pomiar H4 i pełny
+       pomiar I3 — bramka i rysowanie mierzone na PRAWDZIWEJ bibliotece, nie na
+       podstawce, więc żadne z tych zdań nie może już przejść z niewłaściwego powodu.
+   (2) Z DUBLEREM — pytanie odwrócone. Wstrzykujemy `window.QrCreator` i sprawdzamy,
+       że parser go NIE WOŁA (`wywolan === 0`) i że mimo to na 992 dalej rysuje SVG
+       z biblioteki własnej. To jest jedyny pomiar odróżniający „zależność dołączona"
+       od „zależność założona z globala" — bez niego oba wyglądają identycznie.
+   (3) SPRZĄTANIE — dubler zdjęty, kontener wyczyszczony, żeby powierzchnia dała
+       ten sam wynik przy powtórzeniu sondy.                                       */
+window.MP_QR.zmierz = function () {
+  var wynik = { pieczec: MP_PIECZEC, ramki: {}, widocznosc: document.visibilityState };
+
+  RAMKI.forEach(function (r) {
+    var f = ramka(r.nazwa);
+    if (!f || !f.contentWindow || !f.contentWindow.MP_QR_RAMKA) {
+      wynik.ramki[r.nazwa] = { ok: false, powod: 'ramka nie odpowiada' };
+      return;
+    }
+    var w = f.contentWindow, R = w.MP_QR_RAMKA;
+    var o = { nominalna: r.w, innerWidth: R.szerokoscRamki, parser: R.parserZaladowany,
+              mediaQuery: R.mediaQuery(), pieczecRamki: R.pieczec };
+
+    /* (1) linia bazowa */
+    R.wyczyscKontener(); R.wyczyscDziennik();
+    o.bibliotekaPrzed = R.bibliotekaObecna();
+    o.globalPrzed = R.globalQr();
+    o.deklaracja = R.deklaracja();
+    w.MP.przepis.rysujQR();
+    o.bazowy = { kontener: R.stanKontenera(), dziennik: R.dziennik.slice() };
+    o.adresQR = w.MP.przepis.adresQR();
+
+    /* (2) z dublerem */
+    R.wyczyscKontener(); R.wyczyscDziennik();
+    var wywolania = R.wstawDubler();
+    w.MP.przepis.rysujQR();
+    o.zDublerem = { kontener: R.stanKontenera(), dziennik: R.dziennik.slice(),
+                    wywolan: wywolania.length, konfiguracja: wywolania[0] || null };
+
+    /* (3) sprzątanie */
+    o.dublerZdjety = R.zdejmijDubler();
+    R.wyczyscKontener(); R.wyczyscDziennik();
+
+    var powyzejProgu = R.szerokoscRamki >= 992;
+
+    /* H4 — test negatywny ma sens tylko poniżej progu; powyżej progu mierzymy
+       jego stronę pozytywną, czyli że bramka w ogóle się otwiera. */
+    o.h4 = powyzejProgu
+      ? { dotyczy: false }
+      : { dotyczy: true,
+          /* Falsyfikowalny NAPRAWDĘ: biblioteka jest w pliku, więc gdyby bramka
+             nie działała, kontener dostałby SVG i ta asercja by padła. */
+          ok: o.bazowy.kontener.dzieci === 0 && o.zDublerem.kontener.dzieci === 0,
+          falsyfikowalny: true };
+
+    o.bramkaOtwarta = powyzejProgu
+      ? { dotyczy: true,
+          ok: o.bazowy.kontener.svg === true &&
+              o.bazowy.kontener.ariaLabel !== null &&
+              o.zDublerem.kontener.svg === true }
+      : { dotyczy: false };
+
+    /* Dubler NIE MOŻE zostać zawołany — na żadnej szerokości. Poniżej progu
+       zatrzymuje go bramka, powyżej progu parser rysuje własną biblioteką. */
+    o.globalNieWolany = o.zDublerem.wywolan === 0;
+
+    /* I3 — cztery pytania osobno, bo „zadeklarowana i obecna, nigdy zakładana
+       z global" to cztery różne zdania i każde może być fałszywe osobno. */
+    o.i3 = {
+      globalPusty: o.globalPrzed === 'undefined',
+      zadeklarowana: !!(o.deklaracja && o.deklaracja.qr && o.deklaracja.qr.nazwa &&
+                        o.deklaracja.qr.wersja && o.deklaracja.qr.licencja &&
+                        o.deklaracja.qr.globalna === false),
+      deklaracjaTresc: o.deklaracja && o.deklaracja.qr
+        ? (o.deklaracja.qr.nazwa + '@' + o.deklaracja.qr.wersja + ' ' + o.deklaracja.qr.licencja)
+        : null,
+      obecnaWArtefakcie: powyzejProgu ? o.bazowy.kontener.svg === true : null,
+      nieZakladanaZGlobala: o.globalNieWolany,
+      ostrzezenNaDesktopie: powyzejProgu ? o.bazowy.dziennik.length : null,
+      trescOstrzezenia: (o.bazowy.dziennik[0] || {}).tresc || null
+    };
+
+    wynik.ramki[r.nazwa] = o;
+  });
+
+  var r991 = wynik.ramki.qr991, r992 = wynik.ramki.qr992, r1024 = wynik.ramki.qr1024;
+
+  wynik.h4Falsyfikowalny =
+    !!(r991 && r992 && r991.h4.ok === true && r992.bramkaOtwarta.ok === true);
+
+  var wszystkie = [r991, r992, r1024].filter(Boolean);
+
+  wynik.i3 = {
+    zadeklarowana: wszystkie.length === 3 && wszystkie.every(function (r) { return r.i3.zadeklarowana; }),
+    deklaracja: (r992 && r992.i3.deklaracjaTresc) || null,
+    obecnaWArtefakcie: !!(r992 && r992.i3.obecnaWArtefakcie === true &&
+                          r1024 && r1024.i3.obecnaWArtefakcie === true),
+    globalPusty: wszystkie.length === 3 && wszystkie.every(function (r) { return r.i3.globalPusty; }),
+    nieZakladanaZGlobala: wszystkie.length === 3 && wszystkie.every(function (r) { return r.i3.nieZakladanaZGlobala; }),
+    ostrzezenieNaDesktopie: !!(r992 && r992.i3.ostrzezenNaDesktopie > 0),
+    ok: false
+  };
+  wynik.i3.ok = wynik.i3.zadeklarowana && wynik.i3.obecnaWArtefakcie &&
+                wynik.i3.globalPusty && wynik.i3.nieZakladanaZGlobala &&
+                !wynik.i3.ostrzezenieNaDesktopie;
+
+  wynik.ok = wynik.h4Falsyfikowalny && wynik.i3.ok;
+
+  document.getElementById('wynik').textContent = JSON.stringify(wynik, null, 2);
+  document.getElementById('podsumowanie').className = wynik.ok ? 'ok' : 'zle';
+  return wynik;
+};
+</script>
+</body>
+</html>

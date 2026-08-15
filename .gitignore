@@ -1,0 +1,11 @@
+# Stan przebiegu łańcucha — runtime, nigdy nie wersjonowany.
+# Blokada jest oceniana po znaczniku czasu w pierwszej linii, więc w repozytorium
+# byłaby zawsze nieaktualna i zawsze konfliktowa.
+LOCK
+LOCK.*
+
+# Blokada Chrome mieszka w Claude\_runtime\ i jest poza tym repo — tu tylko przypomnienie.
+
+node_modules/
+.DS_Store
+Thumbs.db

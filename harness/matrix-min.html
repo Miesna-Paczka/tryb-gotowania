@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>MATRYCA (min) — tryb gotowania</title>
+
+<!--
+  harness/matrix.html — matryca szerokości łańcucha `tryb-gotowania-embed`.
+
+  Dlaczego iframe'y, a nie `resize_window`: desktopowy Chrome nie zejdzie oknem
+  poniżej ~500 px, a mierzymy 320–480. Media queries i `orientation` WEWNĄTRZ
+  iframe'u odpowiadają na wymiar iframe'u, a `position: fixed` overlaya wiąże się
+  z viewportem iframe'u — więc jeden zrzut łapie kilka szerokości naraz.
+
+  Powierzchnie POZA tą matrycą (STAN.md, przebieg 2):
+   · `nojs.html` — pola kartowe czytelne bez JS (wiersz A8),
+   · `prog.html` — próg 499/500 px dla przycisku startu (G07 / H8).
+-->
+
+<style>
+  :root{--tlo:#12100e;--panel:#1c1915;--ok:#3ddc84;--zle:#ff6b5e;--tekst:#eee}
+  html,body{margin:0;background:var(--tlo);color:var(--tekst);
+            font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
+  header{position:sticky;top:0;z-index:5;background:var(--panel);padding:10px 14px;
+         border-bottom:1px solid #333}
+  header b{font-size:15px}
+  #podsumowanie.ok{color:var(--ok)} #podsumowanie.zle{color:var(--zle)}
+  #szczegoly{margin:6px 0 0;padding-left:18px;max-height:160px;overflow:auto}
+  #szczegoly li{color:var(--zle)}
+  .rzad{display:flex;gap:14px;padding:14px;align-items:flex-start;overflow-x:auto}
+  .komorka{flex:0 0 auto}
+  .etykieta{padding:0 0 4px;font-size:12px;color:#aaa}
+  .etykieta .stan{font-weight:700}
+  .etykieta .stan.ok{color:var(--ok)} .etykieta .stan.zle{color:var(--zle)}
+  iframe{border:1px solid #444;background:#fff;display:block}
+  h2{font-size:13px;margin:14px 14px 0;color:#aaa;text-transform:uppercase;letter-spacing:.08em}
+</style>
+</head>
+<body>
+
+<header>
+  <b>MATRYCA — jednostka 1 (harness)</b>
+  <span id="podsumowanie">ładowanie…</span>
+  <ul id="szczegoly"></ul>
+</header>
+
+<h2>portret · 780 px wysokości</h2>
+<div class="rzad" id="portret"></div>
+
+<h2>landscape · scrim „obróć telefon"</h2>
+<div class="rzad" id="poziome"></div>
+
+<script>
+/* Szerokości z „Powierzchni pomiaru" w STAN.md. `nazwa` trafia do `window.name`
+   ramki i wraca w postMessage, więc wynik da się przypisać bez czytania
+   contentWindow (file:// bywa nieprzezroczyste między ramkami). */
+var RAMKI = [
+  { nazwa: '320', w: 320, h: 780, gdzie: 'portret' },
+  { nazwa: '360', w: 360, h: 780, gdzie: 'portret' },
+  { nazwa: '390', w: 390, h: 780, gdzie: 'portret' },
+  { nazwa: '440', w: 440, h: 780, gdzie: 'portret' },
+  { nazwa: '480', w: 480, h: 780, gdzie: 'portret' },
+  { nazwa: '844x390', w: 844, h: 390, gdzie: 'poziome' },
+  { nazwa: '667x375', w: 667, h: 375, gdzie: 'poziome' }
+];
+
+var wyniki = Object.create(null);
+/* HARNESS-ONLY — pieczęć przemiaru (przebieg 15, dorobienie do pary `*-min`).
+   Uwaga ta sama, co w `matrix.html`: pieczęć chroni artefakty, NIE ten plik.
+   Po edycji harnessu nawiguj pod `matrix-min.html?v=<coś nowego>`.                 */
+window.MP_PIECZEC = String(Date.now());
+window.MP_MATRYCA = { ramki: RAMKI, wyniki: wyniki, gotowe: false, pieczec: MP_PIECZEC };
+
+RAMKI.forEach(function (r) {
+  var kom = document.createElement('div');
+  kom.className = 'komorka';
+  kom.innerHTML = '<div class="etykieta" id="et-' + r.nazwa + '">' +
+                  r.w + ' × ' + r.h + ' · <span class="stan">…</span></div>';
+  var f = document.createElement('iframe');
+  f.src = 'fixture-min.html?pieczec=' + MP_PIECZEC;
+  f.name = r.nazwa;
+  f.width = r.w; f.height = r.h;
+  f.setAttribute('title', 'fixture ' + r.nazwa);
+  kom.appendChild(f);
+  document.getElementById(r.gdzie).appendChild(kom);
+});
+
+window.addEventListener('message', function (e) {
+  var d = e.data;
+  if (!d || !d.mpHarness) return;
+  var nazwa = d.nazwa || String(d.mpHarness.szerokosc);
+  wyniki[nazwa] = d.mpHarness;
+
+  var et = document.getElementById('et-' + nazwa);
+  if (et) {
+    var s = et.querySelector('.stan');
+    s.textContent = d.mpHarness.ok ? 'OK' : 'BŁĄD';
+    s.className = 'stan ' + (d.mpHarness.ok ? 'ok' : 'zle');
+  }
+  odswiez();
+});
+
+function odswiez() {
+  var klucze = Object.keys(wyniki);
+  var zle = klucze.filter(function (k) { return !wyniki[k].ok; });
+  var bledyKonsoli = klucze.reduce(function (n, k) { return n + wyniki[k].konsola.length; }, 0);
+  var el = document.getElementById('podsumowanie');
+  var komplet = klucze.length === RAMKI.length;
+  el.textContent = '— ' + (klucze.length - zle.length) + '/' + RAMKI.length +
+                   ' ramek OK · błędów konsoli: ' + bledyKonsoli +
+                   (komplet ? '' : ' · czekam na ' + (RAMKI.length - klucze.length));
+  el.className = (komplet && !zle.length) ? 'ok' : (zle.length ? 'zle' : '');
+
+  var ul = document.getElementById('szczegoly');
+  ul.innerHTML = zle.map(function (k) {
+    var w = wyniki[k];
+    var a = w.asercje.filter(function (x) { return !x.ok; })
+             .map(function (x) { return x.nazwa + (x.detal ? ' → ' + x.detal : ''); });
+    var c = w.konsola.map(function (x) { return x.poziom + ': ' + x.tresc; });
+    return '<li>' + k + ': ' + a.concat(c).join(' ; ') + '</li>';
+  }).join('');
+
+  window.MP_MATRYCA.gotowe = komplet;
+}
+
+/* ---- G10: powrót do portretu zdejmuje scrim BEZ utraty stanu -----------------
+   Rotacji nie da się zmierzyć wewnątrz ramki: `orientation` odpowiada na wymiar
+   ramki, a ramka sama siebie nie przewymiaruje. Mierzy więc RODZIC — zmiana
+   `width`/`height` iframe'a jest dla treści dokładnie tym samym zdarzeniem, co
+   obrót telefonu, bo media query pyta o viewport, nie o urządzenie.
+
+   Kryterium „bez utraty stanu" jest tym, czego przeładowanie by nie przeżyło:
+   numer kroku, liczba i pozostały czas minutników, zaznaczone składniki oraz
+   TOŻSAMOŚĆ węzła overlaya (przemontowanie zerwałoby minutniki).                */
+/* ---- F4: systemowy „wstecz" wychodzi z overlaya (I-09 · WYM §3) --------------
+   Mierzy RODZIC i mierzy w JEDNEJ ramce. Powód zmierzony w przebiegu 8: historia
+   sesji jest WSPÓLNA dla ramki i dokumentu nadrzędnego (`history.length` rodzica
+   rośnie razem z ramką), więc pięć ramek robiących `back()` naraz mieszałoby się
+   w jednej historii. Pozostałe ramki mają `MP_BEZ_HISTORII = true`.
+
+   Trawersja jest asynchroniczna — stąd Promise. Po pomiarze wracamy do stanu
+   zastanego: `back()` zdejmuje NASZ wpis, więc pozycja w historii jest ta sama,
+   co przed sondą. `history.length` zostaje o 1 dłuższa i to jest nieusuwalne —
+   przeglądarka nie ma API na skrócenie historii; kolejny `pushState` z tej samej
+   pozycji nadpisze wpis „do przodu", więc długość nie rośnie z każdym pomiarem. */
+/* ---- ŚWIEŻOŚĆ ARTEFAKTU — dziura, której pieczęć NIE zasłania -----------------
+   Pieczęć przemiaru (przebieg 14) chroni przed cache'em HTTP: gwarantuje, że
+   przeglądarka pobierze PLIK, a nie jego kopię sprzed edycji. Nie mówi natomiast
+   nic o tym, czy ten plik jest AKTUALNY względem źródła — a `*.min.js` powstaje
+   ręcznie, poza łańcuchem (`npm install` w piaskownicy nie przechodzi, przebieg 15).
+   Artefakt zminifikowany zbudowany przed ostatnią edycją źródła daje pomiar, który
+   wygląda dokładnie jak udany: te same asercje, ta sama liczba, inny plik.
+   To ta sama rodzina, co pułapka cache'a, tylko o piętro wyżej — i akurat ta
+   powierzchnia jest jedyną, na której może wystąpić.
+
+   Oracle jest zewnętrzny wobec treści plików: nagłówek `Last-Modified` z serwera
+   statycznego. Minifikat MŁODSZY od źródła = w porządku; STARSZY = artefakt stary,
+   niezależnie od tego, ile asercji przeszło. Zero parsowania, zero zgadywania
+   po rozmiarze.                                                                   */
+window.MP_MATRYCA.swiezosc = function () {
+  var PARY = [
+    { zrodlo: '../tryb-gotowania.js',  minifikat: '../tryb-gotowania.min.js' },
+    { zrodlo: '../przepis-parser.js',  minifikat: '../przepis-parser.min.js' }
+  ];
+  function data(u) {
+    return fetch(u, { method: 'HEAD', cache: 'reload' }).then(function (r) {
+      var lm = r.headers.get('last-modified');
+      return { url: u, ok: r.ok, lastModified: lm, ms: lm ? Date.parse(lm) : null,
+               dlugosc: r.headers.get('content-length') };
+    });
+  }
+  return Promise.all(PARY.map(function (p) {
+    return Promise.all([data(p.zrodlo), data(p.minifikat)]).then(function (d) {
+      var z = d[0], m = d[1];
+      var roznicaMin = (z.ms != null && m.ms != null) ? Math.round((m.ms - z.ms) / 60000) : null;
+      return {
+        para: p.minifikat.replace('../', ''),
+        zrodlo: z.lastModified, minifikat: m.lastModified,
+        minifikatMlodszyOMin: roznicaMin,
+        ok: z.ms != null && m.ms != null && m.ms >= z.ms,
+        bajtow: { zrodlo: z.dlugosc, minifikat: m.dlugosc }
+      };
+    });
+  })).then(function (wyniki) {
+    return { ok: wyniki.every(function (w) { return w.ok; }), pary: wyniki };
+  });
+};
+
+window.MP_MATRYCA.f4 = function () {
+  var ramka = function (n) {
+    return Array.prototype.find.call(document.querySelectorAll('iframe'),
+                                     function (x) { return x.name === n; });
+  };
+  var f = ramka('360');
+  if (!f) return Promise.resolve({ ok: false, powod: 'brak ramki 360' });
+  var w = f.contentWindow;
+  var inna = ramka('320').contentWindow;
+  var r = { dlugoscPrzed: history.length };
+
+  r.wlaczonaTu = w.MP.tryb.historia.wlaczona();
+  r.wylaczonaObok = !inna.MP.tryb.historia.wlaczona();
+
+  return odsacz().then(pomiar);
+
+  /* Blok samosprawdzenia otwiera i zamyka overlay kilka razy w JEDNEJ turze pętli
+     zdarzeń, a `history.back()` jest asynchroniczny — więc sync-owe `pushState`
+     wyprzedzają swoje `back()` i zostawiają po sobie wpisy `{mpTryb}`. Produkcja
+     tego nie robi (między zamknięciem a otwarciem zawsze mija tura), ale sonda
+     musi mieć czystą linię bazową, bo inaczej pyta „czy wpis zniknął" na historii,
+     w której leżą cudze takie same wpisy. Zdejmujemy je najpierw — co przy okazji
+     spełnia regułę „nie zostawiaj historii dłuższej, niż zastałeś" lepiej niż
+     samo `back()` po pomiarze. Limit kroków i kontrola URL-a rodzica pilnują,
+     żeby cofanie nie wyszło poza wpisy same-document i nie zabrało matrycy. */
+  function odsacz() {
+    var url = location.href, krokow = 0;
+    function dalej() {
+      if (krokow >= 6) return Promise.resolve();
+      if (!(w.history.state && w.history.state.mpTryb === true)) return Promise.resolve();
+      if (location.href !== url) return Promise.resolve();
+      krokow++;
+      return new Promise(function (res) {
+        var t = setTimeout(res, 400);
+        w.addEventListener('popstate', function raz() {
+          w.removeEventListener('popstate', raz);
+          clearTimeout(t); setTimeout(res, 0);
+        });
+        w.history.back();
+      }).then(dalej);
+    }
+    return dalej().then(function () { r.odsaczonych = krokow; });
+  }
+
+  function pomiar() {
+  r.stanBazowy = !!(w.history.state && w.history.state.mpTryb === true);
+  w.MP.tryb.zamknij();                       // czysty start, gdyby coś zostało otwarte
+  w.MP.tryb.otworz(w.MP_HARNESS.widok, { krok: 3 });
+  r.wpisPoOtwarciu = w.MP.tryb.historia.wpis();
+  r.otwartyPrzed = w.MP.tryb.korzen().hasAttribute('data-otwarty');
+  r.dlugoscPoPushu = history.length;
+  /* Oracle POZYCJI, nie długości. `history.length` po pierwszym pomiarze już nie
+     rośnie (kolejny push nadpisuje wpis „do przodu"), więc przyrost długości
+     mierzyłby to, czy sonda biegnie pierwszy raz — a nie to, o co pyta wiersz.
+     Stan wpisu jest natomiast jednoznaczny: nasz albo nie nasz. */
+  r.stanPoPushu = !!(w.history.state && w.history.state.mpTryb === true);
+  /* Kontrola, że ramka nie zabrała ze sobą rodzica: URL matrycy ma zostać ten sam. */
+  r.urlRodzicaPrzed = location.href;
+
+  return new Promise(function (res) {
+    var czas = setTimeout(function () { domknij('popstate nie przyszedł w 2000 ms'); }, 2000);
+    function naPop() { setTimeout(function () { domknij(''); }, 0); }
+    function domknij(powod) {
+      clearTimeout(czas);
+      w.removeEventListener('popstate', naPop);
+      r.powod = powod;
+      r.otwartyPo = w.MP.tryb.korzen().hasAttribute('data-otwarty');
+      r.wpisPo = w.MP.tryb.historia.wpis();
+      r.urlRodzicaPo = location.href;
+      r.ramkaZyje = !!w.MP_HARNESS.wynik && w.MP_HARNESS.wynik.asercje.length > 0;
+      r.asercjiWRamce = w.MP_HARNESS.wynik ? w.MP_HARNESS.wynik.asercje.length : 0;
+      r.dlugoscPo = history.length;
+      r.stanPo = !!(w.history.state && w.history.state.mpTryb === true);
+      r.ok = !powod &&
+             r.wlaczonaTu === true && r.wylaczonaObok === true &&
+             r.stanBazowy === false &&          // ← linia bazowa czysta
+             r.wpisPoOtwarciu === true && r.stanPoPushu === true &&
+             r.stanPo === false &&              // ← nasz wpis zdjęty z historii
+             r.otwartyPrzed === true &&
+             r.otwartyPo === false &&           // ← „wstecz" ZAMKNĄŁ overlay
+             r.wpisPo === false &&              // ← i nie został po nas wpis
+             r.urlRodzicaPo === r.urlRodzicaPrzed &&
+             r.ramkaZyje === true;              // ← ramka się nie przeładowała
+      res(r);
+    }
+    w.addEventListener('popstate', naPop);
+    w.history.back();                          // ← „systemowy wstecz"
+  });
+  }
+};
+
+window.MP_MATRYCA.g10 = function () {
+  var f = Array.prototype.find.call(document.querySelectorAll('iframe'),
+                                    function (x) { return x.name === '844x390'; });
+  if (!f) return { ok: false, powod: 'brak ramki poziomej' };
+  var w = f.contentWindow, cz = w.MP.tryb.czesci();
+  var widoczny = function () { return w.getComputedStyle(cz.scrim).display !== 'none'; };
+
+  w.MP.tryb.otworz(w.MP_HARNESS.widok, { krok: 4 });
+  w.MP.tryb.minutniki.wyczysc();
+  var m = w.MP.tryb.minutniki.uruchom({ nazwa: 'duś ragù', sekundy: 1934 });
+  w.MP.tryb.odhacz('skrobia-ziemniaczana', true);
+  var przed = {
+    scrim: widoczny(), korzen: w.MP.tryb.korzen(), krok: cz.etykieta.textContent,
+    minutnikow: w.MP.tryb.minutniki.lista().length, pozostalo: m.pozostalo,
+    zaznaczone: w.MP.tryb.zaznaczone().join(',')
+  };
+  f.width = 390; f.height = 844;                     // ← „obrót" do portretu
+  var poObrocie = {
+    scrim: widoczny(), korzen: w.MP.tryb.korzen(), krok: cz.etykieta.textContent,
+    minutnikow: w.MP.tryb.minutniki.lista().length, pozostalo: m.pozostalo,
+    zaznaczone: w.MP.tryb.zaznaczone().join(','),
+    szerokoscTresci: Math.round(cz.top.getBoundingClientRect().width)
+  };
+  f.width = 844; f.height = 390;                     // ← i z powrotem, żeby matryca została matrycą
+  var wrocil = widoczny();
+  w.MP.tryb.minutniki.wyczysc();
+  w.MP.tryb.odhacz('skrobia-ziemniaczana', false);
+
+  return {
+    ok: przed.scrim === true && poObrocie.scrim === false && wrocil === true &&
+        poObrocie.korzen === przed.korzen && poObrocie.krok === przed.krok &&
+        poObrocie.minutnikow === przed.minutnikow &&
+        poObrocie.pozostalo === przed.pozostalo &&
+        poObrocie.zaznaczone === przed.zaznaczone && poObrocie.zaznaczone !== '' &&
+        poObrocie.szerokoscTresci === 390,
+    przed: przed, po: poObrocie, scrimWrocil: wrocil
+  };
+};
+
+/* ---- C10 · C11 · C12 na powierzchni ZMINIFIKOWANEJ (przebieg 18) ------------
+   Ta powierzchnia nie miała nigdy żadnej sondy pulsu — `c1012()` istnieje tylko
+   w `matrix.html`. Wiersze C10/C11 były czerwone wszędzie, więc nikomu nie
+   przeszkadzało, że na minifikacie nie ma czym ich zmierzyć; od chwili, w której
+   zzieleniały na źródłach (przeb. 18), brak sondy tutaj stał się luką: decyzja
+   I5/I7 wybiera powierzchnię, która pojedzie na produkcję, a o pulsie na niej
+   nie wiedzielibyśmy nic.
+
+   Portowana jest wersja PRZEWIJANA, nie `c1012()`, i to jest wybór, nie wygoda:
+   `c1012()` wymaga niezminimalizowanego okna, które w przebiegu 18 było dostępne
+   przez ~90 s i nie jest odtwarzalne na żądanie. Przyrząd przewijany działa
+   w karcie ukrytej, więc ta powierzchnia da się sprawdzić w każdej sesji.
+   Pełny wywód metody, granice i kontrola negatywna: `matrix.html`, nota przy
+   `c1012seek()`. Skrót granicy: podpis nie odróżnia „biegnie" od „wstrzymana",
+   dlatego wiersz zdaje tylko w parze z `playState !== 'paused'`.
+
+   Czego ta sonda NIE przesądza: zieleń C10/C11 w MATRYCY pochodzi z `c1012()`
+   na źródłach. Tutejszy wynik odpowiada na węższe pytanie — „czy minifikacja
+   zmieniła puls" — i jest wart tyle, ile to pytanie.                          */
+window.MP_MATRYCA.c1012seek = function () {
+  var CEL = ['320', '360', '390', '440', '480'];
+  var PROBKI = [0, 125, 250, 375, 500, 625, 750, 875, 1000];
+  var OCZ10 = '1,0.9,0.8,0.7,0.6,0.7,0.8,0.9,1';
+  var OCZ11 = '1,0.8,0.6,0.8,1,0.8,0.6,0.8,1';
+  var AKCENT = 'rgb(207, 65, 26)';
+
+  function kreska2(d, z) {
+    return Math.round(parseFloat(z) * devicePixelRatio) ===
+           Math.max(1, Math.floor(d * devicePixelRatio));
+  }
+  function skala(cs) {
+    var m = (cs.transform || '').match(/matrix\(([^)]+)\)/);
+    return m ? Math.round(parseFloat(m[1].split(',')[0]) * 1000) / 1000 : cs.transform;
+  }
+  function podpis(w, k) {
+    var a = k.getAnimations()[0];
+    if (!a) return { brak: true };
+    var przed = a.currentTime, out = [];
+    for (var i = 0; i < PROBKI.length; i++) {
+      a.currentTime = PROBKI[i];
+      out.push(skala(w.getComputedStyle(k)));
+    }
+    a.currentTime = przed;
+    var cs = w.getComputedStyle(k);
+    return { podpis: out.join(','), okresEfektu: a.effect.getTiming().duration,
+             deklarowanyOkres: cs.animationDuration, playState: a.playState,
+             kolor: cs.backgroundColor, szer: parseFloat(cs.width),
+             wys: parseFloat(cs.height) };
+  }
+
+  var ramki = CEL.map(function (n) {
+    return Array.prototype.find.call(document.querySelectorAll('iframe'),
+                                     function (x) { return x.name === n; });
+  }).filter(Boolean);
+  if (ramki.length !== CEL.length) {
+    return { ok: false, powod: 'brak ramek portretowych: ' + ramki.length + '/' + CEL.length };
+  }
+
+  var wynik = { przyrzad: 'seek', powierzchnia: 'minifikat',
+                widocznosc: document.visibilityState, dpr: devicePixelRatio,
+                probki: PROBKI, ramki: {} };
+
+  ramki.forEach(function (f) {
+    var w = f.contentWindow;
+    w.MP.tryb.otworz(w.MP_HARNESS.widok, { krok: 3 });
+    w.MP.tryb.minutniki.wyczysc();
+    w.MP_TEST.reset();
+    var m = w.MP.tryb.minutniki.uruchom({ nazwa: 'duś ragù', sekundy: 1934 });
+
+    w.MP_TEST.przewin(1934 - 45);
+    w.MP.tryb.minutniki.tyk();
+    var k = m.el.kropka, pig = m.el.pigulka;
+    var a10 = podpis(w, k), st10 = m.stan;
+    var obrys = w.getComputedStyle(pig).outlineWidth;
+    var kolorObrysu = w.getComputedStyle(pig).outlineColor;
+
+    w.MP_TEST.przewin(39);
+    w.MP.tryb.minutniki.tyk();
+    var a11 = podpis(w, k), st11 = m.stan;
+
+    w.MP_TEST.przewin(11);
+    w.MP.tryb.minutniki.tyk();
+    var c12 = { stan: m.stan, animacji: k.getAnimations().length,
+                nazwa: w.getComputedStyle(k).animationName,
+                odliczanie: m.el.odliczanie.textContent };
+
+    var r = { nazwa: f.name };
+    r.c10 = {
+      ok: st10 === 'ostatnia-minuta' && a10.podpis === OCZ10 &&
+          a10.okresEfektu === 1000 && a10.deklarowanyOkres === '1s' &&
+          a10.playState !== 'paused' &&
+          a10.kolor === AKCENT && a10.szer === 12 && a10.wys === 12 &&
+          kreska2(1.5, obrys) && kolorObrysu === AKCENT,
+      cykliW1000ms: 1000 / a10.okresEfektu, odczyt: a10, obrysPigulki: obrys
+    };
+    r.c11 = {
+      ok: st11 === 'koncowka' && a11.podpis === OCZ11 &&
+          a11.okresEfektu === 500 && a11.deklarowanyOkres === '0.5s' &&
+          a11.playState !== 'paused' &&
+          a11.kolor === a10.kolor && a11.szer === a10.szer,
+      cykliW1000ms: 1000 / a11.okresEfektu,
+      eskalacjaTempem: a10.okresEfektu === 2 * a11.okresEfektu,
+      eskalacjaNieBarwa: a11.kolor === a10.kolor, odczyt: a11
+    };
+    r.c12 = {
+      ok: c12.stan === 'zero' && c12.animacji === 0 && c12.nazwa === 'none' &&
+          c12.odliczanie === '0:00',
+      odczyt: c12
+    };
+    wynik.ramki[f.name] = r;
+
+    w.MP.tryb.minutniki.wyczysc();
+    w.MP_TEST.reset();
+    w.MP.tryb.zamknij();
+  });
+
+  var nazwy = Object.keys(wynik.ramki);
+  ['c10', 'c11', 'c12'].forEach(function (n) {
+    wynik[n] = nazwy.every(function (x) { return wynik.ramki[x][n].ok; });
+  });
+  wynik.ok = wynik.c10 && wynik.c11 && wynik.c12;
+  wynik.ramekZmierzonych = nazwy.length;
+  return wynik;
+};
+/* ============ INWARIANT ODLEGŁOŚCI — sonda rodzica (przeb. 21) ===============
+   STAN.md 0aa: odstępy są NIEZMIENNE wobec szerokości, skaluje się wyłącznie
+   kolumna treści. Ramka eksportuje `MP_HARNESS.wynik.odleglosci`; ta sonda robi
+   jedyną rzecz, której ramka zrobić nie może — porównuje pięć ramek między sobą.
+
+   Wynik jest asymetryczny celowo: `rozne` to lista defektów, `kolumny` to
+   KONTROLA DODATNIA. Gdyby kolumny treści też wyszły równe, sonda mierzyłaby
+   pięć kopii tej samej ramki, a nie pięć szerokości — i „zero rozjazdów"
+   znaczyłoby wtedy dokładnie nic.                                             */
+window.inwariantOdleglosci = function () {
+  var CEL = ['320', '360', '390', '440', '480'];
+  var ramki = CEL.map(function (n) {
+    return Array.prototype.find.call(document.querySelectorAll('iframe'),
+                                     function (x) { return x.name === n; });
+  }).filter(Boolean);
+  if (ramki.length !== CEL.length) {
+    return { ok: false, powod: 'brak ramek portretowych: ' + ramki.length + '/' + CEL.length };
+  }
+
+  var dane = {}, kolumny = {}, braki = [];
+  ramki.forEach(function (f) {
+    var w = f.contentWindow;
+    var y = w.MP_HARNESS && w.MP_HARNESS.wynik;
+    if (!y || !y.odleglosci || y.odleglosci.blad) {
+      braki.push(f.name + (y && y.odleglosci ? ': ' + y.odleglosci.blad : ': brak eksportu'));
+      return;
+    }
+    dane[f.name] = y.odleglosci;
+    kolumny[f.name] = y.kolumnaTresci;
+  });
+  if (braki.length) { return { ok: false, powod: 'ramki bez pomiaru', braki: braki }; }
+
+  var klucze = Object.keys(dane['360']);
+  var rozne = [], zgodne = 0;
+  klucze.forEach(function (k) {
+    var wartosci = CEL.map(function (n) { return dane[n][k]; });
+    /* Wzorcem jest 360 — szerokość klatki Figmy (STAN.md 0aa), nie mediana
+       i nie 320. Mediana ukryłaby rozjazd, w którym trzy ramki mylą się zgodnie. */
+    var wzor = dane['360'][k];
+    if (wartosci.every(function (v) { return v === wzor; })) { zgodne++; }
+    else {
+      rozne.push({ wlasnosc: k, wzor360: wzor,
+                   zmierzone: CEL.map(function (n, i) { return n + '=' + wartosci[i]; }).join(' ') });
+    }
+  });
+
+  /* Kontrola dodatnia: kolumna treści MA się różnić i MA wynosić szerokość − 32. */
+  var kolumnyOk = CEL.every(function (n) { return kolumny[n] === parseInt(n, 10) - 32; });
+  var kolumnyRozne = new Set(CEL.map(function (n) { return kolumny[n]; })).size === CEL.length;
+
+  return {
+    ok: rozne.length === 0 && kolumnyOk && kolumnyRozne,
+    wlasnosciZgodnych: zgodne, wlasnosciWszystkich: klucze.length,
+    rozne: rozne,
+    kolumny: CEL.map(function (n) { return n + '→' + kolumny[n]; }).join(' '),
+    kolumnyOk: kolumnyOk, kolumnyRozne: kolumnyRozne
+  };
+};
+</script>
+</body>
+</html>

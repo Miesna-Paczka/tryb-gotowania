@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>PRÓG 500 px — tryb gotowania</title>
+
+<!--
+  harness/prog.html — powierzchnia progu (wiersze matrycy G07 i H8).
+  WYMAGANIA §1: przycisk wejścia w tryb gotowania jest widoczny do 499 px
+  włącznie i ukryty od 500 px w górę. To zachowanie STRONY, nie overlaya,
+  więc mierzy się je po obu stronach progu, a nie w matrycy szerokości.
+  Wynik przychodzi z `fixture.html` w polu `startWidoczny`.
+-->
+
+<style>
+  :root{--tlo:#12100e;--ok:#3ddc84;--zle:#ff6b5e}
+  html,body{margin:0;background:var(--tlo);color:#eee;
+            font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
+  header{padding:10px 14px;background:#1c1915;border-bottom:1px solid #333}
+  .ok{color:var(--ok)} .zle{color:var(--zle)}
+  .rzad{display:flex;gap:14px;padding:14px;overflow-x:auto}
+  .etykieta{padding:0 0 4px;font-size:12px;color:#aaa}
+  iframe{border:1px solid #444;background:#fff;display:block}
+</style>
+</head>
+<body>
+
+<header><b>PRÓG 500 px</b> — <span id="podsumowanie">ładowanie…</span></header>
+<div class="rzad" id="rzad"></div>
+
+<script>
+/* oczekiwanie: 499 → przycisk widoczny, 500 → ukryty */
+var RAMKI = [
+  { nazwa: '499', w: 499, ocz: true },
+  { nazwa: '500', w: 500, ocz: false }
+];
+var wyniki = Object.create(null);
+window.MP_PROG = { wyniki: wyniki, gotowe: false };
+
+RAMKI.forEach(function (r) {
+  var kom = document.createElement('div');
+  kom.innerHTML = '<div class="etykieta" id="et-' + r.nazwa + '">' + r.w +
+                  ' px · oczekiwany przycisk: ' + (r.ocz ? 'WIDOCZNY' : 'UKRYTY') +
+                  ' · <span class="stan">…</span></div>';
+  var f = document.createElement('iframe');
+  f.src = 'fixture.html'; f.name = r.nazwa; f.width = r.w; f.height = 620;
+  f.setAttribute('title', 'fixture ' + r.nazwa);
+  kom.appendChild(f);
+  document.getElementById('rzad').appendChild(kom);
+});
+
+window.addEventListener('message', function (e) {
+  var d = e.data;
+  if (!d || !d.mpHarness) return;
+  var r = RAMKI.filter(function (x) { return x.nazwa === d.nazwa; })[0];
+  if (!r) return;
+  var zgodne = d.mpHarness.startWidoczny === r.ocz;
+  wyniki[r.nazwa] = { startWidoczny: d.mpHarness.startWidoczny, zgodne: zgodne, ok: d.mpHarness.ok };
+
+  var s = document.querySelector('#et-' + r.nazwa + ' .stan');
+  s.textContent = (zgodne ? 'OK' : 'BŁĄD — jest ' + (d.mpHarness.startWidoczny ? 'WIDOCZNY' : 'UKRYTY'));
+  s.className = 'stan ' + (zgodne ? 'ok' : 'zle');
+
+  var klucze = Object.keys(wyniki);
+  var zle = klucze.filter(function (k) { return !wyniki[k].zgodne; });
+  var el = document.getElementById('podsumowanie');
+  el.textContent = (klucze.length - zle.length) + '/' + RAMKI.length + ' zgodnych' +
+                   (klucze.length === RAMKI.length ? '' : ' · czekam');
+  el.className = (klucze.length === RAMKI.length && !zle.length) ? 'ok' : (zle.length ? 'zle' : '');
+  window.MP_PROG.gotowe = klucze.length === RAMKI.length;
+});
+</script>
+</body>
+</html>

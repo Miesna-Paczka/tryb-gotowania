@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>PRZEGLĄD — wszystkie ekrany i warianty trybu gotowania</title>
+
+<!--
+  harness/przeglad.html — powierzchnia INSPEKCYJNA, nie pomiarowa.
+  Powstała na prośbę operatora (2026-08-15, przebieg 28) i nie liczy się do MATRYCY.
+
+  Czym się różni od `matrix.html`: matryca pokazuje JEDEN stan (ekran startowy)
+  na siedmiu szerokościach, bo mierzy układ. Ta strona pokazuje WSZYSTKIE stany
+  na JEDNEJ szerokości naraz, bo służy oglądaniu. Szerokość przełącza się u góry
+  i wtedy przerysowują się wszystkie sceny — inwariant odległości (STAN 0aa) mówi,
+  że między szerokościami ma się zmieniać wyłącznie szerokość treści, więc
+  przełącznik jest też najtańszym sposobem, żeby to zobaczyć na oko.
+
+  Minutniki BIEGNĄ NAPRAWDĘ. Puls kropki jest animacją i zamrożony nie znaczyłby
+  nic, więc każda scena minutnikowa dostaje inną pozostałą liczbę sekund i sama
+  wchodzi w swój stan: >60 s puls 1×/s, ≤60 s ostatnia minuta, ≤10 s puls 2×/s,
+  0:00 wygaszenie. Zegar przewijamy `MP_TEST.przewin()`, żeby nie czekać czterech
+  minut na stan, który ma trwać dziesięć sekund.
+
+  HARNESS-ONLY w całości. Nie wchodzi do embedu (pakiet poz. 10).
+-->
+
+<style>
+  :root{
+    --tlo:#12100e; --panel:#1c1915; --kreska:#333; --tekst:#eee; --slaby:#9a948c;
+    --ok:#3ddc84; --uwaga:#ffc75f;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--tlo);color:var(--tekst);
+            font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
+  header{position:sticky;top:0;z-index:10;background:var(--panel);
+         border-bottom:1px solid var(--kreska);padding:10px 14px;
+         display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  header b{font-size:15px;letter-spacing:.02em}
+  .grupa{display:flex;gap:6px;align-items:center}
+  .grupa span{color:var(--slaby)}
+  button.szer{background:#2a2620;color:var(--tekst);border:1px solid #444;
+              border-radius:4px;padding:4px 10px;cursor:pointer;font:inherit}
+  button.szer[aria-pressed="true"]{background:var(--ok);color:#0d0c0a;border-color:var(--ok);font-weight:700}
+  #stan{margin-left:auto;color:var(--slaby)}
+  #siatka{display:flex;flex-wrap:wrap;gap:18px;padding:18px;align-items:flex-start}
+  .scena{background:var(--panel);border:1px solid var(--kreska);border-radius:6px;
+         padding:8px;display:flex;flex-direction:column;gap:6px}
+  .glowa{display:flex;gap:8px;align-items:baseline}
+  .nr{color:var(--ok);font-weight:700}
+  .tytul{font-weight:700}
+  .zrodlo{color:var(--slaby);font-size:11px}
+  .opis{color:var(--slaby);font-size:11px;max-width:480px}
+  iframe{border:1px solid #444;background:#fff;display:block}
+  .blad{color:#ff6b5e;font-size:11px;min-height:14px}
+</style>
+</head>
+<body>
+
+<header>
+  <b>PRZEGLĄD — tryb gotowania</b>
+  <div class="grupa">
+    <span>szerokość:</span>
+    <button class="szer" data-w="320">320</button>
+    <button class="szer" data-w="360" aria-pressed="true">360</button>
+    <button class="szer" data-w="390">390</button>
+    <button class="szer" data-w="440">440</button>
+    <button class="szer" data-w="480">480</button>
+    <button class="szer" data-w="844x390">844×390 poziom</button>
+  </div>
+  <div class="grupa">
+    <button class="szer" id="przerysuj">przerysuj wszystko</button>
+  </div>
+  <div id="stan">…</div>
+</header>
+
+<div id="siatka"></div>
+
+<script>
+/* ------------------------------------------------------------------ SCENY
+
+   Każda scena to funkcja sterująca, wykonywana WEWNĄTRZ ramki po jej załadowaniu.
+   Dostaje `w` (contentWindow fixture'a) i ma zostawić interfejs w żądanym stanie.
+
+   Zasada, której warto pilnować przy dopisywaniu scen: scena steruje wyłącznie
+   PUBLICZNYM interfejsem `MP.tryb.*` i `MP.przepis.*`. Gdyby musiała sięgnąć do
+   wnętrza modułu, znaczyłoby to, że stan jest nieosiągalny dla użytkownika, a taki
+   stan nie ma czego robić w przeglądzie — jest defektem, nie wariantem.          */
+
+var SCENY = [
+  /* ---- ekrany pełne ---- */
+  { id:'start', tytul:'Ekran startowy', zrodlo:'7195:10893 · B21 (zdjęcie), A14 (pasek meta)',
+    opis:'Stan wejściowy. Pasek meta renderuje się tylko przy wypełnionym `wartosci-porcja` — w CMS ma je 1 z 18 przepisów.',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { ekran:'start', porcje:2 }); } },
+
+  { id:'lista-2', tytul:'Pełna lista składników, 2 porcje', zrodlo:'G7 · D1–D12 · E5',
+    opis:'Osobna powierzchnia, nie nakładka na ekran startowy — `lista()` zdejmuje ekran. Markery zamienników: kropkowane podkreślenie i kółko „i".',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { ekran:'start', porcje:2 }); w.MP.tryb.lista(); } },
+
+  { id:'lista-7', tytul:'Pełna lista, 7 porcji', zrodlo:'G1–G6 · A16',
+    opis:'Szczyt zakresu. Porównaj gramatury z listą wyżej: skalują się TYLKO składniki. Kroki, minutniki i pasek meta zostają — to jest test negatywny G7/A16 widziany gołym okiem.',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { ekran:'start', porcje:7 }); w.MP.tryb.lista(); } },
+
+  { id:'wznowienie', tytul:'Ekran wznowienia', zrodlo:'S1 · karta z paskiem postępu',
+    opis:'Wejście z zapamiętaną sesją. Pasek karty domierzany po złożeniu ekranu, nie w trakcie.',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { ekran:'wznowienie', krok:6 }); } },
+
+  { id:'koniec', tytul:'Ekran zakończenia', zrodlo:'7195:11178 · C6 (bez mechaniki −70 zł)',
+    opis:'Wariant v1.0 wybrany przez operatora. Pasek postępu pełny (R5).',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { ekran:'koniec' }); } },
+
+  /* ---- kroki: trzy warianty pasa dolnego (reguła składania C1) ---- */
+  { id:'krok-bez', tytul:'Krok 4 — „bez minutnika"', zrodlo:'BOTTOM · reguła składania §4.1',
+    opis:'Jedyny krok payloadu z jawnym `bez minutnika`. Wysokość pasa jest WYNIKIEM składania, nie wpisaną liczbą (C1, operator 2026-08-15) — dlatego podpisów wysokości tu nie ma, są w sondzie.',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { krok:KROK_BEZ }); } },
+
+  { id:'krok-czas', tytul:'Krok 1 — sam badge czasu', zrodlo:'C02 · badge „ok. 5 min"',
+    opis:'Krok deklaruje czas, ale nie proponuje odliczania. Badge nie powtarza się w treści kroku (C02).',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { krok:KROK_CZAS }); } },
+
+  { id:'krok-minutnik', tytul:'Krok 5 — z propozycją minutnika', zrodlo:'`minutnik: kurczak 4 min`',
+    opis:'Krok, który minutnik PROPONUJE, ale go nie uruchamia. Pas dolny dokłada przycisk — porównaj z krokiem 4 wyżej.',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { krok:KROK_MIN }); } },
+
+  { id:'krok-marker', tytul:'Krok 1 — marker i tooltip zamiennika', zrodlo:'E1–E3 · E11 · tooltip 296 px',
+    opis:'Tooltip NIE jest modalny (inaczej niż dialog) i nie minimalizuje minutników. Szerokość liczona od kolumny treści, nie od okna.',
+    akcja:function(w){
+      w.MP.tryb.otworz(WIDOK(w), { krok:KROK_MARKER });
+      var m = w.MP.tryb.czesci().top.querySelector('.mp-tryb__marker');
+      if (m) m.click(); else throw new Error('brak markera w kroku ' + KROK_MARKER);
+    } },
+
+  /* ---- minutniki: cztery stany czasu + formy kafla ---- */
+  { id:'min-w-toku', tytul:'Minutnik — w toku (puls 1×/s)', zrodlo:'C10 · stan `w-toku` (>60 s)',
+    opis:'Kropka pulsuje raz na sekundę. Stan trwa jedenaście minut, więc podtrzymywania nie potrzebuje.',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { krok:KROK_MIN });
+                       w.MP.tryb.minutniki.uruchom({ nazwa:'kurczak', sekundy:12*60 }); } },
+
+  { id:'min-ostatnia-minuta', tytul:'Minutnik — ostatnia minuta', zrodlo:'stan `ostatnia-minuta` (≤60 s)',
+    opis:'Próg 60 s. Scena PODTRZYMYWANA: przy zejściu do 12 s minutnik startuje od nowa, żeby stan nie uciekł w trakcie oglądania.',
+    utrzymuj:{ nazwa:'kurczak', sekundy:55, prog:12 },
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { krok:KROK_MIN });
+                       w.MP.tryb.minutniki.uruchom({ nazwa:'kurczak', sekundy:55 }); } },
+
+  { id:'min-koncowka', tytul:'Minutnik — końcówka (puls 2×/s)', zrodlo:'C11 · stan `koncowka` (≤10 s)',
+    opis:'Puls przyspiesza do dwóch razy na sekundę — jedyna różnica wobec sceny wyżej i widać ją WYŁĄCZNIE w ruchu. Scena podtrzymywana, inaczej trwałaby dziewięć sekund.',
+    utrzymuj:{ nazwa:'kurczak', sekundy:9, prog:1 },
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { krok:KROK_MIN });
+                       w.MP.tryb.minutniki.uruchom({ nazwa:'kurczak', sekundy:9 }); } },
+
+  { id:'min-zero', tytul:'Minutnik — po 0:00 (wygaszenie)', zrodlo:'C12 · stan `zero`',
+    opis:'Po zejściu do zera puls gaśnie, a kafel ZOSTAJE — minutnik nie znika sam. Scena dochodzi do zera w sekundę i tam stoi.',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { krok:KROK_MIN });
+                       w.MP.tryb.minutniki.uruchom({ nazwa:'kurczak', sekundy:1 }); } },
+
+  { id:'min-rozwiniety', tytul:'Minutnik — kafel rozwinięty', zrodlo:'C07 · forma 126 / 198+H',
+    opis:'Szewron znika przy zwinięciu (C07). NIENARYSOWANE: plik nie mówi, co decyduje o formie krótkiej vs pełnej — obie występują przy biegnącym minutniku.',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { krok:KROK_MIN });
+                       w.MP.tryb.minutniki.uruchom({ nazwa:'kurczak', sekundy:9*60, rozwinieta:true,
+                                                     podpowiedz:'Zdejmij z ognia, gdy sos zgęstnieje.' }); } },
+
+  { id:'min-dwa', tytul:'Dwa minutniki naraz', zrodlo:'C14 · najwyższy pas w zestawie',
+    opis:'Drugi kafel DOKŁADA się do stosu, nie zastępuje pierwszego. Dwa różne stany czasu obok siebie: jeden w toku, drugi w ostatniej minucie.',
+    utrzymuj:{ nazwa:'sos', sekundy:50, prog:10 },
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { krok:KROK_MIN });
+                       w.MP.tryb.minutniki.uruchom({ nazwa:'kurczak', sekundy:12*60 });
+                       w.MP.tryb.minutniki.uruchom({ nazwa:'sos', sekundy:50 }); } },
+
+  /* ---- warstwy nad interfejsem ---- */
+  { id:'dialog-S2', tytul:'Dialog S2 — przerwać gotowanie?', zrodlo:'S2 · `aria-modal`',
+    opis:'Modalny, w odróżnieniu od tooltipa. Brzmienie jest placeholderem — finalne dostarcza pipeline treści.',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { krok:KROK_MIN }); w.MP.tryb.dialog.otworz('S2'); } },
+
+  { id:'dialog-S4', tytul:'Dialog S4 — limit minutników', zrodlo:'S4 · limit z `W.limitMinutnikow`',
+    opis:'Pada przy próbie uruchomienia minutnika ponad limit. Tu wywołany wprost, żeby nie zależeć od limitu.',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { krok:KROK_MIN }); w.MP.tryb.dialog.otworz('S4'); } },
+
+  { id:'baner-S3', tytul:'Baner offline S3', zrodlo:'S3 · `offline.pokaz()`',
+    opis:'Stan bez sieci. Na stagingu wyzwalany zdarzeniem przeglądarki, tu wprost.',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { krok:KROK_MIN }); w.MP.tryb.offline.pokaz(); } },
+
+  { id:'scrim-poziom', tytul:'Scrim „obróć telefon" (poziom)', zrodlo:'landscape · placeholder brzmienia',
+    opis:'Widoczny wyłącznie w ramce poziomej — przełącz szerokość na 844×390, żeby go zobaczyć.',
+    akcja:function(w){ w.MP.tryb.otworz(WIDOK(w), { krok:KROK_MIN }); } }
+];
+
+/* Numery kroków dobrane do payloadu teriyaki. Trzymam je w stałych, a nie wklejone
+   w scenach, bo przy zmianie payloadu poprawia się jedno miejsce, nie sześć. */
+/* ODCZYTANE z payloadu teriyaki 2026-08-15, nie zgadnięte: krok 4 jest jedynym
+   z jawnym `bez minutnika`, minutnik proponują kroki 5 (`kurczak`) i 7 (`sos`),
+   reszta ma sam badge czasu. Pierwsze wydanie tej strony miało tu 1/2/3 i wszystkie
+   trzy sceny pasa dolnego wyglądały identycznie — sonda to złapała. */
+var KROK_BEZ = 4, KROK_CZAS = 1, KROK_MIN = 5, KROK_MARKER = 1;
+
+function WIDOK(w) {
+  /* Fixture wystawia gotowy widok po swoim bloku pomiarowym. Gdyby go nie było
+     (zmiana kolejności skryptów), budujemy własny — scena ma się nie wysypać
+     przez to, że przyrząd zmienił kształt. */
+  if (w.MP_HARNESS && w.MP_HARNESS.widok) return w.MP_HARNESS.widok;
+  var model = (w.MP_HARNESS && w.MP_HARNESS.model) || w.MP.przepis.zaladuj();
+  return w.MP.przepis.naPorcje(model, 2);
+}
+
+/* ---- PODTRZYMYWANIE STANU MINUTNIKA -------------------------------------
+
+   Stany `ostatnia-minuta` i `koncowka` są z definicji krótkie: dziewięć sekund
+   końcówki wystarczy do pomiaru GIF-em, ale nie do oglądania. Podtrzymywanie
+   restartuje minutnik, gdy zejdzie poniżej progu — kafel wraca do górnej granicy
+   swojego stanu i pulsuje dalej.
+
+   Dlaczego nie zamrożenie zegara: `MP_TEST.przewin()` przesuwa czas, ale puls jest
+   ANIMACJĄ, a zamrożony minutnik nie pulsuje. Scena pokazywałaby wtedy właściwą
+   liczbę i nieprawdziwe zachowanie, czyli dokładnie ten rodzaj podstawki, który
+   w przebiegu 28 ukrył canvas zamiast SVG. Podtrzymywanie kosztuje jeden interwał
+   i pokazuje rzecz prawdziwą.
+
+   TO JEST WYŁĄCZNIE INSPEKCJA. Matryca mierzy stany bez podtrzymywania.            */
+
+function podtrzymaj(w, cfg) {
+  setInterval(function () {
+    try {
+      var m = w.MP.tryb.minutniki.lista().filter(function (x) { return x.nazwa === cfg.nazwa; })[0];
+      if (!m || m.pozostalo > cfg.prog) return;
+      w.MP.tryb.minutniki.usun(m);
+      w.MP.tryb.minutniki.uruchom({ nazwa: cfg.nazwa, sekundy: cfg.sekundy });
+    } catch (e) { /* ramka przerysowana — następny tik trafi w nową */ }
+  }, 1000);
+}
+
+/* ------------------------------------------------------------------ RENDER */
+
+var WYMIARY = { '320':[320,780], '360':[360,780], '390':[390,780],
+                '440':[440,780], '480':[480,780], '844x390':[844,390] };
+var szerokoscTeraz = '360';
+
+function zbudujSiatke() {
+  var siatka = document.getElementById('siatka');
+  siatka.textContent = '';
+  var wym = WYMIARY[szerokoscTeraz];
+  var gotowych = 0, bledow = 0;
+
+  SCENY.forEach(function (s, i) {
+    var kom = document.createElement('div');
+    kom.className = 'scena';
+    kom.style.width = (wym[0] + 18) + 'px';
+
+    var glowa = document.createElement('div');
+    glowa.className = 'glowa';
+    glowa.innerHTML = '<span class="nr">' + String(i + 1).padStart(2, '0') + '</span>' +
+                      '<span class="tytul"></span>';
+    glowa.querySelector('.tytul').textContent = s.tytul;
+    kom.appendChild(glowa);
+
+    var zr = document.createElement('div');
+    zr.className = 'zrodlo'; zr.textContent = s.zrodlo;
+    kom.appendChild(zr);
+
+    var op = document.createElement('div');
+    op.className = 'opis'; op.textContent = s.opis;
+    op.style.width = wym[0] + 'px';
+    kom.appendChild(op);
+
+    var f = document.createElement('iframe');
+    f.src = 'fixture.html?scena=' + s.id + '&t=' + Date.now();
+    f.name = 'przeglad-' + s.id;      // nie '360' — historia zostaje przy matrycy (F4)
+    f.width = wym[0]; f.height = wym[1];
+    f.setAttribute('title', s.tytul);
+    kom.appendChild(f);
+
+    var blad = document.createElement('div');
+    blad.className = 'blad';
+    kom.appendChild(blad);
+
+    f.addEventListener('load', function () {
+      try {
+        s.akcja(f.contentWindow);
+        if (s.utrzymuj) podtrzymaj(f.contentWindow, s.utrzymuj);
+        gotowych++;
+      } catch (e) {
+        bledow++;
+        blad.textContent = 'scena nie wykonana: ' + e.message;
+      }
+      document.getElementById('stan').textContent =
+        'scen ' + gotowych + '/' + SCENY.length +
+        (bledow ? ' · BŁĘDÓW: ' + bledow : ' · bez błędów') +
+        ' · szerokość ' + szerokoscTeraz;
+    });
+
+    siatka.appendChild(kom);
+  });
+
+  document.getElementById('stan').textContent = 'ładowanie ' + SCENY.length + ' scen…';
+}
+
+Array.prototype.forEach.call(document.querySelectorAll('button.szer[data-w]'), function (b) {
+  b.addEventListener('click', function () {
+    Array.prototype.forEach.call(document.querySelectorAll('button.szer[data-w]'), function (x) {
+      x.setAttribute('aria-pressed', String(x === b));
+    });
+    szerokoscTeraz = b.getAttribute('data-w');
+    zbudujSiatke();
+  });
+});
+document.getElementById('przerysuj').addEventListener('click', zbudujSiatke);
+
+/* Uchwyt dla sesji sterującej: `MP_PRZEGLAD.sceny()` zwraca listę identyfikatorów,
+   `MP_PRZEGLAD.ramka(id)` daje okno konkretnej sceny do dalszego grzebania. */
+window.MP_PRZEGLAD = {
+  sceny: function () { return SCENY.map(function (s) { return s.id; }); },
+  ramka: function (id) {
+    var f = document.querySelector('iframe[name="przeglad-' + id + '"]');
+    return f ? f.contentWindow : null;
+  },
+  szerokosc: function () { return szerokoscTeraz; },
+  przerysuj: zbudujSiatke
+};
+
+zbudujSiatke();
+</script>
+</body>
+</html>
