@@ -1,6 +1,10 @@
 # STAN — łańcuch: embed trybu gotowania
 
 licznik przebiegów: 28/30
+**UWAGA OPERATORA (2026-08-15, 16:00): zostały DWA ogniwa do bezpiecznika.**
+Jednostka dla ogniwa 29 ma dziewięć pozycji i prawie na pewno nie zmieści się
+w dwóch przebiegach. Jeśli matryca ma zostać domknięta bez przerwy, zresetuj
+licznik do 0/30 — to jest zmiana jednej liczby w tej linii i należy do operatora.
 DWIE BLOKADY, różny zasięg i różne okno (wersja 2026-08-14, decyzja operatora):
 
 - **Przebieg** — plik `LOCK` w tym katalogu, nie linia w tym pliku. Znacznik ISO
@@ -2161,18 +2165,39 @@ byłaby dziś nieznana albo — gorzej — przepisana z `package.json` zamiast z
 
 ### Następny krok dla ogniwa nr 29 (aktualizacja z przebiegu 28)
 
-**MATRYCA 193/196. Trzy czerwone: B16 · B21 · I4** — i te trzy naprawdę są decyzjami
-operatora, sprawdzone w kolumnie statusu, nie w podsumowaniu. Wstrzymanych decyzyjnie
-pięć (W18, W46, W47, W76, W77).
+**MATRYCA 193/196. Trzy czerwone: B16 · B21 · I4. Wstrzymanych decyzyjnie pięć**
+(W18, W46, W47, W76, W77).
 
-1. **Sprawdź, czy operator coś rozstrzygnął.** Czekają: **D-27.1** (kolor `--mp-cta`),
-   **D-23.1** (źródło zdjęcia → B21, sprzężone W76), **D-15.1/B16** (font ikon w runtimie
-   → B16 i I4 razem), **D-25.5** (`typo/Caption` 12 czy 14 → sześć wierszy W),
-   **D-26.1**, **D-26.2**. B16 i I4 to jedna decyzja i dwa wiersze.
-2. **Jeśli nic nie rozstrzygnięto — TU warunek 5 jest prawdziwy**, w odróżnieniu od
-   przebiegów 26 i 27. Zanim go ogłosisz, przeczytaj kolumnę statusu każdej z trzech
-   czerwieni i potwierdź, że żadna nie mówi „czeka na wykonanie". Ten przebieg powstał
-   wyłącznie z tego, że ktoś to zrobił.
+**UWAGA — TEN AKAPIT ZASTĘPUJE PUNKTY 1 I 2 W ICH PIERWOTNYM BRZMIENIU.**
+Operator rozstrzygnął **WSZYSTKO** w sesji konwersacyjnej 2026-08-15 po inspekcji
+`przeglad.html`, już po zamknięciu przebiegu 28. **Warunek wyjścia nr 5 NIE zachodzi
+i nie wolno go ogłosić** — nie ma ani jednej pozycji czekającej na operatora poza
+jedną liczbą (próg WYM §4, patrz niżej), która nie blokuje żadnego wiersza.
+
+**Zacznij od rozdziału „ROZSTRZYGNIĘCIA OPERATORA — sesja 2026-08-15, po inspekcji
+`przeglad.html`" — trzynaście pozycji z tabelą stanu wykonania.** Jest wyżej w tym
+pliku, nad nagłówkiem PRZEBIEGU 28. Pierwotne brzmienie punktów 1–2 („sprawdź, czy
+operator coś rozstrzygnął / jeśli nic, to warunek 5") powstało PRZED tą sesją i było
+prawdziwe przez kilkanaście minut. Zostawiam je skreślone zamiast usuwać, bo to jest
+trzeci raz w tym łańcuchu, gdy zdanie zbiorcze przeżywa fakty, które opisuje — i ta
+powtarzalność jest ważniejsza od oszczędności miejsca.
+
+**Jednostka dla ogniwa 29 jest jedna i duża — dziewięć pozycji, wszystkie rozstrzygnięte:**
+zdjęcie główne z `zdjecie-glowne` na starcie i zakończeniu (B21, W76) · font ikon
+Outlined do runtime'u (B16 + I4 razem) · `--mp-cta` → **#E55529** · byczek inline SVG
+z Figmy `7283:10838` (**w Webflow go NIE MA**, sprawdzone 896 assetów) · etykieta
+„krok X z Y" wyśrodkowana · `.mp-tryb__czas` do PRAWEJ na wszystkich powierzchniach ·
+hit-area tooltipa 120 % wysokości kółka `i` na pełną szerokość wiersza · badge czasu
+jako wyzwalacz minutnika (D-28.2, klatka `7195:11065`) · `przeliczBottom()` przepisany
+pod model dwutrybowy z WYM v1.6.
+
+**Trzy rozstrzygnięcia nie wymagają ANI LINIJKI kodu** — Caption 14, zieleń #487622
+i Outlined są już spełnione w runtimie. Potrzebny sam przemiar, żeby sześć wierszy W
+zzieleniało. Zacznij od nich: najtańsza zieleń w całej kolejce.
+
+**Jedyna otwarta pozycja: próg WYM §4.** Operator powiedział „podnieść w granicach
+rozsądku"; łańcuch zaproponował **45 000** i czeka na potwierdzenie. To NIE jest
+warunek wyjścia — pracuj dalej, a przy przekroczeniu 40 000 zapisz fakt i jedź.
 3. **Pakiet integracyjny ZAKTUALIZOWANY w jednostce 3 tego przebiegu** — §1, §2, §3,
    §3d i §7 przepisane pod stan po obu jednostkach. **Nie przemierzaj ich ponownie
    bez powodu**; powodem jest zmiana artefaktu, nie upływ czasu. Do zrobienia zostaje
