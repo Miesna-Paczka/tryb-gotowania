@@ -93,7 +93,11 @@
      Próg mierzy się na osobnej powierzchni (`prog.html`), nie w matrycy szerokości. */
   #mp-start{display:inline-block;font:600 15px/1 system-ui,sans-serif;padding:14px 18px;
             border:0;border-radius:8px;background:var(--mp-ink);color:#fff}
-  @media (min-width:500px){ #mp-start{display:none} }
+  /* D-35.1 ROZSTRZYGNIĘTE 2026-08-15 przez operatora, definitywnie:
+     przycisk WIDOCZNY do 500 px WŁĄCZNIE, UKRYTY od 501 px w górę.
+     Do tej zmiany stało `min-width:500px`, czyli ukrycie już NA 500 —
+     rozjazd o jeden piksel wobec reguły na stronie. */
+  @media (min-width:501px){ #mp-start{display:none} }
 
   /* HARNESS-ONLY — pasek diagnostyczny. Nie wchodzi do embedu. */
   #mp-harness{position:fixed;left:0;right:0;bottom:0;z-index:99998;
@@ -2282,14 +2286,28 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
        i wiersz bez niego. */
     MP.tryb.lista(false);
     MP.tryb.pokazKrok(1);
-    var wiersze = function () { return cz.top.querySelectorAll('.mp-tryb__wiersz'); };
+    /* PRZEBAZOWANE: „lista skrócona" to teraz STAN, nie ekran — wiersze sekcji
+       `dalej`/`zużyte` SĄ w drzewie także po zwinięciu, tylko kontener ma wysokość
+       zero. Zapytanie o `.mp-tryb__wiersz` na całym TOP-ie liczyłoby więc wiersze
+       niewidoczne i mierzyło co innego, niż deklaruje etykieta. Zakres zawężony
+       do listy „w tym kroku", czyli bezpośredniego dziecka ramki. */
+    var wiersze = function () {
+      var u = cz.top.querySelector('.mp-tryb__ramka-skladnikow > .mp-tryb__skladniki');
+      return u ? u.querySelectorAll('.mp-tryb__wiersz') : cz.top.querySelectorAll('.mp-tryb__wiersz');
+    };
     var w1 = wiersze();
     var zMarkerem = cz.top.querySelector('.mp-tryb__wiersz[data-mp-zamiennik]');
     var bezMarkera = cz.top.querySelector('.mp-tryb__wiersz:not([data-mp-zamiennik])');
 
-    sprawdz('D5: lista skrócona pokazuje tylko „w tym kroku"',
-            cz.top.querySelectorAll('.mp-tryb__naglowek-sekcji').length === 0 &&
-            w1.length === 7, w1.length);
+    /* PRZEBAZOWANE: oracle „zero nagłówków sekcji" opisywał ODDZIELNY EKRAN.
+       Dziś nagłówki istnieją zawsze, a o zwinięciu decyduje wysokość kontenera —
+       pytamy więc o to, co widać, a nie o to, co jest w drzewie. */
+    var resztaZw = cz.top.querySelector('.mp-tryb__reszta');
+    sprawdz('D5: lista skrócona pokazuje tylko „w tym kroku" (reszta zwinięta do zera)',
+            !!resztaZw && Math.round(pr(resztaZw).height) === 0 &&
+            w1.length === 7,
+            w1.length + ' wierszy · reszta ' +
+            (resztaZw ? Math.round(pr(resztaZw).height) : 'brak') + ' px');
     /* Skok 31 z §3.2 to wiersz 19 + ODSTĘP 12 — mierzalny jest odstęp, bo wiersz
        z markerem ma 20 px (§3.14) i wtedy skok wynosi 32. Pierwsza wersja asercji
        pytała o skok 31 i dostała 32 na wierszu z zamiennikiem: liczba z klatki
@@ -2497,17 +2515,71 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     var sumaN = sekcjeN.reduce(function (a, b) { return a + b; }, 0);
     var naglowki = cz.top.querySelectorAll('.mp-tryb__naglowek-sekcji');
     var linie = cz.top.querySelectorAll('.mp-tryb__linia');
-    sprawdz('D6: pełna lista = sekcje z nagłówkami, linia MIĘDZY sekcjami',
-            naglowki.length === niepuste && linie.length === niepuste - 1 && niepuste === 3 &&
+    /* PRZEBAZOWANE 2026-08-15 — ekran pełnej listy USUNIĘTY, rozwijanie jest w miejscu.
+       Struktura po zmianie: ramka `.mp-tryb__ramka-skladnikow` zawiera etykietę
+       „w tym kroku", listę `teraz`, kontener `.mp-tryb__reszta[data-mp-lista-pelna]`
+       z sekcjami `dalej`/`zużyte`, i przycisk. Dlatego nagłówków sekcji jest DWA,
+       nie trzy — „w tym kroku" nosi `.mp-tryb__etykieta-sekcji`, bo jest widoczne
+       także w stanie zwiniętym i nie ma nad sobą linii. Linie są DWIE, po jednej
+       PRZED każdą sekcją w rozwijanym kontenerze; stara reguła `niepuste - 1`
+       opisywała linie MIĘDZY sekcjami jednego wspólnego pudełka i przestała
+       obowiązywać razem z tym pudełkiem. */
+    var etykietaTeraz = cz.top.querySelector('.mp-tryb__etykieta-sekcji');
+    var reszta = cz.top.querySelector('.mp-tryb__reszta');
+    sprawdz('D6: sekcje rozwinięte = nagłówek na każdą, linia PRZED każdą, „w tym kroku" osobno',
+            !!etykietaTeraz && etykietaTeraz.textContent === 'w tym kroku' &&
+            !!reszta && reszta.hasAttribute('data-mp-lista-pelna') &&
+            naglowki.length === niepuste - 1 && linie.length === niepuste - 1 &&
+            niepuste === 3 &&
             Array.prototype.map.call(naglowki, function (h) { return h.textContent; }).join('|') ===
-              'w tym kroku|dalej|zużyte',
+              'dalej|zużyte',
             Array.prototype.map.call(naglowki, function (h) { return h.textContent; }).join('|'));
+    /* Kontrola, że rozwinięcie NIE clipuje treści — to jest zgłoszenie operatora
+       z 2026-08-15 („rozwijanie uniemożliwia przewijanie"). Kontener ma
+       `overflow:hidden` na stałe (potrzebne do animacji wysokości), więc jedyne,
+       co dzieli stan zdrowy od zaciętego, to czy wysokość wróciła do `auto`.
+       Zamrożona wartość w pikselach obcina listę i wygląda jak brak przewijania. */
+    /* ORACLE POPRAWIONY PO POMIARZE: `scrollHeight <= clientHeight` było ZŁYM
+       pytaniem i nie dało się go spełnić z definicji. Zmierzone: pudełka dzieci
+       kończą się CO DO PIKSELA na wysokości kontenera (ostatnie dziecko dołem na 360
+       przy `clientHeight` 360), a `scrollHeight` 373 bierze się z `.mp-tryb__cel` —
+       celu dotyku 44×44, który z projektu WYSTAJE poza wiersz 19 px (§3.14).
+       Pytamy więc o dwie rzeczy osobno: (a) czy TREŚĆ się mieści, (b) czy wysokość
+       wróciła do `auto`. Przycięcie celu dotyku jest osobnym znaleziskiem i ma
+       własną asercję niżej — mieszanie tych dwóch rzeczy w jednym wierszu dało
+       asercję, która nie umiała przejść nawet przy zdrowym produkcie. */
+    var ostDziecko = reszta && reszta.lastElementChild;
+    sprawdz('D6: po rozwinięciu treść mieści się w kontenerze, a wysokość wraca do `auto`',
+            !!reszta && !!ostDziecko && reszta.style.height === '' &&
+            Math.round(pr(reszta).height) > 0 &&
+            Math.round(pr(ostDziecko).bottom - pr(reszta).top) === Math.round(pr(reszta).height),
+            'inline „' + (reszta ? reszta.style.height : '?') + '" · dziecko dołem ' +
+            (ostDziecko ? Math.round(pr(ostDziecko).bottom - pr(reszta).top) : '?') +
+            ' vs kontener ' + (reszta ? Math.round(pr(reszta).height) : '?'));
+    /* ZNALEZISKO 2026-08-15, wiersz CZERWONY z pomiaru, nie z przeglądu:
+       `overflow:hidden` — konieczne do animowania wysokości — PRZYCINA cel dotyku
+       ostatniego wiersza listy. Przycięcie obejmuje trafianie, nie tylko rysowanie,
+       więc ostatni składnik w rozwiniętej sekcji ma mniejsze pole dotyku niż 44 px.
+       Nie naprawiam tego w locie: naprawa to albo dopełnienie kontenera, albo
+       `overflow-clip-margin`, i jedno i drugie zmienia rytm — czyli decyzja
+       projektowa, nie poprawka. */
+    var ostWiersz = reszta && reszta.querySelectorAll('.mp-tryb__wiersz');
+    ostWiersz = ostWiersz && ostWiersz.length ? ostWiersz[ostWiersz.length - 1] : null;
+    var celOst = ostWiersz && ostWiersz.querySelector('.mp-tryb__cel');
+    var wystaje = celOst ? Math.round(pr(celOst).bottom - pr(reszta).bottom) : null;
+    sprawdz('D13: cel dotyku OSTATNIEGO wiersza nie jest przycięty przez `overflow` kontenera',
+            !!celOst && wystaje <= 0,
+            celOst ? ('cel wystaje ' + wystaje + ' px poza kontener · cel ' +
+                      Math.round(pr(celOst).height) + ' px') : 'brak celu');
     /* ---- W59–W61 — wykończenie listy PEŁNEJ (`7196:10993`), odczyt przeb. 25 -----
        Sekcja D mierzy tę listę od przebiegu 6 i mierzy ją dobrze — ale jako SKŁAD:
        ile sekcji, ile wierszy, jaki rytm, gdzie linia. Barw i wag nie sprawdzał nikt.
        Wszystkie trzy własności niżej były w runtimie niezgodne z plikiem przed
        poprawką z tego przebiegu; asercje powstały po niej i dlatego są zielone. */
-    var listaP = wezelLub(cz.top, '.mp-tryb__lista');
+    /* PRZEBAZOWANE: obrysowanym pudełkiem jest teraz RAMKA bloku składników —
+       ta sama, która w stanie zwiniętym otacza samo „w tym kroku". Lico 16 wychodzi
+       z `padding:15` + `border:1`, dokładnie jak przedtem na `.mp-tryb__lista`. */
+    var listaP = wezelLub(cz.top, '.mp-tryb__ramka-skladnikow');
     var sLis = getComputedStyle(listaP), sNag = getComputedStyle(elLubZ(naglowki[1])),
         sLin = getComputedStyle(elLubZ(linie[0]));
     sprawdz('W59: ramka listy pełnej — OBRYS 1 px `beige-2`, bez wypełnienia, lico 16',
@@ -2524,13 +2596,13 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     sprawdz('W61: kreska między sekcjami — `primary-text`, tak samo jak kreska listy skróconej',
             String(sLin.backgroundColor).replace(/\s+/g, '') === 'rgb(62,43,34)',
             sLin.backgroundColor);
-    var wp = cz.top.querySelectorAll('.mp-tryb__lista .mp-tryb__wiersz');
+    var wp = cz.top.querySelectorAll('.mp-tryb__ramka-skladnikow .mp-tryb__wiersz');
     sprawdz('D6: pełna lista pokazuje WSZYSTKIE składniki kroku (' + sekcjeN.join('+') + ')',
             wp.length === sumaN && sumaN === 11, wp.length + ' vs ' + sumaN);
     /* Skok mierzymy WEWNĄTRZ jednej sekcji: przez granicę sekcji leży nagłówek
        i linia, więc odległość między wierszami sąsiednich sekcji nie jest skokiem
        listy (zmierzone 60 px w przebiegu 6). */
-    var ule = cz.top.querySelectorAll('.mp-tryb__lista .mp-tryb__skladniki');
+    var ule = cz.top.querySelectorAll('.mp-tryb__ramka-skladnikow .mp-tryb__skladniki');
     var ulWiele = null;
     Array.prototype.forEach.call(ule, function (u) { if (!ulWiele && u.children.length >= 2) ulWiele = u; });
     sprawdz('D11: skok wiersza wewnątrz sekcji pełnej listy = 27 (19 + odstęp 8)',
@@ -2538,12 +2610,20 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             Math.round(pr(ulWiele.children[1]).top - pr(ulWiele.children[0]).top) === 27 &&
             Math.round(pr(ulWiele.children[1]).top - pr(ulWiele.children[0]).bottom) === 8,
             ulWiele && Math.round(pr(ulWiele.children[1]).top - pr(ulWiele.children[0]).top));
-    sprawdz('D6: rytm 8 px także wokół nagłówka i linii',
-            Math.round(pr(naglowki[1]).top - pr(linie[0]).bottom) === 8 &&
-            Math.round(pr(linie[0]).top - pr(ule[0].lastElementChild).bottom) === 8 &&
+    /* PRZEBAZOWANE — rytm ma teraz DWIE wartości i to jest reguła, nie niedopatrzenie:
+       WEWNĄTRZ rozwijanego kontenera 8 px (jego własny `gap`), a na GRANICY między
+       listą „w tym kroku" a kontenerem 12 px (`gap` ramki, ten sam, który dzieli
+       etykietę od listy). Stara asercja znała tylko 8, bo wszystko siedziało
+       w jednym pudełku pełnej listy.
+       [DO POTWIERDZENIA W FIGMIE] granica 12 px jest WYPROWADZONA z gapa ramki,
+       a nie odczytana z klatki — klatka `7196:10993` rysowała układ, którego już
+       nie ma. Wartość jest spójna z resztą ramki, ale to wniosek, nie pomiar. */
+    sprawdz('D6: rytm 8 px wewnątrz kontenera, 12 px na granicy z listą „w tym kroku"',
+            Math.round(pr(naglowki[0]).top - pr(linie[0]).bottom) === 8 &&
+            Math.round(pr(linie[0]).top - pr(ule[0].lastElementChild).bottom) === 12 &&
             Math.round(pr(linie[0]).height) === 1,
-            Math.round(pr(naglowki[1]).top - pr(linie[0]).bottom) + '/' +
-            Math.round(pr(linie[0]).top - pr(ule[0].lastElementChild).bottom));
+            'nad nagłówkiem ' + Math.round(pr(naglowki[0]).top - pr(linie[0]).bottom) +
+            ' / granica ' + Math.round(pr(linie[0]).top - pr(ule[0].lastElementChild).bottom));
     /* D1 / D2 — dwa stany wiersza, nie trzy: `dalej` NIE dostaje delty wizualnej */
     var wTeraz = ule[0].children[0], wDalej = ule[1].children[0], wZuzyty = ule[2].children[0];
     var stylNazwy = function (w) {
@@ -2573,17 +2653,26 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             sZuz.color === sTer.color,
             sZuz.color + ' vs ' + sTer.color);
     sprawdz('D2: sekcję niesie nagłówek, linia i kolejność — nie styl wiersza',
-            naglowki.length === 3 && linie.length === 2 &&
-            pr(naglowki[1]).top < pr(wDalej).top && pr(linie[0]).top < pr(naglowki[1]).top);
-    sprawdz('D10: pełna lista przewija się natywnie na TOP, bez własnego toru',
+            naglowki.length === 2 && linie.length === 2 &&
+            pr(naglowki[0]).top < pr(wDalej).top && pr(linie[0]).top < pr(naglowki[0]).top);
+    /* PRZEBAZOWANE — pytanie zostaje to samo („przewijanie jest natywne, na TOP"),
+       ale oracle nie może już brzmieć `overflowY === 'visible'` na kontenerze listy:
+       `.mp-tryb__reszta` MUSI mieć `overflow:hidden`, bo bez tego nie da się animować
+       jego wysokości. Mierzymy więc SKUTEK zamiast mechanizmu: TOP się przewija,
+       a rozwijany kontener nie zawiera własnego przewijania (nic w nim nie wystaje). */
+    sprawdz('D10: przewijanie jest natywne na TOP; kontener nie ma własnego toru',
             /auto|scroll/.test(getComputedStyle(cz.top).overflowY) &&
-            getComputedStyle(cz.top.querySelector('.mp-tryb__lista')).overflowY === 'visible' &&
+            !!reszta && !!reszta.lastElementChild &&
+            Math.round(pr(reszta.lastElementChild).bottom - pr(reszta).top) ===
+              Math.round(pr(reszta).height) &&
+            cz.top.scrollHeight > 0 &&
             korzen.querySelectorAll('[class*="scroll-rail"],[class*="thumb"]').length === 0,
-            getComputedStyle(cz.top.querySelector('.mp-tryb__lista')).overflowY);
-    sprawdz('D12: zaznaczenie przeniosło się na pełną listę (stan wiersza, nie DOM-u)',
+            'TOP ' + getComputedStyle(cz.top).overflowY + ' · reszta ' +
+            (reszta ? reszta.scrollHeight + '/' + reszta.clientHeight : '?'));
+    sprawdz('D12: zaznaczenie przeżyło ROZWINIĘCIE listy (stan wiersza, nie DOM-u)',
             cz.top.querySelectorAll('.mp-tryb__wiersz[data-odhaczony]').length === 1 &&
             MP.tryb.zaznaczone().length === 1, MP.tryb.zaznaczone().join(','));
-    var wiecej2 = cz.top.querySelector('.mp-tryb__lista .mp-tryb__wiecej');
+    var wiecej2 = cz.top.querySelector('.mp-tryb__ramka-skladnikow .mp-tryb__wiecej');
     /* C08 — obrót szewronu NA LIŚCIE SKŁADNIKÓW (I-15 `down` = rozwiń, I-16 `up` = zwiń).
        Wiersz C08 stał zielony od przeb. 15 bez własnej asercji: mierzyły go te dwie
        linijki pod etykietą D9, więc żaden przegląd pokrycia nie mógł go zobaczyć.
@@ -2593,9 +2682,13 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             !!wiecej2 && glifPrzed === '⌃', glifPrzed);
     wiecej2.click();
     var glifPo = cz.top.querySelector('.mp-tryb__wiecej-glif').textContent;
-    sprawdz('D9 · C08: po tapnięciu wracamy do listy skróconej, szewron na `⌄`',
+    /* PRZEBAZOWANE: po zwinięciu nagłówki sekcji ZOSTAJĄ w drzewie — kontener jest
+       tylko schowany wysokością zero. Pytamy więc o to, czego naprawdę chcemy:
+       że nie są widoczne. `offsetParent === null` nie zadziała (kontener nie jest
+       `display:none`), więc mierzymy wysokość kontenera. */
+    sprawdz('D9 · C08: po tapnięciu lista jest ZWINIĘTA, szewron na `⌄`',
             MP.tryb.listaOtwarta() === false &&
-            cz.top.querySelectorAll('.mp-tryb__naglowek-sekcji').length === 0 &&
+            Math.round(pr(cz.top.querySelector('.mp-tryb__reszta')).height) === 0 &&
             glifPo === '⌄', glifPo);
     /* Falsyfikowalność wiersza siedzi w tej jednej asercji, nie w dwóch wyżej.
        Dwie asercje na stałe wartości przeszłyby także wtedy, gdyby glif był
@@ -3666,10 +3759,15 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
        numer kroku, a nie pełność listy. Różnica wobec listy skróconej jest właśnie
        taka: skrócona pokazuje wyłącznie „w tym kroku". */
     var sekcje = cz.top.querySelectorAll('.mp-tryb__naglowek-sekcji');
-    var wierszePelne = cz.top.querySelectorAll('.mp-tryb__lista .mp-tryb__wiersz');
+    /* PRZEBAZOWANE: ścieżka ghosta „najpierw pokaż składniki" prowadzi teraz do
+       kroku 1 z ROZWINIĘTYM blokiem składników, a nie na osobny ekran listy. */
+    var wierszePelne = cz.top.querySelectorAll('.mp-tryb__ramka-skladnikow .mp-tryb__wiersz');
     sprawdz('D8: „najpierw pokaż składniki" otwiera listę PEŁNĄ, nie skróconą (G6 · W§5)',
             MP.tryb.listaOtwarta() === true &&
-            wierszePelne.length === w2.skladniki.length && sekcje.length >= 2 &&
+            /* PRZEBAZOWANE: na kroku 1 „zużyte" jest puste, więc nagłówków sekcji
+               w rozwijanym kontenerze jest JEDEN, nie dwa — próg `>= 2` opisywał
+               układ, w którym „w tym kroku" też miało nagłówek. */
+            wierszePelne.length === w2.skladniki.length && sekcje.length >= 1 &&
             wierszePelne.length > w2.kroki[0].skladnikiTeraz.length &&
             MP.tryb.ekranTeraz() === null &&
             getComputedStyle(cz.nawigacja).display !== 'none',

@@ -545,8 +545,16 @@
        a `height` jest animowalne, bo idzie przez piksele, nie przez `auto`.
        `overflow:hidden` jest warunkiem koniecznym, nie ozdobą: bez niego zwinięty
        kontener o wysokości 0 dalej rysowałby treść poza swoim pudełkiem. */
+    /* `flex:0 0 auto` NA SAMYM KONTENERZE, nie tylko na jego dzieciach — druga
+       odsłona tej samej pomyłki tego samego dnia. Ramka bloku składników jest
+       kolumną flex, więc `.mp-tryb__reszta` jest w niej ELEMENTEM flex i domyślne
+       `flex-shrink:1` pozwalało ją ścisnąć. Zmierzone: `height:auto`, a mimo to
+       `scrollHeight 373` przy `clientHeight 360` — trzynaście pikseli listy
+       obcinanych przez `overflow:hidden`, bez własnego paska przewijania, bo
+       kontener nie jest przewijalny. Z zewnątrz wygląda to dokładnie jak
+       „rozwinięcie listy uniemożliwia przewijanie" (zgłoszenie operatora). */
     '#' + ID + ' .mp-tryb__reszta{overflow:hidden;height:0;display:flex;' +
-      'flex-direction:column;gap:8px}' +
+      'flex:0 0 auto;flex-direction:column;gap:8px}' +
     '#' + ID + ' .mp-tryb__reszta[data-otwarta]{height:auto}' +
     /* `flex:0 0 auto` na DZIECIACH — bez tego akordeon nie otwiera się w ogóle
        i objaw jest mylący. Kontener jest kolumną flex, więc przy `height:0`
@@ -1858,23 +1866,35 @@
       trwanie = parseFloat(getComputedStyle(r).transitionDuration) || 0;
     } catch (e) { trwanie = 0; }
 
-    /* `prefers-reduced-motion: reduce` — przejścia nie ma, więc `transitionend`
-       nigdy nie przyjdzie i czekanie na nie zostawiłoby kontener na sztywnej
-       wysokości w pikselach. Kończymy od razu. */
-    if (trwanie === 0) { r.style.height = nowa ? '' : '0px'; return stan.listaOtwarta; }
+    /* DOMKNIĘCIE MUSI BYĆ BEZWARUNKOWE — `transitionend` nie jest gwarancją.
+       Zmierzone 2026-08-15: w karcie w tle (`document.hidden`) przejście nie postępuje
+       wcale, więc zdarzenie nie przychodzi, `height` zostaje na wartości startowej,
+       a `overflow:hidden` obcina listę. Z zewnątrz wygląda to jak „rozwinięcie
+       uniemożliwia przewijanie" — dokładnie zgłoszenie operatora. Ta sama pułapka
+       dotyczy przerwanego przejścia i silników, które go nie odpalą.
+       Stąd trzy drogi do tego samego stanu końcowego, a nie jedna:
+       (a) brak przejścia albo karta w tle → domykamy SYNCHRONICZNIE, bez animacji;
+       (b) `transitionend` → normalna droga;
+       (c) budzik na czas trwania + zapas → siatka bezpieczeństwa dla (b). */
+    function domknij() {
+      if (r._mpKoniec) { r.removeEventListener('transitionend', r._mpKoniec); r._mpKoniec = null; }
+      if (r._mpBudzik) { clearTimeout(r._mpBudzik); r._mpBudzik = null; }
+      /* Po otwarciu oddajemy wysokość CSS-owi (`[data-otwarta]{height:auto}`):
+         zostawiona wartość w pikselach zamroziłaby kontener i pozycja zaznaczona
+         po rozwinięciu przestałaby zmieniać jego rozmiar. */
+      r.style.height = r.hasAttribute('data-otwarta') ? '' : '0px';
+    }
+    if (trwanie === 0 || document.hidden) { domknij(); return stan.listaOtwarta; }
 
     r.style.height = cel + 'px';
     if (r._mpKoniec) r.removeEventListener('transitionend', r._mpKoniec);
+    if (r._mpBudzik) clearTimeout(r._mpBudzik);
     r._mpKoniec = function (e) {
       if (e.target !== r || e.propertyName !== 'height') return;
-      r.removeEventListener('transitionend', r._mpKoniec);
-      r._mpKoniec = null;
-      /* Po otwarciu oddajemy wysokość CSS-owi (`[data-otwarta]{height:auto}`):
-         zostawiona wartość w pikselach zamroziłaby kontener i pozycja
-         zaznaczona po rozwinięciu przestałaby zmieniać jego rozmiar. */
-      if (r.hasAttribute('data-otwarta')) r.style.height = '';
+      domknij();
     };
     r.addEventListener('transitionend', r._mpKoniec);
+    r._mpBudzik = setTimeout(domknij, trwanie * 1000 + 80);
     return stan.listaOtwarta;
   }
 

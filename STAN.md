@@ -84,7 +84,17 @@ Aneks pomiarowy **v1.3**:
 `git/content/handoffs/ANEKS-POMIAR--tryb-gotowania-embed--v1.3.md`
 sha256: `6ab07c4f6f10d000fe42c3f4728809061dca3bd17a5b5fcbc6aeeb3cf87c54fe`
 
-Wymagania **v1.7** (próg miękki rozmiaru 40 000 → **45 000**, obejmuje OBA artefakty;
+Wymagania **v1.8** (D-35.1 rozstrzygnięte definitywnie 2026-08-15: przycisk startu
+WIDOCZNY do 500 px WŁĄCZNIE, UKRYTY od 501 px. Wcześniejsze „próg ukrycia 500" dawało
+się czytać dwojako i było czytane dwojako — harness ukrywał NA 500, strona pokazywała
+DO 500. Zmienione w tym samym ruchu: `min-width:501px` w obu fixture'ach, ramka 501
+w `prog.html` z zachowaniem 499 jako kontroli dodatniej, `@media (max-width:500px)`
+w custom code szablonu przepisu):
+`git/tech/tryb-gotowania/WYMAGANIA.md`
+sha256: `6ba45bb732c6c2b837a9915c36ef95cbd82ad348934125a27363ff8efc0bd509`
+(poprzednie — v1.7: `cd23f958944538c30836184e86a37d6b65ada5ad200f9c008408894d87adf2a9`)
+
+~~Wymagania v1.7~~ (próg miękki rozmiaru 40 000 → **45 000**, obejmuje OBA artefakty;
 D-28.1 rozstrzygnięte przez operatora 2026-08-15, wprowadzone przez łańcuch na wyraźne
 polecenie w tej samej rozmowie. Przy okazji poprawiony nagłówek pliku, który stał na
 „v1.5" mimo wpisu v1.6 na liście zmian):
@@ -2600,6 +2610,46 @@ czeka na czynność, której łańcuchowi nie wolno wykonać:**
 | `S7` | rozjazd 1 zależy od `S4`; rozjazd 2 (`--mp-belka-h` gospodarza) jest pozycją decyzyjną | operator |
 
 **Każdy kolejny przebieg zmierzyłby dokładnie to samo.** Zadanie wyłączone.
+
+### PRZEBAZOWANIE SEKCJI D — WYKONANE (2026-08-15, sesja interaktywna)
+
+**Blok pomiarowy biegnie do końca: 429 asercji × 7 ramek, konsola 0, pokrycie 194.**
+Było 245 z 427 i urwanie. Ekran pełnej listy (`rysujListe`) usunięty, więc oracle
+sekcji `D` przeniesiony na akordeon: „lista skrócona" to STAN (wysokość kontenera 0),
+nie brak węzłów; nagłówki sekcji są DWA (`dalej`, `zużyte`), bo „w tym kroku" nosi
+`.mp-tryb__etykieta-sekcji`; linie stoją PRZED sekcjami, nie między nimi; obrysowanym
+pudełkiem jest `.mp-tryb__ramka-skladnikow` (lico 16 = padding 15 + border 1).
+
+**Dwa DEFEKTY PRODUKTU znalezione przez przebazowanie, obydwa naprawione:**
+1. `.mp-tryb__reszta` była elementem flex bez `flex:0 0 auto` — rodzic ją ściskał.
+2. **Domknięcie animacji zależało wyłącznie od `transitionend`**, które w karcie w tle
+   NIE PRZYCHODZI: `height` zostawało na wartości startowej, `overflow:hidden` obcinał
+   listę i z zewnątrz wyglądało to jak „rozwinięcie uniemożliwia przewijanie"
+   (zgłoszenie operatora). Teraz trzy drogi do stanu końcowego: brak przejścia albo
+   `document.hidden` → domknięcie SYNCHRONICZNE; `transitionend`; budzik na czas
+   trwania + 80 ms jako siatka bezpieczeństwa.
+
+**`D13` — NOWY WIERSZ, czerwony z pomiaru:** `overflow:hidden` przycina cel dotyku
+OSTATNIEGO wiersza rozwiniętej sekcji o **12 px** (cel ma 44, wystaje poza kontener).
+Przycięcie obejmuje trafianie, nie tylko rysowanie. Naprawa to dopełnienie kontenera
+albo `overflow-clip-margin` — jedno i drugie rusza rytm, więc DECYZJA, nie poprawka.
+
+**Sześć czerwieni na 429, wszystkie nazwane:** `B25` (kontrola porównywała dwie
+powierzchnie, druga przestała istnieć), `D11` rytm nad wywoływaczem 24 zamiast 12
+(przycisk stoi za kontenerem, więc gap się dubluje), `D13` (wyżej), `D11` skok
+w sekcji 31 zamiast 27, `D9·C08` zwinięcie, `I5` (powierzchnia źródłowa, stała).
+**Cztery z nich to pytania o GEOMETRIĘ, na które odpowiada Figma** — i to jest
+dokładnie wejście w fazę przeglądów.
+
+**D-35.1 ZAMKNIĘTE decyzją operatora:** widoczny ≤500, ukryty ≥501. WYMAGANIA v1.8
+(hash w „Plikach wiążących"), `min-width:501px` w obu fixture'ach, ramka 501
+w `prog.html` z 499 jako kontrolą dodatnią, `@media (max-width:500px)` w custom code
+szablonu przepisu (Webflow nie ma breakpointu 500).
+
+**PUŁAPKA POMIAROWA, czternasta:** `innerWidth` ZAOKRĄGLA. Ramka `width=501` raportuje
+`innerWidth === 501`, a `matchMedia('(min-width:501px)')` daje FAŁSZ — realnie ~500,x px.
+Przy progu przesuniętym o jeden piksel to wystarcza, żeby wynik był odwrotny.
+`prog.html` kalibruje teraz ramki po `matchMedia`, nie po atrybucie `width`.
 
 ### RAPORT DECYZJI — wszystko, co czeka na operatora po zamknięciu łańcucha
 

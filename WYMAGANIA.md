@@ -1,5 +1,13 @@
 # WYMAGANIA — runtime trybu gotowania v1.7 (2026-08-15)
 
+Zmiana v1.8 (2026-08-15): **D-35.1 ROZSTRZYGNIĘTE definitywnie przez operatora** —
+przycisk startu jest widoczny do **500 px WŁĄCZNIE** i ukryty **od 501 px** w górę.
+Do v1.7 dokument mówił „próg ukrycia 500", co dało się przeczytać na dwa sposoby
+i faktycznie zostało przeczytane na dwa: harness ukrywał NA 500, a reguła na stronie
+pokazywała DO 500. Rozjazd o jeden piksel żył od przeb. 35 jako pozycja decyzyjna.
+Implementacja: `min-width: 501px` (harness) oraz `@media (max-width:500px){display:flex}`
+w custom code szablonu przepisu (Webflow nie ma breakpointu 500).
+
 Zmiana v1.7 (2026-08-15): **próg miękki rozmiaru 40 000 → 45 000 znaków** i objęcie
 nim OBU artefaktów (runtime + parser). Decyzja operatora, pozycja D-28.1. Powód:
 po wpięciu biblioteki QR do parsera (D-13.1) oba pliki stanęły kilkaset znaków pod
@@ -61,17 +69,20 @@ w rozmowie operatorskiej 2026-08-12 i nie istnieje nigdzie indziej.
 
 ## 1. Rozstrzygnięcia z 2026-08-12 (istnieją tylko tutaj)
 
-- **Tryb gotowania jest wyłącznie telefoniczny.** Wsparcie: szerokości ≤499 px
-  (poniżej progu ukrycia), portret. Największe sprzedawane telefony [V 2026-08-12]:
+- **Tryb gotowania jest wyłącznie telefoniczny.** Wsparcie: szerokości ≤500 px
+  (do progu ukrycia WŁĄCZNIE — v1.8), portret. Największe sprzedawane telefony [V 2026-08-12]:
   iPhone 17 Pro Max **440** CSS px; Galaxy S25 Ultra **480** CSS px przy opt-in
   QHD+ (domyślnie FHD+ ≈384–412). Foldables poza zakresem (decyzja operatora).
-- **Próg ukrycia przycisku startu: 500 px, własne media query.** Reguła: próg
+- **Próg ukrycia przycisku startu: WIDOCZNY ≤500, UKRYTY ≥501 (v1.8).** Reguła: próg
   śledzi największy sprzedawany telefon (bez foldables), tuż nad jego szerokością
   CSS, bez oglądania się na natywne breakpointy Webflow (decyzja operatora
   2026-08-12). Wartość bieżąca = **500**: S25 Ultra przy QHD+ siedzi NA 480, więc
   granica 480 odcinałaby ten telefon; w paśmie 481–499 nie ma żadnego znanego
-  urządzenia, więc 500 nie wpuszcza tabletów. Implementacja: `min-width: 500px`
-  na fleksie-rodzicu przycisku (strona szablonu). Wartość jest PINEM wspólnym
+  urządzenia, więc 500 nie wpuszcza tabletów. **Granica jest INKLUZYWNA po stronie
+  telefonu**: 500 px to jeszcze telefon, 501 to już nie (D-35.1, operator 2026-08-15).
+  Implementacja: `min-width: 501px` w harnessie; na stronie szablonu
+  `@media (max-width:500px){.recipe-floating-cta{display:flex}}` w custom code —
+  Designer nie ma breakpointu 500, więc reguły nie da się tam wyklikać. Wartość jest PINEM wspólnym
   obu połów; rewizja przy terminie reverify aneksu.
 - **Ścieżka desktopowa = QR** (spec §8: blok QR renderuje się wyłącznie ≥992 px,
   leniwie). Konsekwencja do potwierdzenia przez operatora: w oknie 480–991 px
@@ -118,7 +129,7 @@ widoczny też w podglądzie Webflow (CR6) — harness go odtwarza.
   w `<head>` = strona szablonu; runtime ZDEJMUJE klasę `mp-wchodzi-w-gotowanie`
   dopiero PO zamontowaniU overlaya (nie na DOMContentLoaded); bezpiecznik 3 s
   należy do head-skryptu. Nazwy klas/id — dosłownie ze specu §17.
-- **Próg 500** (§1) — wspólny pin przycisku i pomiaru. (Do v1.3 stało tu „480"
+- **Próg 500/501** (§1) — wspólny pin przycisku i pomiaru: widoczny ≤500, ukryty ≥501 (D-35.1). (Do v1.3 stało tu „480"
   — literówka, C9, rozstrzygnięta przez operatora 2026-08-14.)
 - **Karty Q→A na stronie**: runtime WYSTAWIA sparsowane wpisy w modelu
   (`MP.przepis`); kto wstrzykuje karty na stronę (loader stronowy vs szablon) —
@@ -197,7 +208,7 @@ w `?debug=1`.
 Nie skaluje kroków, minutników ani czasu przepisu przy zmianie porcji (D10/§18).
 Nie renderuje QR poniżej 992 px. Nie dotyka pól poza kontraktem DOM. Nie zapisuje
 nic poza swoim kluczem localStorage (S1). Nie uruchamia trzeciego minutnika (D11).
-Nie pokazuje przycisku startu ≥500 px (test na stronie harnessa; do v1.3 stało
+Nie pokazuje przycisku startu **≥501 px** (D-35.1; test na stronie harnessa; do v1.3 stało
 tu „480" — ta sama literówka C9). Nie wpuszcza
 `czas:` i `minutnik:` naraz bez ostrzeżenia (spec §4.2). Nie czyta kwoty zniżki
 z Site Settings i nie renderuje mechaniki zdjęciowej na ekranie zakończenia
