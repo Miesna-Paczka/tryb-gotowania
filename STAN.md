@@ -1,10 +1,21 @@
 # STAN — łańcuch: embed trybu gotowania
 
-licznik przebiegów: 28/30
-**UWAGA OPERATORA (2026-08-15, 16:00): zostały DWA ogniwa do bezpiecznika.**
-Jednostka dla ogniwa 29 ma dziewięć pozycji i prawie na pewno nie zmieści się
-w dwóch przebiegach. Jeśli matryca ma zostać domknięta bez przerwy, zresetuj
-licznik do 0/30 — to jest zmiana jednej liczby w tej linii i należy do operatora.
+licznik przebiegów: 28/**40**
+
+**LIMIT PODNIESIONY 30 → 40, decyzja operatora 2026-08-15, 16:05.**
+
+**KONFLIKT DO USUNIĘCIA PRZEZ OPERATORA — prompt harmonogramu nadal mówi 30.**
+Liczba 30 stoi w dwóch miejscach pliku
+`C:\Users\andrz\Documents\Claude\Scheduled\tryb-gotowania-embed\SKILL.md`
+(warunek wyjścia nr 3 oraz punkt 2 „Kolejności startowej"). Tego pliku łańcuch
+NIE MOŻE poprawić: leży poza podpiętym folderem, a aktualizacja zadania narzędziem
+harmonogramu wymagałaby przekazania pola `prompt`, co skasowałoby instrukcje
+na stałe. **Zmiana dwóch liczb w tym pliku należy do operatora.**
+
+Do czasu tej zmiany obowiązuje 30, bo prompt wygrywa ze STAN.md dokładnie w tych
+dwóch sekcjach — i tak ma być. Ogniwo, które dobije do 30, ma się zatrzymać
+i zameldować, a nie „wiedzieć lepiej" ze STAN-u. Zatrzymanie jest tanie, cichy
+override bezpiecznika nie jest.
 DWIE BLOKADY, różny zasięg i różne okno (wersja 2026-08-14, decyzja operatora):
 
 - **Przebieg** — plik `LOCK` w tym katalogu, nie linia w tym pliku. Znacznik ISO
@@ -24,6 +35,42 @@ Skille: `ciaglosc-sesji`, `miesna-paczka-webflow` (+ `mp-design-system` przy ka�
 dotknięciu wyglądu). Katalog roboczy łańcucha: ten folder. To jest też lokalna kopia
 repo `lukaszwerecik/tryb-gotowania` — kanonem jest GitHub; operator pushuje ręcznie,
 łańcuch NIGDY nie uruchamia gita.
+
+## GIT — kadencja commitów (ustalenie operatora 2026-08-15)
+
+**Tak: KAŻDE ogniwo commituje i pushuje. Kadencja jest ta sama co kadencja STAN.md —
+commit w tej samej chwili co zapis stanu, czyli PO KAŻDEJ ZMIERZONEJ JEDNOSTCE, nie
+na koniec przebiegu.**
+
+Powód jest identyczny jak przy regule „nigdy nie kumuluj aktualizacji stanu na koniec":
+przerwane ogniwo ma kosztować jedną jednostkę, nie cały przebieg. Commit kumulowany
+na koniec ginie razem z sesją, która urwała się w połowie — a urwanie się w połowie
+jest tu normalnym, zaprojektowanym końcem przebiegu (warunek 6), nie awarią.
+
+**Kolejność w obrębie jednostki jest wiążąca:** pomiar → `STAN.md` i `MATRYCA.md`
+→ `git add -A` → `commit` → `push`. Commit ma utrwalać stan SPÓJNY: artefakt, jego
+pomiar i zapis o pomiarze w jednym drzewie. Commit przed aktualizacją matrycy
+utrwala kod, o którym repozytorium twierdzi coś nieprawdziwego.
+
+**Czego ogniwu NIE WOLNO, bez wyjątków i bez „chyba że":**
+`push --force`, `push --force-with-lease`, `rebase`, `reset --hard`, `tag`.
+**Odrzucony push = STOP i raport, nigdy próba naprawy.** Odrzucenie znaczy, że
+ktoś inny ruszył `main` — operator albo sesja przycisku pływającego — a łańcuch
+nie ma jak zgadnąć, co z tym zrobić. Zgadywanie przy rozjeździe historii to jedyna
+operacja w tym łańcuchu, która potrafi skasować cudzą pracę bezpowrotnie.
+
+**Treść commita to drugi egzemplarz raportu przebiegu**, nie „update". Ma nieść:
+co zmierzono, który wiersz matrycy zmienił kolor i dlaczego. `git log` staje się
+wtedy przeszukiwalną historią pomiarów, a to jest jedyna rzecz, której STAN.md
+nie potrafi — jest jednym plikiem i rośnie liniowo.
+
+**Sprzężenie z sesją przycisku pływającego (równoległa, 2026-08-15).** Ta sesja
+konsumuje embed Z REPO, więc od teraz każdy push zmienia grunt pod jej nogami.
+Konsekwencja, o której obie strony muszą wiedzieć: `main` jest CELEM RUCHOMYM
+i będzie się ruszał kilka razy na godzinę. Pin „na produkcję wyłącznie z taga,
+nigdy `@main`" zostaje bez zmian; do testów integracyjnych `@main` jest dopuszczalny,
+ale wynik testu jest ważny wyłącznie wraz z SHA commita, na którym powstał.
+**Test przycisku bez zapisanego SHA nie jest wynikiem, tylko wrażeniem.**
 
 ## Pliki wiążące (czytaj po ścieżce, weryfikuj hash — nie parafrazuj, nie wklejaj)
 
