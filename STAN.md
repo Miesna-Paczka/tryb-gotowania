@@ -1,21 +1,18 @@
 # STAN — łańcuch: embed trybu gotowania
 
-licznik przebiegów: 28/**40**
+licznik przebiegów: 29/**40**
 
-**LIMIT PODNIESIONY 30 → 40, decyzja operatora 2026-08-15, 16:05.**
+**LIMIT PODNIESIONY 30 → 40, decyzja operatora 2026-08-15, 16:05.
+KONFLIKT ZAMKNIĘTY o 16:20 — prompt harmonogramu też mówi 40** (zweryfikowane
+odczytem: warunek wyjścia nr 3 = linia 23, punkt 2 „Kolejności startowej" = linia 44,
+oba `40`). Poprawkę wprowadził operator; łańcuch nie ma prawa zapisu do tego pliku
+i nie próbował go obejść przez `update_scheduled_task` z polem `prompt`.
 
-**KONFLIKT DO USUNIĘCIA PRZEZ OPERATORA — prompt harmonogramu nadal mówi 30.**
-Liczba 30 stoi w dwóch miejscach pliku
-`C:\Users\andrz\Documents\Claude\Scheduled\tryb-gotowania-embed\SKILL.md`
-(warunek wyjścia nr 3 oraz punkt 2 „Kolejności startowej"). Tego pliku łańcuch
-NIE MOŻE poprawić: leży poza podpiętym folderem, a aktualizacja zadania narzędziem
-harmonogramu wymagałaby przekazania pola `prompt`, co skasowałoby instrukcje
-na stałe. **Zmiana dwóch liczb w tym pliku należy do operatora.**
-
-Do czasu tej zmiany obowiązuje 30, bo prompt wygrywa ze STAN.md dokładnie w tych
-dwóch sekcjach — i tak ma być. Ogniwo, które dobije do 30, ma się zatrzymać
-i zameldować, a nie „wiedzieć lepiej" ze STAN-u. Zatrzymanie jest tanie, cichy
-override bezpiecznika nie jest.
+**Zostawiam ten akapit, a nie kasuję, bo opisuje procedurę do powtórzenia.** Limit
+żyje w DWÓCH miejscach — w tej linii i w promptcie — i tylko jedno z nich łańcuch
+umie zmienić. Przy następnym podniesieniu trzeba ruszyć oba, inaczej ogniwo zatrzyma
+się na niższej liczbie i będzie miało rację, bo w sekcjach bezpiecznika prompt wygrywa
+ze STAN-em.
 DWIE BLOKADY, różny zasięg i różne okno (wersja 2026-08-14, decyzja operatora):
 
 - **Przebieg** — plik `LOCK` w tym katalogu, nie linia w tym pliku. Znacznik ISO
