@@ -22,6 +22,12 @@
  *   <!-- galeria `zdjecia-krokow`, MultiImage -->
  *   <img data-mp-foto-kroku src="…-krok-07.webp">
  *
+ *   <!-- zdjęcie główne przepisu, pole `zdjecie-glowne` (Image) — D-23.1.
+ *        Jedno na stronę; runtime rysuje je na ekranie startowym, na ekranie
+ *        wznowienia i na ekranie zakończenia. Brak atrybutu = brak zdjęcia,
+ *        a nie dziura w układzie (R3). -->
+ *   <img data-mp-foto-glowne src="{{zdjecie-glowne}}">
+ *
  * POZA KONTRAKTEM, opt-in (rozszerzenie NIEZATWIERDZONE — pin, WYMAGANIA §3):
  *
  *   <section data-mp-pole="wskazowka">…<div data-mp-surowe>{{wskazowka}}</div></section>
@@ -641,6 +647,25 @@
     });
   }
 
+  /* Zdjęcie GŁÓWNE przepisu — D-23.1 (operator, 2026-08-15): pole `zdjecie-glowne`
+     (Image, id `93ac881e…`), to samo na ekranie startowym i na zakończeniu.
+     Osobne wejście kontraktu DOM, bo `data-mp-foto-kroku` jest galerią MultiImage
+     i wiąże się z polem KROKU; zdjęcie przepisu nie ma tam czego szukać. To jest
+     zmiana KONTRAKTU — patrz `PAKIET-INTEGRACYJNY.md` §5.
+
+     Pusty `src` traktujemy jak brak: Webflow renderuje `<img src="">` dla pustego
+     pola Image, a to jest brak zdjęcia, nie zdjęcie o pustym adresie. Sprawdzamy
+     ATRYBUT, nie `img.src` — przeglądarka rozwija pusty `src` do adresu strony,
+     więc `img.src` dla pustego pola zwraca URL dokumentu i wygląda na trafienie. */
+  function zdjecieGlowne(nadpisanie) {
+    if (nadpisanie != null) return String(nadpisanie) || null;
+    var img = document.querySelector('[data-mp-foto-glowne]');
+    if (!img) return null;
+    var atrybut = (img.getAttribute('src') || '').trim();
+    if (!atrybut) return null;
+    return img.currentSrc || img.src || null;
+  }
+
   // ---------------------------------------------------------------- model + skalowanie
 
   function zJson(txt) {
@@ -716,6 +741,7 @@
     model.tytul =korzen ? (korzen.getAttribute('data-tytul') || document.title) : document.title;
     model.porcjeBazowe = korzen ? (parseInt(korzen.getAttribute('data-porcje-bazowe'), 10) || 1) : 1;
     model.czas = korzen ? korzen.getAttribute('data-czas') : null;
+    model.fotoUrl = zdjecieGlowne(opcje.fotoGlowne);
     model.meta = zbudujMeta(model.czas,
       (opcje.wartosciPorcja != null ? opcje.wartosciPorcja : tekstZeSkryptu('mp-wartosci-porcja')));
     model.bledy = bledy.slice();
@@ -831,7 +857,11 @@
       return kopia;
     });
 
+    /* `fotoUrl` przechodzi na poziom WIDOKU (D-23.1). Bez tego przepustu
+       `zdjecieEkranu()` pytał o pole, którego widok nie miał, i zwracał `null`
+       przy każdym wejściu — usterka B21, żywa od pierwszej wersji runtime'u. */
     return { tytul: model.tytul, czas: model.czas, meta: model.meta || [], porcje: porcje,
+             fotoUrl: model.fotoUrl || null,
              skladniki: skladniki, kroki: kroki,
              zamienniki: model.zamienniki || {}, bledy: model.bledy };
   }

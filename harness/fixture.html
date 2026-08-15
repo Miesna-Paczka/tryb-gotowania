@@ -205,6 +205,16 @@ Przełóż na talerze, skrop sokiem z drugiej połowy limonki i posyp sezamem.
 
 <main class="mp-strona">
   <h1>Kurczak teriyaki</h1>
+
+  <!-- zdjęcie główne przepisu — pole `zdjecie-glowne` (Image, D-23.1), wejście
+       kontraktu DOM `data-mp-foto-glowne`. Źródło to data-URI SVG, a nie plik:
+       harness żyje w `git\`, gdzie raster jest zakazany, a `<img>` MUSI się wczytać
+       — element z zepsutym adresem ma te same wymiary co element ze zdjęciem, więc
+       „renderuje się" mierzone samą geometrią byłoby zdaniem o pudełku, nie o zdjęciu.
+       Dlatego asercja B21 pyta dodatkowo o `naturalWidth > 0`.
+       Stoi w WIDOCZNEJ treści strony (A8), tak jak stoi na stronie przepisu. -->
+  <img class="mp-foto-glowne" data-mp-foto-glowne alt="Kurczak teriyaki"
+       src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NTYiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNjU2IDMwMCI+PHJlY3Qgd2lkdGg9IjY1NiIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNDODZBM0EiLz48Y2lyY2xlIGN4PSIzMjgiIGN5PSIxNTAiIHI9IjgwIiBmaWxsPSIjRjFFQ0RGIi8+PC9zdmc+">
   <p>
     <span class="mp-badge">30 min</span><span class="mp-badge">2 porcje</span><span class="mp-badge">łatwe</span><span class="mp-badge">kurczak</span><span class="mp-badge">na szybki obiad</span>
   </p>
@@ -372,11 +382,739 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
   };
 })(window);
 
+/* HARNESS-ONLY — MUTACJE (przebieg 35). Przyrząd na TAUTOLOGIE, czyli na asercje,
+   które mają operator porównania i mimo to nie potrafią spaść.
+
+   Po co osobny przyrząd. Sito składniowe z przeb. 34 przejechało 286 wywołań
+   `sprawdz()` i znalazło 12 warunków bez operatora; nie znajdzie natomiast
+   `80 === 0 + 80` — bo to MA operator i przechodzi przez każdy filtr składniowy.
+   Jedyny oracle na tę klasę to MUTACJA: psujemy mierzoną własność na żywej
+   powierzchni i patrzymy, czy asercja spada. Asercja, która nie spadła przy
+   zepsutej własności, jest opisem, nie asercją.
+
+   Dlaczego przed blokiem pomiarowym, a nie w nim. Blok pomiarowy biegnie RAZ,
+   przy wczytaniu, i trzyma stan w domknięciu — nie da się go przemierzyć bez
+   przeprojektowania. Mutacja per asercja wymaga więc świeżego dokumentu na każdą
+   mutację, a to jest dokładnie matryca ramek: `mutacja.html` ładuje ten plik raz
+   na mutację, z parametrem `?mutacja=`.
+
+   Mutacje psują PRODUKT (arkusz runtime'u, publiczną funkcję parsera), nigdy
+   przyrząd. Mutacja dotykająca `sprawdz()` albo etykiet mierzyłaby samą siebie.
+
+   TO NIE MOŻE WEJŚĆ DO PAKIETU INTEGRACYJNEGO (poz. 10). */
+(function () {
+  var param = (location.search.match(/[?&]mutacja=([^&]*)/) || [])[1] || '';
+  var nazwa = param ? decodeURIComponent(param) : '';
+  window.MP_MUTACJA = { nazwa: nazwa || 'BRAK', zastosowana: false, opis: '', cel: '', celAsercja: '', blad: '' };
+  if (!nazwa || nazwa === 'BRAK') { return; }
+
+  function styl(css) {
+    var s = document.createElement('style');
+    s.id = 'mp-mutacja';
+    s.textContent = css;
+    document.head.appendChild(s);
+    /* `!important` wygrywa z arkuszem runtime'u niezależnie od kolejności wstawienia
+       — arkusz runtime'u dokłada się dopiero przy otwarciu overlaya, czyli PÓŹNIEJ. */
+    return document.getElementById('mp-mutacja') === s;
+  }
+
+
+  /* Wstrzyknięcie do TOP-u po KAŻDYM `pokazKrok()`. Runtime przebudowuje treść przy
+     zmianie kroku, a asercje mierzą po konkretnych `pokazKrok(n)` — węzeł dołożony
+     raz zniknąłby przed pomiarem i dałby ZERO EFEKTU, czyli zdanie o mutacji zamiast
+     o wierszu. Idempotentne: swój poprzedni egzemplarz usuwa. */
+  function wstrzykniecie(tag, tekst, klasa, odOtwarcia) {
+    if (!window.MP || !MP.tryb || typeof MP.tryb.pokazKrok !== 'function') { return false; }
+    var ZNAK = 'mp-mutacja-wstrzyk';
+    function dolóz() {
+      try {
+        var cz = MP.tryb.czesci();
+        if (cz && cz.top) {
+          var stary = cz.top.querySelector('.' + ZNAK);
+          if (stary) { stary.parentNode.removeChild(stary); }
+          var el = document.createElement(tag);
+          el.className = ZNAK + (klasa ? ' ' + klasa : '');
+          if (tekst) { el.textContent = tekst; }
+          cz.top.appendChild(el);
+        }
+      } catch (e) {}
+    }
+    /* `odOtwarcia` istnieje przez JEDEN zmierzony przypadek, nie na zapas: `M12` celuje
+       w `B15`, a `B15` mierzy PRZED pierwszym `pokazKrok()` — wstrzyknięcie zapięte tylko
+       na `pokazKrok()` dawało `ZERO EFEKTU` (przeb. 35, jednostka 2). Flaga jest wyłącznie
+       dla `M12`: włączenie jej dla `M9`–`M11` przesunęłoby moment uszkodzenia i zmieniło
+       liczby ubocznych padnięć, czyli zerwało porównywalność z pomiarem przeb. 35. */
+    if (odOtwarcia && typeof MP.tryb.otworz === 'function') {
+      var origOtworz = MP.tryb.otworz;
+      MP.tryb.otworz = function () { var r = origOtworz.apply(this, arguments); dolóz(); return r; };
+    }
+    var oryg = MP.tryb.pokazKrok;
+    MP.tryb.pokazKrok = function () {
+      var r = oryg.apply(this, arguments);
+      dolóz();
+      return r;
+    };
+    return true;
+  }
+
+  /* Wspólny zaczep klasy szóstej. Osobna funkcja, nie cztery kopie: podmiana
+     prototypu jest operacją globalną i jedno miejsce jej wykonania jest jedynym
+     miejscem, w którym trzeba pilnować, żeby nie zdejmowała nic poza swoim
+     selektorem. Porównanie jest ŚCISŁE (`===`), nie po podciągu — selektor
+     złożony, który zawiera ten napis, musi nadal działać, inaczej mutacja
+     kasowałaby pół drzewa i mówiłaby „coś padło" zamiast „ten wiersz spada". */
+  function brakWezla(sel) {
+    if (!window.Element || !Element.prototype || !Element.prototype.querySelector) { return false; }
+    var oryg = Element.prototype.querySelector;
+    Element.prototype.querySelector = function (s) {
+      if (s === sel) { return null; }
+      return oryg.apply(this, arguments);
+    };
+    var probny = document.createElement('div');
+    return probny.querySelector(sel) === null;
+  }
+
+  var KATALOG = {
+    /* --- reguła składania BOTTOM-u: dwie różne własności, dwie różne mutacje --- */
+    'M1-bottom-klamstwo': {
+      cel: 'B26', celAsercja: 'publikuje ZMIERZON',
+      opis: '`--mp-bottom-h` publikuje stałe 80px zamiast zmierzonej wysokości pasa',
+      zastosuj: function () {
+        var oryg = CSSStyleDeclaration.prototype.setProperty;
+        CSSStyleDeclaration.prototype.setProperty = function (n, v, p) {
+          return oryg.call(this, n, n === '--mp-bottom-h' ? '80px' : v, p);
+        };
+        return true;
+      }
+    },
+    'M2-bottom-padding': {
+      cel: 'B26', celAsercja: 'stos + pasek nawigacji',
+      opis: 'BOTTOM dostaje 20px dopełnienia dolnego — tożsamość `bottom = stos + nawigacja` przestaje być prawdziwa',
+      zastosuj: function () { return styl('.mp-tryb__bottom{padding-bottom:20px!important}'); }
+    },
+    /* --- geometrie mierzone twardymi liczbami z Figmy --- */
+    'M3-hit-area': {
+      cel: 'B10', celAsercja: 'B10: cel dotyku „←"',
+      opis: '„←" skurczony do 40×40 — próg dotyku 44 px złamany',
+      zastosuj: function () {
+        return styl('.mp-tryb__wstecz{width:40px!important;height:40px!important;' +
+                    'min-width:40px!important;min-height:40px!important}');
+      }
+    },
+    'M4-pigulka-44': {
+      cel: 'C03', celAsercja: 'pigułka zwinięta = 40',
+      opis: 'pigułka zwinięta rozdęta do 44px — rytm `stos` i cała reguła składania idą za nią',
+      zastosuj: function () {
+        return styl('.mp-tryb__pigulka[data-forma="zwinieta"]{height:44px!important;min-height:44px!important}');
+      }
+    },
+    'M5-mark-blok': {
+      cel: 'B14', celAsercja: 'marker łamie się z wierszem',
+      opis: '`<mark>` przestawiony na `display:block` — marker przestaje łamać się z wierszem',
+      zastosuj: function () { return styl('mark{display:block!important}'); }
+    },
+    'M6-badge-30': {
+      cel: 'C01', celAsercja: 'stałą wysokość 26',
+      opis: 'badge czasu rozdęty do 30px — stała wysokość we wszystkich trzech stanach złamana',
+      zastosuj: function () {
+        return styl('.mp-tryb__czas{height:30px!important;min-height:30px!important}');
+      }
+    },
+    'M7-top-bez-dopelnienia': {
+      cel: 'B12', celAsercja: 'padding dolny TOP',
+      opis: 'TOP traci dopełnienie dolne — ostatni element wchodzi pod pasek BOTTOM',
+      zastosuj: function () { return styl('.mp-tryb__top{padding-bottom:0!important}'); }
+    },
+    /* --- KLASA DRUGA: asercje o NIEOBECNOŚCI i o LICZBIE ----------------------
+       Batch pierwszy (M1–M8) psuł WYMIARY, czyli pytał „czy wiersz zauważy złą
+       liczbę". Ten pyta o co innego i trudniejszego: **czy wiersz zauważy rzecz,
+       której nie powinno być**. To jest naturalne siedlisko tautologii — warunek
+       `querySelectorAll(...).length === 0` przechodzi tak samo, gdy nic nie ma,
+       jak wtedy, gdy selektor jest zły albo pyta w złym poddrzewie. Zero z pustego
+       selektora wygląda identycznie jak zero z czystego produktu.
+
+       Wstrzyknięcie idzie przez opakowanie `MP.tryb.pokazKrok()` — a nie przez
+       jednorazowe dołożenie węzła — bo runtime przebudowuje treść TOP-u przy każdej
+       zmianie kroku, a asercje mierzą po konkretnych `pokazKrok(n)`. Wstrzyknięcie
+       jednorazowe zniknęłoby przed pomiarem i dałoby ZERO EFEKTU, czyli fałszywy
+       alarm o mutacji zamiast zdania o wierszu. Każde wstrzyknięcie jest idempotentne
+       (usuwa swój poprzedni egzemplarz), żeby nie narastało przez ~30 wywołań. */
+    'M9-adnotacja': {
+      cel: 'B13', celAsercja: 'zero adnotacji projektanta',
+      opis: 'do TOP-u wraca adnotacja projektanta („cel koloru") — parser jej nie zdjął',
+      zastosuj: function () { return wstrzykniecie('span', 'cel koloru', ''); }
+    },
+    'M10-wlasny-tor': {
+      cel: 'B12', celAsercja: 'przewijanie natywne na TOP',
+      opis: 'w TOP-ie ląduje własny tor przewijania (`.scroll-rail`) zamiast natywnego',
+      zastosuj: function () { return wstrzykniecie('div', '', 'scroll-rail'); }
+    },
+    'M11-drugi-mark': {
+      cel: 'B14', celAsercja: 'marker to <mark>, nie prostokąt',
+      opis: 'w kroku z markerem pojawia się DRUGI `<mark>` — liczba markerów przestaje być jeden',
+      zastosuj: function () { return wstrzykniecie('mark', 'x', ''); }
+    },
+    'M12-iframe': {
+      cel: 'B15', celAsercja: 'zero iframe',
+      opis: 'overlay dostaje `<iframe>` — dokładnie to, czego B15 zabrania',
+      zastosuj: function () { return wstrzykniecie('iframe', '', '', true); }
+    },
+    'M13-stos-widoczny': {
+      cel: 'B8', celAsercja: 'znika w całości',
+      opis: 'pusty `stos` przestaje znikać — dokłada swoje dopełnienie mimo zera kafli',
+      zastosuj: function () { return styl('.mp-tryb__stos{display:block!important}'); }
+    },
+    'M14-top-bez-gornego': {
+      cel: 'B12', celAsercja: 'pierwszy element startuje pod belką',
+      opis: 'TOP traci dopełnienie górne — pierwszy element wjeżdża pod belkę',
+      zastosuj: function () { return styl('.mp-tryb__top{padding-top:0!important}'); }
+    },
+    'M15-cta-krotsze': {
+      cel: 'B10', celAsercja: 'CTA wypełnia resztę wiersza',
+      opis: 'CTA odsunięte od prawej krawędzi o 8px — przestaje wypełniać wiersz',
+      zastosuj: function () { return styl('.mp-tryb__dalej{margin-right:8px!important}'); }
+    },
+    'M16-overlay-absolute': {
+      cel: 'B15', celAsercja: 'position fixed',
+      opis: 'overlay przestawiony na `position:absolute` — przewija się razem ze stroną gospodarza',
+      zastosuj: function () { return styl('#mp-tryb{position:absolute!important}'); }
+    },
+    /* --- KLASA TRZECIA: CZAS i STAN (przeb. 36) ------------------------------
+       Batche 1 i 2 psuły GEOMETRIĘ i DRZEWO — oba synchronicznie, oba w jednym
+       momencie życia overlaya. Nietknięta została klasa, której oracle jest PARĄ
+       (stan, własność): puls kropki zależny od `data-stan`, barwa czasu przy 0:00,
+       limit minutników, trwałość sesji, wpis w historii.
+
+       Tautologia ma tu INNE siedlisko niż w batchu 2. Tam ryzykiem było zero
+       z pustego selektora; tu — asercja pytająca o własność, która w mierzonym
+       stanie ma TĄ SAMĄ wartość co w stanie sąsiednim. Taki wiersz przechodzi
+       zarówno wtedy, gdy przejście między stanami działa, jak i wtedy, gdy w ogóle
+       go nie ma — a to jest dokładnie ta klasa defektu, której matryca szerokości
+       nie widzi, bo mierzy jeden moment naraz.
+
+       Czego świadomie NIE MA w tym batchu: zamrożonego `MP.zegar.teraz()`, mimo że
+       kolejka z przeb. 35 wymieniała go pierwszym. Dwa powody, oba twarde.
+       (1) `MP.zegar` jest seamem HARNESSU (`MP_TEST`), nie produktu — runtime schodzi
+       na `Date.now()`, gdy go nie ma. Mutacja seamu mierzyłaby przyrząd.
+       (2) Zamrożony zegar rozsypuje całą sekwencję C09–C12 naraz, więc mówi
+       „coś padło”, a nie „ten wiersz potrafi spaść”. Mutacja o setce ubocznych
+       padań jest tak samo bezużyteczna jak mutacja o zerze. */
+    'M17-puls-koncowka-wolny': {
+      cel: 'C11', celAsercja: 'ostatnie 10 s → puls 2×/s',
+      opis: 'w końcówce puls zwolniony do 1×/s — druga eskalacja tempem znika, kolor zostaje',
+      zastosuj: function () {
+        return styl('#mp-tryb [data-stan="koncowka"] .mp-tryb__kropka{animation-duration:1s!important}');
+      }
+    },
+    'M18-puls-po-zerze': {
+      cel: 'C12', celAsercja: '0:00 → puls wygaszony',
+      opis: 'przy 0:00 puls biegnie dalej — kropka nie gaśnie po dojściu do zera',
+      zastosuj: function () {
+        return styl('#mp-tryb [data-stan="zero"] .mp-tryb__kropka' +
+                    '{animation:mp-tryb-puls 1s steps(60) infinite!important}');
+      }
+    },
+    'M19-puls-minuta-szybki': {
+      cel: 'C10', celAsercja: '≤ 60 s → puls 1×/s',
+      opis: 'ostatnia minuta pulsuje od razu 2×/s — dwa progi eskalacji zlewają się w jeden',
+      zastosuj: function () {
+        return styl('#mp-tryb [data-stan="ostatnia-minuta"] .mp-tryb__kropka{animation-duration:.5s!important}');
+      }
+    },
+    'M20-puls-w-toku': {
+      cel: 'C09', celAsercja: 'kropka „w toku" jest statyczna',
+      opis: 'kropka pulsuje od pierwszej sekundy — próg 60 s przestaje cokolwiek znaczyć',
+      zastosuj: function () {
+        return styl('#mp-tryb [data-stan="w-toku"] .mp-tryb__kropka' +
+                    '{animation:mp-tryb-puls 1s steps(60) infinite!important}');
+      }
+    },
+    'M21-zero-kolor-atrament': {
+      cel: 'W64', celAsercja: 'czas przy 0:00 — `primary-cta`',
+      opis: 'czas przy 0:00 zostaje atramentem — barwa przestaje być własnością pary (forma, stan)',
+      zastosuj: function () {
+        return styl('#mp-tryb [data-forma="pelna"][data-stan="zero"] .mp-tryb__odliczanie,' +
+                    '#mp-tryb [data-forma="krotka"][data-stan="zero"] .mp-tryb__odliczanie' +
+                    '{color:#3E2B22!important}');
+      }
+    },
+    /* Trzy następne nie idą przez arkusz, bo ich własności nie ma w CSS. Każda
+       rusza miejsce, które produkt czyta W CHWILI WYWOŁANIA — stąd dosięgają
+       wewnętrznych wywołań, a nie tylko tych, które robi pomiar. To jest różnica
+       między mutacją produktu a mutacją widoku przyrządu. */
+    'M22-limit-trzy': {
+      cel: 'F7', celAsercja: 'F7: trzeci minutnik nie startuje',
+      opis: 'limit podniesiony do 3 — trzeci minutnik startuje zamiast otwierać dialog S4',
+      zastosuj: function () {
+        if (!window.MP || !MP.tryb || !MP.tryb.wymiary) { return false; }
+        MP.tryb.wymiary.limitMinutnikow = 3;   // `W` czytane przy każdym `uruchom()`
+        return MP.tryb.wymiary.limitMinutnikow === 3;
+      }
+    },
+    'M23-sesja-niema': {
+      cel: 'F8', celAsercja: 'S1 wznawia na zapisanym kroku',
+      opis: 'zapis sesji przepada w magazynie — własny klucz nie dolatuje do `localStorage`',
+      zastosuj: function () {
+        if (!window.Storage || !Storage.prototype || !Storage.prototype.setItem) { return false; }
+        var oryg = Storage.prototype.setItem;
+        /* Wyłącznie własny prefiks: gdyby mutacja głuszyła cały magazyn, padłby też
+           test negatywny o CUDZYCH kluczach i nie dałoby się odróżnić, który wiersz
+           zobaczył defekt, a który zobaczył zepsute otoczenie. */
+        Storage.prototype.setItem = function (k) {
+          if (String(k).indexOf('mp-tryb:') === 0) { return; }
+          return oryg.apply(this, arguments);
+        };
+        return true;
+      }
+    },
+    'M24-historia-zawsze': {
+      cel: 'F4', celAsercja: 'overlay otwarty trzyma wpis',
+      opis: '`historia.wpis()` melduje wpis także tam, gdzie historia jest wyłączona',
+      zastosuj: function () {
+        if (!window.MP || !MP.tryb || !MP.tryb.historia) { return false; }
+        MP.tryb.historia.wpis = function () { return true; };
+        return MP.tryb.historia.wpis() === true;
+      }
+    },
+    /* --- KLASA CZWARTA: DANE i PARSER (przeb. 36, jednostka 5) ----------------
+       Trzy batche psuły RUNTIME; poza `M8` ani jedna mutacja nie tknęła `MP.przepis`.
+       A to tam mieszka najliczniejsza rodzina wierszy TESTÓW NEGATYWNYCH — `H1`, `H2`,
+       `H3`, `H5`, `H6`, `A4` — czyli asercji o tym, czego robić NIE WOLNO. Test
+       negatywny przechodzi też wtedy, gdy nie mierzy nic, więc jest najtańszy do
+       napisania i najłatwiejszy do przeoczenia.
+
+       WARSTWA ZACZEPIENIA jest tu inna niż w batchu 3 i to jest świadome. Funkcje
+       parsera są wołane PRZEZ POMIAR (`MP.przepis.naPorcje(model, 4)`), a nie przez
+       runtime, więc opakowanie publicznej funkcji dosięga dokładnie tej ścieżki,
+       o którą pyta wiersz. Tam, gdzie tak nie jest, mutacja psuje wartość czytaną
+       w chwili wywołania (`kluczLS`, `limitMarkerow`), nie opakowanie. */
+    'M25-czas-skaluje': {
+      cel: 'H3', celAsercja: 'czas przepisu NIE skaluje się z porcjami',
+      opis: 'przeliczenie porcji skaluje też CZAS przepisu — dwie porcje, dwa razy dłużej',
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.naPorcje !== 'function') { return false; }
+        var oryg = MP.przepis.naPorcje;
+        MP.przepis.naPorcje = function (model, n) {
+          var w = oryg.apply(this, arguments);
+          if (w && typeof w.czas === 'string') { w.czas = (15 * (n || 1)) + ' min'; }
+          return w;
+        };
+        return true;
+      }
+    },
+    'M26-kroki-skaluja': {
+      cel: 'H1', celAsercja: 'liczba kroków NIE skaluje się z porcjami',
+      opis: 'przeliczenie porcji DOKŁADA krok przy większej liczbie porcji',
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.naPorcje !== 'function') { return false; }
+        var oryg = MP.przepis.naPorcje;
+        MP.przepis.naPorcje = function (model, n) {
+          var w = oryg.apply(this, arguments);
+          if (w && w.kroki && w.kroki.length && (n || 0) > 2) { w.kroki = w.kroki.concat([w.kroki[0]]); }
+          return w;
+        };
+        return true;
+      }
+    },
+    'M27-minutnik-skaluje': {
+      cel: 'H2', celAsercja: 'minutnik NIE skaluje się z porcjami',
+      opis: 'minutnik kroku mnoży się przez liczbę porcji — cztery porcje, cztery razy dłużej',
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.naPorcje !== 'function') { return false; }
+        var oryg = MP.przepis.naPorcje;
+        MP.przepis.naPorcje = function (model, n) {
+          var w = oryg.apply(this, arguments);
+          if (w && w.kroki) {
+            w.kroki = w.kroki.map(function (k) {
+              if (k && k.minutnik && typeof k.minutnik.sekundy === 'number') {
+                var kopia = {}; for (var p in k) { if (k.hasOwnProperty(p)) { kopia[p] = k[p]; } }
+                kopia.minutnik = { sekundy: k.minutnik.sekundy * (n || 1) };
+                for (var q in k.minutnik) {
+                  if (k.minutnik.hasOwnProperty(q) && q !== 'sekundy') { kopia.minutnik[q] = k.minutnik[q]; }
+                }
+                return kopia;
+              }
+              return k;
+            });
+          }
+          return w;
+        };
+        return true;
+      }
+    },
+    'M28-body-rosnie': {
+      cel: 'H5', celAsercja: 'runtime nie dokłada węzłów do body',
+      opis: 'wczytanie modelu dokłada węzeł do `body` — ślad poza kontraktem',
+      /* Zaczep na `zaladuj()`, nie na `podzielWszystkieKarty()`: `H5` robi zdjęcie
+         `body` i tytułu, a potem woła WYŁĄCZNIE `zaladuj()` i `naPorcje()`. Pierwsza
+         wersja mutacji celowała w przekształcenie kart i dała ZERO EFEKTU — czyli
+         zdanie o MUTACJI, nie o wierszu (przeb. 36, jednostka 5, ta sama pomyłka
+         co `M12` w przeb. 35: uszkodzenie poza oknem pomiaru). */
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.zaladuj !== 'function') { return false; }
+        var oryg = MP.przepis.zaladuj;
+        MP.przepis.zaladuj = function () {
+          var r = oryg.apply(this, arguments);
+          /* NIE idempotentnie, i to jest cała różnica: `zaladuj()` woła się także
+             w rozgrzewce fixture'a, PRZED zdjęciem `przedBody`. Wersja idempotentna
+             dokładała węzeł raz — czyli przed pomiarem — i różnicy nie było widać.
+             Mutacja niewidoczna w oknie pomiaru to zdanie o mutacji, nie o wierszu. */
+          document.body.appendChild(document.createElement('div'));
+          return r;
+        };
+        return true;
+      }
+    },
+    'M29-tytul-ruszony': {
+      cel: 'H5', celAsercja: 'runtime nie zmienia document.title',
+      opis: 'wczytanie modelu dopisuje się do `document.title`',
+      /* Ten sam zaczep i ten sam powód co w `M28` — patrz komentarz wyżej. */
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.zaladuj !== 'function') { return false; }
+        var oryg = MP.przepis.zaladuj;
+        MP.przepis.zaladuj = function () {
+          var r = oryg.apply(this, arguments);
+          document.title += ' ·';   /* nieidempotentnie — powód jak w `M28` */
+          return r;
+        };
+        return true;
+      }
+    },
+    'M30-klucz-ls-inny': {
+      cel: 'H6', celAsercja: 'runtime ma JEDEN nazwany klucz',
+      opis: 'parser deklaruje inny klucz `localStorage` niż umówiony',
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis) { return false; }
+        MP.przepis.kluczLS = 'mp-cos-innego';
+        return MP.przepis.kluczLS === 'mp-cos-innego';
+      }
+    },
+    'M31-gramatura-mnozy': {
+      cel: 'A10', celAsercja: '„1 x 1,5 kg" nadal = 1500',
+      opis: 'parser gramatury gubi przelicznik kilogramów — 1,5 kg czytane jako 1,5 g',
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || !MP.przepis._wewnetrzne ||
+            typeof MP.przepis._wewnetrzne.parsujGramature !== 'function') { return false; }
+        var oryg = MP.przepis._wewnetrzne.parsujGramature;
+        MP.przepis._wewnetrzne.parsujGramature = function () {
+          var w = oryg.apply(this, arguments);
+          if (w && typeof w.gramatura === 'number' && w.gramatura >= 1000) { w.gramatura = w.gramatura / 1000; }
+          return w;
+        };
+        return true;
+      }
+    },
+    'M32-obcy-nosnik-wciagany': {
+      cel: 'A4', celAsercja: 'obcy `<script type="text/plain">` NIE jest wciągany',
+      opis: 'wczytanie modelu dokleja składnik z OBCEGO nośnika `text/plain`',
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.zaladuj !== 'function') { return false; }
+        var oryg = MP.przepis.zaladuj;
+        MP.przepis.zaladuj = function () {
+          var m = oryg.apply(this, arguments);
+          if (m && m.skladniki && m.skladniki.length) {
+            var kopia = {}; for (var p in m.skladniki[0]) {
+              if (m.skladniki[0].hasOwnProperty(p)) { kopia[p] = m.skladniki[0][p]; } }
+            kopia.key = 'duch';
+            m.skladniki = m.skladniki.concat([kopia]);
+          }
+          return m;
+        };
+        return true;
+      }
+    },
+    /* --- KLASA PIĄTA: WEJŚCIE USZKODZONE i SANITYZACJA (przeb. 37, jednostka 1) ---
+       Batch 4 pytał, czy parser nie psuje wejścia POPRAWNEGO. Nietknięta została
+       druga połowa jego roboty: co robi z wejściem NIEPOPRAWNYM. `A3`, `A11` i `A12`
+       to wiersze o PARZE (wyzwala się / nie fałszywuje), a para ma DWA różne sposoby
+       zepsucia — ciszę i fałszywy alarm — więc `A3` dostaje mutację na każdą stronę.
+       Wiersz sprawdzany tylko od strony ciszy przechodzi również wtedy, gdy ostrzega
+       zawsze, a ostrzeżenie zawsze prawdziwe jest tak samo bezużyteczne jak żadne.
+
+       ZACZEP: opakowanie `MP.przepis.zaladuj` — reguła (a) z przeb. 36. Każdy z tych
+       wierszy buduje WŁASNY model spreparowanym payloadem (`mK`, `mP`) i robi to
+       przez pomiar, więc opakowanie publicznej funkcji dosięga dokładnie tej ścieżki,
+       o którą pyta wiersz. Mutacje psują WYNIK, nie wnętrze parsera: uszkodzenie ma
+       wyglądać jak zły model oddany na stronę, bo tak wygląda ten defekt naprawdę. */
+    'M33-klucz-widmo-cichy': {
+      cel: 'A3', celAsercja: 'A3: #klucz bez odpowiednika → błąd',
+      opis: 'parser MILCZY na `#klucz` bez odpowiednika — uszkodzone wejście przechodzi na stronę bez śladu',
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.zaladuj !== 'function') { return false; }
+        var oryg = MP.przepis.zaladuj;
+        MP.przepis.zaladuj = function () {
+          var m = oryg.apply(this, arguments);
+          if (m && m.bledy && m.bledy.length) {
+            m.bledy = m.bledy.filter(function (b) {
+              return String(b).indexOf('bez odpowiednika w skladniki') < 0;
+            });
+          }
+          return m;
+        };
+        return true;
+      }
+    },
+    'M34-klucz-falszywy-alarm': {
+      cel: 'A3', celAsercja: 'A3 (nie fałszywuje)',
+      opis: 'parser zgłasza brak odpowiednika także dla kluczy ISTNIEJĄCYCH — bramka builda blokuje zdrowy przepis',
+      /* Druga strona tej samej pary. `A3` ma dwie asercje z premedytacją i dopiero
+         obie razem mówią coś o wierszu: pierwsza pilnuje, żeby błąd powstawał,
+         druga — żeby nie powstawał zawsze. */
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.zaladuj !== 'function') { return false; }
+        var oryg = MP.przepis.zaladuj;
+        MP.przepis.zaladuj = function () {
+          var m = oryg.apply(this, arguments);
+          if (m && m.bledy && m.pola) {
+            var maKlucz = false;
+            Object.keys(m.pola).forEach(function (n) {
+              (m.pola[n] || []).forEach(function (w) { if (w && w.klucz) { maKlucz = true; } });
+            });
+            if (maKlucz) { m.bledy = m.bledy.concat(['#skrobia bez odpowiednika w skladniki']); }
+          }
+          return m;
+        };
+        return true;
+      }
+    },
+    'M35-krotko-w-odpowiedzi': {
+      cel: 'A11', celAsercja: 'A11: krótko: nie wchodzi do odpowiedzi',
+      opis: '`krótko:` zostaje w treści odpowiedzi — metadana redakcyjna wychodzi na kartę jako tekst',
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.zaladuj !== 'function') { return false; }
+        var oryg = MP.przepis.zaladuj;
+        MP.przepis.zaladuj = function () {
+          var m = oryg.apply(this, arguments);
+          if (m && m.pola) {
+            Object.keys(m.pola).forEach(function (n) {
+              (m.pola[n] || []).forEach(function (w) {
+                if (w && w.krotko && typeof w.odpowiedz === 'string') {
+                  w.odpowiedz = w.odpowiedz + ' krótko: ' + w.krotko;
+                }
+              });
+            });
+          }
+          return m;
+        };
+        return true;
+      }
+    },
+    'M36-krotko-zmyslone': {
+      cel: 'A11', celAsercja: 'A11: brak krótko: to nie błąd',
+      opis: 'brak `krótko:` czytany jako PUSTY napis, nie jako brak — pole nieistniejące udaje istniejące',
+      /* Defekt cichy z tej samej rodziny co „uszkodzony wpis czytany jako BRAK wpisu":
+         tooltip dostaje wtedy pustą treść zamiast nie dostać nic i nie ma jak
+         odróżnić „redakcja nie napisała" od „napisała pustkę". */
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.zaladuj !== 'function') { return false; }
+        var oryg = MP.przepis.zaladuj;
+        MP.przepis.zaladuj = function () {
+          var m = oryg.apply(this, arguments);
+          if (m && m.pola) {
+            Object.keys(m.pola).forEach(function (n) {
+              (m.pola[n] || []).forEach(function (w) { if (w && w.krotko === null) { w.krotko = ''; } });
+            });
+          }
+          return m;
+        };
+        return true;
+      }
+    },
+    'M37-pytanie-w-odpowiedzi': {
+      cel: 'A13', celAsercja: 'A13: odpowiedź zlepiona z wierszy, bez pytania w środku',
+      opis: 'zlepianie wierszy gubi granicę pytania — pytanie wraca w środku własnej odpowiedzi',
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.zaladuj !== 'function') { return false; }
+        var oryg = MP.przepis.zaladuj;
+        MP.przepis.zaladuj = function () {
+          var m = oryg.apply(this, arguments);
+          if (m && m.pola) {
+            Object.keys(m.pola).forEach(function (n) {
+              (m.pola[n] || []).forEach(function (w) {
+                if (w && w.pytanie && typeof w.odpowiedz === 'string') {
+                  w.odpowiedz = w.pytanie + ' ' + w.odpowiedz;
+                }
+              });
+            });
+          }
+          return m;
+        };
+        return true;
+      }
+    },
+    'M38-wpisy-sklejone': {
+      cel: 'A13', celAsercja: 'A13: przechowywanie = 3 wpisy',
+      opis: 'pusta linia przestaje rozdzielać wpisy — dwa ostatnie wpisy pola sklejają się w jeden',
+      /* Pole `przechowywanie` wybrane świadomie: `co-mozesz-zmienic` niesie klucze
+         (`A3`) i `krótko:` (`A11`), więc sklejenie tam dawałoby lawinę ubocznych
+         padnięć i mutacja mówiłaby „coś padło" zamiast „ten wiersz potrafi spaść". */
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.zaladuj !== 'function') { return false; }
+        var oryg = MP.przepis.zaladuj;
+        MP.przepis.zaladuj = function () {
+          var m = oryg.apply(this, arguments);
+          var p = m && m.pola && m.pola['przechowywanie'];
+          if (p && p.length >= 2) {
+            var a = p[p.length - 2], b = p[p.length - 1];
+            if (a && b && typeof a.odpowiedz === 'string') {
+              a.odpowiedz = a.odpowiedz + ' ' + (b.pytanie || '') + ' ' + (b.odpowiedz || '');
+              m.pola['przechowywanie'] = p.slice(0, p.length - 1);
+            }
+          }
+          return m;
+        };
+        return true;
+      }
+    },
+    'M39-czas-kanoniczny-glusi': {
+      cel: 'A12', celAsercja: 'A12: brak czasu → ostrzeżenie',
+      opis: 'przechowywanie bez czasu kanonicznego przestaje ostrzegać — wpis bez trwałości idzie na stronę cicho',
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.zaladuj !== 'function') { return false; }
+        var oryg = MP.przepis.zaladuj;
+        MP.przepis.zaladuj = function () {
+          var m = oryg.apply(this, arguments);
+          if (m && m.ostrzezenia && m.ostrzezenia.length) {
+            m.ostrzezenia = m.ostrzezenia.filter(function (o) {
+              return String(o).indexOf('czasu w formacie kanonicznym') < 0;
+            });
+          }
+          return m;
+        };
+        return true;
+      }
+    },
+    'M40-tresc-serwerowa-zjedzona': {
+      cel: 'A9', celAsercja: 'A9: treść serwerowa przeżyła przekształcenie',
+      opis: 'przekształcenie zachowuje węzeł serwerowy, ale ZJADA jego treść — karta zostaje pusta',
+      /* Zaczep na `podzielWszystkieKarty()`, bo to jest okno pomiaru `A9` (reguła (b)).
+         Mutacja nie rusza tożsamości węzła ani klas — gdyby ruszyła, padłyby wszystkie
+         cztery asercje `A9` naraz i nie dałoby się powiedzieć, KTÓRA z nich potrafi
+         spaść. Uszkodzenie jest najwęższe, jakie ten wiersz opisuje: treść znika. */
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.podzielWszystkieKarty !== 'function') { return false; }
+        var oryg = MP.przepis.podzielWszystkieKarty;
+        MP.przepis.podzielWszystkieKarty = function () {
+          /* Referencja brana PRZED przekształceniem, bo parser zdejmuje z węzła
+             `data-mp-surowe` w chwili przejęcia go na pierwszą kartę (`przepis-parser.js`,
+             `karta.removeAttribute('data-mp-surowe')`). Selektor po fakcie nie trafiłby
+             w nic i mutacja wyszłaby ZERO EFEKTU — czyli zdaniem o mutacji, nie o wierszu.
+             Złapane statycznie w przeb. 37, przed uzbrojeniem przeglądarki. */
+          var przed = document.querySelector('[data-mp-pole="wskazowka"] [data-mp-surowe]');
+          var r = oryg.apply(this, arguments);
+          var k = przed || document.querySelector('[data-mp-pole="wskazowka"] .mp-karta');
+          if (k) { k.textContent = '—'; }
+          return r;
+        };
+        return true;
+      }
+    },
+    /* --- KLASA SZÓSTA: NIEOBECNOŚĆ WĘZŁA (przeb. 37, jednostka 3) --------------
+       Nie pyta o wygląd ani o dane, tylko o to, czy blok pomiarowy PRZEŻYJE brak
+       węzła. `narzedzia/sito-dereferencji.py` pokazuje 41 miejsc, w których asercja
+       dereferencjonuje wynik `querySelector` bez guardu; sito daje WZORZEC, a nie
+       dowód — dowodem jest mutacja. Ta klasa zamienia listę podejrzeń w pomiar.
+
+       ZACZEP: opakowanie `Element.prototype.querySelector` zwracające `null` dla
+       JEDNEGO selektora. To jest najwierniejsza symulacja defektu „element nie
+       został wyrenderowany" — dosięga i runtime'u, i bloku pomiarowego, tak jak
+       zrobiłby to prawdziwy brak węzła. Podmiana `display:none` tego NIE symuluje:
+       węzeł dalej istnieje i `querySelector` go oddaje.
+
+       CZEGO TU SZUKAMY: werdykt ZABITA jest oczekiwany i mało ciekawy — cel padnie,
+       bo węzła nie ma. Ciekawa jest kolumna `urwania` i wiersz `I10`: jeśli brak
+       węzła zabija ramkę przed końcem, to ten sam brak na produkcji zabiłby wszystko,
+       co matryca mierzy PO nim, a strona meldowałaby `ok` na podstawie tego, czego
+       nie zmierzyła. */
+    'M41-null-tooltip-zamknij': {
+      cel: 'E10', celAsercja: 'E10 / I-25: tap `×` zamyka tooltip',
+      opis: '`.mp-tryb__tooltip-zamknij` nie istnieje — tooltip bez przycisku zamknięcia',
+      zastosuj: function () { return brakWezla('.mp-tryb__tooltip-zamknij'); }
+    },
+    'M42-null-dialog-link': {
+      cel: 'F3', celAsercja: 'F3: „wyjdź mimo to" zamyka overlay',
+      opis: '`.mp-tryb__dialog-link` nie istnieje — dialog S2 bez wyjścia awaryjnego',
+      zastosuj: function () { return brakWezla('.mp-tryb__dialog-link'); }
+    },
+    'M43-null-baner-akcja': {
+      cel: 'F11', celAsercja: 'F11: „sprawdź ponownie" zdejmuje baner',
+      opis: '`.mp-tryb__baner-akcja` nie istnieje — baner offline bez przycisku ponowienia',
+      zastosuj: function () { return brakWezla('.mp-tryb__baner-akcja'); }
+    },
+    'M44-null-meta-wartosc': {
+      cel: 'A14', celAsercja: 'A14: pasek meta renderuje TRZY kolumny',
+      opis: '`.mp-tryb__meta-wartosc` nie istnieje — pasek meta bez wartości w kolumnach',
+      zastosuj: function () { return brakWezla('.mp-tryb__meta-wartosc'); }
+    },
+    /* --- mutacja na asercji WZMOCNIONEJ w przeb. 34: sprawdza samo wzmocnienie --- */
+    'M8-naglowek-odbudowany': {
+      cel: 'A9', celAsercja: 'nagłówek sekcji nietknięty',
+      opis: 'przekształcenie ODBUDOWUJE nagłówek — ten sam napis i ta sama klasa, inny węzeł',
+      zastosuj: function () {
+        if (!window.MP || !MP.przepis || typeof MP.przepis.podzielWszystkieKarty !== 'function') { return false; }
+        var oryg = MP.przepis.podzielWszystkieKarty;
+        MP.przepis.podzielWszystkieKarty = function () {
+          var r = oryg.apply(this, arguments);
+          var t = document.querySelectorAll('.mp-pole__tytul');
+          for (var i = 0; i < t.length; i++) {
+            var kopia = t[i].cloneNode(true);
+            t[i].parentNode.replaceChild(kopia, t[i]);
+          }
+          return r;
+        };
+        return true;
+      }
+    }
+  };
+
+  window.MP_MUTACJE_KATALOG = Object.keys(KATALOG).map(function (k) {
+    return { nazwa: k, cel: KATALOG[k].cel, celAsercja: KATALOG[k].celAsercja, opis: KATALOG[k].opis };
+  });
+
+  var m = KATALOG[nazwa];
+  if (!m) { window.MP_MUTACJA.blad = 'nieznana mutacja'; return; }
+  window.MP_MUTACJA.cel = m.cel;
+  window.MP_MUTACJA.celAsercja = m.celAsercja;
+  window.MP_MUTACJA.opis = m.opis;
+  try {
+    window.MP_MUTACJA.zastosowana = m.zastosuj() === true;
+  } catch (e) {
+    window.MP_MUTACJA.blad = String(e && e.message ? e.message : e);
+  }
+})();
+
 /* HARNESS-ONLY — samosprawdzenie jednostki 1. */
 (function () {
   var wynik = { szerokosc: 0, ok: false, startWidoczny: null, orientacja: '', asercje: [], bledyModelu: [], konsola: [] };
 
+  /* ==== POKRYCIE WIERSZY MATRYCY (przeb. 33) ==================================
+     Rejestr identyfikatorów wierszy, o które asercje FAKTYCZNIE pytały. Liczony
+     w chwili wywołania, z etykiety, a nie grepem po pliku — bo etykieta bywa
+     składana w locie (`'A2 · H9: ' + k[0]`) i analiza statyczna takiej nie widzi,
+     czyli meldowałaby brak pokrycia tam, gdzie pomiar jest.
+
+     Po co: przebieg 33 zastał trzynaście wierszy mierzonych WYŁĄCZNIE na
+     powierzchni pełnej — powierzchnia zminifikowana, czyli ta, która pojedzie
+     do embedu, była wobec nich ślepa przez dziesięć przebiegów i meldowała
+     „ZERO padnięć". Zero padnięć na wierszu, o który się nie pyta, jest prawdą
+     o przyrządzie, nie o produkcie. Tego nie dawało się zobaczyć z raportu:
+     obie liczby asercji były różne od zawsze i różnicy nikt nie rozpisał.
+
+     Identyfikatory bierzemy z PREFIKSU etykiety (do pierwszego dwukropka), żeby
+     `W69: … — H4: DM Serif Display` nie zaliczyło wiersza H4 — „H4" jest tam
+     poziomem nagłówka z Figmy, nie wierszem matrycy. Wiersz współdzielony
+     zapisuje się w prefiksie jawnie, po separatorze: `'A2 · H9: …'`. */
+  var POKRYCIE = Object.create(null);
+  function idyZEtykiety(nazwa) {
+    var i = nazwa.indexOf(':');
+    var pref = (i < 0 || i > 40) ? nazwa.slice(0, 20) : nazwa.slice(0, i);
+    return pref.match(/\b[A-IW]\d{1,2}\b/g) || [];
+  }
   function sprawdz(nazwa, warunek, detal) {
+    idyZEtykiety(nazwa).forEach(function (id) {
+      var n = id.charAt(0) + String(parseInt(id.slice(1), 10));   // C08 i C8 to ten sam wiersz
+      POKRYCIE[n] = (POKRYCIE[n] || 0) + 1;
+    });
     wynik.asercje.push({ nazwa: nazwa, ok: !!warunek, detal: detal == null ? '' : String(detal) });
     return !!warunek;
   }
@@ -396,12 +1134,62 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     wynik.ostrzezeniaModelu = model.ostrzezenia.slice();
 
     sprawdz('model zbudowany', !!model);
+
+    /* ==== A4 — nośnikiem pól jest `<script type="text/plain">` (przeb. 33) =========
+       Wiersz zielony od przebiegu 3 bez asercji. Sam fakt, że model powstał, NIE jest
+       jego dowodem: `tekstZeSkryptu()` czyta przez `getElementById`, więc przeszłoby
+       to także z `<div>`. Pytanie wiersza jest o NOŚNIK — dlaczego akurat `script`:
+       bo treść pola ma nie renderować się na stronie, a jednocześnie ma być odczytana.
+       Asercja pyta więc o oba warunki naraz, plus o to, że ID jest wiążące. */
+    var elSkl = document.getElementById('mp-skladniki');
+    var elKrk = document.getElementById('mp-kroki');
+    sprawdz('A4: `skladniki` i `kroki` stoją w `<script type="text/plain">`, nie w widocznym węźle',
+            !!elSkl && !!elKrk &&
+            elSkl.tagName === 'SCRIPT' && elKrk.tagName === 'SCRIPT' &&
+            elSkl.getAttribute('type') === 'text/plain' &&
+            elKrk.getAttribute('type') === 'text/plain',
+            (elSkl && elSkl.tagName + '/' + elSkl.getAttribute('type')) + ' · ' +
+            (elKrk && elKrk.tagName + '/' + elKrk.getAttribute('type')));
+    sprawdz('A4: nośnik NIE renderuje treści na stronie (zero pudełka w układzie)',
+            !!elSkl && elSkl.getClientRects().length === 0 && elSkl.offsetParent === null,
+            elSkl ? (elSkl.getClientRects().length + ' pudełek') : 'brak elementu');
+    sprawdz('A4: to, co odczytane, POCHODZI z tych węzłów — 11 składników i 9 kroków',
+            !!elSkl && elSkl.textContent.indexOf('#kurczak') >= 0 &&
+            model.skladniki.length === 11 && model.kroki.length === 9,
+            model.skladniki.length + ' / ' + model.kroki.length);
+    /* KONTROLA UJEMNA: wiąże IDENTYFIKATOR, nie obecność jakiegokolwiek `text/plain`.
+       Bez niej wiersz przeszedłby na stronie, która wsypuje treść z dowolnego skryptu
+       — a wtedy każdy `<script type="text/plain">` gospodarza byłby wejściem parsera. */
+    var podrzucony = document.createElement('script');
+    podrzucony.type = 'text/plain';
+    podrzucony.id = 'mp-skladniki-podrobka';
+    podrzucony.textContent = '#duch 999 kg ducha';
+    document.body.appendChild(podrzucony);
+    var mPodr = MP.przepis.zaladuj();
+    sprawdz('A4 KONTROLA UJEMNA: obcy `<script type="text/plain">` NIE jest wciągany do modelu',
+            mPodr.skladniki.every(function (s) { return s.key !== 'duch'; }) &&
+            mPodr.skladniki.length === 11,
+            mPodr.skladniki.length + ' składników, `duch` ' +
+            (mPodr.skladniki.some(function (s) { return s.key === 'duch'; }) ? 'WCIĄGNIĘTY' : 'pominięty'));
+    document.body.removeChild(podrzucony);
     sprawdz('bledy walidacji = 0', model.bledy.length === 0, model.bledy.join(' | '));
     sprawdz('9 krokow', model.kroki.length === 9, model.kroki.length);
     sprawdz('11 skladnikow', model.skladniki.length === 11, model.skladniki.length);
     sprawdz('porcje bazowe = 2', model.porcjeBazowe === 2, model.porcjeBazowe);
     sprawdz('tytul z data-tytul', model.tytul === 'Kurczak teriyaki', model.tytul);
     sprawdz('czas z data-czas', model.czas === '30 min', model.czas);
+    sprawdz('B21/D-23.1: model niesie `fotoUrl` ze zdjęcia głównego (`[data-mp-foto-glowne]`)',
+            typeof model.fotoUrl === 'string' && model.fotoUrl.indexOf('data:image/svg+xml') === 0,
+            String(model.fotoUrl).slice(0, 40));
+    /* Kontrola ujemna dwustopniowa. Bez niej „pole jest" znaczyłoby tylko tyle, że
+       coś jest — a `img.src` dla PUSTEGO `src` przeglądarka rozwija do adresu
+       dokumentu, więc naiwny odczyt zwróciłby URL strony i wyglądał na trafienie. */
+    sprawdz('B21: kontrola ujemna — jawnie podane puste zdjęcie daje `null`, nie adres strony',
+            MP.przepis.zaladuj({ pola: true, fotoGlowne: '' }).fotoUrl === null,
+            String(MP.przepis.zaladuj({ pola: true, fotoGlowne: '' }).fotoUrl));
+    sprawdz('B21: `fotoUrl` przechodzi na poziom WIDOKU (`naPorcje`), nie tylko modelu',
+            MP.przepis.naPorcje(model, 4).fotoUrl === model.fotoUrl,
+            String(MP.przepis.naPorcje(model, 4).fotoUrl).slice(0, 40));
 
     var kurczak = model.skladniki.filter(function (s) { return s.key === 'kurczak'; })[0];
     sprawdz('#kurczak ma podpiety produkt', !!(kurczak && kurczak.produkt), kurczak && kurczak.produkt && kurczak.produkt.slug);
@@ -440,10 +1228,10 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     sprawdz('4 porcje: 2 × 330 g', /^2 × 330 g/.test(etyk(w4, 'kurczak')), etyk(w4, 'kurczak'));
 
     /* TEST NEGATYWNY (poz. 7): kroki i minutniki NIE skalują się z porcjami */
-    sprawdz('NEG: liczba krokow niezalezna od porcji', w4.kroki.length === w2.kroki.length, w4.kroki.length);
-    sprawdz('NEG: minutnik niezalezny od porcji',
+    sprawdz('H1: liczba kroków NIE skaluje się z porcjami', w4.kroki.length === w2.kroki.length, w4.kroki.length);
+    sprawdz('H2: minutnik NIE skaluje się z porcjami',
             w4.kroki[4].minutnik.sekundy === w2.kroki[4].minutnik.sekundy, w4.kroki[4].minutnik.sekundy);
-    sprawdz('NEG: tekst kroku niezalezny od porcji',
+    sprawdz('H1: tekst kroku NIE skaluje się z porcjami',
             w4.kroki[4].tekst === w2.kroki[4].tekst);
 
     /* podział listy względem kroku (klatka „W · krok 3") */
@@ -461,12 +1249,12 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     MP.przepis.rysujQR();          // <992 px: nie robi nic i NIE ostrzega
 
     /* H3 (test negatywny): czas przepisu nie skaluje się z porcjami */
-    sprawdz('NEG: czas przepisu niezalezny od porcji', w4.czas === w2.czas && w2.czas === '30 min', w4.czas);
+    sprawdz('H3: czas przepisu NIE skaluje się z porcjami', w4.czas === w2.czas && w2.czas === '30 min', w4.czas);
 
     /* H4 (test negatywny): QR nie rysuje się poniżej 992 px.
        Wszystkie ramki matrycy są węższe, więc kontener ma zostać pusty. */
     var qr = document.querySelector('[data-mp-qr]');
-    sprawdz('NEG: brak QR ponizej 992 px', !!qr && qr.innerHTML === '' && qr.children.length === 0,
+    sprawdz('H4: brak QR poniżej 992 px (bramkę z test-doublem mierzy `qr.html`)', !!qr && qr.innerHTML === '' && qr.children.length === 0,
             qr ? qr.children.length + ' dzieci' : '(brak kontenera)');
 
     /* ---- payload spreparowany: skalowanie i odmiana (G02–G06) --------------
@@ -513,7 +1301,7 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
       ['@slug bez odpowiednika', /którego nie ma w produkty-w-przepisie/.test(bl2)],
       ['foto: bez trafienia', /szuka zdjęcia/.test(bl2)]
     ];
-    klasy.forEach(function (k) { sprawdz('A2: ' + k[0], k[1]); });
+    klasy.forEach(function (k) { sprawdz((k[0].indexOf('(H9)') >= 0 ? 'A2 · H9: ' : 'A2: ') + k[0], k[1]); });
 
     /* ---- jednostka 2: pola kartowe Q→A (A3, A5–A7, A9, A11–A13) -------------
        Kolejność jest istotna: model czyta SUROWY tekst, więc identyfikatory
@@ -718,6 +1506,12 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     var elPuste = document.querySelector('[data-mp-pole="test-puste"]');
     var refSurowy = elWsk.querySelector('[data-mp-surowe]');
     var pierwszaOdpowiedz = refSurowy.textContent.split('\n')[1];
+    /* Świadek nagłówka wzięty PRZED przekształceniem — patrz asercja „nagłówek
+       sekcji nietknięty" niżej. Bez świadka wiersz pytał wyłącznie o ISTNIENIE
+       nagłówka po przekształceniu, a obiecuje NIETKNIĘCIE; przekształcenie, które
+       zburzyłoby nagłówek i zbudowało nowy o tej samej klasie, przechodziło. */
+    var refTytul = elWsk.querySelector('.mp-pole__tytul');
+    var tytulPrzed = refTytul ? refTytul.textContent : null;
 
     MP.przepis.podzielWszystkieKarty();
 
@@ -731,8 +1525,19 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     sprawdz('A9: treść serwerowa przeżyła przekształcenie',
             refSurowy.textContent.indexOf(pierwszaOdpowiedz.slice(0, 40)) >= 0,
             refSurowy.textContent.slice(0, 40));
-    sprawdz('A9: nagłówek sekcji nietknięty',
-            !!elWsk.querySelector('.mp-pole__tytul'));
+    /* Wzmocnione w przeb. 34 (przegląd metodą „co by to obaliło"). Stara wersja
+       brzmiała `!!elWsk.querySelector('.mp-pole__tytul')` — pytała o ISTNIENIE
+       węzła po przekształceniu, więc nie istniał stan, w którym by spadła, poza
+       całkowitym usunięciem nagłówka. Teraz pyta o TOŻSAMOŚĆ węzła i o treść,
+       czyli o to, co wiersz obiecuje: przekształcenie ma być w miejscu.
+       Kontrola dodatnia w warunku: `tytulPrzed` musi być NIEPUSTE — inaczej
+       porównanie `null === null` przechodziłoby na polu bez nagłówka.          */
+    sprawdz('A9: nagłówek sekcji nietknięty — ten sam węzeł i ta sama treść',
+            !!refTytul && elWsk.querySelector('.mp-pole__tytul') === refTytul &&
+            typeof tytulPrzed === 'string' && tytulPrzed.trim().length > 0 &&
+            refTytul.textContent === tytulPrzed && refTytul.parentNode === elWsk,
+            'tożsamość ' + (elWsk.querySelector('.mp-pole__tytul') === refTytul) +
+            ' · treść „' + String(tytulPrzed).slice(0, 24) + '"');
 
     /* A6 — N kart po pustej linii, pytanie pogrubione */
     function karty(pole) { return document.querySelectorAll('[data-mp-karta="' + pole + '"]'); }
@@ -848,6 +1653,165 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             fill() + ' vs ' + torW);
     sprawdz('B6: kikut startowy = 8 px, nie zero', MP.tryb.wymiary.postepMin === 8,
             MP.tryb.wymiary.postepMin);
+
+    /* B23 (U-3, defekt zgłoszony przez operatora 2026-08-15) — etykieta „krok X z Y"
+       WYŚRODKOWANA nad torem postępu. Pudełko etykiety ma dokładnie szerokość toru,
+       więc pomiar pudełka niczego nie rozstrzyga: przy `text-align:start` i przy
+       `center` jest ono identyczne. Mierzymy więc PROSTOKĄT TEKSTU przez `Range` —
+       to jedyny oracle, który odróżnia napis dosunięty do lewej od wyśrodkowanego.
+       Kontrola dodatkowa na deklaracji zostaje, ale sama by nie wystarczyła. */
+    var etykPostep = korzen.querySelector('.mp-tryb__etykieta');
+    if (etykPostep && etykPostep.firstChild) {
+      var zakres = document.createRange();
+      zakres.selectNodeContents(etykPostep);
+      var rTx = zakres.getBoundingClientRect(), rTor = pr(cz.tor);
+      var srodekTx = (rTx.left + rTx.right) / 2, srodekTor = (rTor.left + rTor.right) / 2;
+      sprawdz('B23 (U-3): „krok X z Y" wyśrodkowane nad torem (mierzone prostokątem TEKSTU)',
+              Math.abs(srodekTx - srodekTor) <= 1 &&
+              getComputedStyle(etykPostep).textAlign === 'center',
+              'środek napisu ' + srodekTx.toFixed(1) + ' vs środek toru ' +
+              srodekTor.toFixed(1) + ' · ' + getComputedStyle(etykPostep).textAlign);
+      sprawdz('B23 (U-3): kontrola ujemna — napis NIE jest dosunięty do lewej krawędzi toru',
+              rTx.left - rTor.left > 1,
+              'lewa napisu ' + rTx.left.toFixed(1) + ' vs lewa toru ' + rTor.left.toFixed(1) +
+              ' (napis ' + Math.round(rTx.width) + ' w torze ' + Math.round(rTor.width) + ')');
+    } else {
+      sprawdz('B23 (U-3): „krok X z Y" wyśrodkowane nad torem (mierzone prostokątem TEKSTU)',
+              false, 'BRAK `.mp-tryb__etykieta` albo etykieta pusta');
+    }
+
+
+    /* ==== B24 · B25 — DWA DEFEKTY OPERATORSKIE, KTÓRE NIE MIAŁY WIERSZA =========
+       Założone w przebiegu 32, w tym samym przebiegu, w którym matryca po raz pierwszy
+       pokazała 200/200. Powód założenia jest dokładnie tą zielenią: U-2 i U-4 są znane
+       od przebiegu 29, opisane w STAN.md prozą, i **żaden wiersz o nie nie pytał**.
+       Matryca 200/200 mówiła więc „nic nie jest czerwone", a czytana była jako
+       „wszystko jest zrobione" — ten sam rozjazd, który sekcja W nazwała przy bilansie
+       54/54. Defekt bez wiersza jest niewidoczny dla przyrządu, a przyrząd jest jedyną
+       rzeczą, która pilnuje pamięci łańcucha między przebiegami.
+
+       OBA WIERSZE MAJĄ PAŚĆ i to jest ich zamierzony stan początkowy. Asercja, która
+       rodzi się zielona, nie udowodniła niczego poza tym, że ktoś ją napisał pod wynik. */
+
+    /* B24 (U-4) — slot znaku marki jest PUSTY. Geometria slotu (51×40 @ 16,16) zgadza
+       się z Figmą `7283:10838` co do piksela i była mierzona wcześniej; nikt nie pytał
+       o ZAWARTOŚĆ. To jest różnica między „element jest na swoim miejscu" a „element
+       coś pokazuje" — ta sama, którą przy zdjęciu głównym rozstrzygnął `naturalWidth`. */
+    var znakEl = korzen.querySelector('.mp-tryb__znak');
+    var znakR = znakEl ? znakEl.getBoundingClientRect() : null;
+    sprawdz('B24 (U-4): slot znaku marki NIESIE znak (inline `<svg>` albo `<img>`), nie jest pustym pudełkiem',
+            !!znakEl && (znakEl.querySelector('svg') || znakEl.querySelector('img') ||
+                         (znakEl.textContent || '').trim().length > 0),
+            znakEl ? ('slot ' + Math.round(znakR.width) + '×' + Math.round(znakR.height) +
+                      ' · svg ' + znakEl.querySelectorAll('svg').length +
+                      ' · img ' + znakEl.querySelectorAll('img').length +
+                      ' · treść "' + (znakEl.textContent || '').trim() + '"')
+                    : 'BRAK `.mp-tryb__znak`');
+    /* Kontrola dodatnia do B24: gdyby slot zniknął z drzewa, asercja wyżej padłaby
+       z tego samego powodu co przy pustce, a to są dwa różne defekty. */
+    sprawdz('B24 (U-4): kontrola dodatnia — slot istnieje i ma geometrię z Figmy (51×40)',
+            !!znakEl && Math.round(znakR.width) === 51 && Math.round(znakR.height) === 40,
+            znakR ? Math.round(znakR.width) + '×' + Math.round(znakR.height) : 'brak');
+
+    /* B25 (U-2) — `.mp-tryb__czas` ma na dwóch powierzchniach dwa różne wyrównania.
+       Na ekranie kroku siedzi w rzędzie `space-between` obok nazwy kroku i ląduje
+       po PRAWEJ; na pełnej liście nie ma sąsiada i ląduje po LEWEJ. Ta sama klasa,
+       dwa rysunki. Matryca tego nie widziała, bo pytała o OBECNOŚĆ `.czas`.
+       Mierzymy odległości od OBU krawędzi kolumny treści, bo sama współrzędna `x`
+       nic nie znaczy przy pięciu różnych szerokościach ramek. */
+    function stronaW(elCzas, kontener) {
+      if (!elCzas || !kontener) return null;
+      var a = elCzas.getBoundingClientRect(), b = kontener.getBoundingClientRect();
+      var doLewej = a.left - b.left, doPrawej = b.right - a.right;
+      return { doLewej: Math.round(doLewej), doPrawej: Math.round(doPrawej),
+               strona: doLewej <= doPrawej ? 'lewa' : 'prawa' };
+    }
+    /* Obu powierzchni NIE DA SIĘ zmierzyć jednym odczytem i to jest własność kodu,
+       nie niedogodność pomiaru: `rysujListe()` zaczyna od `top.textContent = ''`,
+       więc ekran kroku i pełna lista są dwoma STANAMI tego samego kontenera, nigdy
+       dwoma elementami naraz. Przełączamy więc widok, mierzymy, wracamy do stanu
+       zastanego — i zapisujemy tę drogę, żeby następne ogniwo nie próbowało
+       `querySelector` na obu naraz i nie wyciągnęło z pustki wniosku o wyrównaniu. */
+    var listaByla = MP.tryb.listaOtwarta();
+    if (listaByla) { MP.tryb.lista(false); }
+    var swiadekKrok = !!cz.top.querySelector('.mp-tryb__rzad-kroku') &&
+                      !cz.top.querySelector('[data-mp-lista-pelna]');
+    var sKrok = stronaW(korzen.querySelector('.mp-tryb__rzad-kroku .mp-tryb__czas'), cz.top);
+    MP.tryb.lista(true);
+    var swiadekLista = !!cz.top.querySelector('[data-mp-lista-pelna]') &&
+                       !cz.top.querySelector('.mp-tryb__rzad-kroku');
+    var sLista = stronaW(cz.top.querySelector('.mp-tryb__czas'), cz.top);
+    MP.tryb.lista(false);
+    if (listaByla) { MP.tryb.lista(true); }
+    /* ŚWIADEK PRZEŁĄCZENIA — kontrola dodatnia do B25 i powód, dla którego ten wiersz
+       nie zzieleniał „od razu i za darmo". Dwa odczyty wychodzą tu identyczne co do
+       piksela; identyczny wynik z dwóch pomiarów jest zawsze podejrzany, bo najtańszym
+       jego wyjaśnieniem jest, że zmierzono dwa razy to samo. Świadek pyta o coś, co
+       MUSI się między odczytami zmienić: ekran kroku ma `.mp-tryb__rzad-kroku` i nie ma
+       `[data-mp-lista-pelna]`, pełna lista odwrotnie. Bez tej asercji zieleń B25
+       znaczyłaby „przyrząd nie przełączył widoku", a brzmiałaby jak „defekt naprawiony". */
+    sprawdz('B25 (U-2): kontrola dodatnia — oba odczyty pochodzą z RÓŻNYCH stanów TOP-u',
+            swiadekKrok && swiadekLista,
+            'stan kroku ' + (swiadekKrok ? 'ok' : 'ZŁY') + ' · stan listy ' + (swiadekLista ? 'ok' : 'ZŁY'));
+    sprawdz('B25 (U-2): `.mp-tryb__czas` wyrównany TAK SAMO na ekranie kroku i na pełnej liście',
+            !!sKrok && !!sLista && sKrok.strona === sLista.strona,
+            (sKrok ? 'krok: ' + sKrok.strona + ' (L' + sKrok.doLewej + '/P' + sKrok.doPrawej + ')' : 'krok: brak elementu') +
+            ' · ' +
+            (sLista ? 'lista: ' + sLista.strona + ' (L' + sLista.doLewej + '/P' + sLista.doPrawej + ')' : 'lista: brak elementu'));
+
+
+    /* ==== B26 (U-1) — REGUŁA SKŁADANIA BOTTOM-u jako TOŻSAMOŚĆ, nie jako lista ======
+       Wiersz B7 („BOTTOM liczony z reguły składania") stoi zielony od przebiegu 6
+       z pustą kolumną wyniku — czyli sprzed rozstrzygnięcia C1, które tę regułę
+       ustanowiło (operator, 2026-08-15). Zieleń starsza od reguły, którą rzekomo
+       mierzy, jest zielenią o czymś innym. U-1 mówi ponadto, że `przeliczBottom()`
+       „liczy rzecz, która nie istnieje" — to zdanie pochodzi z przebiegu 29 i też
+       nikt go nie przemierzył.
+
+       Mierzymy TOŻSAMOŚĆ z INTERAKCJE §4.1: `BOTTOM = stos + pasek nawigacji`.
+       Tożsamość jest mocniejszym oracle'em od listy wysokości, bo nie trzeba jej
+       aktualizować przy każdym nowym układzie stosu — i dokładnie dlatego operator
+       zamienił listę na regułę.
+
+       Druga asercja pyta o to, czy `przeliczBottom()` PUBLIKUJE prawdę: zmienna
+       `--mp-bottom-h` jest jedyną drogą, którą reszta arkusza dowiaduje się o wysokości
+       pasa, więc rozjazd między nią a zmierzonym pudełkiem byłby defektem niewidocznym
+       w żadnym pomiarze geometrii — wszystko leżałoby dobrze, a odstęp od dołu nie. */
+    /* PIERWSZA WERSJA TEGO WIERSZA PRZESZŁA JAKO `80 = 0 + 80` i to jest cała nauka.
+       W stanie, w którym kończy się blok pomiarowy, stos ma ZERO dzieci, więc tożsamość
+       jest prawdziwa trywialnie — i dokładnie tak samo prawdziwa byłaby przy dowolnie
+       zepsutym `przeliczBottom()`. Wiersz B7 stoi zielony od przebiegu 6 z pustą kolumną
+       wyniku i najprawdopodobniej mierzył właśnie to. Dlatego szukamy stanu z NIEPUSTYM
+       stosem: przechodzimy kroki po kolei i zatrzymujemy się na pierwszym, który wnosi
+       pigułkę minutnika. Stan zastany odtwarzamy na końcu. */
+    /* ŻADEN z dziewięciu kroków nie wnosi pigułki sam z siebie — zmierzone, nie założone.
+       Stos zapełnia się dopiero po URUCHOMIENIU minutnika, czyli po geście użytkownika.
+       To jest drugi powód, dla którego B7 mógł stać zielony przez dwadzieścia sześć
+       przebiegów: w stanie, w którym kończy się blok pomiarowy, reguła składania nie
+       ma czego składać. Uruchamiamy więc minutnik jawnie, mierzymy, i sprzątamy po sobie
+       (`wyczysc()`), żeby wiersz nie zostawił biegnącego odliczania kolejnym asercjom. */
+    var stanMinutnikowPrzed = MP.tryb.minutniki.lista().length;
+    var uruchomiony = MP.tryb.minutniki.uruchom({ nazwa: 'sonda B26', sekundy: 600 });
+    var czB = MP.tryb.czesci();
+    var bR = pr(czB.bottom), sR = czB.stos ? pr(czB.stos) : null, nR = pr(czB.nawigacja);
+    var bH = Math.round(bR.height), sH = sR ? Math.round(sR.height) : 0, nH = Math.round(nR.height);
+    var dzieciStosu = czB.stos ? czB.stos.children.length : 0;
+    var zmiennaBottom = parseFloat(getComputedStyle(korzen).getPropertyValue('--mp-bottom-h')) || 0;
+    sprawdz('B26 (U-1): `BOTTOM` = stos + pasek nawigacji (TOŻSAMOŚĆ z INTERAKCJE §4.1, nie lista wysokości)',
+            Math.abs(bH - (sH + nH)) <= 1,
+            'bottom ' + bH + ' · stos ' + sH + ' + nawigacja ' + nH + ' = ' + (sH + nH));
+    sprawdz('B26 (U-1): `przeliczBottom()` publikuje ZMIERZONĄ wysokość w `--mp-bottom-h`',
+            Math.abs(Math.round(zmiennaBottom) - bH) <= 1,
+            '--mp-bottom-h ' + zmiennaBottom + ' vs pudełko ' + bH);
+    /* Kontrola dodatnia: tożsamość `x = 0 + x` jest prawdziwa zawsze i nic nie mierzy.
+       Wiersz ma sens tylko wtedy, gdy stos w mierzonym stanie coś zawiera — inaczej
+       asercja wyżej potwierdza jedynie, że pasek nawigacji ma swoją wysokość. */
+    sprawdz('B26 (U-1): kontrola dodatnia — stos NIEPUSTY w mierzonym stanie (inaczej tożsamość jest trywialna)',
+            sH > 0 && dzieciStosu > 0,
+            'minutnik ' + (uruchomiony ? 'uruchomiony' : 'NIE uruchomiony') +
+            ' · stos ' + sH + ' px, dzieci ' + dzieciStosu +
+            ' · minutników przed sondą ' + stanMinutnikowPrzed);
+    if (!stanMinutnikowPrzed) { MP.tryb.minutniki.wyczysc(); }
 
     /* B10 — pasek nawigacji 80 px: `←` 44×44, odstęp 12, CTA wypełnia resztę */
     sprawdz('B10: nawigacja = 80 px', Math.round(pr(cz.nawigacja).height) === 80, pr(cz.nawigacja).height);
@@ -1054,8 +2018,21 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     sprawdz('C05: baza 198 zadeklarowana jako wymiar, nie liczba w kodzie',
             wym.pigulkaBaza === 198 && wym.pigulkaKrotka === 126, wym.pigulkaBaza);
     sprawdz('C07: szewron obecny ⟺ pigułka rozwinięta PEŁNA', m2.el.szewron.hidden === false);
-    sprawdz('C07: pełna ma podpowiedź, primary i rząd ghostów',
-            !m2.el.podpowiedz.hidden && !m2.el.primary.hidden && !m2.el.ghosty.hidden);
+    /* Wzmocnione w przeb. 34 (przegląd metodą „co by to obaliło"). Stara wersja
+       pytała wyłącznie o atrybut `hidden` trzech elementów — czyli o to, czy ktoś
+       ich nie SCHOWAŁ, a nie o to, czy się RYSUJĄ. To dokładnie ta różnica, na
+       której I4 zzieleniało z pustki w przeb. 31: warunek przechodził w poddrzewie,
+       które nie miało ani jednego prostokąta. Kryterium jest teraz `getClientRects()`,
+       a podpowiedź dostaje dodatkowo niezerową wysokość, bo to ona wnosi wzrost
+       pigułki mierzony przez C05 (198 + hPodp).                                  */
+    var rysuje = function (el) { return !!el && el.getClientRects().length > 0; };
+    sprawdz('C07: pełna ma podpowiedź, primary i rząd ghostów — RYSOWANE, nie tylko bez `hidden`',
+            !m2.el.podpowiedz.hidden && !m2.el.primary.hidden && !m2.el.ghosty.hidden &&
+            rysuje(m2.el.podpowiedz) && rysuje(m2.el.primary) && rysuje(m2.el.ghosty) &&
+            hPodp > 0,
+            'prostokątów ' + [m2.el.podpowiedz, m2.el.primary, m2.el.ghosty]
+              .map(function (e) { return e.getClientRects().length; }).join('/') +
+            ' · hPodp ' + Math.round(hPodp));
     sprawdz('B9: rząd ghostów = 48, odstęp 16', hEl(m2.el.ghosty) === 48 &&
             pxN(m2.el.ghosty, 'columnGap') === 16, hEl(m2.el.ghosty) + '/' + pxN(m2.el.ghosty, 'columnGap'));
     /* W62/W63 — wykończenie pigułki PEŁNEJ wg S5 (`7240:10900`), odczyt przeb. 25.
@@ -1302,12 +2279,54 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             sKolko.backgroundColor + ' obrys ' + sKolko.borderTopWidth + ' r' +
             sKolko.borderTopLeftRadius + ' · ' + sLit.color + ' ' + sLit.fontWeight +
             '/' + sLit.fontSize);
-    sprawdz('E6: cel dotyku markera 44×44, wyśrodkowany na kółku 20 px',
-            Math.round(pr(kolko.querySelector('.mp-tryb__cel')).width) === 44 &&
-            Math.round(pr(kolko.querySelector('.mp-tryb__cel')).height) === 44 &&
-            Math.abs((pr(kolko.querySelector('.mp-tryb__cel')).left + pr(kolko.querySelector('.mp-tryb__cel')).right)
-                     - (pr(kolko).left + pr(kolko).right)) < 1,
-            Math.round(pr(kolko.querySelector('.mp-tryb__cel')).width));
+    /* E6 PRZEPISANE w przeb. 30 pod U-7 (rozstrzygnięcie operatora 2026-08-15).
+       Do przeb. 29 oracle brzmiał „44×44 wokół kółka” i był zielony — mierzył
+       poprawnie cel, który operator uznał za za wąski (20 px klikalne z 295 px wiersza).
+       Nowy oracle: PEŁNA SZEROKOŚĆ WIERSZA × 120 % wysokości kółka `i` (20 → 24),
+       nadmiar 4 px po równo nad i pod wierszem. */
+    var celM = kolko.querySelector('.mp-tryb__cel'), rCelM = pr(celM), rLi = pr(zMarkerem);
+    sprawdz('E6 (U-7): cel markera = pełna szerokość wiersza × 24 px (120 % kółka 20)',
+            Math.round(rCelM.width) === Math.round(rLi.width) &&
+            Math.round(rCelM.height) === 24 &&
+            Math.abs(rCelM.left - rLi.left) < 1 && Math.abs(rCelM.right - rLi.right) < 1,
+            Math.round(rCelM.width) + '×' + Math.round(rCelM.height) +
+            ' vs wiersz ' + Math.round(rLi.width));
+    sprawdz('E6 (U-7): nadmiar 4 px ROZŁOŻONY PO RÓWNO — 2 nad wierszem, 2 pod',
+            Math.abs((rLi.top - rCelM.top) - 2) < 0.6 &&
+            Math.abs((rCelM.bottom - rLi.bottom) - 2) < 0.6,
+            'nad ' + (rLi.top - rCelM.top).toFixed(2) + ' pod ' + (rCelM.bottom - rLi.bottom).toFixed(2));
+    /* Kontrola po drugiej stronie: naprawa jednego gestu nie może zepsuć drugiego.
+       Nakładka markera przechodzi POD checkboxem, więc w punkcie środka ptaszka
+       trafienie ma należeć do PTASZKA. Mierzone gestem (`elementFromPoint`), a nie
+       deklaracją `z-index` — jeśli punkt wypadnie poza widokiem, wiersz PADA zamiast
+       cicho przejść na słabszy dowód. */
+    var ptM = zMarkerem.querySelector('.mp-tryb__ptaszek'), rPt = pr(ptM);
+    var pX = rPt.left + rPt.width / 2, pY = rPt.top + rPt.height / 2;
+    var trafiony = document.elementFromPoint(pX, pY);
+    /* W ORIENTACJI POZIOMEJ nad interfejsem stoi scrim „obróć telefon" i to ON
+       przejmuje każdy gest — z projektu, nie z usterki (A13/F14). Asercja gestowa
+       musi więc znać orientację, inaczej mierzyłaby scrim i nazywała to defektem
+       celu dotyku. W poziomie odwracamy oczekiwanie: trafieniem MA być scrim.
+       To nie jest złagodzenie oracle'a, tylko drugi, przeciwny wymóg na tej samej
+       drodze pomiarowej — gdyby scrim przepuszczał gest do wiersza, wiersz padłby. */
+    var scrimP = korzen.querySelector('.mp-tryb__scrim-poziom');
+    var poziomo = !!scrimP && getComputedStyle(scrimP).display !== 'none';
+    sprawdz('E6 (U-7): checkbox ZACHOWUJE własny cel — gest w środek ptaszka trafia w ptaszka',
+            poziomo ? (trafiony === scrimP || (scrimP && scrimP.contains(trafiony)))
+                    : (!!trafiony && (trafiony === ptM || ptM.contains(trafiony))),
+            (poziomo ? 'POZIOM (oczekiwany scrim): ' : '') +
+            (trafiony ? (trafiony.className || trafiony.tagName) : 'poza widokiem (' +
+            Math.round(pX) + ',' + Math.round(pY) + ')'));
+    /* I odwrotnie: gest w środek NAZWY składnika ma trafić w cel markera, bo
+       o to całe U-7 chodziło. Bez tego wiersz dowodziłby tylko, że nakładka ma
+       właściwy prostokąt — a prostokąt pod spodem nie jest celem dotyku. */
+    var nazwaM = zMarkerem.querySelector('.mp-tryb__nazwa-skl'), rNz = pr(nazwaM);
+    var tNaz = document.elementFromPoint(rNz.left + rNz.width / 2, rNz.top + rNz.height / 2);
+    sprawdz('E6 (U-7): gest w środek NAZWY otwiera tooltip — trafienie należy do markera',
+            poziomo ? (tNaz === scrimP || (scrimP && scrimP.contains(tNaz)))
+                    : (!!tNaz && (tNaz === kolko || kolko.contains(tNaz))),
+            (poziomo ? 'POZIOM (oczekiwany scrim): ' : '') +
+            (tNaz ? (tNaz.className || tNaz.tagName) : 'poza widokiem'));
     sprawdz('E6: cel 44 px NIE rozpycha wiersza (20 px) ani odstępu listy (12)',
             Math.round(pr(zMarkerem).height) === 20 &&
             odstepy.every(function (o) { return o === 12; }),
@@ -1341,6 +2360,36 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     sprawdz('D7: tap otwiera listę PEŁNĄ (cel, nie etykieta)',
             MP.tryb.listaOtwarta() === true &&
             !!cz.top.querySelector('[data-mp-lista-pelna]'), MP.tryb.listaOtwarta());
+    /* B22 (U-2, rozstrzygnięcie operatora 2026-08-15) — pigułka czasu stoi przy PRAWEJ
+       krawędzi kolumny treści TAK SAMO na pełnej liście, jak na ekranie kroku.
+       Wiersz istnieje, bo B19 mierzy TYLKO powierzchnię kroku i był zielony w chwili,
+       gdy ta sama klasa na liście stała po lewej (x=16). Oracle jest KRAWĘDZIĄ, nie
+       własnością CSS: `flex-end`, `margin-left:auto` i `space-between` dają ten sam
+       obraz, a pytanie brzmi, gdzie pigułka stoi. Kolumna treści = TOP minus lico 16. */
+    var czasL = cz.top.querySelector('.mp-tryb__czas');
+    if (czasL) {
+      var rTop = cz.top.getBoundingClientRect(), rCzL = czasL.getBoundingClientRect();
+      var licoP = parseFloat(getComputedStyle(cz.top).paddingRight) || 0;
+      /* Prawa krawędź kolumny liczona z PUDEŁKA TREŚCI (`clientLeft`+`clientWidth`),
+         nie z `getBoundingClientRect().right`. Różnica to pasek przewijania: TOP
+         przewija się, a pasek siedzi WEWNĄTRZ pudełka obramowania i zjada 15 px.
+         W portrecie obie liczby są równe i błąd był niewidoczny; w poziomie (390/375
+         wysokości) pasek się pojawia i pierwsza wersja tej asercji padła na obu
+         ramkach, opisując poprawne położenie pigułki jako rozjazd 15 px. */
+      var kolumnaPrawa = rTop.left + cz.top.clientLeft + cz.top.clientWidth - licoP;
+      sprawdz('B22 (U-2): pigułka czasu na PEŁNEJ LIŚCIE przy prawej krawędzi kolumny',
+              Math.abs(kolumnaPrawa - rCzL.right) < 1,
+              'prawa pigułki ' + Math.round(rCzL.right) + ' vs kolumna ' +
+              Math.round(kolumnaPrawa) + ' (lico ' + licoP + ', pasek ' +
+              Math.round(rTop.width - cz.top.clientWidth - cz.top.clientLeft * 2) + ')');
+      sprawdz('B22 (U-2): kontrola ujemna — pigułka NIE stoi już przy lewej krawędzi',
+              Math.abs(rCzL.left - (rTop.left + licoP)) > 1,
+              'lewa pigułki ' + Math.round(rCzL.left) + ' vs kolumna ' +
+              Math.round(rTop.left + licoP));
+    } else {
+      sprawdz('B22 (U-2): pigułka czasu na PEŁNEJ LIŚCIE przy prawej krawędzi kolumny',
+              false, 'BRAK `.mp-tryb__czas` na pełnej liście');
+    }
     /* Trzy sekcje naraz ma dopiero krok ze środka przepisu — w kroku 1 „zużyte"
        jest z definicji puste. Liczby bierzemy z MODELU, nie z klatki 360:
        inaczej asercja mierzyłaby payload, a nie regułę. */
@@ -1446,14 +2495,26 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             cz.top.querySelectorAll('.mp-tryb__wiersz[data-odhaczony]').length === 1 &&
             MP.tryb.zaznaczone().length === 1, MP.tryb.zaznaczone().join(','));
     var wiecej2 = cz.top.querySelector('.mp-tryb__lista .mp-tryb__wiecej');
-    sprawdz('D9: ten sam cel dotyku zamyka listę; glif obraca się ⌄↔⌃',
-            !!wiecej2 && wiecej2.querySelector('.mp-tryb__wiecej-glif').textContent === '⌃',
-            wiecej2 && wiecej2.querySelector('.mp-tryb__wiecej-glif').textContent);
+    /* C08 — obrót szewronu NA LIŚCIE SKŁADNIKÓW (I-15 `down` = rozwiń, I-16 `up` = zwiń).
+       Wiersz C08 stał zielony od przeb. 15 bez własnej asercji: mierzyły go te dwie
+       linijki pod etykietą D9, więc żaden przegląd pokrycia nie mógł go zobaczyć.
+       Nie jest to ten sam szewron co C07 — tamten należy do PIGUŁKI minutnika. */
+    var glifPrzed = wiecej2 && wiecej2.querySelector('.mp-tryb__wiecej-glif').textContent;
+    sprawdz('D9 · C08: lista ROZWINIĘTA — szewron pokazuje `⌃` (I-16: `up` = zwiń)',
+            !!wiecej2 && glifPrzed === '⌃', glifPrzed);
     wiecej2.click();
-    sprawdz('D9: po tapnięciu wracamy do listy skróconej',
+    var glifPo = cz.top.querySelector('.mp-tryb__wiecej-glif').textContent;
+    sprawdz('D9 · C08: po tapnięciu wracamy do listy skróconej, szewron na `⌄`',
             MP.tryb.listaOtwarta() === false &&
             cz.top.querySelectorAll('.mp-tryb__naglowek-sekcji').length === 0 &&
-            cz.top.querySelector('.mp-tryb__wiecej-glif').textContent === '⌄');
+            glifPo === '⌄', glifPo);
+    /* Falsyfikowalność wiersza siedzi w tej jednej asercji, nie w dwóch wyżej.
+       Dwie asercje na stałe wartości przeszłyby także wtedy, gdyby glif był
+       przypisany na sztywno w dwóch różnych miejscach kodu i wcale się nie OBRACAŁ
+       — a „obraca się" jest dosłowną treścią wiersza C08. Pytamy więc o RÓŻNICĘ. */
+    sprawdz('C08: szewron faktycznie się OBRACA — wartość po tapnięciu ≠ wartość przed',
+            glifPrzed !== glifPo && glifPrzed === '⌃' && glifPo === '⌄',
+            glifPrzed + ' → ' + glifPo);
 
     /* D12 — zaznaczenia przeżywają przejście krok → krok i powrót */
     MP.tryb.pokazKrok(2);
@@ -1788,8 +2849,8 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     /* W57 — CTA dialogu jest instancją `cta — cta`, więc pytam o to samo, o co pyta
        W05 przy przycisku „dalej": wypełnienie `primary-cta` i pigułka. Wysokości 48
        nie dubluję — mierzy ją F7. */
-    sprawdz('W57: CTA dialogu — `primary-cta` #CF411A, pigułka r100, SemiBold 600, 16/20',
-            String(sCta.backgroundColor).replace(/\s+/g, '') === 'rgb(207,65,26)' &&
+    sprawdz('W57: CTA dialogu — `primary-cta` #E55529, pigułka r100, SemiBold 600, 16/20',
+            String(sCta.backgroundColor).replace(/\s+/g, '') === 'rgb(229,85,41)' &&
             parseFloat(sCta.borderTopLeftRadius) >= 24 &&
             sCta.fontWeight === '600' && sCta.fontSize === '16px' &&
             Math.round(parseFloat(sCta.lineHeight)) === 20 &&
@@ -1926,6 +2987,11 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     var hPrzedProba = hBottom();
     var trzeci = MP.tryb.minutniki.uruchom({ nazwa: 'trzeci', sekundy: 300 });
     var dlg4 = MP.tryb.dialog.el();
+    /* ZASTĘPNIK POMIAROWY (przeb. 36) — patrz nagłówek łatki: odczepiony węzeł
+       zamiast `null`, żeby brak dialogu S4 był padnięciem, a nie wyjątkiem
+       wywracającym 131 dalszych asercji. */
+    var pusty = function () { return document.createElement('div'); };
+    var dlg4m = dlg4 || pusty();
     /* F7 + H7: odmowa jest bezśladowa. Nie wystarczy, że funkcja zwraca `null` —
        trzeci minutnik nie może zostawić po sobie ani kafla, ani wpisu w tablicy,
        ani zmiany wysokości BOTTOM. Dlatego pytamy o cztery rzeczy naraz. */
@@ -1934,12 +3000,12 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             cz.stos.children.length === kafliPrzed && hBottom() === hPrzedProba,
             MP.tryb.minutniki.lista().length + ' minutniki · kafli ' + cz.stos.children.length);
     sprawdz('F7: próba trzeciego otwiera dialog S4 na tym samym szkielecie co S2',
-            !!dlg4 && dlg4.getAttribute('data-mp-dialog') === 'S4' &&
+            !!dlg4 && dlg4m.getAttribute('data-mp-dialog') === 'S4' &&
             cz.scrimDialogu.hasAttribute('data-otwarty') &&
             korzen.hasAttribute('data-otwarty') &&
-            Math.round(pr(dlg4).width) === Math.round(pr(korzen).width) - 32 &&
-            pxN(dlg4, 'paddingTop') === 24,
-            MP.tryb.dialog.rodzaj() + ' · ' + Math.round(pr(dlg4).width));
+            Math.round(pr(dlg4m).width) === Math.round(pr(korzen).width) - 32 &&
+            pxN(dlg4m, 'paddingTop') === 24,
+            MP.tryb.dialog.rodzaj() + ' · ' + Math.round(pr(dlg4m).width));
     var w4 = MP.tryb.dialog.wiersze();
     /* §3b.1 skład S4: 2 × wiersz minutnika 280×44 + CTA 280×48, BEZ linku „wyjdź
        mimo to" — S4 niczego nie przerywa, więc nie ma wyjścia awaryjnego. */
@@ -1947,24 +3013,26 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             w4.length === 2 &&
             w4.every(function (r) { return Math.round(pr(r).height) === 44; }) &&
             w4.every(function (r) {
-              return Math.round(pr(r).width) === Math.round(pr(dlg4).width) - 48;
+              return Math.round(pr(r).width) === Math.round(pr(dlg4m).width) - 48;
             }) &&
-            (Math.round(pr(korzen).width) !== 360 || Math.round(pr(w4[0]).width) === 280),
-            w4.length + ' × ' + Math.round(pr(w4[0]).width) + '×' + Math.round(pr(w4[0]).height));
+            (Math.round(pr(korzen).width) !== 360 || Math.round(pr(w4[0] || pusty()).width) === 280),
+            w4.length + ' × ' + Math.round(pr(w4[0] || pusty()).width) + '×' +
+            Math.round(pr(w4[0] || pusty()).height));
     sprawdz('F7: S4 kończy się na CTA — bez linku „wyjdź mimo to" (§3b.1)',
-            !dlg4.querySelector('.mp-tryb__dialog-link') &&
-            Math.round(pr(dlg4.querySelector('.mp-tryb__dialog-cta')).height) === 48 &&
-            Math.round(pr(dlg4.querySelector('.mp-tryb__dialog-cta')).top -
-                       pr(w4[1]).bottom) === 12,
+            !!dlg4 && !dlg4m.querySelector('.mp-tryb__dialog-link') &&
+            Math.round(pr(dlg4m.querySelector('.mp-tryb__dialog-cta') || pusty()).height) === 48 &&
+            Math.round(pr(dlg4m.querySelector('.mp-tryb__dialog-cta') || pusty()).top -
+                       pr(w4[1] || pusty()).bottom) === 12,
             'odstęp wiersz → CTA ' +
-            Math.round(pr(dlg4.querySelector('.mp-tryb__dialog-cta')).top - pr(w4[1]).bottom));
+            Math.round(pr(dlg4m.querySelector('.mp-tryb__dialog-cta') || pusty()).top -
+                       pr(w4[1] || pusty()).bottom));
     /* Wewnętrzny rytm wiersza: nazwa x=16, „zakończ" przypięte 16 px od prawej,
        czas prawo-równany 16 px przed „zakończ" — reguła wyprowadzona z dwóch
        pomiarów x (171 i 178), które kończą się na tym samym 202. */
-    var r0 = w4[0];
-    var nazwa0 = r0.querySelector('.mp-tryb__dialog-min-nazwa');
-    var czas0 = r0.querySelector('.mp-tryb__dialog-min-czas');
-    var kon0 = r0.querySelector('.mp-tryb__dialog-min-koniec');
+    var r0 = w4[0] || pusty();
+    var nazwa0 = r0.querySelector('.mp-tryb__dialog-min-nazwa') || pusty();
+    var czas0 = r0.querySelector('.mp-tryb__dialog-min-czas') || pusty();
+    var kon0 = r0.querySelector('.mp-tryb__dialog-min-koniec') || pusty();
     sprawdz('F7: rytm wiersza — nazwa 16 od lewej, „zakończ" 16 od prawej, czas 16 przed nim',
             Math.round(pr(nazwa0).left - pr(r0).left) === 16 &&
             Math.round(pr(r0).right - pr(kon0).right) === 16 &&
@@ -1981,8 +3049,9 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             })(), kon0.querySelector('.mp-tryb__cel') ?
                   Math.round(pr(kon0.querySelector('.mp-tryb__cel')).height) : 'brak celu');
     sprawdz('F7: S4 wyśrodkowany pionowo (§3b.1 mierzy 235 = (780−311)/2)',
-            Math.abs((pr(dlg4).top + pr(dlg4).bottom) - (pr(korzen).top + pr(korzen).bottom)) < 2,
-            Math.round((pr(dlg4).top + pr(dlg4).bottom) / 2 - (pr(korzen).top + pr(korzen).bottom) / 2));
+            !!dlg4 &&
+            Math.abs((pr(dlg4m).top + pr(dlg4m).bottom) - (pr(korzen).top + pr(korzen).bottom)) < 2,
+            Math.round((pr(dlg4m).top + pr(dlg4m).bottom) / 2 - (pr(korzen).top + pr(korzen).bottom) / 2));
     /* „zakończ" zwalnia miejsce: zdejmuje TEN minutnik i zamyka dialog. Trzeci NIE
        startuje sam — to byłoby zachowanie zgadywane (I-18 opisuje tylko odmowę). */
     kon0.click();
@@ -2054,9 +3123,9 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             sWie.alignItems === 'center' && sGli.fontSize === '20px' &&
             Math.round(pr(banGlif).right + 8) === Math.round(pr(banTekst).left),
             sWie.alignItems + ' · ' + sGli.fontSize);
-    sprawdz('W52: akcja w barwie `primary-cta` #CF411A — glif i napis — bez podkreślenia',
-            String(sGli.color).replace(/\s+/g, '') === 'rgb(207,65,26)' &&
-            String(sTek.color).replace(/\s+/g, '') === 'rgb(207,65,26)' &&
+    sprawdz('W52: akcja w barwie `primary-cta` #E55529 — glif i napis — bez podkreślenia',
+            String(sGli.color).replace(/\s+/g, '') === 'rgb(229,85,41)' &&
+            String(sTek.color).replace(/\s+/g, '') === 'rgb(229,85,41)' &&
             sTek.textDecorationLine === 'none' &&
             sTek.fontWeight === '400' && sTek.fontSize === '14px',
             sTek.color + ' · ' + sTek.textDecorationLine);
@@ -2215,6 +3284,35 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             Math.round(pr(wierszeK[1]).top - pr(wierszeK[0]).bottom) === 12 &&
             Math.round(pr(wierszeK[2]).top - pr(wierszeK[1]).bottom) === 12,
             Math.round(pr(wierszeK[1]).top - pr(wierszeK[0]).bottom));
+    /* W76 — ZDJĘCIE GŁÓWNE na ekranie zakończenia (`7195:11188`, 328×150 @ y163).
+       D-23.1 mówi „to samo zdjęcie na starcie i na zakończeniu", więc wiersz mierzy
+       TĘ SAMĄ instancję pola, a nie drugie źródło. Wypełnienie ramki wyprowadzone
+       do W79 — jedno pytanie na wiersz, inaczej wiersz nie ma jak zzielenieć. */
+    var fotoK = cz.top.querySelector('[data-mp-foto-ekranu]');
+    if (fotoK) {
+      var rK = fotoK.getBoundingClientRect(), sK = getComputedStyle(fotoK);
+      sprawdz('W76: zdjęcie na zakończeniu — kolumna × 150 @ y163, promień 12, obrys BRAK, cień BRAK',
+              Math.round(rK.height) === 150 &&
+              Math.round(rK.width) === cz.top.clientWidth - 32 &&
+              Math.round(rK.top) === 163 && Math.round(rK.left) === 16 &&
+              parseFloat(sK.borderTopLeftRadius) === 12 &&
+              parseFloat(sK.borderTopWidth) === 0 && sK.boxShadow === 'none' &&
+              fotoK.naturalWidth > 0,
+              Math.round(rK.width) + '×' + Math.round(rK.height) + ' @ y' + Math.round(rK.top) +
+              ' r' + sK.borderTopLeftRadius + ' · naturalWidth ' + fotoK.naturalWidth);
+      /* „To samo zdjęcie" mierzymy przez ŹRÓDŁO, nie przez porównanie z ekranem
+         startowym: `czS` powstaje setki linii NIŻEJ w tym samym zakresie, więc
+         odwołanie do niego tutaj rzuciłoby `TypeError` — `var` hoistuje nazwę,
+         nie przypisanie. Ta sama pułapka, co przy helperach `cW26` z przebiegu 26. */
+      sprawdz('W76: to SAMO źródło co na starcie (D-23.1) — `[data-mp-foto-glowne]`, jedno pole',
+              fotoK.currentSrc.indexOf('data:image/svg+xml') === 0 &&
+              document.querySelectorAll('[data-mp-foto-glowne]').length === 1,
+              fotoK.getAttribute('src').slice(0, 40) + ' · źródeł ' +
+              document.querySelectorAll('[data-mp-foto-glowne]').length);
+    } else {
+      sprawdz('W76: zdjęcie na ekranie zakończenia (`7195:11188`, 328×150 @ y163)',
+              false, 'BRAK elementu `[data-mp-foto-ekranu]`');
+    }
     /* ---- W69–W75 — wykończenie EKRANU ZAKOŃCZENIA (`7195:11178`), odczyt przeb. 26.
        Ostatnia powierzchnia zestawu bez ani jednego wiersza W. Helpery lokalne
        i z sufiksem `26`, bo `cW`/`barwa`/`deklar` powstają dopiero w bloku W przeb. 21,
@@ -2288,8 +3386,8 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
        wspólna dla start / S1 / zakończenia, więc poprawka dotyczy trzech ekranów naraz
        (B11 mierzy ich UKŁAD i był zielony od przeb. 8 — o wykończenie nie pytał nikt). */
     var sCta = cW26(cz.akcjaPrimary), sGho = cW26(cz.akcjaGhost);
-    sprawdz('W67: `cta — cta` — wypełnienie `primary-cta` #CF411A, kapsuła r100, SemiBold 600, 16/20, biel złamana',
-            rgb26(sCta.backgroundColor) === 'rgb(207,65,26)' &&
+    sprawdz('W67: `cta — cta` — wypełnienie `primary-cta` #E55529, kapsuła r100, SemiBold 600, 16/20, biel złamana',
+            rgb26(sCta.backgroundColor) === 'rgb(229,85,41)' &&
             parseFloat(sCta.borderTopLeftRadius) >= 24 &&
             sCta.fontWeight === '600' && sCta.fontSize === '16px' &&
             Math.round(parseFloat(sCta.lineHeight)) === 20 &&
@@ -2444,13 +3542,24 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     MP.tryb.porcje(2);
     var wznowione = MP.tryb.sesja.wznow();
     var kartaWzn = cz.top.querySelector('[data-mp-karta="S1"]');
+    var krokWzn = function () {
+      var e = kartaWzn && kartaWzn.querySelector('.mp-tryb__karta-krok');
+      return e ? e.textContent : '';
+    };
     sprawdz('F8: S1 wznawia na zapisanym kroku i zapisanej liczbie porcji (I-30)',
             !!zapis && zapis.krok === 6 && zapis.porcje === 3 &&
             !!wznowione && MP.tryb.ekranTeraz() === 'wznowienie' &&
             MP.tryb.porcje() === 3 &&
-            kartaWzn.querySelector('.mp-tryb__karta-krok').textContent.indexOf('krok 6 z') === 0,
+            /* Dereferencja przez `krokWzn()`, nie wprost: gdy wznowienie się nie
+               powiedzie, karty S1 NIE MA, a `null.querySelector` wywracał cały blok
+               pomiarowy — czyli asercje po F8 nie biegły wcale i komparator mutacji
+               czytał to jako TAUTOLOGIĘ wiersza (przeb. 36, `M23-sesja-niema`).
+               Pytanie wiersza bez zmian; zmienia się tylko to, że brak karty jest
+               PADNIĘCIEM, a nie wyjątkiem. Ten sam standard, którego asercja obok
+               wymaga od produktu: „bez wyjątku" obowiązuje też przyrząd. */
+            krokWzn().indexOf('krok 6 z') === 0,
             (zapis ? zapis.krok + '/' + zapis.porcje : 'brak zapisu') + ' → ' +
-            kartaWzn.querySelector('.mp-tryb__karta-krok').textContent.slice(0, 18));
+            (krokWzn().slice(0, 18) || '(brak karty S1)'));
     var kluczePo = obce();
     sprawdz('F8 / H-neg: zapis dotyka WYŁĄCZNIE swojego klucza (WYM §6)',
             kluczePo === kluczePrzed &&
@@ -2583,14 +3692,14 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             mS5.el.odliczanie.textContent === '0:00',
             mS5.el.odliczanie.textContent);
     /* W64 (przeb. 26) — jedyna czerwień POMIAROWA sekcji W, założona świadomie
-       w przebiegu 25: w stanie `0:00` czas przechodzi na `primary-cta` #CF411A
+       w przebiegu 25: w stanie `0:00` czas przechodzi na `primary-cta` #E55529
        (`7240:10922`). Mierzone TU, bo S5 to jedyne miejsce, w którym pigułka jest
        jednocześnie PEŁNA i na zerze — a barwa jest własnością pary (forma, stan),
        nie samej formy. Kontrola po drugiej stronie: W66 mierzy tę samą klasę przy
        minutniku biegnącym i wymaga tam atramentu. */
     var sOdlZero = getComputedStyle(mS5.el.odliczanie);
-    sprawdz('W64: czas przy 0:00 — `primary-cta` #CF411A, dalej Bold 700 / 34',
-            String(sOdlZero.color).replace(/\s+/g, '') === 'rgb(207,65,26)' &&
+    sprawdz('W64: czas przy 0:00 — `primary-cta` #E55529, dalej Bold 700 / 34',
+            String(sOdlZero.color).replace(/\s+/g, '') === 'rgb(229,85,41)' &&
             sOdlZero.fontSize === '34px' && sOdlZero.fontWeight === '700' &&
             Math.round(parseFloat(sOdlZero.lineHeight)) === 34,
             sOdlZero.color + ' ' + sOdlZero.fontSize + '/' + sOdlZero.lineHeight);
@@ -2717,6 +3826,65 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     sprawdz('I7 (a) KONTROLA POZYTYWNA: walidator ODRZUCA pusty, biały, placeholderowy i nie-string',
             przepuszczone.length === 0,
             przepuszczone.length === 0 ? ('odrzucone ' + zleOpisy.length + '/' + zleOpisy.length) : ('PRZEPUSZCZONE: ' + przepuszczone.join('|')));
+    /* ==== I6 — luki G1–G12 rozstrzygnięte i OZNACZONE w źródle (przeb. 33) =======
+       Wiersz stał zielony od przebiegu 28 bez ani jednej asercji: twierdzenie
+       o ZAMKNIĘTEJ liście dwunastu pozycji opierało się wyłącznie na lekturze kodu,
+       czyli na dokładnie tym, czego zakazuje reguła sekcji W. Nie istniał stan,
+       w którym ten wiersz by spadł — a to jest definicja tautologii z przeb. 32 (B26).
+
+       Oracle to PLIK ŹRÓDŁOWY, pobrany jawnie, a nie artefakt załadowany do tej ramki.
+       Różnica wobec I5 jest celowa i przeciwna: I5 mierzy to, co POJEDZIE do embedu,
+       więc na powierzchni zminifikowanej ma czytać `min.js`. I6 mierzy, czy decyzje
+       o lukach są w repozytorium udokumentowane — a minifikator wycina komentarze,
+       więc ten sam pomiar na `min.js` odpowiadałby „czy komentarze zostały usunięte"
+       (zostały), nie „czy luki są rozstrzygnięte". Dwa wiersze, dwa różne pliki. */
+    var zrodloLuk = null;
+    try {
+      var xhrI6 = new XMLHttpRequest();
+      xhrI6.open('GET', '../tryb-gotowania.js', false);
+      xhrI6.send(null);
+      zrodloLuk = xhrI6.status === 200 ? xhrI6.responseText : null;
+    } catch (eI6) { zrodloLuk = null; }
+
+    function zbierzLuki(txt) {
+      var zn = Object.create(null);
+      (txt.match(/NIENARYSOWANE\s*\(([^)]*)\)/g) || []).forEach(function (dop) {
+        dop.replace(/NIENARYSOWANE\s*\(|\)/g, '').split(',').forEach(function (g) {
+          var n = g.trim().toUpperCase();
+          if (/^G\d{1,2}$/.test(n)) zn[n] = (zn[n] || 0) + 1;
+        });
+      });
+      return zn;
+    }
+
+    /* KONTROLA POZYTYWNA ekstraktora — przed użyciem, nie po. Znacznik bywa
+       ZBIORCZY („G3, G4" stoi w jednym miejscu, bo obie luki wykonuje ta sama
+       linia), więc ekstraktor, który czyta tylko pojedyncze, zgłosiłby brak G4
+       przy poprawnym kodzie. Kontrola sprawdza właśnie ten przypadek. */
+    var probka = zbierzLuki('a // NIENARYSOWANE (G3, G4): wspólne\nb // NIENARYSOWANE (G11): jedno');
+    sprawdz('I6 KONTROLA POZYTYWNA: ekstraktor czyta znacznik ZBIORCZY („G3, G4") i pojedynczy',
+            probka['G3'] === 1 && probka['G4'] === 1 && probka['G11'] === 1 &&
+            Object.keys(probka).length === 3,
+            Object.keys(probka).sort().join(',') || 'pusto');
+
+    if (zrodloLuk) {
+      var znalLuki = zbierzLuki(zrodloLuk);
+      var LUKI = ['G1','G2','G3','G4','G5','G6','G7','G8','G9','G10','G11','G12'];
+      var brakLuk = LUKI.filter(function (g) { return !znalLuki[g]; });
+      var spozaListy = Object.keys(znalLuki).filter(function (g) { return LUKI.indexOf(g) < 0; });
+      sprawdz('I6: DWANAŚCIE luk G1–G12 ma znacznik `// NIENARYSOWANE (Gn):` w źródle runtime\'u',
+              brakLuk.length === 0,
+              brakLuk.length ? ('BRAK znacznika: ' + brakLuk.join(',')) :
+                LUKI.map(function (g) { return g + '×' + znalLuki[g]; }).join(' '));
+      /* Lista jest ZAMKNIĘTA — to część treści wiersza, nie ozdoba. Znacznik `G13`
+         znaczyłby, że ktoś dołożył lukę bez rozstrzygnięcia w REJESTRZE-LUK. */
+      sprawdz('I6: lista luk ZAMKNIĘTA — zero znaczników spoza G1–G12',
+              spozaListy.length === 0, spozaListy.join(',') || 'brak spoza listy');
+    } else {
+      sprawdz('I6: źródło runtime\'u pobrane do pomiaru luk', false,
+              'nie udało się pobrać ../tryb-gotowania.js');
+    }
+
     /* Ścieżkę bierzemy z ZAŁADOWANEGO tagu, nie z literału. Literał mierzyłby
        zawsze plik źródłowy, także w wariancie harnessu podstawiającym artefakt
        zminifikowany — czyli odpowiadałby na inne pytanie niż wiersz I5, który
@@ -2763,8 +3931,13 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
          jedyna liczba, która decyduje o tym, czy embed w ogóle wejdzie do Webflow
          (limit twardy 50 000 znaków). Raportujemy zawsze; asercja pilnuje progu. */
       wynik.znakiRuntime = zrodlo.length;
-      sprawdz('I5: rozmiar runtime\'u < 40 000 znaków (limit twardy 50 000)',
-              zrodlo.length < 40000, zrodlo.length + ' zn.');
+      /* Próg PODNIESIONY 40 000 → 45 000 w WYM v1.7 (D-28.1, decyzja operatora
+         2026-08-15). Liczba stoi tu w JEDNYM miejscu i musi być tą samą, co w §4
+         pliku wiążącego — asercja podniesiona przed zmianą wymagania mierzyłaby
+         liczbę, której wymaganie nie zna. Kolejność była odwrotna i taka zostaje. */
+      sprawdz('I5: rozmiar runtime\'u < 45 000 znaków (WYM v1.7, limit twardy 50 000)',
+              zrodlo.length < 45000,
+              zrodlo.length + ' zn. (zapas ' + (45000 - zrodlo.length) + ')');
 
       /* ---- H10 — runtime v1.0 NIE czyta kwoty zniżki z Site Settings ----------
          C6 rozstrzygnięte przez operatora: `7195:11178`, bez mechaniki −70 zł.
@@ -2900,12 +4073,12 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             ' (dpr ' + devicePixelRatio + ') ' + sWstecz.borderTopColor + ' r' +
             sWstecz.borderTopLeftRadius + ' ' + Math.round(rWstecz.width) + '×' + Math.round(rWstecz.height));
 
-    /* W05 — CTA „dalej" (`7290:10905`): wypełnienie `primary-cta` #CF411A.
+    /* W05 — CTA „dalej" (`7290:10905`): wypełnienie `primary-cta` #E55529.
        Do przebiegu 20 przycisk był `--mp-atrament` #3E2B22 — brązowy zamiast
        pomarańczowego, czyli inny kolor, nie inny odcień. */
     var sDalej = cW(cz.dalej);
-    sprawdz('W05: CTA „dalej" wypełnione `primary-cta` #CF411A',
-            barwa(sDalej.backgroundColor, 207, 65, 26), sDalej.backgroundColor);
+    sprawdz('W05: CTA „dalej" wypełnione `primary-cta` #E55529',
+            barwa(sDalej.backgroundColor, 229, 85, 41), sDalej.backgroundColor);
 
     /* W06 — promień 100 (kapsuła), padding 24/14, rozkład `space-between`. */
     var rDalej = cz.dalej.getBoundingClientRect();
@@ -2966,9 +4139,9 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
        i obrys 1 px renderują się IDENTYCZNIE (oba 0.8px), więc różnica, którą
        Figma rysuje między `←` a `×`, jest na tym ekranie niewidoczna. To nie jest
        usterka kodu — to granica gęstości. Pozycja na listę decyzji. */
-    sprawdz('W11: `×` — obrys 1,5 px #CF411A, promień 100, własne tło 80 % + rozmycie, glif 20 px',
+    sprawdz('W11: `×` — obrys 1,5 px #E55529, promień 100, własne tło 80 % + rozmycie, glif 20 px',
             /(^|\s)1\.5px\s+solid/.test(deklar('__zamknij', 'border')) &&
-            rysowany(sX.borderTopWidth, 1.5) && barwa(sX.borderTopColor, 207, 65, 26) &&
+            rysowany(sX.borderTopWidth, 1.5) && barwa(sX.borderTopColor, 229, 85, 41) &&
             parseFloat(sX.borderTopLeftRadius) === 100 &&
             Math.abs(alfa(sX.backgroundColor) - 0.8) < 0.01 && /blur/.test(bfX) &&
             sX.fontSize === '20px',
@@ -3202,8 +4375,27 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
        kolumn z `MP.przepis.naPorcje(...).meta`, a nie o konkretne napisy: napis
        mierzyłby fixture, a „cokolwiek niepustego" przepuściłoby stałą w kodzie. */
     var metaModel = MP.przepis.naPorcje(model, 4).meta || [];
+    /* WARTOWNIK BRAKU (przeb. 37, wiersz `I13`). Bez niego brak `.mp-tryb__meta-wartosc`
+       rzucał wyjątkiem i zabijał 28 asercji stojących PO tej linii — zmierzone mutacją
+       `M44-null-meta-wartosc`, nie wywnioskowane. Wartownik ma gwarantować FAŁSZ, a nie
+       „coś innego": zaczyna się od `\u0000`, którego model nie jest w stanie wyprodukować,
+       więc żadne porównanie z treścią modelu ani z `model.czas` nie może wyjść PRAWDĄ.
+       Wykaz dla `A14` — asercja ma cztery człony i wartownik przewraca dwa z nich:
+       `metaRender.join('|') === metaModel…join('|')` (napis z `\u0000` nie równa się
+       żadnej wartości modelu) oraz `metaRender[0] === model.czas` (to samo). Dwa pozostałe
+       (`metaModel.length === 3`, `metaRender.length === 3`) nie dotykają węzła i zostają
+       nietknięte, więc asercja nadal mierzy to, co mierzyła. */
+    var BRAK_WEZLA = '\u0000brak-wezla';
+    function tekstWezla(rodzic, sel) {
+      var e = rodzic && rodzic.querySelector(sel);
+      return e ? e.textContent : BRAK_WEZLA;
+    }
+    function atrybutWezla(rodzic, sel, atr) {
+      var e = rodzic && rodzic.querySelector(sel);
+      return e ? e.getAttribute(atr) : BRAK_WEZLA;
+    }
     var metaRender = [].map.call(kolumny, function (k) {
-      return k.querySelector('.mp-tryb__meta-wartosc').textContent;
+      return tekstWezla(k, '.mp-tryb__meta-wartosc');
     });
     sprawdz('A14: pasek meta renderuje TRZY kolumny wzięte z modelu (`wartosci-porcja`)',
             metaModel.length === 3 && metaRender.length === 3 &&
@@ -3229,12 +4421,102 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
        prosi o trzy i wypisuje je w `data-mp-ligatura`, więc migracja B16 dostaje
        listę maszynowo czytelną, a nie do wyczytania z kodu. Wiersz NIE ocenia,
        czy ligatury są w subsecie — to jest pomiar I4 i decyzja operatora. */
+    /* Ta sama poprawka co wyżej i ten sam powód. Wykaz dla `I4a`: jedyny człon asercji
+       to `ligatury.join(',') === 'hourglass,local_dining,leaderboard'`, więc wartownik
+       przewraca ją w całości — nie istnieje sposób, żeby napis z `\u0000` zrównał się
+       z listą nazw ligatur. */
     var ligatury = [].map.call(kolumny, function (k) {
-      return k.querySelector('.mp-tryb__meta-glif').getAttribute('data-mp-ligatura');
+      return atrybutWezla(k, '.mp-tryb__meta-glif', 'data-mp-ligatura');
     });
     wynik.ligaturyMeta = ligatury.join(',');
     sprawdz('I4a: pasek meta deklaruje nazwy ligatur (`hourglass`, `local_dining`, `leaderboard`)',
             ligatury.join(',') === 'hourglass,local_dining,leaderboard', ligatury.join(','));
+
+    /* ==== B16 · I4 — FONT IKON WPIĘTY DO RUNTIME'U (przeb. 31) ====================
+       Do tego przebiegu oba wiersze były czerwone z jednego powodu: runtime deklarował
+       ZERO `@font-face` i podstawiał znaki Unicode z fallbackiem `|| '·'`.
+       Mierzymy CZTERY rzeczy, bo trzy pierwsze osobno dają się oszukać:
+       (a) runtime wnosi trzy `@font-face` rodziny `Material Symbols Outlined`,
+       (b) adresy wskazują origin **Webflow**, nie lokalny plik (D-15.1),
+       (c) glif renderuje się jako JEDEN znak, a nie jako słowo — z KONTROLĄ UJEMNĄ,
+       (d) nazwa spoza subsetu NIE dostaje zastępnika, tylko ostrzeżenie (to jest B16). */
+    var arkuszTrybu = document.getElementById('mp-tryb-styl');
+    var trescArkusza = arkuszTrybu ? arkuszTrybu.textContent : '';
+    var deklaracjeFF = (trescArkusza.match(/@font-face/g) || []).length;
+    var adresyFontu = (MP.tryb.fontIkon ? MP.tryb.fontIkon() : []);
+    sprawdz('B16: runtime deklaruje `@font-face` — trzy wagi subsetu, zamiast zera',
+            deklaracjeFF === 3 &&
+            trescArkusza.indexOf("font-family:'Material Symbols Outlined'") >= 0,
+            'deklaracji ' + deklaracjeFF);
+    sprawdz('B16/D-15.1: font ikon jedzie z originu WEBFLOW, nie z pliku lokalnego',
+            adresyFontu.length === 3 &&
+            adresyFontu.every(function (f) { return /^https:\/\/cdn\.prod\.website-files\.com\//.test(f.url); }) &&
+            adresyFontu.map(function (f) { return f.waga; }).join(',') === '300,400,500',
+            adresyFontu.map(function (f) { return f.waga; }).join(',') + ' · ' +
+            (adresyFontu[0] ? adresyFontu[0].url.slice(0, 52) : 'brak'));
+    /* (c) — pomiar szerokości, nie obecności. Element z nazwą ligatury ma tę samą
+       treść tekstową niezależnie od tego, czy font się wczytał; różni je WYNIK
+       rysowania. Jeden glif ≈ stopień pisma, słowo ≈ wielokrotność.
+
+       PRZEBIEG 32 — POMIAR ODROCZONY ZA BRAMKĘ `document.fonts.load()`.
+       Przebieg 31 zmierzył ten wiersz jako czerwony na 320/360/390 i zielony na
+       440/480 oraz obu poziomych. Rozkład był całą diagnozą: gdyby brakowało glifów
+       w subsecie, padłoby wszystkie SIEDEM ramek. Ramki startują kolejno, sonda była
+       synchroniczna — trzy pierwsze mierzyły, zanim plik z CDN-u dojechał, kolejne
+       trafiły w pamięć podręczną. Defekt siedział w PRZYRZĄDZIE, nie w runtimie,
+       a wiersz opisywał wyścig i nazywał go brakiem glifu.
+
+       Sonda jest tu tylko DEFINIOWANA; wywołuje ją ogon bloku po rozwiązaniu bramki.
+       Odroczenie musi być dokładnie takie wąskie: gatowanie CAŁEGO pomiaru przesunęłoby
+       też asercje, które z fontem ikon nie mają nic wspólnego, i zamieniło jedną
+       niepewność czasową na drugą, szerszą.
+
+       Korzeń rozwiązujemy W MOMENCIE WYWOŁANIA, a nie z domknięcia: `.mp-ikona` żyje
+       pod `#mp-tryb`, a ogon bloku bywa wykonywany przy overlayu zamkniętym — węzeł
+       z domknięcia byłby wtedy odpięty od dokumentu i `getBoundingClientRect()`
+       zwróciłby same zera, czyli „glif" o szerokości 0 px. Zero przeszłoby warunek
+       `w <= 24` i dałoby zieleń z niczego.                                          */
+    function szerGlifu(txt, gdzie) {
+      var s = document.createElement('span');
+      s.className = 'mp-ikona';
+      s.style.cssText = 'position:absolute;left:-9999px;font-size:20px;white-space:nowrap';
+      gdzie.appendChild(s);                  // WEWNĄTRZ overlaya: `.mp-ikona` żyje pod `#ID`
+      s.textContent = txt;
+      var w = s.getBoundingClientRect().width;
+      s.parentNode.removeChild(s);
+      return Math.round(w * 10) / 10;
+    }
+    /* Kryterium „korzeń nadaje się do mierzenia" to WIDOCZNOŚĆ, nie obecność w drzewie.
+       Zmierzone w tym przebiegu, pierwsza seria: `MP.tryb.zamknij()` NIE odpina węzła,
+       tylko zdejmuje `data-otwarty`, a overlay chowa CSS. Warunek `contains()`
+       przechodził więc zawsze, sonda mierzyła w niewyrenderowanym poddrzewie i wszystkie
+       siedem ramek dało `0/0/0 px`. Dolna granica 8 px zamieniła to na czerwień zamiast
+       na fałszywą zieleń — i to jedyny powód, dla którego rozjazd był widoczny.
+       `getClientRects().length === 0` jest pytaniem o rysowanie, nie o rodzica.       */
+    var domiarI4 = function () {
+      var k = (MP.tryb.korzen && MP.tryb.korzen()) || null;
+      var zamknacPo = false;
+      if (!k || !k.getClientRects().length) {
+        MP.tryb.otworz(MP_HARNESS.widok, { krok: 1 });
+        k = MP.tryb.korzen();
+        zamknacPo = true;
+      }
+      var szerLig = MP.tryb.zbiorLigatur().map(function (n) { return szerGlifu(n, k); });
+      var szerNieistniejacej = szerGlifu('nie_ma_takiej_ikony', k);
+      if (zamknacPo) { MP.tryb.zamknij(); }
+      /* Dolna granica 8 px zamiast `> 0`: glif ma szerokość rzędu stopnia pisma,
+         a 0 px znaczy „element nie jest renderowany", nie „ikona jest wąska". */
+      sprawdz('I4: ligatury runtime\'u renderują się jako JEDEN glif (kontrola ujemna: nazwa spoza subsetu = słowo)',
+              szerLig.length === 3 && szerLig.every(function (w) { return w >= 8 && w <= 24; }) &&
+              szerNieistniejacej > 100,
+              'glify ' + szerLig.join('/') + ' px · nieistniejąca ' + szerNieistniejacej + ' px');
+    };
+    sprawdz('B16: brak glifu = zgłoszenie, NIE własny zastępnik (`|| \'·\'` zdjęte)',
+            typeof MP.tryb.ostrzezenia === 'function' &&
+            trescArkusza.indexOf('·') < 0 &&
+            MP.tryb.zbiorLigatur().join(',') === 'hourglass,local_dining,leaderboard',
+            'zbiór ' + MP.tryb.zbiorLigatur().join(',') +
+            ' · ostrzeżeń ' + (MP.tryb.ostrzezenia ? MP.tryb.ostrzezenia().length : 'brak API'));
 
     /* A16 — TEST NEGATYWNY selektora porcji wobec paska meta (przebieg 27).
        Pakiet §3c zapowiadał tę asercję zdaniem „do dopisania razem z wierszem" i nikt
@@ -3287,14 +4569,29 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
       /* W33 — glif: Material Symbols Outlined **Light 300**, 32 px, `secondary-text (h1)`
          #487622. KRÓJ mierzy B16 (font ikon nie jest wpięty w runtime), ten wiersz
          pyta o stopień, grubość i barwę — czyli o to, co kod rozstrzyga sam. */
-      var gl = kolumny[0].querySelector('.mp-tryb__meta-glif'), sGl = cW(gl);
+      /* ZASTĘPNIK POMIAROWY (przeb. 37, wiersz `I13`) — odczepiony `div`, wzór z bloku
+         S4 w przeb. 36. Bez niego brak `.mp-tryb__meta-glif` albo `.mp-tryb__meta-wartosc`
+         wywracał `getComputedStyle(null)` i zabijał 18 asercji stojących PO tej linii;
+         zmierzone `M44` po pierwszej naprawie (409 z 427 asercji), czyli **znalezione
+         przemiarem, nie przewidziane** — pierwszy guard zdjął dwie dereferencje z trzech.
+         WYKAZ, że zastępnik gwarantuje FAŁSZ, a nie przypadkową PRAWDĘ:
+         `W33` — odczepiony `div` nie ma stylu obliczonego z arkusza, więc `fontSize`
+         nie równa się `32px`, `fontWeight` nie równa się `300`, `barwa()` nie trafia
+         w #487622, a `parseFloat(height)` daje `NaN`, który przegrywa każde porównanie;
+         `W34` — analogicznie `fontWeight`/`fontSize`/`lineHeight`(→`NaN`)/`barwa()`,
+         a `odstepGl` liczy się z prostokąta zerowego, więc nie wychodzi 8.
+         Każdy z tych członów osobno przewraca asercję, a asercja jest koniunkcją. */
+      var elLub = function (rodzic, sel) {
+        return (rodzic && rodzic.querySelector(sel)) || document.createElement('div');
+      };
+      var gl = elLub(kolumny[0], '.mp-tryb__meta-glif'), sGl = cW(gl);
       sprawdz('W33: glif meta — 32 px, waga 300, #487622 (krój = B16, osobno)',
               sGl.fontSize === '32px' && sGl.fontWeight === '300' &&
               barwa(sGl.color, 72, 118, 34) && Math.round(parseFloat(sGl.height)) === 32,
               sGl.fontSize + '/' + sGl.fontWeight + ' ' + sGl.color + ' h' + sGl.height);
       /* W34 — etykieta: DM Sans SemiBold 600, 14, interlinia 1,2 (16,8), `primary-text`,
          odstęp 8 od glifu (gap kolumny, nie margines etykiety). */
-      var wart = kolumny[0].querySelector('.mp-tryb__meta-wartosc'), sWa = cW(wart);
+      var wart = elLub(kolumny[0], '.mp-tryb__meta-wartosc'), sWa = cW(wart);
       var odstepGl = Math.round(wart.getBoundingClientRect().top - gl.getBoundingClientRect().bottom);
       sprawdz('W34: etykieta meta — SemiBold 600, 14/16,8, #3E2B22, odstęp 8 od glifu',
               sWa.fontWeight === '600' && sWa.fontSize === '14px' &&
@@ -3331,13 +4628,54 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     } else {
       sprawdz('W38: tytuł ekranu obecny do pomiaru', false, 'BRAK `.mp-tryb__ekran-tytul`');
     }
-    /* B21 — asercja stwierdza STAN FAKTYCZNY, nie życzenie: dopóki źródło zdjęcia
-       przepisu nie jest rozstrzygnięte, wiersz ma być czerwony i ma mówić dlaczego.
-       Zielona byłaby dopiero wtedy, gdy zdjęcie 328×150 stanie przy y=88. */
-    sprawdz('B21: zdjęcie przepisu na ekranie startowym (`7195:10901`, 328×150 @ y88)',
-            !!czS.top.querySelector('.mp-tryb__foto'),
-            czS.top.querySelector('.mp-tryb__foto') ? 'jest'
-              : 'BRAK — `widok.fotoUrl` to pole KROKU; widok przepisu go nie ma (D-23.1)');
+    /* B21 · W78 — ZDJĘCIE GŁÓWNE na ekranie startowym (`7195:10901`).
+       Do przebiegu 30 wiersz był czerwony i asercja stwierdzała STAN FAKTYCZNY:
+       `zdjecieEkranu()` czytał `stan.widok.fotoUrl`, a `fotoUrl` było polem KROKU.
+       D-23.1 rozstrzygnięte (pole `zdjecie-glowne`), więc asercja pyta teraz o to,
+       o co pytać miała: czy zdjęcie STOI tam, gdzie je narysowano.
+       Wysokość 150 i górna krawędź 88 są NIEZMIENNE wobec szerokości (inwariant 0aa);
+       zmienia się wyłącznie szerokość, bo kolumna treści to `innerWidth − 32`. */
+      /* ORACLE SZEROKOŚCI = PUDEŁKO TREŚCI, nie `innerWidth`. Zmierzone w przeb. 31:
+         na 844×390 i 667×375 wiersz padał z odchyłką dokładnie −15, czyli szerokością
+         KLASYCZNEGO paska przewijania, który desktopowy Chrome rysuje w poziomie (TOP
+         się tam przewija, w portrecie nie). `innerWidth` liczy pasek, kolumna treści go
+         nie ma. Trzecia odsłona tej samej pułapki: B1 w przeb. 22, G01 w przeb. 24,
+         krawędź pigułki w przeb. 30. Wersja z `innerWidth` TWORZYŁA defekt w raporcie. */
+    var fotoS = czS.top.querySelector('[data-mp-foto-ekranu]');
+    if (fotoS) {
+      var rF = fotoS.getBoundingClientRect(), sF = cW(fotoS);
+      sprawdz('B21: zdjęcie przepisu na ekranie startowym — kolumna × 150 @ y88, PIERWSZY element TOP-u',
+              czS.top.firstElementChild === fotoS &&
+              Math.round(rF.height) === 150 &&
+              Math.round(rF.width) === czS.top.clientWidth - 32 &&
+              Math.round(rF.top) === 88 && Math.round(rF.left) === 16 &&
+              fotoS.naturalWidth > 0,
+              Math.round(rF.width) + '×' + Math.round(rF.height) + ' @ y' + Math.round(rF.top) +
+              ' x' + Math.round(rF.left) + ' · naturalWidth ' + fotoS.naturalWidth);
+      /* W78 — wykończenie ramki zdjęcia. Promień **12** z `get_design_context`
+         (`7195:10901`), nie 8 z pierwszej wersji arkusza. Obrys i cień: jawne BRAK,
+         bo własność nierysowana zapisuje się jako „brak", nie pomija.
+         WYPEŁNIENIA tu nie ma — to osobne pytanie (W79, dwa sprzeczne odczyty Figmy)
+         i osobna decyzja operatora; zdjęcie i tak przykrywa ramkę w całości. */
+      sprawdz('W78: ramka zdjęcia głównego — promień 12, `cover`, obrys BRAK, cień BRAK',
+              parseFloat(sF.borderTopLeftRadius) === 12 &&
+              parseFloat(sF.borderBottomRightRadius) === 12 &&
+              sF.objectFit === 'cover' && sF.display === 'block' &&
+              parseFloat(sF.borderTopWidth) === 0 && sF.boxShadow === 'none',
+              'r' + sF.borderTopLeftRadius + ' ' + sF.objectFit + ' obrys ' +
+              sF.borderTopWidth + ' cień ' + sF.boxShadow);
+      /* Tytuł ekranu schodzi o wysokość zdjęcia + odstęp 16: klatka daje y254,
+         a przebieg 23 zmierzył y88 i nazwał rozjazd „skutkiem braku zdjęcia".
+         Ta asercja jest testem, czy skutek zniknął razem z przyczyną. */
+      if (tytulE) {
+        sprawdz('B21: tytuł ekranu wraca na y254 (`7195:10902`) — rozjazd 166 px był skutkiem braku zdjęcia',
+                Math.round(tytulE.getBoundingClientRect().top) === 254,
+                'y' + Math.round(tytulE.getBoundingClientRect().top));
+      }
+    } else {
+      sprawdz('B21: zdjęcie przepisu na ekranie startowym (`7195:10901`, 328×150 @ y88)',
+              false, 'BRAK elementu `[data-mp-foto-ekranu]`');
+    }
 
     /* W35 · W36 — selektor porcji (`7195:10911` + `7263:10728`). Geometria była
        zielona (G01) od przebiegu 8; wykończenia nie pytał nikt. */
@@ -3354,9 +4692,9 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
       /* Obrys 1,5 px przy dpr 1,25 użyje się jako 0,8 px — ten sam mechanizm
          przycięcia do piksela urządzenia, co przy W04/W11/W22. Mierzymy DEKLARACJĘ
          przez `>0`, a barwę i promień dokładnie. */
-      sprawdz('W36: przyciski `−`/`+` — biel złamana, obrys 1,5 px #CF411A, promień 100, 40×40',
+      sprawdz('W36: przyciski `−`/`+` — biel złamana, obrys 1,5 px #E55529, promień 100, 40×40',
               barwa(sPrz.backgroundColor, 255, 253, 251) &&
-              barwa(sPrz.borderTopColor, 207, 65, 26) && parseFloat(sPrz.borderTopWidth) > 0 &&
+              barwa(sPrz.borderTopColor, 229, 85, 41) && parseFloat(sPrz.borderTopWidth) > 0 &&
               parseFloat(sPrz.borderTopLeftRadius) === 100 &&
               Math.round(przycW.getBoundingClientRect().width) === 40 &&
               Math.round(przycW.getBoundingClientRect().height) === 40,
@@ -3651,6 +4989,54 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     wynik.odleglosci = { blad: String(e.message) };
   }
 
+  /* ==== BRAMKA FONTU IKON — dopięcie pomiaru I4 (przeb. 32) =====================
+     Bramka stoi TUTAJ, a nie na początku bloku, i to jest wymuszone, nie wygodne:
+     `@font-face` wnosi ARKUSZ RUNTIME'U, który powstaje dopiero przy pierwszym
+     `MP.tryb.otworz()`. Przed pierwszym otwarciem overlaya `document.fonts` nie zna
+     rodziny `Material Symbols Outlined`, więc `load()` rozwiązałby się natychmiast
+     z pustą listą i wyglądał na spełnioną bramkę. Do tego miejsca overlay był
+     otwierany wielokrotnie, więc arkusz jest w dokumencie na pewno.
+
+     Odrzucenie bramki NIE wstrzymuje raportu — `then(dalej, dalej)`. Brak sieci ma
+     dawać CZERWONE I4, czyli prawdę o tym pomiarze, a nie ramkę bez wyniku, czyli
+     ciszę, którą matryca policzyłaby jako „czekam na 1".
+     Diagnostykę zapisujemy w `wynik.bramkaFontu`, żeby dało się odróżnić „font
+     wczytany" od „przeglądarka nie ma API" bez zgadywania z szerokości glifu.     */
+  function dopnijIZamknij() {
+    try {
+      if (typeof domiarI4 === 'function') { domiarI4(); }
+      else { sprawdz('I4: sonda ligatur wykonana', false, 'blok przerwał się przed definicją sondy'); }
+    } catch (eI4) {
+      sprawdz('I4: sonda ligatur wykonana', false, String(eI4.message));
+    }
+    finalizuj();
+  }
+
+  var bramka;
+  try {
+    if (document.fonts && document.fonts.load) {
+      bramka = Promise.all(['300', '400', '500'].map(function (waga) {
+        return document.fonts.load(waga + ' 20px "Material Symbols Outlined"', 'hourglass');
+      })).then(function (grupy) {
+        var n = grupy.reduce(function (s, g) { return s + g.length; }, 0);
+        wynik.bramkaFontu = 'wczytanych krojów: ' + n +
+          ' · check() ' + (document.fonts.check('20px "Material Symbols Outlined"') ? 'tak' : 'nie');
+      }, function (e) {
+        wynik.bramkaFontu = 'odrzucona: ' + (e && e.message ? e.message : String(e));
+      });
+    } else {
+      wynik.bramkaFontu = 'brak API document.fonts';
+      bramka = Promise.resolve();
+    }
+  } catch (eB2) {
+    wynik.bramkaFontu = 'wyjątek bramki: ' + eB2.message;
+    bramka = Promise.resolve();
+  }
+  bramka.then(dopnijIZamknij, dopnijIZamknij);
+
+  function finalizuj() {
+  wynik.pokrycie = Object.keys(POKRYCIE).sort();
+  wynik.mutacja = window.MP_MUTACJA || { nazwa: 'BRAK', zastosowana: false };
   wynik.konsola = MP_HARNESS.dziennik.slice();
   var zle = wynik.asercje.filter(function (a) { return !a.ok; });
   wynik.ok = zle.length === 0 && wynik.konsola.length === 0;
@@ -3672,6 +5058,7 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
 
   window.MP_HARNESS.wynik = wynik;
   try { parent.postMessage({ mpHarness: wynik, nazwa: name || '' }, '*'); } catch (e) {}
+  }
 })();
 </script>
 </body>

@@ -26,17 +26,50 @@
   'use strict';
 
   var ID = 'mp-tryb';
+
+  /* U-4 / B24 — ZNAK MARKI INLINE. Slot `.mp-tryb__znak` był policzony co do piksela
+     i pusty od przebiegu 29: 51×40 z beżowym wypełnieniem, czyli pudełko zamiast znaku.
+     Źródło: Figma `7283:10838`, pobrane przez `download_assets` jako SVG (2026-08-15,
+     przeb. 36). Wcześniejsze ogniwo orzekło, że Figma wektora nie odda — to była
+     nieprawda o narzędziu: `get_design_context` faktycznie oddaje tylko wygasający
+     adres eksportu, ale `download_assets` oddaje plik. Mistrzem jest `znak-byczek.svg`
+     w katalogu łańcucha; tu leży jego kopia, bo runtime jedzie na stronę jako JEDEN
+     plik i nie ma skąd dociągnąć zasobu.
+     Jedna ścieżka, zero `<image>`, zero `<defs>`, `viewBox` 0 0 50.8766 40 — czyli
+     dokładnie geometria slotu. Wypełnienie przeniesione na `currentColor`, żeby jeden
+     znak obsłużył belkę jasną i ciemną; kolor ustawia CSS na `--mp-atrament` (#3E2B22),
+     czyli wartość, którą znak miał w Figmie. */
+  var ZNAK = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50.8766 40" fill="currentColor"><path d="M49.6896 0.673371C47.7838 2.87349 45.322 4.52025 42.5599 5.44252C42.4265 5.48919 42.2886 5.52253 42.1574 5.57587C40.9143 6.07812 39.5444 6.17145 38.2434 5.84699C35.9173 5.34919 33.56 4.99361 31.1894 4.78249C30.5667 4.72026 29.8173 4.63359 29.1501 4.56025V3.99133C27.9314 3.89577 26.6861 3.84244 25.4719 3.84244H25.4007C24.1865 3.84244 22.9389 3.89355 21.7225 3.99133V4.56025C21.0553 4.63359 20.3036 4.71804 19.681 4.78249C17.3103 4.99139 14.9553 5.34696 12.6269 5.84699C11.3259 6.17145 9.95605 6.07812 8.71292 5.57587C8.58171 5.52253 8.44383 5.48919 8.3104 5.44252C5.55282 4.52025 3.09102 2.87349 1.18518 0.673371C1.00505 0.462248 0.829362 0.251125 0.618096 0C0.177773 0.808934 -0.0334929 1.7201 0.00431254 2.64015C0.042118 4.01133 0.562499 5.32696 1.4765 6.35146C2.3438 7.33152 3.38457 8.1449 4.54542 8.7516C6.10434 9.57387 7.74999 10.2228 9.45346 10.685C9.60023 10.7273 9.74479 10.7873 9.88489 10.8362C11.9486 20.5834 14.0079 30.3061 16.0605 40H25.4385H34.8165C36.8691 30.3061 38.9284 20.5834 40.9921 10.8362C41.1322 10.7873 41.2746 10.7273 41.4236 10.685C43.1248 10.2228 44.7705 9.57387 46.3316 8.7516C47.4924 8.1449 48.5332 7.33152 49.4005 6.35146C50.3145 5.32696 50.8349 4.01133 50.8727 2.64015C50.9083 1.7201 50.697 0.808934 50.2567 0C50.0454 0.251125 49.8697 0.462248 49.6896 0.673371ZM31.4763 35.802H19.3963C17.5705 27.1748 15.7492 18.5699 13.9145 9.90722C16.4897 9.39608 19.0939 9.03161 21.7091 8.81604L21.6824 18.3032L25.3985 16.5743L25.4296 16.5609H25.4341L25.4696 16.5743L29.1857 18.3032L29.159 8.81604C31.7765 9.03161 34.3784 9.39608 36.9536 9.90722C35.1189 18.5699 33.2976 27.1748 31.4718 35.802H31.4763Z"/></svg>';
   var ID_STYL = 'mp-tryb-styl';
 
-  /* Substytuty Unicode ligatur Material Symbols używanych przez pasek meta.
-     Znikają razem z B16, gdy font ikon wejdzie do runtime'u — do tego czasu
-     tablica jest jedynym miejscem, w którym rozjazd „nazwa ligatury ↔ znak
-     zastępczy" jest zapisany raz, a nie rozsypany po widokach. */
-  var SUBSTYTUT_GLIFU = {
-    hourglass: '⧗',
-    local_dining: '♨',
-    leaderboard: '▥'
-  };
+  /* ~~Substytuty Unicode~~ — ZDJĘTE w przebiegu 31 razem z B16. Runtime rysuje teraz
+     PRAWDZIWE ligatury Material Symbols Outlined z subsetu wgranego do Webflow.
+     Zbiór ligatur, których używa runtime, zostaje TABLICĄ (a nie znika), bo I4 pyta
+     wprost o „ligatury używane przez runtime" — bez tego miejsca zbiór trzeba by
+     odtwarzać z lektury widoków, a to jest dokładnie ten rodzaj wiedzy, który
+     rozjeżdża się po cichu. `zbiorLigatur()` udostępnia go pomiarowi.
+
+     B16 („brak glifu = błąd zgłoszony, nie własny fallback") naruszał wcześniej
+     nie sam substytut, tylko **fallback `|| '·'`**: nazwa spoza subsetu dostawała
+     kropkę i wyglądała jak ikona, której nie ma. Teraz nieznana nazwa idzie
+     do `ostrzezenie()` i renderuje się PUSTO — bo słowo w miejscu ikony widać
+     natychmiast, a kropka udaje sukces. */
+  var LIGATURY = ['hourglass', 'local_dining', 'leaderboard'];
+
+  /* Font ikon — trzy wagi subsetu, hosting **Webflow** (D-15.1, rozstrzygnięte
+     pomiarem w przeb. 31: `FontFace.load()` z obcego originu przechodzi, więc CORS
+     nie stoi na drodze i plik NIE musi jechać do GitHuba).
+     Adresy są DANYMI, nie tekstem w arkuszu, żeby pakiet integracyjny i pomiar
+     czytały jedno miejsce. `font-display: block`, nie `swap`: przy `swap`
+     przeglądarka najpierw rysuje NAZWĘ LIGATURY krojem zastępczym, czyli słowo
+     „hourglass" w pasku meta. Niewidoczna ikona przez 100 ms jest tańsza niż
+     widoczne słowo. */
+  var FONT_IKON_BAZA = 'https://cdn.prod.website-files.com/6983617613052dc9fe624303/';
+  var FONT_IKON = [
+    [300, '6a802bb795ffed595d0d4157_MaterialSymbolsOutlined-Light.woff2'],
+    [400, '6a802bb76772924b821ab866_MaterialSymbolsOutlined-Regular.woff2'],
+    [500, '6a802bb7e5ca52af75b2f846_MaterialSymbolsOutlined-Medium.woff2']
+  ];
 
   /* Zamienniki tokenów designu, KROTKI TRZYELEMENTOWE: [nazwa, wartość, opis migracji].
      Wariant (3) rozstrzygnięcia operatora „kształt builda" (2026-08-15): opis migracji
@@ -71,13 +104,18 @@
        2. `--mp-zielen` = `secondary-text` #487622 — jedyne dziś użycie to kreska
           nad pasem dolnym (W02). Figma nazywa ten styl `secondary-text (h1)`;
           w Webflow zmienna nazywa się bez nawiasu i to jej nazwa tu stoi.
-       3. `--mp-cta` MA wartość identyczną z `--mp-alarm`, ale w witrynie nie ma
-          zmiennej o tej wartości: `primary-cta` = #E55529. To jest rozjazd Figma ↔
-          witryna, nie duplikat do usunięcia — pozycja D-27.1, do rozstrzygnięcia
-          przez operatora. Do tego czasu opis mówi, czego NIE MA, a nie zgaduje. */
+       3. `--mp-cta` = `primary-cta` #E55529 — **D-27.1 ROZSTRZYGNIĘTE przez operatora
+          2026-08-15: bierzemy kolor z witryny, nie z Figmy.** Do przebiegu 29 stała tu
+          figmowa #CF411A z opisem „BRAK zmiennej". Rozjazd był prawdziwy i nie zniknął:
+          Figma dalej rysuje #CF411A, a witryna ma #E55529. Rozstrzygnięto go na korzyść
+          witryny, bo embed żyje w witrynie i to jej zmienna jest oracle'em wdrożenia.
+          UWAGA na sąsiada: `--mp-alarm` ZOSTAJE przy #CF411A (I-19, kropka i obrys
+          pigułki) — te dwa tokeny miały do dziś identyczną wartość i rozjechały się
+          właśnie teraz. Zlanie ich po tej zmianie skasowałoby różnicę, której nikt
+          nie zgłosił, a wyglądałoby na sprzątanie duplikatu. */
     ['--mp-bialy-pelny', '#FFFFFF', 'white-bg'],
     ['--mp-zielen', '#487622', 'secondary-text'],
-    ['--mp-cta', '#CF411A', 'BRAK zmiennej: primary-cta = #E55529, nie #CF411A (D-27.1)']
+    ['--mp-cta', '#E55529', 'primary-cta']
   ];
 
   /* Wymiary z GEOMETRIA.md §4.1 — liczby, nie „mniej więcej". Zmiana którejkolwiek
@@ -169,10 +207,22 @@
       'background:color-mix(in srgb,var(--mp-bialy) 80%,transparent);' +
       'display:flex;align-items:center;gap:' + W.odstep + 'px;' +
       'padding:0 ' + W.margines + 'px}' +
+    /* Beżowe wypełnienie i promień 8 px zdjęte razem z wstawieniem znaku: były
+       wypełniaczem slotu, a nie własnością powierzchni. [I] — wniosek z tego, że
+       pudełko dokładnie pokrywa się z ramką znaku (51×40 wobec 50,88×40), więc
+       beż byłby widoczny wyłącznie w prześwitach ścieżki. NIE zweryfikowane
+       odczytem wypełnienia ramki w Figmie — pozycja na liście decyzji. */
     '#' + ID + ' .mp-tryb__znak{width:51px;height:40px;flex:0 0 auto;' +
-      'background:var(--mp-beige-2);border-radius:8px}' +
+      'color:var(--mp-atrament);line-height:0}' +
+    '#' + ID + ' .mp-tryb__znak svg{display:block;width:100%;height:100%}' +
     '#' + ID + ' .mp-tryb__postep-blok{flex:1 1 auto;min-width:0}' +
-    '#' + ID + ' .mp-tryb__etykieta{font-size:12px;line-height:16px;height:16px;margin:0}' +
+    /* U-3 (defekt zgłoszony przez operatora 2026-08-15, zmierzony w przeb. 28):
+       etykieta „krok X z Y" ma być WYŚRODKOWANA nad torem postępu. Miała
+       `text-align: start` odziedziczone, a że jej pudełko ma dokładnie szerokość
+       toru (x=83 szer=203 przy 360), wyglądała na dosuniętą do lewej krawędzi paska.
+       Jedna deklaracja; wiersz matrycy pyta o WYRÓWNANIE, nie o szerokość pudełka. */
+    '#' + ID + ' .mp-tryb__etykieta{font-size:12px;line-height:16px;height:16px;margin:0;' +
+      'text-align:center}' +
     /* W12 (przeb. 21): tor paska postępu to `beige-1` #F1ECDF, nie `beige-2`
        #C5B18A — beige-2 był o dwa stopnie za ciemny i zjadał kontrast wypełnienia.
        Promień 100 (pigułka), nie 3: przy wysokości 6 px oba wyglądają podobnie,
@@ -397,7 +447,14 @@
     '#' + ID + ' .mp-tryb__nazwa-kroku{flex:1 1 auto;min-width:0;margin:0;' +
       'font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:22px;' +
       'line-height:1.1;color:var(--mp-zielen)}' +
-    '#' + ID + ' .mp-tryb__czas{align-self:flex-start;height:26px;padding:0 12px;' +
+    /* U-2 (rozstrzygnięcie operatora 2026-08-15): pigułka czasu stoi przy PRAWEJ
+       krawędzi JEDNAKOWO na każdej powierzchni. Do przeb. 29 miała `flex-start`,
+       więc na ekranie KROKU wychodziła po prawej (rząd `space-between` z tytułem,
+       x=260/282), a na PEŁNEJ LIŚCIE po lewej (x=16) — ta sama klasa, dwa wyrównania,
+       bo w liście nie ma sąsiada, który by ją odepchnął. Nadpisanie dla rzędu kroku
+       (`align-self:center`) zostaje: tam o stronę decyduje `space-between`, a `center`
+       dotyczy osi poprzecznej i pionowo centruje pigułkę względem tytułu. */
+    '#' + ID + ' .mp-tryb__czas{align-self:flex-end;height:26px;padding:0 12px;' +
       'border-radius:13px;font-size:14px;line-height:26px;background:var(--mp-beige-1);' +
       'color:var(--mp-atrament)}' +
     /* „bez minutnika" ma zmierzony MNIEJSZY stopień pisma (16 px wysokości tekstu
@@ -422,7 +479,35 @@
     '#' + ID + ' .mp-tryb__opis mark{background:var(--mp-atrament);' +
       'color:var(--mp-bialy-pelny);' +
       '-webkit-box-decoration-break:clone;box-decoration-break:clone}' +   /* R14 */
+    /* B16 — font ikon w RUNTIMIE. Trzy statyczne subsety, nie oś zmienna: `font-weight`
+       syntetyczny dałby cichy fałsz (waga „by wyglądała", a nie „byłaby"). `@font-face`
+       stoi POZA zakresem `#ID`, bo reguła at-rule nie zagnieżdża się w selektorze —
+       to jedyne miejsce arkusza, które wychodzi poza korzeń overlaya, i wychodzi
+       z konieczności języka, nie z wyboru.
+       `font-display: block`, nie `swap`: przy `swap` przeglądarka rysuje najpierw
+       NAZWĘ ligatury krojem zastępczym, czyli słowo „hourglass" w pasku meta. */
+    FONT_IKON.map(function (f) {
+      return "@font-face{font-family:'Material Symbols Outlined';font-style:normal;" +
+             'font-weight:' + f[0] + ";font-display:block;src:url('" + FONT_IKON_BAZA + f[1] +
+             "') format('woff2')}";
+    }).join('') +
+    /* `font-feature-settings:'liga'` JAWNIE: ligatury standardowe bywają wyłączane
+       przez reset strony gospodarza, a wtedy nazwa ikony renderuje się jako SŁOWO —
+       objaw wygląda na brak glifu, a jest brakiem cechy (nauka z przeb. 21). */
+    '#' + ID + " .mp-ikona{font-family:'Material Symbols Outlined';font-weight:400;" +
+      "font-variant-ligatures:normal;font-feature-settings:'liga';" +
+      'letter-spacing:normal;text-transform:none;white-space:nowrap;' +
+      'direction:ltr;-webkit-font-smoothing:antialiased}' +
     '#' + ID + ' .mp-tryb__foto{width:100%;height:150px;object-fit:cover;border-radius:8px;display:block}' +
+    /* Zdjęcie GŁÓWNE przepisu (D-23.1) — ekran startowy `7195:10901` i zakończenia
+       `7195:11188`, obie ramki 328×150 z promieniem **12**. Modyfikator, a nie zmiana
+       `.mp-tryb__foto`, bo zdjęcie KROKU nie ma dziś klatki w zestawie (inwentarz
+       INTERAKCJE zna wyłącznie „krok BEZ zdjęcia", `7240:10936`) — przestawienie
+       jego promienia byłoby zielenią z lektury kodu, nie z odczytu.
+       Wysokość zostaje STAŁA (150), nie stałoaspektowa: inwariant odległości 0aa
+       zabrania miary zależnej od szerokości, a D-26.2 każe aspekt. Rozjazd idzie
+       na listę decyzji (D-31.1), nie do kodu. */
+    '#' + ID + ' .mp-tryb__foto--glowne{border-radius:12px}' +
     /* Blok składników na ekranie kroku — W22/W26/W29, Figma `7477:12561` (zewnętrzne)
        i `7195:10935` (ramka). DWA pudełka, nie jedno: zewnętrzne niesie nagłówek
        „składniki" (`7477:12562`) i samo nie ma żadnego wykończenia; wewnętrzne JEST
@@ -502,7 +587,12 @@
        to inny element wizualny, i przetrwał piętnaście przebiegów, bo sekcja E
        pytała o POŁOŻENIE i cel dotyku (20 px, odstęp 8, hit 44), a o barwy nie
        pytał nikt aż do reguły pokrycia. Wymiar i odstęp zostają: były zmierzone. */
-    '#' + ID + ' .mp-tryb__marker{position:relative;flex:0 0 auto;width:20px;height:20px;' +
+    /* U-7 (rozstrzygnięcie operatora 2026-08-15) — cel tooltipa obejmuje CAŁY WIERSZ,
+       nie samo kółko. Zmierzony defekt: wiersz `li` ma 295 px, a klikalne było 20 px
+       markera, czyli 7 % szerokości. Marker traci własne `position:relative`, bo jego
+       cel musi się odnosić do WIERSZA — dlatego kotwicą jest teraz `li`. */
+    '#' + ID + ' .mp-tryb__wiersz[data-mp-zamiennik]{position:relative}' +
+    '#' + ID + ' .mp-tryb__marker{position:static;flex:0 0 auto;width:20px;height:20px;' +
       'margin-left:8px;padding:0;border:0;border-radius:100px;' +
       'background:var(--mp-zielen);color:var(--mp-bialy);font-size:13px;line-height:20px;' +
       'font-weight:500;text-align:center;cursor:pointer}' +
@@ -512,6 +602,16 @@
        matrycy E6 pyta dokładnie o wymiar tego celu. */
     '#' + ID + ' .mp-tryb__cel{position:absolute;left:50%;top:50%;width:44px;height:44px;' +
       'transform:translate(-50%,-50%);border-radius:50%}' +
+    /* U-7 — cel MARKERA nadpisuje regułę wspólną: pełna szerokość wiersza, wysokość
+       120 % kółka `i` (20 → 24), nadmiar 4 px rozłożony po równo nad i pod wierszem
+       przez centrowanie na osi pionowej. Dwie rzeczy, o które trzeba tu uważać:
+       (1) checkbox ZACHOWUJE własny cel 44×44 i musi zostać NAD nakładką, inaczej
+       naprawa jednego gestu psuje drugi — stąd `z-index` na ptaszku; (2) nakładka
+       jest dzieckiem `<button>` markera, więc trafienie w nią to trafienie w marker
+       i nie trzeba drugiego nasłuchu. Kółko `i` samo w sobie zostaje 20 px (W48). */
+    '#' + ID + ' .mp-tryb__marker .mp-tryb__cel{left:0;right:0;top:50%;' +
+      'width:auto;height:24px;transform:translateY(-50%);border-radius:0}' +
+    '#' + ID + ' .mp-tryb__ptaszek{z-index:1}' +
     '#' + ID + ' .mp-tryb__kryterium{margin:0;font-size:14px;line-height:20px;color:var(--mp-beige-3)}' +
 
     /* Wywoływacz pełnej listy w liście skróconej (§3.2): linia 1 px, rytm 12 px
@@ -845,6 +945,13 @@
       'display:flex;position:absolute;inset:0;z-index:2;align-items:center;justify-content:center;' +
       'background:var(--mp-bialy)}}';
 
+  /* Rejestr ostrzeżeń runtime'u. NIE `console.warn`: matryca wymaga zera błędów
+     I OSTRZEŻEŃ w konsoli na każdej ramce, więc zgłoszenie przez konsolę zamieniłoby
+     jedną czerwień (B16) na drugą. Zgłoszenie ma być odczytywalne przez pomiar
+     i nieszkodliwe dla użytkownika — lista spełnia oba warunki, konsola żadnego. */
+  var ostrzezeniaRuntime = [];
+  function ostrzezenie(tekst) { ostrzezeniaRuntime.push(String(tekst)); return null; }
+
   function el(tag, klasa, rodzic) {
     var e = document.createElement(tag);
     if (klasa) e.className = klasa;
@@ -877,6 +984,10 @@
     var belka = el('div', 'mp-tryb__belka', korzen);
     var znak = el('span', 'mp-tryb__znak', belka);
     znak.setAttribute('aria-hidden', 'true');
+    /* `innerHTML` na WŁASNYM, stałym napisie — nie na danych z CMS-u.
+       Znak jest dekoracyjny, bo rodzic ma `aria-hidden`; dlatego inline SVG
+       nie niesie `role` ani `aria-label`: sprzeczne ARIA to defekt. */
+    znak.innerHTML = ZNAK;
     var blok = el('div', 'mp-tryb__postep-blok', belka);
     var etykieta = el('p', 'mp-tryb__etykieta', blok);
     var tor = el('div', 'mp-tryb__tor', blok);
@@ -1653,12 +1764,17 @@
     return przeliczBottom();
   }
 
+  /* D-23.1: `widok.fotoUrl` niesie ZDJĘCIE GŁÓWNE przepisu (pole `zdjecie-glowne`),
+     przepuszczone przez `naPorcje()`. Do przebiegu 30 pole to nie istniało na poziomie
+     widoku — było polem KROKU — więc funkcja zwracała `null` zawsze i zdjęcie nie
+     pojawiało się na żadnym z trzech ekranów (B21, W76). */
   function zdjecieEkranu(rodzic) {
     var url = stan.widok && stan.widok.fotoUrl;
     if (!url) return null;                 // R3: brak zdjęcia nie zostawia dziury
-    var f = el('img', 'mp-tryb__foto', rodzic);
+    var f = el('img', 'mp-tryb__foto mp-tryb__foto--glowne', rodzic);
     f.src = url;
     f.alt = '';
+    f.setAttribute('data-mp-foto-ekranu', '');
     return f;
   }
 
@@ -1673,11 +1789,19 @@
     var meta = el('div', 'mp-tryb__meta', top);
     (stan.widok && stan.widok.meta ? stan.widok.meta : []).forEach(function (m) {
       var kol = el('div', 'mp-tryb__meta-kol', meta);
-      var g = el('span', 'mp-tryb__meta-glif', kol);
-      /* Substytut Unicode w miejsce ligatury subsetu — ta sama droga co `⌄`, `←`, `→`.
-         Nazwa prawdziwej ligatury zostaje w `data-mp-ligatura`, żeby migracja (B16)
-         i pomiar zbioru używanych ligatur (I4) nie musiały czytać kodu. */
-      g.textContent = SUBSTYTUT_GLIFU[m.glif] || '·';
+      var g = el('span', 'mp-tryb__meta-glif mp-ikona', kol);
+      /* B16 — PRAWDZIWA ligatura subsetu, bez fallbacku. Nazwa spoza `LIGATURY`
+         nie dostaje znaku zastępczego: idzie do `ostrzezenie()` i zostaje pusto.
+         Powód jest pomiarowy, nie estetyczny — znak zastępczy renderuje się jak
+         ikona i przechodzi każdą asercję o obecności glifu, więc brak subsetu
+         wyglądałby dokładnie jak subset kompletny. */
+      if (m.glif && LIGATURY.indexOf(m.glif) < 0) {
+        ostrzezenie('glif „' + m.glif + '" nie należy do subsetu ikon — pomijam, ' +
+                    'bo własny zastępnik ukryłby brak (B16)');
+        g.textContent = '';
+      } else {
+        g.textContent = m.glif || '';
+      }
       g.setAttribute('data-mp-ligatura', m.glif || '');
       g.setAttribute('aria-hidden', 'true');
       el('span', 'mp-tryb__meta-wartosc', kol).textContent = m.wartosc || '';
@@ -1984,6 +2108,13 @@
     czesci: function () { return stan.czesci; },
     wymiary: W,
     tokeny: TOKENY,
+    /* I4 — zbiór ligatur, których runtime FAKTYCZNIE używa, plus adresy subsetu.
+       Pomiar czyta stąd, zamiast odtwarzać zbiór z lektury widoków. */
+    zbiorLigatur: function () { return LIGATURY.slice(); },
+    fontIkon: function () {
+      return FONT_IKON.map(function (f) { return { waga: f[0], url: FONT_IKON_BAZA + f[1] }; });
+    },
+    ostrzezenia: function () { return ostrzezeniaRuntime.slice(); },
     odhacz: odhacz,
     zaznaczone: function () { return Object.keys(zaznaczone); },
     lista: przelaczListe,

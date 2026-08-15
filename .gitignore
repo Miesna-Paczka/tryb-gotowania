@@ -9,3 +9,13 @@ LOCK.*
 node_modules/
 .DS_Store
 Thumbs.db
+
+# Artefakty sond, nie treść repozytorium. `.proba-rm-*` to pliki-świadki próby
+# `rm` (uprawnienie do usuwania w tym katalogu jest wyłączone, więc sondy nie da
+# się po sobie sprzątnąć); `_katalog_tmp.js` zostawiła pierwsza wersja narzędzia
+# `sprawdz-katalog-mutacji.py`, zanim zaczęła podawać kod do `node` strumieniem.
+.proba-rm-*
+harness/_katalog_tmp.js
+
+# artefakty sond renam/rm
+.test-rename-*

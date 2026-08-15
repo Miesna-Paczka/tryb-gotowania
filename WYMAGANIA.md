@@ -1,4 +1,13 @@
-# WYMAGANIA — runtime trybu gotowania v1.5 (2026-08-15)
+# WYMAGANIA — runtime trybu gotowania v1.7 (2026-08-15)
+
+Zmiana v1.7 (2026-08-15): **próg miękki rozmiaru 40 000 → 45 000 znaków** i objęcie
+nim OBU artefaktów (runtime + parser). Decyzja operatora, pozycja D-28.1. Powód:
+po wpięciu biblioteki QR do parsera (D-13.1) oba pliki stanęły kilkaset znaków pod
+starym progiem — runtime 39 536, parser 39 369 — czyli próg zaczął blokować pracę
+wykończeniową zamiast ostrzegać przed limitem platformy. Limit twardy 50 000 bez
+zmian. Nagłówek pliku poprawiony przy okazji: stał na „v1.5", choć lista zmian
+otwierała się wpisem „v1.6". Wprowadzone przez łańcuch `tryb-gotowania-embed`
+na wyraźne polecenie operatora (plik wiążący — normalnie edytuje go wyłącznie operator).
 
 Zmiana v1.6 (2026-08-15): **pas dolny ma DWA TRYBY** (rząd / stos) i jest
 NIEZALEŻNY od pływających widżetów — decyzja operatora po inspekcji `przeglad.html`.
@@ -133,7 +142,12 @@ widoczny też w podglądzie Webflow (CR6) — harness go odtwarza.
 
 Vanilla JS, ES2019+, bez zależności poza biblioteką QR (~10 kB, do SVG, spec §8);
 zależność ZADEKLAROWANA w kodzie, nie zakładana. Jeden plik runtime'u; limit
-twardy 50 000 znaków (droga integracyjna przez embed), cel < 40 000. `<mark>`
+twardy 50 000 znaków (droga integracyjna przez embed), cel **< 45 000**. Próg dotyczy
+**OBU artefaktów wysyłanych do embedu** — runtime'u i parsera — bo od wpięcia biblioteki
+QR (D-13.1) oba są plikami tej samej klasy i oba jadą tą samą drogą. Zapas do limitu
+twardego zostaje wtedy 5 000 znaków (10 %) po każdej stronie: próg miękki ma być
+sygnałem, a nie awarią wdrożenia, a przy 42 000 zapalałby się przy każdej jednostce
+wykończeniowej i przestałby cokolwiek znaczyć. `<mark>`
 z `box-decoration-break: clone` (instrukcja §3). Typografia i tokeny: DM Sans;
 Caption 14→12, Body Small 14, Body Large 18→16; cień `drop_shadow_ui` dokładnie
 wg HANDBACK decyzja 11 (ambient 0/−1 blur 2 α5% · key 0/−4 blur 8 spread −2 α10%,

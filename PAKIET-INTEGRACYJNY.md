@@ -14,8 +14,10 @@ Ten plik **nie jest instrukcją publikacji**. Publikacja, staging i produkcja s�
 
 | co | stan |
 |---|---|
-| runtime (`tryb-gotowania.js`) | gotowy; **zminifikowany mieści się** (39 346 zn.), źródło nie — wkleja się artefakt, **dwa embedy**, parser przed runtime'em — §2 |
-| warstwa danych (`przepis-parser.js`) | gotowa; **urosła w przeb. 28 o bibliotekę QR** (D-13.1/B): 39 369 zn. zminifikowana, zapas do WYM §4 spadł z 22 659 do **631** — §2, §3d |
+| runtime (`tryb-gotowania.js`) | gotowy; **zminifikowany mieści się** (**40 713 zn.**, zapas **4 287** do progu **45 000** z WYM v1.7), źródło nie — wkleja się artefakt, **dwa embedy**, parser przed runtime'em — §2 |
+| warstwa danych (`przepis-parser.js`) | gotowa; **urosła w przeb. 28 o bibliotekę QR** (D-13.1/B): **39 592 zn.** zminifikowana, zapas **5 408** — §2, §3d |
+| font ikon | **WPIĘTY I ZMIERZONY** (przeb. 31 wpiął, przeb. 32 zmierzył bez wyścigu): trzy `@font-face` z CDN Webflow, ligatury 20,0 px przy stopniu 20 z kontrolą ujemną 365,6 px, na 14 ramkach. Subsetu **nie generować i nie wgrywać drugiego** — stoi w Webflow — §3b |
+| matryca pomiarowa | **200/200 🟢, zero czerwieni** (przeb. 32). Poza liczeniem **5 ⏸** czekających na jedno zdanie operatora: W18, W46, W47, W77, W79 |
 | zależność QR | **ZAMKNIĘTA w przeb. 28**: `qrcode-generator` 2.0.4 (MIT) wbudowany w artefakt parsera, `window` puste, wiersz I3 zielony — §3d |
 | tokeny → zmienne Webflow | **opis migracji jest DANĄ (`TOKENY[i][2]`) od przeb. 28**, odczytaną z witryny: 7 z 10 wiąże się 1:1, **trzy braki nazwane jawnie**. Komentarzy przy tokenach nie ma i nie wolno ich odtwarzać — §3 |
 | kontrakt meta (`wartosci-porcja`) | **ratyfikowany i wykonany**; pole w CMS jest, wypełnione dla **1 z 18** przepisów — §3c |
@@ -42,12 +44,63 @@ To nie jest przyrost do odchudzenia — to jest cena decyzji „brak cudzego hos
 | `przepis-parser.js` | **109 896** | 110 912 |
 | **razem (źródła)** | **224 133** | 227 912 |
 
-Limit embedu Webflow: **50 000 znaków na element**. WYM §4 chce **< 40 000**.
+Limit embedu Webflow: **50 000 znaków na element**. WYM §4 (v1.7) chce **< 45 000** — próg podniesiony z 40 000 decyzją operatora 2026-08-15, D-28.1.
 Źródła nie wchodzą w grę i nigdy nie wchodziły: runtime sam przekracza limit twardy
 **2,3 ×**. Wklejane są wyłącznie artefakty zminifikowane — tabela niżej.
 
 **Pin ze STAN.md „22 KB mieści się" jest nieaktualny** — opisuje parser sprzed
 rozbudowy, sprzed warstwy widoku. Nie poprawiam go, bo piny zmienia operator.
+
+### PRZEMIAR PRZEBIEGU 31 — liczby po wykonaniu D-23.1
+
+Wszystkie cztery pliki urosły o jedno wejście kontraktu. Liczby są z **builda**, nie
+z szacunku (`terser <plik> -c -m`), i z tego samego uruchomienia, z którego pochodzi
+zmierzona powierzchnia — inaczej pakiet podawałby rozmiar innego artefaktu niż zmierzony.
+
+| plik | znaków (bajtów) | delta wobec przeb. 30 |
+|---|---|---|
+| `tryb-gotowania.min.js` | **39 648** (39 737 B) | +112 B |
+| `przepis-parser.min.js` | **39 957** B | +223 B |
+| **razem (artefakty)** | **≈ 79 694 B** | **> 50 000 → nadal DWA embedy** |
+
+Zapas do progu WYM §4 (45 000): runtime **5 352**, parser **5 043**. Wniosek dla planu:
+jednostka fontu ikon (B16/I4, deklaracje `@font-face` to setki znaków) mieści się z zapasem
+w obu artefaktach — ale liczbę do tej tabeli bierze się po buildzie, nie przed.
+
+### PRZEMIAR PRZEBIEGU 32 — obowiązujący. Tabela wyżej opisuje artefakt SPRZED fontu ikon
+
+**Tabela z przebiegu 31 jest o jedną jednostkę spóźniona.** Powstała po jednostce D-23.1,
+a ten sam przebieg zbudował potem `min.js` jeszcze raz, wpinając trzy `@font-face`.
+Liczby wyżej opisują więc plik, którego już nie ma w katalogu. Zostawiam je jako zapis,
+bo pokazują koszt jednostki fontu ikon (**+1 065 znaków runtime'u**), ale **do wklejenia
+i do listy kontrolnej obowiązuje tabela niżej.**
+
+Przyrząd, nazwany raz i na stałe: **`len(open(plik,'rb').read().decode('utf-8'))`**
+dla znaków, `len(bajtów)` dla bajtów. Limit Webflow liczy ZNAKI, więc znaki są liczbą
+wiążącą, a bajty raportowane obok wyłącznie dlatego, że różnica ujawnia polskie litery.
+
+| plik | znaków | bajtów | zapas do 45 000 |
+|---|---|---|---|
+| `tryb-gotowania.min.js` | **40 713** | 40 803 | **4 287** |
+| `przepis-parser.min.js` | **39 592** | 39 957 | **5 408** |
+| **razem (artefakty)** | **80 305** | 80 760 | **> 50 000 → nadal DWA embedy** |
+| `tryb-gotowania.js` (źródło) | 121 928 | 124 976 | — |
+| `przepis-parser.js` (źródło) | 111 611 | 112 670 | — |
+
+**Przebieg 31 podał BAJTY i nazwał je znakami.** Jego „runtime zminifikowany 40 803 zn.,
+zapas 4 197" to `wc -c`, nie `wc -m`: znaków jest 40 713, a zapas 4 287. Kierunek pomyłki
+był łagodny — znaków jest zawsze mniej niż bajtów w UTF-8, więc bajtowy odczyt jest
+ostrożniejszy i żaden próg nie został przekroczony po cichu. **Nie jest to jednak
+nieszkodliwe, bo jedno z dwóch pytań, na które ta sekcja odpowiada, brzmi „ile jeszcze
+wolno dopisać".** Zapas podany z dokładnością do metody nie jest zapasem, tylko widełkami,
+o których czytelnik nie wie, że je czyta. Stąd nazwanie przyrządu wyżej: liczba w tym
+pliku ma pochodzić z jednego, wskazanego z nazwy sposobu liczenia, a nie z tego,
+co akurat było pod ręką w danym przebiegu.
+
+**Zapas runtime'u zszedł poniżej 10 % progu** (4 287 z 45 000). To nie jest jeszcze
+problem, ale przestało być liczbą, o której można nie myśleć: kolejna jednostka wielkości
+fontu ikon zjadłaby jej czwartą część. Do rozważenia przez operatora, gdy zapas spadnie
+poniżej 3 000 — dziś tylko odnotowane, bez wniosku.
 
 ### ZASTRZEŻENIE ZDJĘTE (przebieg 26) — liczby są znowu [V]
 
@@ -97,33 +150,51 @@ tersera. Po przebudowie sonda świeżości musi wyjść zielona zanim liczby wr�
 `npx --yes terser <plik> -c -m -o /tmp/<nazwa>.js`, oba pliki przebudowane w tym
 przebiegu i przemierzone na `matrix-min.html` (7 ramek, ZERO padnięć, konsola czysta):
 
-| plik | źródło | zminifikowany | mniej o | zapas do 40 000 |
+
+> **NIEAKTUALNE OD PRZEBIEGU 32 — liczby w tej tabeli opisują artefakt sprzed DWÓCH
+> jednostek** (przed D-23.1 i przed fontem ikon). Zostają jako zapis tempa przyrostu,
+> który był tu ich właściwym zadaniem. **Stan obowiązujący jest w §2, w tabeli
+> „PRZEMIAR PRZEBIEGU 32": runtime 40 713 zn. / zapas 4 287, parser 39 592 zn. /
+> zapas 5 408.** Reguła na przyszłość, żeby ten rozjazd nie wracał: **liczba rozmiaru
+> żyje w JEDNYM miejscu (§2), a pozostałe sekcje mają się do niego odsyłać, nie
+> przepisywać go.** Trzy kopie tej samej liczby w jednym pliku rozjechały się dokładnie
+> tak, jak rozjechał się bilans matrycy utrzymywany obok wierszy — z tego samego powodu.
+
+| plik | źródło | zminifikowany | mniej o | zapas do **45 000** (WYM v1.7) |
 |---|---|---|---|---|
-| `tryb-gotowania.js` | 114 237 | **39 346** | 66 % | **654** |
-| `przepis-parser.js` | 109 896 | **39 369** | 64 % | 631 |
-| **razem** | 224 133 | **78 715** | 65 % | — |
+| `tryb-gotowania.js` | 116 838 | **39 536** | 66 % | **5 464** |
+| `przepis-parser.js` | 109 896 | **39 369** | 64 % | 5 631 |
+| **razem** | 226 734 | **78 905** | 65 % | — |
 
-**Wniosek się nie zmienia, margines owszem: 78 715 > 50 000.** Zminifikowana całość
-w JEDNYM embedzie nie mieści się o **28 715 znaków** (było 6 379). Osobno mieści się
-każdy z nich w limicie TWARDYM 50 000 — runtime z zapasem 10 654, parser 10 631 —
-ale **oba są dziś nad miękkim progiem 40 000 z WYM §4 albo tuż pod nim**.
+**Wniosek się nie zmienia, margines owszem: 78 905 > 50 000.** Zminifikowana całość
+w JEDNYM embedzie nie mieści się o **28 905 znaków** (było 6 379). Osobno mieści się
+każdy z nich w limicie TWARDYM 50 000 — runtime z zapasem 10 464, parser 10 631 —
+**i od WYM v1.7 oba mieszczą się także w progu miękkim, z zapasem ok. 5 500 każdy**.
 
-**Zmiana obrazu decyzji, i to jest główna wiadomość tej sekcji.** Do przebiegu 27
-próg 40 000 dotyczył wyłącznie runtime'u; parser miał 22 659 znaków zapasu i nie
-uczestniczył w rozmowie. Po wykonaniu D-13.1 **oba pliki stoją kilkaset znaków pod
-progiem**: runtime 654, parser 631. Każda następna jednostka wykończeniowa przebija
-jeden z nich. To nie jest awaria — twardy limit platformy ma dalej 25 % zapasu po obu
-stronach — ale **WYM §4 przestało być wymaganiem, które spełnia się przypadkiem**
-i wymaga rozstrzygnięcia operatora, zanim padnie w połowie jednostki.
+**D-28.1 ROZSTRZYGNIĘTE — próg miękki 40 000 → 45 000, WYM v1.7 (operator 2026-08-15).**
+Historia tej pozycji jest warta zapamiętania, bo pokazuje, jak wymaganie traci sens
+bez jednej zmiany w sobie. Do przebiegu 27 próg 40 000 dotyczył wyłącznie runtime'u;
+parser miał 22 659 znaków zapasu i w rozmowie nie uczestniczył. Po wykonaniu D-13.1
+(biblioteka QR, 22 kB do parsera) **oba pliki stanęły kilkaset znaków pod progiem** —
+runtime 654, parser 631 — czyli próg przestał ostrzegać przed limitem platformy,
+a zaczął blokować pracę wykończeniową. Wymaganie nie zmieniło ani słowa; zmienił się
+świat, który opisywało.
 
-**To jest liczba do pilnowania, nie do zignorowania.** Ostatnie cztery przebiegi
+Nowa liczba zostawia **5 000 znaków (10 %) zapasu do twardych 50 000 po każdej
+stronie**. Dobrana tak, żeby próg dalej był sygnałem: przy 48 000 sygnał przychodziłby
+za późno na reakcję, przy 42 000 zapalałby się przy każdej jednostce wykończeniowej
+i przestałby cokolwiek znaczyć.
+
+**Liczba dalej jest do pilnowania — podniesiony próg kupuje czas, nie odporność.** Ostatnie cztery przebiegi
 dołożyły do zminifikowanego runtime'u po 300–1 300 znaków każdy (przeb. 25:
 37 512 → 37 834; przeb. 26: 37 834 → 39 038; przeb. 28: 39 038 → **39 346**,
 za co odpowiada wariant (3) tokenów — **308 znaków odczytane z builda**, nie
-oszacowane). W tym tempie próg 40 000 pada w następnym przebiegu dotykającym CSS-a,
-a od tego przebiegu **to samo dotyczy parsera**. Warianty, gdy padnie: podnieść próg
-(WYM §4 to wymaganie operatora, nie limit platformy — twarde 50 000 zostaje z zapasem
-25 %), albo wydzielić arkusz do trzeciego embedu. **Nie decyduję; sygnalizuję z liczbą.**
+oszacowane; przeb. 30: 39 346 → **39 536** za cztery rozstrzygnięcia operatora).
+W tempie 300–1 300 znaków na przebieg zapas 5 464 wystarcza na **kilkanaście jednostek
+wykończeniowych**, a nie na jedną — i to jest cała różnica, jaką kupiła ta decyzja.
+Jednostka fontu ikon (B16/I4) wchodzi z deklaracjami `@font-face` liczonymi w setkach
+znaków i przy starym progu realnie gasiła I5. Gdy zapas zejdzie poniżej ~1 500,
+pozostaje drugi wariant, ten sam co wcześniej: **wydzielić arkusz do trzeciego embedu**.
 
 **Rekomendacja: (1) + (2) razem — minifikacja ORAZ dwa embedy.** Nie „albo": sama
 minifikacja nie wystarcza (51 017), sam podział nie wystarcza (runtime 81 309).
@@ -300,6 +371,38 @@ zmienna.** Zmienna z wbudowanym α odbiera tę możliwość.
 ---
 
 ## 3b. Font ikon — subset zmierzony Z PLIKU (przeb. 11, PRZEMIERZONY NA v4 w przeb. 26)
+
+> **STAN NA PRZEBIEG 32 — font nie jest już pozycją do zrobienia, tylko własnością
+> zmierzoną.** Runtime deklaruje **trzy `@font-face`** rodziny `Material Symbols Outlined`
+> (wagi 300/400/500, `font-display: block`), a pliki bierze **z CDN Webflow**, nie
+> z GitHuba i nie z pliku lokalnego. Adresy żyją w kodzie jako DANE (tablica `FONT_IKON`)
+> i wychodzą na zewnątrz przez `MP.tryb.fontIkon()`, więc lista kontrolna nie musi ich
+> przepisywać z arkusza.
+>
+> Trzy rzeczy zmierzone i nieoczywiste, każda z kontrolą:
+> 1. **CORS przechodzi z obcego originu** — sprawdzone z `http://localhost:8123`, czyli
+>    z adresu dla Webflow obcego pod każdym względem (przeb. 31). Pomiar z localhosta jest
+>    tu MOCNIEJSZY od pomiaru ze stagingu: gdyby CDN wpuszczał tylko własne domeny, padłby.
+> 2. **Ligatury renderują się jako jeden glif** — 20,0 px przy stopniu 20, na czternastu
+>    ramkach obu powierzchni, z kontrolą ujemną: nazwa spoza subsetu daje **365,6 px**,
+>    czyli słowo (przeb. 32).
+> 3. **`font-display: block`, nie `swap`** — przy `swap` przeglądarka rysuje NAZWĘ ligatury
+>    krojem zastępczym, czyli w pasku meta pojawia się słowo zamiast ikony. Niewidoczna
+>    ikona przez chwilę jest tańsza niż widoczne słowo. Konsekwencja dla integratora:
+>    **jeśli font nie dojedzie, ikony będą puste, a nie zastępcze** — i tak ma być,
+>    bo `|| '·'` zostało zdjęte świadomie (B16).
+>
+> **Subsetu nie generować i nie wgrywać drugiego.** Trzy pliki stoją w bibliotece fontów
+> witryny `6983617613052dc9fe624303`, wgrane poza tym łańcuchem; D-24.2 jest wykonane
+> w Webflow, nie tylko rozstrzygnięte. Tabela niżej opisuje **plik źródłowy subsetu**
+> i pozostaje prawdziwa — służy pytaniu „czy dany glif w ogóle istnieje", nie pytaniu
+> „skąd runtime bierze font".
+>
+> **Jedna rzecz nadal wymaga uwagi przy integracji:** runtime wstawia `@font-face`
+> **poza zakresem `#mp-tryb`**, bo at-rule nie zagnieżdża się w selektorze. To jedyne
+> miejsce arkusza wychodzące poza korzeń overlaya. Jeśli strona gospodarza deklaruje
+> własną rodzinę o tej samej nazwie, obie deklaracje się zsumują, a wygra ta o pasującej
+> wadze — do sprawdzenia w fazie stagingowej (pozycja dla §6).
 
 Zmierzone `fontTools`em bezpośrednio na **`local/tech/fonts/subset-2026-08-15-v4/`**,
 bez przeglądarki i bez serwera. **Uwaga: to INNY subset niż w poprzednim wydaniu tej
@@ -584,16 +687,30 @@ jest przemiar `qr.html`, nie zgodność sygnatur.**
 
 ### Rozmiar — po wykonaniu, nie przed
 
-| embed | zminifikowany | zapas do 50 000 | zapas do 40 000 (WYM §4) |
+
+> **NIEAKTUALNE OD PRZEBIEGU 32 — liczby w tej tabeli opisują artefakt sprzed DWÓCH
+> jednostek** (przed D-23.1 i przed fontem ikon). Zostają jako zapis tempa przyrostu,
+> który był tu ich właściwym zadaniem. **Stan obowiązujący jest w §2, w tabeli
+> „PRZEMIAR PRZEBIEGU 32": runtime 40 713 zn. / zapas 4 287, parser 39 592 zn. /
+> zapas 5 408.** Reguła na przyszłość, żeby ten rozjazd nie wracał: **liczba rozmiaru
+> żyje w JEDNYM miejscu (§2), a pozostałe sekcje mają się do niego odsyłać, nie
+> przepisywać go.** Trzy kopie tej samej liczby w jednym pliku rozjechały się dokładnie
+> tak, jak rozjechał się bilans matrycy utrzymywany obok wierszy — z tego samego powodu.
+
+| embed | zminifikowany | zapas do 50 000 | zapas do **45 000** (WYM §4, v1.7) |
 |---|---|---|---|
-| runtime `tryb-gotowania.min.js` | **39 435 B / 39 346 zn.** | 10 654 | **654** |
-| parser `przepis-parser.min.js` | **39 734 B / 39 369 zn.** | 10 631 | **631** |
+| runtime `tryb-gotowania.min.js` | **39 388 B / 39 536 zn.** | 10 464 | **5 464** |
+| parser `przepis-parser.min.js` | **39 734 B / 39 369 zn.** | 10 631 | **5 631** |
 
 Biblioteka kosztowała parser **22 028 znaków artefaktu** — dwa razy więcej niż
 szacunek „ok. 10 kB" ze spec §8, bo `qrcode-generator` jest większy od odrzuconego
 `qr-creatora`. Mieści się z zapasem w limicie twardym, ale **zjadł cały komfort
 wobec progu miękkiego**: parser miał 22 659 znaków zapasu do 40 000, ma 631.
-Ta liczba jest odczytana z builda, nie oszacowana.
+Ta liczba jest odczytana z builda, nie oszacowana. **Aktualizacja przeb. 30: to
+właśnie ten rachunek doprowadził do D-28.1** — operator podniósł próg do 45 000
+(WYM v1.7), więc zapas parsera wynosi dziś **5 631**, a runtime'u 5 464. Zdanie
+powyżej zostaje, bo opisuje, dlaczego decyzja zapadła; liczba „631" jest historią,
+nie stanem.
 
 ### Licencja — pozycja, której lista kontrolna nie miała
 
@@ -665,6 +782,21 @@ harnessu** — i tak samo nie wolno go usuwać. Nie został wymieniony, bo lista
 — **0 × w runtimie**; `MP_TEST` w runtimie — **1 ×, komentarz, wiersz 955** (numer bez
 zmian od przebiegu 26).
 
+**PRZEMIERZONE PONOWNIE W PRZEBIEGU 32** [V], po jednostce fontu ikon z przeb. 31,
+która ruszała runtime. Wynik: **wszystkie liczby bez zmian** — `HARNESS-ONLY` 16 / 16 / 1 / 1 / 4
+i **0 × w czterech plikach runtime'u**; `MP_PIECZEC` i `document.write` **0 × w runtimie**;
+`MP_TEST` **1 ×, komentarz**. Zmieniło się jedno: **komentarz `MP_TEST` stoi teraz w wierszu
+1054, nie 955** — plik urósł o 99 wierszy. Numer wiersza podawany w tym pliku jest
+z definicji nietrwały i jest tu tylko po to, żeby sprawdzenie dało się powtórzić,
+a nie żeby czemukolwiek służyć; **własnością jest „jedno trafienie i jest to komentarz",
+nie adres**. Przy okazji uzupełnienie inwentarza: `MP_BEZ_HISTORII` występuje w runtimie
+**2 ×** (komentarz `NIENARYSOWANE:` w 1558 i odczyt w 1567) oraz **1 ×** w minifikacie —
+to jest trzeci seam z korekty wyżej, policzony, żeby lista nie musiała powoływać się
+na pamięć. Trzy nowe funkcje publiczne z przeb. 31 — `zbiorLigatur()`, `fontIkon()`,
+`ostrzezenia()` — **nie są kodem pomiarowym i nie wchodzą na tę listę**: pomiar z nich
+korzysta, ale to zwykłe API runtime'u, tak samo jak `czesci()` czy `korzen()`.
+Kryterium tej sekcji brzmi „czy w produkcji szkodzi", nie „czy harness tego używa".
+
 ---
 
 ## 5. Czego runtime wymaga od szablonu (kontrakt DOM — UZUPEŁNIONY w przebiegu 27)
@@ -680,6 +812,27 @@ zmian od przebiegu 26).
 >
 > Bez tej linii integracja wygląda na kompletną i daje **ekran startowy bez paska meta**
 > na każdym przepisie — usterkę, która wygląda jak decyzja projektowa.
+
+> **KONTRAKT URÓSŁ DRUGI RAZ — przebieg 31, wejście `data-mp-foto-glowne`.**
+> D-23.1 (operator, 2026-08-15) kieruje zdjęcie przepisu do pola **`zdjecie-glowne`**
+> (Image, id `93ac881e…`), to samo na ekranie startowym i na zakończeniu. Parser czyta je
+> osobnym wejściem, a nie przez galerię `data-mp-foto-kroku`: tamta jest MultiImage
+> i wiąże się z polem KROKU, więc zdjęcie przepisu nie ma tam czego szukać.
+>
+> **Bez tej linii integracja daje ekran startowy bez zdjęcia i tytuł o 166 px za wysoko** —
+> dokładnie stan, który matryca opisywała jako B21 🔴 przez osiem przebiegów. To druga
+> usterka tej samej klasy co brak `#mp-wartosci-porcja`: kod pyta o pole, którego szablon
+> nie podaje, a wynik wygląda na decyzję projektową, nie na brak.
+>
+> **Parser czyta ATRYBUT `src`, nie własność `img.src`.** Dla pustego pola Image Webflow
+> renderuje `<img src="">`, a przeglądarka rozwija pusty `src` do adresu dokumentu —
+> naiwny odczyt zwróciłby URL strony przepisu i wyglądał na poprawne zdjęcie.
+> Puste pole daje więc `null` i **brak elementu**, nie ramkę ze złamanym obrazem (R3).
+> Zmierzone kontrolą ujemną w obu powierzchniach harnessu, przebieg 31.
+>
+> **Zmiana wymaga wiersza w `instrukcja-pisania-przepisow.md` §6** (pin B1 — żaden łańcuch
+> nie dopisuje do interfejsu embedu jednostronnie). Change request:
+> `CR--zdjecie-glowne--2026-08-15.md` w katalogu łańcucha.
 
 Poniższy blok jest kanonem po uzupełnieniu:
 
@@ -698,6 +851,9 @@ Poniższy blok jest kanonem po uzupełnieniu:
 
 <!-- galeria `zdjecia-krokow`, MultiImage -->
 <img data-mp-foto-kroku src="…-krok-07.webp">
+
+<!-- zdjęcie główne przepisu, pole `zdjecie-glowne` (Image) — D-23.1 -->
+<img data-mp-foto-glowne src="{{zdjecie-glowne}}">
 
 <!-- blok QR: renderowany wyłącznie ≥992 px -->
 <div data-mp-qr></div>
@@ -756,9 +912,12 @@ harnessu** — zostaje wyłącznie decyzja, czy runtime deklaruje własne `@font
 Do wykonania **po** decyzji o rozmiarze (§2). Kolejność jest wiążąca.
 
 1. [ ] decyzja o kroku budowania podjęta; **OBA** artefakty zbudowane i zmierzone —
-       **< 50 000 znaków, cel < 40 000** (wiersz I5). Dziś: runtime **39 346 zn.**
-       (zapas 654), parser **39 369 zn.** (zapas 631). Od przebiegu 28 próg WYM §4
-       dotyczy obu plików, nie samego runtime'u
+       **< 50 000 znaków, cel < 45 000** (wiersz I5, WYM **v1.7**). Dziś (przeb. 32):
+       runtime **40 713 zn.** (zapas **4 287**), parser **39 592 zn.** (zapas **5 408**).
+       Od przebiegu 28 próg WYM §4 dotyczy obu plików, nie samego runtime'u; od przebiegu 30
+       wynosi 45 000 (D-28.1). **Licz ZNAKI, nie bajty** — `len(bajty.decode('utf-8'))`,
+       nie `wc -c`: limit Webflow jest znakowy, a w tych plikach różnica sięga 365 sztuk
+       i przebieg 31 podał ją jako znaki (§2)
 2. [ ] **dziesięć** tokenów podmienionych wg §3; **trzy** braki rozstrzygnięte jawnie
        (`--mp-akcent`, `--mp-alarm`, `--mp-cta`). **Nazwy bierz z `TOKENY[i][2]`
        w artefakcie, NIE z komentarzy** — od przebiegu 28 opis migracji jest daną
@@ -767,8 +926,9 @@ Do wykonania **po** decyzji o rozmiarze (§2). Kolejność jest wiążąca.
        i `white-full-bg` nie istnieją (jest `off-white-bg-100%` i `white-bg`),
        `--mp-atrament` MA odpowiednik (`primary-text`), a `--mp-cta` go nie ma
        (`primary-cta` = #E55529, nie #CF411A — pozycja **D-27.1**)
-3. [ ] `grep -c HARNESS-ONLY` na artefakcie → **0** (sprawdzone przeb. 27: 0 w czterech
-       plikach runtime'u, 16 + 16 + 1 + 1 + 4 w harnessie)
+3. [ ] `grep -c HARNESS-ONLY` na artefakcie → **0** (sprawdzone ponownie przeb. 32,
+       po jednostce fontu ikon: 0 w czterech plikach runtime'u, 16 + 16 + 1 + 1 + 4
+       w harnessie — bez zmian wobec przeb. 27)
 4. [ ] `grep "MP_BEZ_HISTORII\s*=\s*true"` na artefakcie → **brak przypisania**.
        ~~`grep MP_BEZ_HISTORII` → brak~~ — **pozycja była błędna i wykonana zepsułaby
        działanie.** Runtime **czyta** `global.MP_BEZ_HISTORII` w `historiaWlaczona()`

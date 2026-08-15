@@ -29,6 +29,12 @@ pozycją: wiersz dotyczy **obecności i zachowania** elementu, nie brzmienia tek
 stagingu albo na fizycznym urządzeniu. Nie blokują końca pętli lokalnej; ich
 przygotowanie to jednostka 10 (pakiet integracyjny).
 
+**Sekcja S też jest poza liczeniem zieleni lokalnej — ale W ŚRODKU warunku wyjścia
+nr 2** (założona 2026-08-15, przeb. 35). Różnica wobec Z jest istotna: Z to lista
+przygotowawcza, S to bramka. Matryca szerokości może być zielona w komplecie, a łańcuch
+i tak nie ma prawa się zamknąć, dopóki S nie przejdzie — bo A–I mierzą embed w harnessie,
+a nie embed w stronie gospodarza.
+
 ---
 
 ## A · Parser i model danych
@@ -38,7 +44,7 @@ przygotowanie to jednostka 10 (pakiet integracyjny).
 | A1 | `?debug=1` → panel błędów widoczny, zero błędów na payloadzie teriyaki | A1 · W§2 | 1× | DOM | 🟢 | 3 |
 | A2 | klasy walidacji wg instrukcji §7 wyzwalają się na spreparowanych wpisach | A1 | 1× | DOM | 🟢 | 3 |
 | A3 | klasa „`#klucz` bez odpowiednika w `skladniki`" wyzwala się i nie fałszywuje | A1 · inw. 3 | 1× | DOM | 🟢 | 4 |
-| A4 | `skladniki` / `kroki` czytane z bloków `<script type="text/plain">` | A2 | 1× | DOM | 🟢 | 3 |
+| A4 | `skladniki` / `kroki` czytane z bloków `<script type="text/plain">` | A2 | 1× | DOM | 🟢 **ZMIERZONE 7/7 na obu powierzchniach, przeb. 33 — do tego przebiegu wiersz był TAUTOLOGIĄ.** Zielony od przeb. 3 na tej podstawie, że model w ogóle powstał — a to nie jest jego dowód: `tekstZeSkryptu()` czyta przez `getElementById`, więc `<div>` o tym samym ID przeszedłby tak samo. Kod nie zna nośnika; wiersz o nośnik pyta. Cztery asercje: nośnik to `SCRIPT` typu `text/plain` · **nie renderuje pudełka w układzie** (`getClientRects().length === 0`, `offsetParent === null`) — to jest cała racja bytu tego nośnika, treść ma być odczytana, a nie pokazana · odczytane pochodzi z tych węzłów (11 składników / 9 kroków, `#kurczak` obecny w treści węzła) · **KONTROLA UJEMNA: podrzucony `<script type="text/plain">` o innym ID NIE wchodzi do modelu** (`duch` pominięty, dalej 11 składników). Bez kontroli ujemnej wiersz przechodziłby na stronie, na której KAŻDY `text/plain` gospodarza byłby wejściem parsera | 3 · **33** |
 | A5 | puste pole → sekcja ukryta, nie pusta ramka | A2 | 5× | DOM | 🟢 | 4 |
 | A6 | pola kartowe dzielą się po pustej linii na N kart, pytanie pogrubione | A2 · inw. 2 | 1× | DOM | 🟢 | 4 |
 | A7 | opcjonalny link w karcie Q→A renderuje się jako link, nie tekst | inw. 2 | 1× | DOM | 🟢 | 4 |
@@ -71,12 +77,17 @@ przygotowanie to jednostka 10 (pakiet integracyjny).
 | B13 | adnotacje projektanta (`↕ treść przewija się`, teksty legendy) **nie renderują się** | §3.8 · §3.5 | 5× | DOM | 🟢 | 5 |
 | B14 | atrapy `marker — cel koloru` **nie renderują się** jako prostokąty | R14 · §3.13 | 5× | DOM | 🟢 | 5 |
 | B15 | overlay to `position: fixed` w tym samym dokumencie, nie iframe | W§2 | 1× | DOM | 🟢 | 5 |
-| B16 | glify tylko z subsetu; brak glifu = błąd zgłoszony, nie własny fallback | A9 · W§4 | 1× | DOM | 🔴 **naruszone konstrukcyjnie: `m.glif \|\| '·'`**; potw. na żywo: `@font-face` = **0** | 11 · 15 |
+| B16 | glify tylko z subsetu; brak glifu = błąd zgłoszony, nie własny fallback | A9 · W§4 | 5× · land. | DOM | 🟢 **ZAMKNIĘTE w przeb. 31** (7 ramek, trzy asercje na ramkę): runtime wnosi **3 × `@font-face`** rodziny `Material Symbols Outlined` (było 0), adresy wskazują **origin Webflow** `cdn.prod.website-files.com/6983617613052dc9fe624303/…` w wagach 300/400/500 — D-15.1 rozstrzygnięte pomiarem CORS, nie założeniem. Fallback **`|| '·'` ZDJĘTY**: nazwa spoza `LIGATURY` idzie do rejestru ostrzeżeń i renderuje się PUSTO. Rejestr, a nie `console.warn` — konsola musi zostać zerowa na każdej ramce, więc zgłoszenie przez konsolę zamieniłoby jedną czerwień na drugą. `font-display: block`, nie `swap`: przy `swap` przeglądarka rysuje najpierw NAZWĘ ligatury krojem zastępczym, czyli słowo „hourglass” w pasku meta | 11 · 15 · **31** |
 | B17 | cień `drop_shadow_ui` wg decyzji 11 (ambient + key, rzucany DO GÓRY) | W§4 | 5× | DOM | 🟢 | 8 |
 | B18 | **inwariant odległości**: 25 własności (marginesy, gapy, paddingi, wysokości pasów, promienie, cele dotyku) **identycznych co do piksela** na 320/360/390/440/480; kontrola dodatnia — kolumna treści SKALUJE się (288/328/358/408/448 = szer. − 32) | 0aa · dec. operatora | 5× | sonda rodzica `inwariantOdleglosci()` | 🟢 25/25, `ok:true` | 21 |
 | B20 | pasek meta: **trzy kolumny elastyczne**, odstęp 16 stały, wysokość pasa 81 | `7263:10715` | 5× | DOM | 🟢 zmierzone: odstęp 16, wys. 81 (80,6 przy dpr 1,25), kolumna 88 przy 360 i równa na wszystkich pięciu. Pierwsza wersja miała sztywne 88 px + `space-between` — **ten sam obraz przy 360, rozjazd przy 320**: rósłby odstęp zamiast kolumny | 23 |
-| B21 | **zdjęcie przepisu na ekranie startowym** (`7195:10901`, 328×150 @ y88) | `7195:10901` | 5× | DOM | 🔴 **nie renderuje się nigdy**: `zdjecieEkranu()` czyta `stan.widok.fotoUrl`, a `fotoUrl` jest polem KROKU — widok przepisu takiego pola nie ma. Źródło zdjęcia = **D-23.1**, decyzja operatora | 23 |
+| B21 | **zdjęcie przepisu na ekranie startowym** (`7195:10901`, kolumna × 150 @ y88) | `7195:10901` | 5× · land. | DOM | 🟢 **ZAMKNIĘTE w przeb. 31, D-23.1 wykonane** (7+7 ramek): zdjęcie jest PIERWSZYM dzieckiem TOP-u, `328×150 @ y88 x16` przy 360 i `kolumna × 150 @ y88` na każdej z siedmiu, `naturalWidth 656` — czyli obraz się WCZYTAŁ, a nie tylko zajął pudełko. Droga: nowe wejście kontraktu DOM `data-mp-foto-glowne` (pole `zdjecie-glowne`) → `model.fotoUrl` → przepust przez `naPorcje()` → `zdjecieEkranu()`. Trzy asercje modelu z KONTROLĄ UJEMNĄ: puste pole daje `null`, nie adres strony — przeglądarka rozwija pusty `src` do URL-a dokumentu, więc naiwny odczyt wyglądałby na trafienie. **Skutek uboczny zmierzony osobno: tytuł ekranu wrócił na y254 na WSZYSTKICH siedmiu ramkach** — rozjazd 166 px opisany w przeb. 23 był skutkiem braku zdjęcia, nie usterką tytułu | 23 · **31** |
 | B19 | rząd nagłówka kroku (`7212:10899`): `space-between`, tytuł na `flex: 1`, pigułka czasu przy PRAWEJ krawędzi, rząd ≥ 26 px | `7212:10899` · §3.2 | DOM | 🟢 zmierzone (7 ramek): odstęp od prawej 0, wysokość 26, `space-between`. Do przeb. 22 pigułka wisiała samotnie jako dziecko TOP-u | 22 |
+| B22 | **pigułka czasu przy PRAWEJ krawędzi kolumny treści JEDNAKOWO na każdej powierzchni** — ekran kroku i pełna lista | **U-2 (operator 2026-08-15)** | 5× · land. | DOM | 🟢 **zmierzone w przeb. 30** (7 ramek): prawa pigułki = prawa kolumny co do piksela (344/344 przy 360, 813/813 przy 844); kontrola ujemna — pigułka NIE stoi już przy lewej (262 vs 16). Było `align-self:flex-start`, czyli x=16 na liście i x=260/282 na kroku: **ta sama klasa, dwa wyrównania**, bo w liście nie ma sąsiada, który by ją odepchnął. B19 tego nie łapał, bo mierzy WYŁĄCZNIE powierzchnię kroku. Oracle liczy krawędź kolumny z PUDEŁKA TREŚCI, nie z `getBoundingClientRect()`: w poziomie pasek przewijania zjada 15 px i pierwsza wersja asercji opisała poprawne położenie jako rozjazd | **30** |
+| B23 | etykieta „krok X z Y" **wyśrodkowana nad torem postępu** | **U-3 (operator 2026-08-15)** | 5× · land. | DOM (prostokąt tekstu) | 🟢 **zmierzone w przeb. 30** (7 ramek): środek napisu 185,5 = środek toru 185,5 przy 360; `text-align:center`. **Pudełko etykiety ma dokładnie szerokość toru, więc pomiar pudełka niczego nie rozstrzyga** — przy `start` i przy `center` jest identyczne. Oracle'em jest prostokąt TEKSTU z `Range`; kontrola ujemna: napis 54 px w torze 205 px nie jest dosunięty do lewej (158,7 vs 83,0) | **30** |
+| B24 | slot znaku marki (`.mp-tryb__znak`) **NIESIE ZNAK**, a nie samą geometrię | **U-4 (operator 2026-08-15)** · Figma `7283:10838` | 5× · land. | DOM | 🟢 **ZAMKNIĘTE w przeb. 36 po rozstrzygnięciu operatora (D-32.1 → wariant SVG). Zmierzone 7/7 na OBU powierzchniach: `slot 51×40 · svg 1 · img 0`** [V]. Wcześniej: 0/7, `svg 0 · img 0 · treść pusta`. Slot był policzony dobrze i nigdy nie wypełniony — geometria zgadza się z Figmą co do piksela (51×40 wobec 50,88×40), więc kontrola dodatnia wiersza jest zielona i odróżnia pudełko PUSTE od pudełka NIEISTNIEJĄCEGO. To jest ta sama para pytań co przy zdjęciu głównym: element NA MIEJSCU i element COŚ POKAZUJĄCY to dwa różne zdania, a matryca umiała dotąd zadać tylko pierwsze. **Wiersz założony w przeb. 32 dokładnie dlatego, że matryca pokazała wtedy 200/200:** defekt jest znany od przeb. 29, opisany w STAN.md prozą i przez trzy przebiegi niewidoczny dla przyrządu. Blokada wykonania: **w bibliotece Webflow nie ma czarnego byczka** (przejrzane wszystkie 896 assetów [V]), a rekomendowana ścieżka — inline SVG z `fill:currentColor` — wymaga danych wektorowych, których `get_design_context` nie zwraca: oddaje adres eksportu wygasający po ~7 dniach, nie ścieżkę. **Ręczne narysowanie ścieżki jest zakazane i byłoby zgadywaniem znaku towarowego.** **PREMISA TEJ BLOKADY BYŁA BŁĘDNA i obalono ją pomiarem, nie rozumowaniem:** `get_design_context` rzeczywiście oddaje tylko wygasający adres eksportu, ale **`download_assets` oddaje PLIK** — jedna ścieżka, zero `<image>`, zero `<defs>`, `viewBox 0 0 50.8766 40`, jedno wypełnienie `#3E2B22`, 1841 B. Poprzednie ogniwo orzekło niewykonalność, sprawdziwszy JEDNO narzędzie z dwóch. Znak leży w repo jako `znak-byczek.svg` i inline w runtime; transport przez granicę narzędzi zweryfikowany SHA-256 ścieżki (`692cdf1e…`, 1618 znaków, zgodny co do bitu). Wypełnienie przeniesione na `currentColor`, kolor z CSS `--mp-atrament` | **36** |
+| B25 | `.mp-tryb__czas` wyrównany **tak samo** na ekranie kroku i na pełnej liście | **U-2 (operator 2026-08-15)** | 5× · land. | DOM (odległości od obu krawędzi) | 🟢 **7/7 na obu powierzchniach — i wynik OBALA zgłoszenie.** Obie powierzchnie mają czas po PRAWEJ, z identycznym odstępem 16 px od krawędzi kolumny (przy 360: L266/P16 w obu; przy ramkach poziomych L558/P31 i L735/P31). U-2 opisywał stan sprzed reguły `.mp-tryb__czas{align-self:flex-end}` i nikt go nie zamknął, więc lista defektów niosła przez trzy przebiegi pozycję nieistniejącą. Wiersz ma **kontrolę dodatnią-świadka** i bez niej ta zieleń byłaby bezwartościowa: `rysujListe()` zaczyna od `top.textContent = ''`, więc obu powierzchni nie da się zmierzyć jednym odczytem — trzeba przełączyć widok. Dwa identyczne co do piksela wyniki mają wtedy dwa wyjaśnienia, a tańszym jest to, że zmierzono dwa razy ten sam stan. Świadek pyta o to, co MUSI się zmienić między odczytami (`.mp-tryb__rzad-kroku` kontra `[data-mp-lista-pelna]`) i jest zielony 7/7 | **32** |
+| B26 | `BOTTOM` = stos + pasek nawigacji jako **TOŻSAMOŚĆ**, plus `--mp-bottom-h` niosące zmierzoną wysokość | **U-1 (operator 2026-08-15)** · INTERAKCJE §4.1 · C1 | 5× · land. | DOM | 🟢 **7/7 na obu powierzchniach w stanie NIETRYWIALNYM: `bottom 132 = stos 52 + nawigacja 80`, `--mp-bottom-h` 132.** Zgadza się z wierszem §4.1 „132 / 52 / jedna pigułka zwinięta". **Wiersz powstał, bo B7 stoi zielony od przebiegu 6 z pustą kolumną wyniku — czyli sprzed rozstrzygnięcia C1, które regułę składania ustanowiło (2026-08-15).** Zieleń starsza od reguły, którą rzekomo mierzy, jest zielenią o czymś innym. Pierwsza wersja B26 potwierdziła podejrzenie: przeszła jako **`80 = 0 + 80`**, bo w stanie, w którym kończy się blok pomiarowy, stos ma ZERO dzieci — tożsamość była prawdziwa trywialnie i byłaby równie prawdziwa przy dowolnie zepsutym `przeliczBottom()`. Druga wersja szukała kroku z pigułką i zmierzyła rzecz osobno wartą zapisania: **ŻADEN z dziewięciu kroków nie wnosi pigułki sam z siebie** — stos zapełnia się dopiero po URUCHOMIENIU minutnika, czyli po geście użytkownika. Wiersz uruchamia więc minutnik jawnie i sprząta po sobie (`wyczysc()`), żeby nie zostawić biegnącego odliczania kolejnym asercjom. **U-1 („`przeliczBottom()` liczy rzecz, która nie istnieje") jest tym pomiarem OBALONE**: funkcja mierzy wyrenderowaną wysokość i publikuje ją zmienną, czyli robi dokładnie to, czego chce reguła składania | **32** |
 
 ## C · Minutniki
 
@@ -89,7 +100,7 @@ przygotowanie to jednostka 10 (pakiet integracyjny).
 | C05 | pigułka rozwinięta pełna = `198 + wysokość podpowiedzi` (zmierzone 236 i 255) | R7 · §3.11 | 5× | DOM | 🟢 | 6 |
 | C06 | czas prawo-przypięty do krawędzi treści; szewron odbiera 28 px | R9 | 5× | DOM | 🟢 | 6 |
 | C07 | szewron obecny ⟺ pigułka rozwinięta **pełna**; niezależnie od liczby minutników | R10 | 5× | DOM | 🟢 | 6 |
-| C08 | szewron **na liście składników** obraca się `⌄`↔`⌃` przy rozwinięciu i zwinięciu | G5 · **I-12** | 5× | DOM †† | 🟢 | 15 · **20 (decyzja D-15.3/A)** |
+| C08 | szewron **na liście składników** obraca się `⌄`↔`⌃` przy rozwinięciu i zwinięciu | G5 · **I-12** | 5× | DOM †† | 🟢 **7/7 na obu powierzchniach. Wiersz był mierzony od przeb. 15 — pod etykietą `D9`**, więc żaden przegląd pokrycia nie mógł go zobaczyć: to brak ADRESU pomiaru, nie brak pomiaru (ta sama klasa co H1–H3, H9). Etykiety przepisane na `D9 · C08` w przeb. 33 i **dołożona asercja, która dopiero czyni wiersz falsyfikowalnym**: dwie asercje na stałe wartości (`⌃` rozwinięta, `⌄` zwinięta) przechodzą także wtedy, gdy glif jest przypisany na sztywno w dwóch miejscach kodu i wcale się nie OBRACA — a „obraca się" jest dosłowną treścią wiersza. Trzecia pyta o RÓŻNICĘ: `⌃ → ⌄` po tapnięciu tego samego celu. Nie mylić z C07 — tamten mierzy szewron PIGUŁKI minutnika | 15 · 20 (decyzja D-15.3/A) · **33** |
 | C09 | kropka 8×8 przy > 60 s | R11 · I-19 | 5× | DOM | 🟢 | 6 |
 | C10 | ≤ 60 s: kropka 12×12, kolor akcentu, **puls 1×/s**, obrys pigułki 1,5 px | I-19 | 5× | WAAPI ※ | 🟢 **BIEG ZMIERZONY** — okno widoczne przez ~90 s w przeb. 18; przyrost animacji **1 300 ms** wobec zegara ściennego **1 303 ms**, 5/5 ramek ✽✽ | 12 · 13 · 17 · **18** |
 | C11 | ostatnie 10 s: ten sam kolor, **puls 2×/s** (eskalacja tempem, nie barwą) | I-20 · G3 | 5× | WAAPI ※ | 🟢 **BIEG ZMIERZONY** — przyrost **1 300 ms** wobec **1 308 ms**, 5/5 ramek; eskalacja tempem 1×/s → 2×/s przy identycznej barwie ✽✽ | 12 · 13 · 17 · **18** |
@@ -124,7 +135,7 @@ przygotowanie to jednostka 10 (pakiet integracyjny).
 | E3 | maks **2** markery na krok | A5 | 1× | DOM | 🟢 | 5 |
 | E4 | marker w opisie = `<mark>` z `box-decoration-break: clone`; łamie się z wierszem | R14 | 5× | oko | 🟢 | 7 |
 | E5 | marker w liście = kropkowane podkreślenie + kółko `i` **zaraz za nazwą** | C2 · §3.14 | 5× | DOM | 🟢 | 6 |
-| E6 | cel dotyku markera **44×44** wokół kółka 20 px (pełna wysokość wiersza) | G9 · R13 | 5× | DOM | 🟢 | 6 |
+| E6 | cel dotyku markera = **pełna szerokość wiersza × 24 px** (120 % wysokości kółka `i`), nadmiar 4 px po równo nad i pod wierszem; **checkbox zachowuje własny cel 44×44** | G9 · R13 · **U-7 (operator 2026-08-15)** | 5× | DOM + gest | 🟢 **PRZEPISANE i zmierzone w przeb. 30**: cel **296×24** przy wierszu 296 (360 px), 765×24 przy 844 — nad 2,00 / pod 2,00 na siedmiu ramkach. Do przeb. 29 wiersz brzmiał „44×44 wokół kółka" i **był zielony na oracle'u, który mierzył poprawnie cel uznany potem za zbyt wąski**: 20 px klikalne z 295 px wiersza. Nowy oracle mierzy GEST (`elementFromPoint`), nie prostokąt — środek ptaszka trafia w ptaszka, środek NAZWY trafia w cel markera. W orientacji poziomej oczekiwanie jest ODWRÓCONE: trafieniem ma być scrim „obróć telefon", bo tam interfejs jest z projektu niedostępny | 6 · **30** |
 | E7 | tooltip **296 px**, wsunięty o 16 względem kolumny treści, radius 12 | I-24 · R12 | 5× | DOM | 🟢 | 7 |
 | E8 | tooltip kotwiczy się **8 px pod wierszem**, który go wywołał | R12 | 5× | DOM | 🟢 | 7 |
 | E9 | wnętrze tooltipa: padding 14/12, odstęp 8 | R12 | 5× | DOM | 🟢 | 7 |
@@ -167,7 +178,7 @@ przygotowanie to jednostka 10 (pakiet integracyjny).
 | G07 | przycisk startu widoczny na **499**, ukryty na **500** | A12 · W§1 | próg | DOM | 🟢 | 3 |
 | G08 | landscape: scrim zakrywa overlay w całości | A13 · I-27 | land. | oko | 🟢 | 7 |
 | G09 | pod scrimem odliczanie **NIE zatrzymuje się** | A13 | land. | DOM† | 🟢 | 7 |
-| G10 | powrót do portretu zdejmuje scrim **bez utraty stanu** | A13 | land. | DOM‡ | 🟢 | 8 |
+| G10 | powrót do portretu zdejmuje scrim **bez utraty stanu** | A13 | land. | DOM‡ | 🟢 **PRZEMIERZONE w przeb. 34 na OBU powierzchniach, po dwudziestu sześciu przebiegach bez dotknięcia.** Sonda `MP_MATRYCA.g10()` w `matrix.html` i `matrix-min.html`: ramka 844×390 → 390×844 → 844×390. Wynik identyczny na obu: scrim `true → false → true`, `krok 4 z 9` bez zmiany, jeden minutnik z `pozostalo 1934` bez zmiany, zaznaczony `skrobia-ziemniaczana` bez zmiany, **tożsamość węzła korzenia zachowana** (przemontowanie zerwałoby minutniki), szerokość kolumny treści po obrocie **390** — czyli ramka naprawdę się obróciła, a nie tylko zgłosiła obrót. **Wiersz NIE był długiem pokrycia, wbrew klasyfikacji z przeb. 33:** przyrząd istniał w obu matrycach od przeb. 8, tyle że mieszka w RODZICU, a rejestr pokrycia widzi wyłącznie `sprawdz()` wewnątrz fixture'a. Rejestr był ślepy, nie wiersz pusty — patrz rozdział POKRYCIE | **34** |
 | G11 | mechanizmem jest CSS `@media (orientation: landscape)`, nie `orientation.lock()` | W§1 | land. | DOM | 🟢 | 7 |
 
 ## H · Testy negatywne (WYMAGANIA §6 — wykonać, nie założyć)
@@ -194,11 +205,17 @@ przygotowanie to jednostka 10 (pakiet integracyjny).
 | I1 | **zero błędów i ostrzeżeń konsoli** na każdej mierzonej szerokości | A10 | 5× | DOM | 🟢 ¶¶ | 3 |
 | I2 | zero błędów i ostrzeżeń w orientacji poziomej | A10 · A13 | land. | DOM | 🟢 | 3 |
 | I3 | zależność QR **zadeklarowana i obecna w artefakcie parsera**, nigdy zakładana z `global` | A10 · inw. 8 · **D-13.1/B** | 1× ¶ | DOM | 🟢 **D-13.1 wariant B WYKONANY i zmierzony, przeb. 28** (`qr.html`, ramki 991/992/1024). Cztery pytania osobno, wszystkie zielone: **zadeklarowana** (`MP.przepis.zaleznosci.qr` = `qrcode-generator@2.0.4 MIT`, `globalna:false`) · **obecna w artefakcie** (992 i 1024 rysują `<svg>` 192×192, viewBox 164, 1 ścieżka, `fill #2b2118`, `aria-label` ustawiony) · **`window` PUSTE** (`QrCreator` i `qrcode` = `undefined` na trzech ramkach) · **nie zakładana z globala** (dubler wstrzyknięty, `wywolan === 0` na trzech ramkach). Konsola na desktopie: **0 wpisów** — ostrzeżenie `[MP] brak QrCreator` zniknęło razem ze strażnikiem. Parser min. **39 369 zn.**, zapas do 50 000 = **10 631**. Baner licencyjny MIT przeżywa `terser -c -m` (zmierzone) | 16 · 19 · 20 · **28** |
-| I4 | ligatury Material używane przez runtime istnieją w żywym subsecie | A9 | 1× | plik+DOM | 🔴 **zbiór używanych ligatur PUSTY**; kontrakt meta zredagowany (pakiet §3c) | 11 · 15 |
-| I5 | rozmiar runtime'u < 40 000 znaków (limit twardy 50 000) | W§4 | 1× | DOM | 🟢 **ARTEFAKT: 39 346 zn. / 39 435 B [V] przeb. 28** — zielone na powierzchni zminifikowanej, czyli na tej, która pójdzie do embedu. Powierzchnia źródłowa (114 237 zn.) pada z definicji i tak ma być: do Webflow nie idzie źródło. **Jednostką wiersza są ZNAKI** (przeb. 19). Zapas do progu **654 znaki** — wariant (3) kosztował **308 zn. odczytanych z builda**, nie 140–200 z szacunku | 9 · 14 · 17 · 19 · **28** |
-| I6 | każda luka **G1–G12** jest w kodzie rozstrzygnięta i udokumentowana znacznikiem `// NIENARYSOWANE (Gn):` przy miejscu wykonania; dla luk rozstrzygniętych **zaniechaniem** znacznik stoi tam, gdzie stanąłby kod, i wskazuje asercję negatywną jako właściwy dowód. Wiersz dotyczy **zamkniętej listy luk zachowań z INTERAKCJE §4**; braki szczegółu i brzmienia są poza jego zakresem | W§5 · REJESTR-LUK | 1× | DOM §§ | 🟢 **pokrycie 12/12** | 11 · 14 · **20 (decyzja D-14.1/B)** |
+| I4 | ligatury Material używane przez runtime istnieją w żywym subsecie | A9 | 5× · land. | plik+DOM | 🟢 **7/7 ramek na OBU powierzchniach, z kontrolą ujemną: trzy ligatury po 20,0 px przy stopniu 20 (jeden glif), nazwa spoza subsetu 365,6 px (słowo).** Czerwień z przeb. 31 była defektem PRZYRZĄDU i tak została opisana — sonda szerokości była synchroniczna, a `@font-face` z CDN-u wymaga rundy po sieci, więc trzy pierwsze ramki mierzyły przed dojazdem pliku. Naprawa: sonda odroczona za bramkę `document.fonts.load()` na trzy wagi, wołana z ogona bloku pomiarowego (bramka nie może stać na początku — arkusz z `@font-face` powstaje dopiero przy pierwszym `otworz()`). **Druga usterka przyrządu wyszła dopiero po naprawie pierwszej i jest ciekawsza:** pierwsza wersja sondy sprawdzała `documentElement.contains(korzeń)`, a `zamknij()` NIE odpina overlaya — zdejmuje `data-otwarty` i chowa go CSS-em. Warunek przechodził, sonda mierzyła w niewyrenderowanym poddrzewie i wszystkie siedem ramek dało `0/0/0 px`. Zieleń z niczego złapała dopiero **dolna granica 8 px** wprowadzona przy tej samej naprawie; przy dawnym warunku `w > 0` zero by ją przeszło i wiersz zzieleniałby na pustce. Kryterium jest teraz `getClientRects().length` — pytanie o RYSOWANIE, nie o rodzica. Bramka raportuje też `wynik.bramkaFontu` (`wczytanych krojów: 6 · check() tak` na czternastu ramkach), żeby „font wczytany” dało się odróżnić od „przeglądarka nie ma API” bez wnioskowania z szerokości glifu | 11 · 15 · 31 · **32** |
+| I5 | rozmiar runtime’u **< 45 000 znaków** (WYM **v1.7**, limit twardy 50 000) | W§4 | 1× | DOM | 🟢 **ARTEFAKT: 39 346 zn. / 39 435 B [V] przeb. 28** — zielone na powierzchni zminifikowanej, czyli na tej, która pójdzie do embedu. Powierzchnia źródłowa (114 237 zn.) pada z definicji i tak ma być: do Webflow nie idzie źródło. **Jednostką wiersza są ZNAKI** (przeb. 19). Zapas do progu **654 znaki** — wariant (3) kosztował **308 zn. odczytanych z builda**, nie 140–200 z szacunku · **PRÓG PODNIESIONY 40 000 → 45 000 (D-28.1, operator 2026-08-15; WYM v1.7, nowy hash w STAN).** Przemierzone w przeb. 30 po zmianie pliku wiążącego, nie przed: artefakt **39 536 zn., zapas 5 464** na 7 ramkach. Powierzchnia źródłowa dalej pada z definicji (116 838 zn.) i tak ma być. **Kolejność była wiążąca** — najpierw §4 wymagania, potem asercja, potem pomiar; asercja podniesiona wcześniej mierzyłaby liczbę, której wymaganie nie zna | 9 · 14 · 17 · 19 · **28** · **30** |
+| I6 | każda luka **G1–G12** jest w kodzie rozstrzygnięta i udokumentowana znacznikiem `// NIENARYSOWANE (Gn):` przy miejscu wykonania; dla luk rozstrzygniętych **zaniechaniem** znacznik stoi tam, gdzie stanąłby kod, i wskazuje asercję negatywną jako właściwy dowód. Wiersz dotyczy **zamkniętej listy luk zachowań z INTERAKCJE §4**; braki szczegółu i brzmienia są poza jego zakresem | W§5 · REJESTR-LUK | 1× | DOM §§ | 🟢 **ZMIERZONE 7/7 ramek na obu powierzchniach, przeb. 33 — do tego przebiegu wiersz stał zielony na samej lekturze.** „Pokrycie 12/12" z przeb. 20 było zliczeniem wykonanym raz, ręcznie, i przez trzynaście przebiegów nikt go nie powtórzył; nie istniał stan, w którym wiersz by spadł. Asercja pobiera **plik źródłowy jawnie** (`../tryb-gotowania.js`), a nie artefakt załadowany do ramki — i to jest różnica wobec I5, celowa i przeciwna: I5 ma czytać to, co POJEDZIE do embedu, więc na powierzchni zminifikowanej czyta `min.js`; I6 pyta, czy decyzje o lukach są udokumentowane w repozytorium, a minifikator wycina komentarze, więc ten sam pomiar na `min.js` odpowiadałby „czy komentarze usunięto" (usunięto), nie „czy luki rozstrzygnięto. Zmierzone: **G1×1 G2×1 G3×1 G4×1 G5×3 G6×1 G7×2 G8×1 G9×1 G10×1 G11×3 G12×1** · lista **ZAMKNIĘTA** (zero znaczników spoza G1–G12) · **kontrola pozytywna ekstraktora**: czyta znacznik ZBIORCZY („G3, G4" stoi w jednym miejscu, bo obie luki wykonuje ta sama linia) i pojedynczy — bez niej ekstraktor zgłaszałby brak G4 przy poprawnym kodzie | 11 · 14 · 20 (decyzja D-14.1/B) · **33** |
 | I7 | każdy zamiennik tokenu niesie **opis migracji w danych** (`TOKENY[i][2]`) — nazwa zmiennej Webflow albo jawne uzasadnienie jej braku; zero definicji `--mp-*` spoza listy | STAN piny · **D-kształt-builda/3** | 1× | DOM | 🟢 **wariant (3) WYKONANY i zmierzony, przeb. 28: 6 asercji × 7 ramek × 2 powierzchnie, zero padnięć.** (a) 10/10 tokenów z opisem w `t[2]` · (a) **kontrola pozytywna walidatora: odrzuca 12/12** pustych, białych, placeholderowych i nie-stringów · (a′) każdy opis OBECNY w pobranym artefakcie, nie tylko w obiekcie · (b) zero definicji `--mp-*` spoza listy · (c) **zero linii tokenu z komentarzem `staging:`** — informacja przeniesiona, nie skopiowana. Nazwy zmiennych ODCZYTANE z witryny (33 kolory) [V], nie przepisane z Figmy | 9 · 17 · 19 · 20 · **28** |
+| I8 | **obie powierzchnie pytają o to samo**: zbiory `wynik.pokrycie` są RÓWNE, a żadna asercja obecna w powierzchni pełnej nie jest nieobecna w zminifikowanej | POKRYCIE (przeb. 33) · **inw. 0b** | 1× ¶¶¶ | DOM | 🟢 **ZAŁOŻONE I ZMIERZONE w przeb. 34, przyrząd `harness/pokrycie.html`.** Obie powierzchnie ładowane same-origin, obok siebie, w ramkach 360×780, **pod jedną pieczęcią** — inaczej różnica opisywałaby dwie epoki cache'u, nie dwie powierzchnie. Zmierzone: **zbiory równe, 193 = 193**, `tylkoPelna` i `tylkoMin` puste, konsola 0/0. **Reguła jest KIERUNKOWA, nie symetryczna:** brak asercji w MIN = defekt twardy (to jest stan, który ukrywał się dziesięć przebiegów na artefakcie jadącym do embedu), duplikat w MIN = dopuszczalny, bo dwa egzemplarze stoją w dwóch stanach powierzchni i mierzą więcej, nie mniej. Zmierzone `brakWMin: []` [V]. **Kontrola ujemna na KOMPARATORZE, nie na powierzchni** (podstawiony identyfikator `ZZ99-kontrola-ujemna` musi zostać zobaczony — `falsyfikowalny: true`) plus kontrola dodatnia (zbiór porównany sam ze sobą = równy). Bez pierwszej „zbiory równe" znaczyłoby tylko tyle, że coś zwróciło pustą listę. **Wiersz nie zawiera listy nazw** — reguła kierunkowa nie potrzebuje rejestru wyjątków, który zestarzałby się po cichu | **34** |
 
+| I9 🔴 od przeb. 37 | **matryca umie SPAŚĆ**: dla każdej mutacji z katalogu `MP_MUTACJA` asercja deklarowana jako cel spada, na OBU powierzchniach | MUTACJA (przeb. 34, kolejka poz. 1) · **inw. 0b** | 1× ¶¶¶¶ | DOM | 🟢 **ZAŁOŻONE I ZMIERZONE w przeb. 35, przyrząd `harness/mutacja.html` + blok `MP_MUTACJA` w obu fixture’ach.** Osiem mutacji psujących PRODUKT (arkusz runtime’u albo publiczną funkcję parsera), nigdy przyrząd: `M1` `--mp-bottom-h` publikuje stałe 80px · `M2` BOTTOM z dopełnieniem 20px · `M3` strzałka wstecz 40×40 · `M4` pigułka zwinięta 44px · `M5` `<mark>` na `display:block` · `M6` badge czasu 30px · `M7` TOP bez dopełnienia dolnego · `M8` nagłówek ODBUDOWANY (ten sam napis, inny węzeł). **Zmierzone: 8/8 ZABITYCH na powierzchni pełnej i 8/8 na zminifikowanej**, zero tautologii, zero mutacji bez efektu, liczby ubocznych padnięć identyczne na obu (1/16/1/9/2/1/2/0) [V]. **Trzy werdykty, nie dwa** – `ZERO EFEKTU` (nie spadło nic) jest zdaniem o MUTACJI, nie o wierszu, i nie wolno go liczyć jako tautologii: to ten sam fałszywy alarm co „zero padnięć na wierszu, o który się nie pyta”. **Kontrola ujemna na KOMPARATORZE** (linia bazowa z jedną przewróconą asercją musi zostać zobaczona co do nazwy – `falsyfikowalny: true`) plus dodatnia (baza porównana sama ze sobą = zero nowych upadków). **Wiersz spada**, gdy którakolwiek mutacja skończy się `TAUTOLOGIA`, `ZERO EFEKTU` albo `NIE WESZŁA`. **BATCH 2 (przeb. 35, jednostka 2): katalog rozszerzony do 16 mutacji klasy „nieobecność i liczba”. Pierwszy pomiar dał 15/16 — `M12-iframe` = ZERO EFEKTU, wiersz był przez to CZERWONY przez jedną jednostkę.** Diagnoza: `B15` mierzy PRZED pierwszym `pokazKrok()`, a `M12` wstrzykiwało `<iframe>` dopiero w opakowaniu `pokazKrok()` – w chwili pomiaru uszkodzenia nie było. **Zdanie o mutacji, nie o wierszu**: naprawiono MUTACJĘ (flaga `odOtwarcia`, wyłącznie dla `M12` — włączenie jej dla `M9`–`M11` przesunęłoby moment uszkodzenia i zerwało porównywalność), `B15` nietknięte. **Przemiar (jednostka 4): 16/16 ZABITYCH na OBU powierzchniach, `ok: true`**, uboczne 1/16/1/9/2/1/2/0/0/2/0/3/9/4/0/0 identyczne co do sztuki na pełnej i zminifikowanej [V]. **BATCH 3 (przeb. 36): katalog rozszerzony do 24 mutacji klasy CZASU i STANU** – `M17` puls końcówki zwolniony do 1×/s · `M18` puls biegnie po 0:00 · `M19` ostatnia minuta pulsuje od razu 2×/s · `M20` kropka pulsuje już „w toku” · `M21` czas przy 0:00 zostaje atramentem · `M22` limit minutników podniesiony do 3 · `M23` zapis sesji nie dolatuje do `localStorage` · `M24` `historia.wpis()` zawsze `true`. **Zmierzone: 24/24 ZABITYCH na OBU powierzchniach, `ok: true`, zero tautologii, zero bez efektu, zero urwań** [V]; uboczne 1/16/1/9/2/1/2/0/0/2/0/3/9/4/0/0/0/0/0/0/0/11/0/0 **identyczne co do sztuki na obu** – pierwsze szesnaście liczb niezmienione względem przeb. 35, czyli batch 3 i dwie naprawy przyrządu nie ruszyły porównywalności. **Siedem z ośmiu nowych mutacji ma ZERO ubocznych** (`M17`–`M21`, `M23`, `M24`) – każdy z wierszy `C09`, `C10`, `C11`, `C12`, `W64`, `F8`, `F4` jest JEDYNYM oknem na swój defekt. **Pierwszy pomiar batcha 3 dał 23/24 z werdyktem TAUTOLOGIA na `M23`→`F8` i to była nieprawda o wierszu**: blok pomiarowy wywracał się wyjątkiem `null.querySelector` PRZED asercją celu (`kartaWzn` nie istnieje, gdy wznowienie zawiodło), więc cel nie spadł, bo nigdy nie zabrał głosu. Stąd **PIĄTY werdykt `URWANIE`** i naprawa dwóch dereferencji w przyrządzie (F8 i blok S4) – pytania wierszy bez zmian, zmienia się wyłącznie to, że brak węzła jest PADNIĘCIEM, a nie wyjątkiem. **Wiersz spada** teraz także wtedy, gdy którakolwiek ramka mutanta urwie się przed końcem (pozycja `urwania` weszła do `ok`). **BATCH 4 (przeb. 36, jednostka 5): katalog rozszerzony do 32 mutacji klasy DANYCH i PARSERA** — `M25` czas skaluje się z porcjami · `M26` przybywa krok · `M27` minutnik mnoży się przez porcje · `M28` `zaladuj()` dokłada węzeł do `body` · `M29` `zaladuj()` rusza `document.title` · `M30` inny klucz `localStorage` · `M31` parser gubi przelicznik kilogramów · `M32` obcy nośnik `text/plain` wciągany do modelu. **To jest rodzina TESTÓW NEGATYWNYCH** (`H1`, `H2`, `H3`, `H5`, `H6`, `A4`, `A10`) — asercji o tym, czego robić NIE WOLNO, czyli takich, które przechodzą także wtedy, gdy nie mierzą niczego. **Zmierzone: 32/32 ZABITYCH na OBU powierzchniach, `ok: true`, zero tautologii, zero urwań** [V]; uboczne identyczne co do sztuki na obu, sześć z ośmiu nowych mutacji ma ZERO ubocznych. **Pierwsze dwa pomiary dały 30/32** — `M28` i `M29` wychodziły ZERO EFEKTU, dwa razy z rzędu i z dwóch RÓŻNYCH przyczyn: najpierw zaczep siedział na `podzielWszystkieKarty()`, a `H5` mierzy wokół `zaladuj()`; po przepięciu mutacja była IDEMPOTENTNA, więc dokładała węzeł raz — w rozgrzewce fixture'a, PRZED zdjęciem `przedBody`. **Obie poprawki poszły w MUTACJĘ, wiersze `H5` nietknięte**. **BATCH 5 (przeb. 37, jednostka 1): katalog rozszerzony do 40 mutacji klasy WEJŚCIA USZKODZONEGO** — `M33` parser MILCZY na `#klucz` bez odpowiednika · `M34` zgłasza brak odpowiednika także dla kluczy istniejących · `M35` `krótko:` zostaje w treści odpowiedzi · `M36` brak `krótko:` czytany jako pusty napis, nie jako brak · `M37` pytanie wraca w środku własnej odpowiedzi · `M38` pusta linia przestaje rozdzielać wpisy · `M39` przechowywanie bez czasu przestaje ostrzegać · `M40` przekształcenie zjada treść węzła serwerowego. **`A3`, `A11` i `A12` to wiersze o PARZE** (ostrzegać wtedy i tylko wtedy, gdy wejście jest zepsute), więc `A3` dostał mutację na KAŻDĄ stronę pary: `M33` na ciszę i `M34` na fałszywy alarm — wiersz sprawdzany tylko od strony ciszy przechodzi również wtedy, gdy ostrzega zawsze. **Zmierzone: 40/40 ZABITYCH na OBU powierzchniach, `ok: true`, zero tautologii, zero bez efektu, zero urwań** [V]; uboczne identyczne co do sztuki na obu (1/16/1/9/2/1/2/0/0/2/0/3/9/4/0/0/0/0/0/0/0/**12**/0/0/0/0/0/0/0/0/2/4/0/4/0/0/1/0/0/2), **pięć z ośmiu nowych mutacji ma ZERO ubocznych** (`M33`, `M35`, `M36`, `M38`, `M39`). **Jedyna zmiana w pierwszych 24 liczbach jest wytłumaczona i zamierzona**: `M22` ma 12 ubocznych zamiast 11, bo jego cel został ZAOSTRZONY (patrz `I12`) i `H7` przeszło z trafionych do ubocznych — liczba ruszyła się dlatego, że zmieniło się PYTANIE, a nie produkt. **Pudło zaczepu `M40` złapane STATYCZNIE, przed uzbrojeniem przeglądarki**: parser zdejmuje `data-mp-surowe` w chwili przejęcia węzła na pierwszą kartę, więc selektor po `oryg.apply()` nie trafiłby w nic i mutacja wyszłaby ZERO EFEKTU; referencja brana przed przekształceniem | **35** |
+| I10 🔴 od przeb. 37 | **żadna mutacja nie URYWA bloku pomiarowego**: każda ramka mutanta raportuje TYLE SAMO asercji co linia bazowa, na obu powierzchniach | mutacja (przeb. 36) · **inw. 0b** | 1× | DOM | 🟢 **ZAŁOŻONE I ZMIERZONE w przeb. 36.** Powód założenia jest zmierzony, nie przewidziany: `M22-limit-trzy` wychodził werdyktem **ZABITA** i jednocześnie urywał blok **131 asercji przed końcem** (301 z 432), bo przy limicie 3 dialog S4 się nie otwiera, a `MP.tryb.dialog.el()` zwracało `null`. Cel padł, zanim blok umarł – więc werdykt mówił prawdę, a strona meldowała `ok: true`, mając ramkę, w której jedna trzecia asercji nigdy nie zabrała głosu. **To jest ta sama klasa fałszu co `80 = 0 + 80`: przyrząd twierdzi coś, czego nie zmierzył.** Drugi objaw tej samej przyczyny: liczba ubocznych padnięć `M22` różniła się między powierzchniami (6 vs 5) – różnica mówiła o MIEJSCU ZGONU bloku, nie o produkcie; po naprawie jest równa (11 = 11) [V]. Mierzone przez zbiór długości `asercjiRazem` we wszystkich ramkach mutantów: **jedna wartość = brak urwań** (pełna 427, zminifikowana 432) [V] **PRZESZŁO NA CZERWONO W PRZEB. 37 (jednostka 3) i to jest wynik pomiaru, nie regres**: batch 6 (`M41`–`M44`, klasa NIEOBECNOŚCI WĘZŁA) daje **4 URWANIA na 4 mutacje, na obu powierzchniach** [V]. Utracone asercje: `M41` 160 · `M42` 143 · `M43` 121 · `M44` 28 (powierzchnia pełna, baza 427); na zminifikowanej ten sam wzorzec z offsetem +2/+3 (baza 432). **Naprawa jest jedna i wspólna dla `I9`, `I10` i `I13`** — patrz `I13` | **36 → 🔴 37** |
+| I11 | **obie powierzchnie mierzą TEN SAM zbiór odległości**: każdy klucz `wynik.odleglosci` obecny w źródle jest obecny w artefakcie | inwariant 0aa + sito dereferencji (przeb. 36) · **inw. 0b** | 1× | DOM | 🟢 **ZAŁOŻONE NA CZERWONO I ZAMKNIĘTE NA ZIELONO w tym samym przebiegu 36 (jednostki 3 i 4).** Zmierzone na żywo przez `pokrycie.html` (jedyna powierzchnia widząca obie naraz): **źródło publikuje 50 kluczy odległości, artefakt 33 — siedemnaście odległości mierzy WYŁĄCZNIE powierzchnia źródłowa** [V]: `baner.gap` · `baner.glif.bok` · `baner.padding` · `baner.promien` · `dialog.cta.promien` · `dialog.gap` · `dialog.padding` · `dialog.promien` · `meta.gap` · `meta.kol-gap` · `meta.padding-x` · `meta.promien` · `meta.wysokosc` · `selektor.gap` · `selektor.padding` · `selektor.promien` · `selektor.przycisk.bok`. Blok literalny (18 pozycji: belka, TOP, nawigacja, `stos`, wstecz, zamknij, CTA) oraz grupa `skl.*` są na OBU — rozjazd dotyczy czterech grup dopisywanych warunkowo. **`tylkoWMin` puste**, więc kierunek jest jednoznaczny: artefakt mierzy MNIEJ, a to artefakt jedzie na stronę. **`I8` tego nie widzi z założenia** — porównuje zbiory identyfikatorów WIERSZY, a sonda odległości nie jest wierszem; to ta sama klasa fałszywej zieleni co w przeb. 32 (zielono, bo matryca o to nie pyta). **Naprawa nie należy do tego wiersza**: trzeba domierzyć siedemnaście odległości w `fixture-min.html`, a potem przemierzyć inwariant 0aa na artefakcie — do ogniwa 37. Uwaga metodyczna: sito składniowe szacowało 45/26, pomiar na żywo dał 50/33 — **część kluczy dopisuje się w czasie wykonania i grep ich nie widzi**; prawdą jest pomiar. **DOMIAR WYKONANY (jednostka 4): cztery grupy przeniesione ze źródła do `fixture-min.html` DOSŁOWNIE, razem z kontekstem** (otwarcie ekranu startowego, otwarcie i zamknięcie S2, pokazanie i ukrycie banera, obie gałęzie `catch`) — linia bez otoczenia mierzyłaby inny stan overlaya i dałaby liczby, które WYGLĄDAJĄ na pomiar. **Przemiar: 50 = 50, `brakWMin: []`, `tylkoWMin: []`, `ok: true`** [V]. **Inwariant 0aa na artefakcie: zero rozjazdów na wszystkich 50 odległościach przez pięć szerokości portretowych**, przy `kolumnaTresci` 288/328/358/408/448 jako kontroli dodatniej — gdyby i ona wyszła równa, znaczyłoby to, że mierzymy zamrożoną ramkę [V]. Regresja artefaktu bez ruchu: 3024 × 7, 7 padnięć (`B24`), pokrycie 193, konsola 0; mutacja 24/24, zero urwań, uboczne co do sztuki niezmienione | **36** |
+| I12 | **cel każdej mutacji jest JEDNOZNACZNY**: `celAsercja` trafia w dokładnie JEDNĄ etykietę asercji linii bazowej, na obu powierzchniach | mutacja (przeb. 37) · **inw. 0b** | 1× | DOM | 🟢 **ZAŁOŻONE I ZMIERZONE w przeb. 37 (jednostka 2).** Komparator `mutacja.html` szuka PODCIĄGU, więc cel trafiający w kilka etykiet daje werdykt `ZABITA`, gdy padnie KTÓRAKOLWIEK z nich — zdanie o stopień słabsze, niż wygląda, i **niewidoczne w wyniku**. Zmierzone w przeb. 36: `M3-hit-area` trafiał w `B10`, `E6` i `F7` naraz, `M22-limit-trzy` w `F7` i `H7`; obie przechodziły jako zielone przez trzy przebiegi. `narzedzia/sprawdz-katalog-mutacji.py` to wypisywał, ale **jako UWAGĘ — czyli nie istniał stan, w którym cokolwiek by spadło**; tu pozycja `celeWielokrotne` wchodzi do `ok` strony, więc zaostrzenie celu przestaje zależeć od tego, czy ktoś przeczytał wydruk. Cele zaostrzone: `M3` → `B10: cel dotyku „←"`, `M22` → `F7: trzeci minutnik nie startuje`. **Zmierzone: `celeWielokrotne: []` i `ok: true` na obu powierzchniach** [V]. **Kontrola dodatnia na REALNYCH danych, nie na atrapie**: te same etykiety linii bazowej dają dla STARYCH celów 3 trafienia (`B10`+`E6`+`F7`) i 2 (`F7`+`H7`), czyli wiersz spadłby, gdyby cele zostały niezmienione — a dla nowych 1 i 1 [V]. **Skutek zaostrzenia jest zmierzony, nie założony**: `M22` ma teraz 12 ubocznych zamiast 11, bo `H7` przeszło z trafionych do ubocznych | **37** |
+| I13 | **blok pomiarowy PRZEŻYWA brak węzła**: usunięcie pojedynczego elementu z drzewa daje PADNIĘCIA asercji, nie urwanie ramki | sito dereferencji + mutacja (przeb. 37) · **inw. 0b** | 1× | DOM | 🔴 **ZAŁOŻONE NA CZERWONO w przeb. 37 (jednostka 3), z pomiaru.** `narzedzia/sito-dereferencji.py` wskazywał **41 miejsc**, w których asercja dereferencjonuje wynik `querySelector` bez guardu — ale sito daje WZORZEC, nie dowód. Batch 6 zamienił podejrzenie w pomiar: cztery mutacje `M41`–`M44` odbierają po JEDNYM węźle (`.mp-tryb__tooltip-zamknij`, `.mp-tryb__dialog-link`, `.mp-tryb__baner-akcja`, `.mp-tryb__meta-wartosc`) przez opakowanie `Element.prototype.querySelector` zwracające `null` dla dokładnie tego selektora — **najwierniejsza symulacja „element nie został wyrenderowany”; `display:none` tego NIE symuluje, bo węzeł dalej istnieje.** **Wynik: 4 URWANIA na 4, na obu powierzchniach** [V]. Brak jednego węzła kosztuje **160 / 143 / 121 / 28 asercji** (pełna, baza 427) i **162 / 145 / 123 / 28** (zminifikowana, baza 432) — czyli w najgorszym przypadku **37 % matrycy przestaje zabierać głos**, a strona meldowałaby wynik na podstawie tego, czego nie zmierzyła. **To defekt PRZYRZĄDU, nie produktu** — ta sama rodzina co `F8` i blok S4 w przeb. 36, tylko szersza. **Naprawa nie należy do tego wiersza i nie wolno jej robić hurtem:** każde miejsce wymaga wykazania, że przy zastępniku (odczepiony `div`) KAŻDA dotknięta asercja wychodzi FAŁSZ — zastępnik, który mógłby dać PRAWDĘ, jest gorszy od wyjątku. Cztery zmierzone miejsca: `fixture.html` linie **2661** (`.mp-tryb__tooltip-zamknij.click()`, 160 asercji), **2826** (`.mp-tryb__dialog-link.click()`, 143), **3112** (`.mp-tryb__baner-akcja.click()`, 121), **4325** (`.mp-tryb__meta-wartosc.textContent`, 28). **PIERWSZE MIEJSCE NAPRAWIONE I ZMIERZONE w tym samym przebiegu (jednostka 4): `M44` = ZABITA przy PEŁNEJ długości ramki na obu powierzchniach (427/427 i 432/432), urwania 4 → 3, uboczne pierwszych czterdziestu mutacji niezmienione co do sztuki** [V]. **Naprawa wymagała DWÓCH różnych zastępników i to jest wniosek do przeniesienia**: wartownika napisowego (`\u0000brak-wezla`) tam, gdzie pomiar czyta treść lub atrybut, i odczepionego `div`-a tam, gdzie pomiar potrzebuje ELEMENTU do `getComputedStyle`. **Pierwszy przemiar dał werdykt ZABITA przy ramce krótszej o 18 asercji** — trzecia dereferencja siedziała 190 linii dalej (`W33`/`W34`). **Miarą naprawy jest długość ramki równa bazie, nie werdykt**; gdyby pomiar patrzył tylko na werdykt, naprawa zostałaby uznana za zamkniętą. Zostają trzy miejsca; sito zeszło z 41 na **39** | — |
 ---
 
 ## W · Wykończenie powierzchni (klasa założona 2026-08-15, polecenie operatora)
@@ -227,13 +244,13 @@ i zdanie „wszystko jest pokryte" po raz pierwszy znaczą to samo. Odczyt z `ge
 | W02 | `BOTTOM`: **górna kreska 1 px, `secondary-text (h1)` #487622** (zieleń) | `7195:10948` | DOM | 🟢 zmierzone: `::before` 1 px `rgb(72, 118, 34)`; wysokość pasa NIETKNIĘTA (bottom = naw + stos) | 21 |
 | W03 | `BOTTOM`: cień `drop_shadow_ui` rzucany do góry | W§4 · dec. 11 | DOM | 🟢 (mierzy **B17**, tu tylko odsyłacz — nie duplikować) | 8 |
 | W04 | `←` (`7195:10949`): **obrys 1 px `primary-text` #3E2B22, promień 22, 44×44** — kółko | `7195:10949` | DOM | 🟢 zmierzone: dekl. `1px solid`, użyte 0.8px przy dpr 1,25 (przycięcie do piksela urządzenia), r22, 44×44 | 21 |
-| W05 | CTA „dalej": wypełnienie **`primary-cta` #CF411A** | `7290:10905` | DOM | 🟢 zmierzone: `rgb(207, 65, 26)` | 21 |
+| W05 | CTA „dalej": wypełnienie **`primary-cta` #E55529** | `7290:10905` | DOM | 🟢 zmierzone: `rgb(229, 85, 41)` · **D-27.1 WYKONANE, przeb. 30: `--mp-cta` #CF411A → #E55529, przemierzone `rgb(229,85,41)` na 7+7 ramkach** | 21 · **30** |
 | W06 | CTA „dalej": **promień 100**, padding 24/14, rozkład `justify-between` | `7290:10905` | DOM | 🟢 zmierzone: r100, padding 14/24, `space-between`, h48 | 21 |
 | W07 | CTA „dalej": **glif `arrow_forward` 20 px** po prawej stronie etykiety | `I7290:10905;6968:5090` | DOM | 🟢 zmierzone: glif 20 px, `left ≥ etykieta.right` | 21 |
 | W08 | CTA „dalej": tekst **DM Sans SemiBold 16**, kolor `white-off-bg` #FFFDFB | `I7290:10905;6968:5089` | DOM | 🟢 zmierzone: 600 / 16px / `rgb(255, 253, 251)` | 21 |
 | W09 | `belka`: wypełnienie **`white-off-80%` rgba(255,253,251,.8)** | `7212:10898` | DOM | 🟢 zmierzone: `color(srgb 1 0.992157 0.984314 / 0.8)` | 21 |
 | W10 | `belka`: efekt **BACKGROUND_BLUR r=8** (eksport MCP: `backdrop-blur 4px`) | `7212:10898` | DOM | 🟢 zmierzone: `blur(4px)` | 21 |
-| W11 | `×` w belce: **obrys 1,5 px `primary-cta` #CF411A, promień 100**, własne tło 80 % + rozmycie, glif `close` 20 px | `7283:10787` | DOM | 🟢 zmierzone: dekl. `1.5px solid`, użyte 0.8px (dpr 1,25 — patrz nota o gęstości), r100, tło 80 % + blur | 21 |
+| W11 | `×` w belce: **obrys 1,5 px `primary-cta` #E55529, promień 100**, własne tło 80 % + rozmycie, glif `close` 20 px | `7283:10787` | DOM | 🟢 zmierzone: dekl. `1.5px solid`, użyte 0.8px (dpr 1,25 — patrz nota o gęstości), r100, tło 80 % + blur · **D-27.1 WYKONANE, przeb. 30: `--mp-cta` #CF411A → #E55529, przemierzone `rgb(229,85,41)` na 7+7 ramkach** | 21 · **30** |
 | W12 | pasek postępu: tor **`beige-1-bg` #F1ECDF, promień 100**; wypełnienie `beige-3` #816D44, promień 100 | `7283:10791/10792` | DOM | 🟢 zmierzone: tor `rgb(241, 236, 223)` r100, wypełnienie `rgb(129, 109, 68)` r100 | 21 |
 | W13 | pigułka minutnika: promień **wg FORMY** — zwinięta **8** (`7254:10913`), rozwinięta **12** (`7195:11078`) | `7254:10913` · `7195:11078` | DOM | 🟢 zmierzone obie formy: zwinięta 8px, rozwinięta 12px (320/360/480) | 21 |
 | W14 | pigułka minutnika: **`drop_shadow_ui`** (0/−1 r2 α5 % + 0/−4 r8 spread −2 α10 %) — ten sam co B17 | `7254:10913` · styl | DOM | 🟢 zmierzone: `0,-1,2` + `0,-4,8,-2`, identycznie jak B17 | 21 |
@@ -247,10 +264,10 @@ i zdanie „wszystko jest pokryte" po raz pierwszy znaczą to samo. Odczyt z `ge
 | W23 | checkbox składnika: **obrys 1 px `primary-text` #3E2B22, promień 3**, 16×16 | `I7273:10794;7224:10912` | DOM | 🟢 zmierzone: dekl. `1px solid var(--mp-atrament)`, użyte 0.8px, `rgb(62,43,34)`, r3, 16×16 (było 1,5 px `beige-3` r4 — trzy rozjazdy po jednym stopniu, żaden rzucający się w oczy osobno) | 21 · 22 |
 | W24 | tekst składnika: styl **`Body Small`** — DM Sans **Regular 400**, 14, `primary-text`; interlinia 1,35 (18,9) wobec 19 w runtimie | `I7273:10794;7224:10913` | DOM | 🟢 zmierzone: 400 / 14px / **19** / `rgb(62,43,34)`. Runtime trzyma 19, bo skok 31 jest zmierzony w DWÓCH klatkach (§3.2, §3.12); asercja dopuszcza 18,8–19,1 i raportuje wartość — różnica wobec 1,35 wynosi 0,1 px | 21 · 22 |
 | W25 | kreska pod listą **skróconą** (`7195:10945`): 1 px `primary-text` #3E2B22 — w runtimie realizuje ją `border-top` wywoływacza, nie osobny element | `7195:10945` | DOM | 🟢 zmierzone: 0.8px (dpr) `rgb(62,43,34)`. Reguła **zawężona do tej ramki**: `.mp-tryb__linia` listy PEŁNEJ to inny, nieczytany węzeł i nie wolno jej przemalować tym odczytem | 21 · 22 |
-| W26 | etykieta „w tym kroku” (`7195:10936`): **OBECNOŚĆ**, styl `Caption` — Medium 500, 14/16, `primary-text` | `7195:10936` | DOM | 🟢⚠ zmierzone: „w tym kroku” 500 / **14**px / 16px / `rgb(62,43,34)` — **stopień WARUNKOWY, D-22.1**: `get_variable_defs` podaje `typo/Caption` = 12. Elementu **nie było w runtimie w ogóle** — uwaga z przeb. 21 o barwie `beige-3` dotyczyła nagłówka sekcji w liście PEŁNEJ | 21 · 22 |
+| W26 | etykieta „w tym kroku” (`7195:10936`): **OBECNOŚĆ**, styl `Caption` — Medium 500, 14/16, `primary-text` | `7195:10936` | DOM | 🟢 zmierzone: „w tym kroku” 500 / **14**px / 16px / `rgb(62,43,34)` — **stopień WARUNKOWY, D-22.1**: `get_variable_defs` podaje `typo/Caption` = 12. Elementu **nie było w runtimie w ogóle** — uwaga z przeb. 21 o barwie `beige-3` dotyczyła nagłówka sekcji w liście PEŁNEJ · **D-25.5 ROZSTRZYGNIĘTE (operator 2026-08-15): `typo/Caption` = 14. Stopień warunkowy staje się BEZWARUNKOWY — runtime stał przy 14 od początku, więc rozstrzygnięcie nie wymagało ANI JEDNEJ linijki kodu, tylko przemiaru. Przemierzone w przeb. 30** | 21 · 22 · **30** |
 | W27 | wiersz „zobacz pozostałe” (`7209:10899`): rozkład **`justify-between`**, `Body Small` 14, `primary-text` | `7209:10899` · `7195:10946` | DOM | 🟢 zmierzone: `space-between` / 14px / `rgb(62,43,34)`. Było `margin-left:auto` na glifie, czyli ten sam obraz przy `justify-content: normal` — wiersz pytał o regułę, której w kodzie nie było | 21 · 22 |
 | W28 | szewron przy „zobacz pozostałe” (`7304:13194`): **16 px**, `primary-text`. KRÓJ (`keyboard_arrow_down` vs substytut `⌄`) mierzy **B16**, nie ten wiersz | `7304:13194` | DOM | 🟢 zmierzone: 16px / `rgb(62,43,34)`, glif `⌄` (substytut — KRÓJ mierzy B16) | 21 · 22 |
-| W29 | **nagłówek „składniki”** (`7477:12562`) NAD ramką, w ramce zewnętrznej `7477:12561`: OBECNOŚĆ, `Caption` Medium 500, 14/16, `primary-text`, odstęp 8 do ramki | `7477:12562` | DOM | 🟢⚠ **wiersz założony i zmierzony w przeb. 22**: „składniki” 500 / **14**px / 16px / `rgb(62,43,34)`, odstęp 8 — **stopień WARUNKOWY, D-22.1** (jak W17 i W26). Elementu nie było w runtimie, a w matrycy nie było o niego pytania — przeb. 21 czytał ramkę wewnętrzną i nie wyszedł piętro wyżej | 22 |
+| W29 | **nagłówek „składniki”** (`7477:12562`) NAD ramką, w ramce zewnętrznej `7477:12561`: OBECNOŚĆ, `Caption` Medium 500, 14/16, `primary-text`, odstęp 8 do ramki | `7477:12562` | DOM | 🟢 **wiersz założony i zmierzony w przeb. 22**: „składniki” 500 / **14**px / 16px / `rgb(62,43,34)`, odstęp 8 — **stopień WARUNKOWY, D-22.1** (jak W17 i W26). Elementu nie było w runtimie, a w matrycy nie było o niego pytania — przeb. 21 czytał ramkę wewnętrzną i nie wyszedł piętro wyżej · **D-25.5 ROZSTRZYGNIĘTE (operator 2026-08-15): `typo/Caption` = 14. Stopień warunkowy staje się BEZWARUNKOWY — runtime stał przy 14 od początku, więc rozstrzygnięcie nie wymagało ANI JEDNEJ linijki kodu, tylko przemiaru. Przemierzone w przeb. 30** | 22 · **30** |
 | W30 | **nazwa kroku** (`7195:10930`): OBECNOŚĆ i treść z modelu; **DM Serif Display Regular 400, 22 px** (`typo/H4`), interlinia 1,1, `secondary-text (h1)` **#487622** | `7195:10930` · `7212:10899` | DOM | 🟢 **wiersz założony i zmierzony w przeb. 22** po etapie 0a: „przygotuj sos" wobec 9 tytułów w modelu, `DM Serif Display` 400 22px/24.2px `rgb(72,118,34)`. Runtime **nie renderował tytułu w ogóle**, choć parser go zwraca | 22 |
 | W31 | pigułka czasu (`7195:10931`): tło `beige-1-bg` #F1ECDF, wysokość 26, padding poziomy 12, **promień 13**, tekst `Body Small` 14 `primary-text` | `7195:10931` | DOM | 🟢 zmierzone: `rgb(241,236,223)` h26 p12 r13 14px. Wykończenie było poprawne PRZED przebiegiem 22 — wiersz zapisuje to jawnie, bo reguła pokrycia nie zna „widocznie dobrze" | 22 |
 
@@ -258,7 +275,7 @@ i zdanie „wszystko jest pokryte" po raz pierwszy znaczą to samo. Odczyt z `ge
 | W33 | glif meta: Material Symbols Outlined **Light 300**, **32 px**, `secondary-text (h1)` **#487622** (zieleń, nie atrament) | `7263:10717` | DOM | 🟢 zmierzone: 32px / 300 / `rgb(72,118,34)` / h32. KRÓJ mierzy B16 — runtime nie ma `@font-face`, rysuje substytut Unicode, a nazwa ligatury jedzie w `data-mp-ligatura` | 23 |
 | W34 | etykieta meta: **DM Sans SemiBold 600, 14 / 1,2 (16,8)**, `primary-text`, odstęp **8** od glifu | `7263:10719` | DOM | 🟢 zmierzone: 600 / 14px / 16.8px / `rgb(62,43,34)`, odstęp 8 | 23 |
 | W35 | blok selektora porcji (`7195:10911`): tło **`beige-1-bg` #F1ECDF**, promień **100**, padding 4, odstęp 16 | `7195:10911` | DOM | 🟢 zmierzone: `rgb(241,236,223)`, r100, p4, gap 16. Runtime rysował blok **bez tła i bez kapsuły** — geometria (192 px, G01) była zielona od przeb. 8, wykończenia nie pytał nikt | 23 |
-| W36 | przyciski `−`/`+` (`7263:10728`): **biel złamana #FFFDFB**, obrys **1,5 px `primary-cta` #CF411A**, promień **100**, 40×40 | `7263:10728` | DOM | 🟢 zmierzone: `rgb(255,253,251)`, dekl. 1,5 px `rgb(207,65,26)` (użyte 0,8 przy dpr), r100, 40×40. Było: tło beżowe, promień 8, **zero obrysu**. Rozmiar 40 zostaje wg C8 (dec. operatora) | 23 |
+| W36 | przyciski `−`/`+` (`7263:10728`): **biel złamana #FFFDFB**, obrys **1,5 px `primary-cta` #E55529**, promień **100**, 40×40 | `7263:10728` | DOM | 🟢 zmierzone: `rgb(255,253,251)`, dekl. 1,5 px `rgb(229,85,41)` (użyte 0,8 przy dpr), r100, 40×40. Było: tło beżowe, promień 8, **zero obrysu**. Rozmiar 40 zostaje wg C8 (dec. operatora) · **D-27.1 WYKONANE, przeb. 30: `--mp-cta` #CF411A → #E55529, przemierzone `rgb(229,85,41)` na 7+7 ramkach** | 23 · **30** |
 | W37 | etykieta „N porcji": **SemiBold 600, `typo/H6` = 18 px**; wszystkie 7 odmian mieszczą się w polu 72 px | `7263:10730` | DOM | 🟢 zmierzone: 600 / 18px; szerokości odmian **66,70,71,72,65,66,64** — „4 porcje" wypada **dokładnie 72**, czyli tyle, ile ma węzeł Figmy. Było 16 px | 23 |
 | W38 | **tytuł ekranu** (`7195:10902`): styl **H4** — DM Serif Display Regular 400, **22/1,1**, `secondary-text (h1)` #487622, **wyśrodkowany** | `7195:10902` | DOM | 🟢 zmierzone: `DM Serif Display` 400 22px/24.2px `rgb(72,118,34)` center. Było **DM Sans Bold 700, atrament, do lewej** — ten sam napis rangi co nazwa kroku (W30), narysowany innym krojem, bo o krój tytułu EKRANU nikt nie pytał | 23 |
 
@@ -273,34 +290,44 @@ i zdanie „wszystko jest pokryte" po raz pierwszy znaczą to samo. Odczyt z `ge
 | W49 | baner S3 (`7196:10945`): wypełnienie **`beige-1-bg` #F1ECDF**, promień **12**, padding **16**, układ kolumnowy, odstęp **12** | `7196:10945` | DOM | 🟢 zmierzone (7+7): `rgb(241,236,223)` r12, lico 16/16, `column`, gap 12. Jedyny z czterech wierszy banera, w którym runtime miał rację — i **dlatego był potrzebny**: `W.wnetrze`/`W.blok` to zmienne wspólne z pigułką, więc zgodność wynikała z cudzej liczby, nie z odczytu banera. Wiersz przypina ją do TEGO węzła | 25 |
 | W50 | baner S3: **efekt `drop_shadow_ui`** — `0/−1 r2 α5 %` + `0/−4 r8 spread −2 α10 %`, baza #3E2B22 (rzucany DO GÓRY), ten sam styl nazwany co B17/W14 | `7196:10945` · styl | DOM | 🟢 zmierzone (7+7): `rgba(62,43,34,0.05) 0 −1px 2px 0, rgba(62,43,34,0.1) 0 −4px 8px −2px`. Było: **żadnego `box-shadow`** — element rysowany, wykończenia brak. Ta sama klasa co pas dolny bez tła i jak tamta niewidoczna dla wierszy o układzie. Asercja porównuje **cały ciąg**, bo pytanie „czy jest cień" przepuściłoby jedną warstwę z dwóch | 25 |
 | W51 | treść banera (`7202:10893`): **DM Sans Regular 400, `typo/Body small` 14**, interlinia 1,35, `primary-text` #3E2B22, pełna szerokość | `7202:10893` | DOM | 🟢 zmierzone (7+7): 400 / 14px / 19 / `rgb(62,43,34)`, szerokość = lico banera. Barwa dziedziczona z korzenia overlaya — wiersz pyta o WARTOŚĆ u elementu, nie o zapis w arkuszu, więc zmiana korzenia go przewróci | 25 |
-| W52 | wiersz akcji (`7209:10922`): odstęp **8**, `items-center`; glif `refresh` rysowany na **20 px**; napis „sprawdź ponownie" **`primary-cta` #CF411A**, Regular 400, 14/1,35, **bez podkreślenia** | `7209:10922` · `7202:10894` · `7202:10897` | DOM | 🟢 zmierzone (7+7), dwa wiersze asercji. Trzy rozjazdy naraz: glif **16 px w pudełku 20** (pudełko mierzy F10 i było zielone — sam glif nie), barwa `color:inherit` czyli **atrament zamiast CTA** (potwierdzone DWOMA wiązaniami: napis `7202:10897` i ramka glifu `7202:10894`), oraz **podkreślenie bez źródła** — wynalazek runtime'u, którego nie mierzył żaden wiersz. Zdjęte; skutek a11y na liście decyzji, **D-25.3** | 25 |
+| W52 | wiersz akcji (`7209:10922`): odstęp **8**, `items-center`; glif `refresh` rysowany na **20 px**; napis „sprawdź ponownie" **`primary-cta` #E55529**, Regular 400, 14/1,35, **bez podkreślenia** | `7209:10922` · `7202:10894` · `7202:10897` | DOM | 🟢 zmierzone (7+7), dwa wiersze asercji. Trzy rozjazdy naraz: glif **16 px w pudełku 20** (pudełko mierzy F10 i było zielone — sam glif nie), barwa `color:inherit` czyli **atrament zamiast CTA** (potwierdzone DWOMA wiązaniami: napis `7202:10897` i ramka glifu `7202:10894`), oraz **podkreślenie bez źródła** — wynalazek runtime'u, którego nie mierzył żaden wiersz. Zdjęte; skutek a11y na liście decyzji, **D-25.3** · **D-27.1 WYKONANE, przeb. 30: `--mp-cta` #CF411A → #E55529, przemierzone `rgb(229,85,41)` na 7+7 ramkach** | 25 · **30** |
 | W53 | zakreślenie `<mark>` w opisie kroku: tło **`primary text` #3E2B22** — zakreślenie jest CIEMNE, nie jasne | `7231:10894` (SPEC §3.13) | DOM | 🟢 zmierzone (7+7): `rgb(62,43,34)`. Było `beige-1` #F1ECDF, czyli **odwrotność obrazu**. Prostokąt `marker — cel koloru` ma wypełnienie `primary text` z `mix-blend-multiply`; blend NIE przechodzi do CSS-a, bo w Figmie leży POD tekstem, a `<mark>` tekst ZAWIERA — multiply zmieszałby wybitą biel z tłem i skasował ją. Multiply #3E2B22 na `white-off-bg` daje ≈#3E2B22, więc płaskie wypełnienie odtwarza skutek. **Mierzymy skutek, nie mechanizm** | 25 |
 | W54 | tekst w zakreśleniu wybity **`white full bg` #FFFFFF** | `7229:10907` (wiązanie na frazie) | DOM | 🟢 zmierzone (7+7): `rgb(255,255,255)`. Osobny wiersz od W53 celowo: samo ciemne tło bez wybicia tekstu daje **ciemne na ciemnym**, czyli stan gorszy niż przed poprawką — kontrast jest tu własnością PARY. Biel jest **związana ZMIENNĄ**, nie surowa (odróżnia to ten przypadek od W46) | 25 |
 | W55 | pudełko dialogu S2/S4 (`7196:10925`): wypełnienie **`white full bg` #FFFFFF**, promień **16** | `7196:10925` | DOM | 🟢 zmierzone (7+7): `rgb(255,255,255)` r16. Było: biel ZŁAMANA #FFFDFB i promień **12** z komentarzem „NIENARYSOWANE: promienia dialogu plik nie podaje". Komentarz był nieprawdą o PLIKU — `get_design_context` zwraca `rounded-[16px]` wprost. **Trzeci raz ten sam kształt pomyłki** (W43, W45): brak odczytu zapisany jako brak danych | 25 |
 | W56 | tytuł dialogu (`7196:10926`): **DM Sans SemiBold 600**, `typo/H6` = **18**, interlinia 1,2 → 22, `primary-text` | `7196:10926` | DOM | 🟢 zmierzone (7+7): 600 / 18px / 22. Stopień i interlinia były trafione, **waga nie**: `<h2>` bierze z przeglądarki 700 i nikt o to nie pytał. Uwaga do D-22.1: podpowiedź w kodzie mówi `typo/H6, 24`, a zmienna mówi **18** — trzeci pomiar potwierdzający, że fallback kłamie systemowo | 25 |
-| W57 | CTA dialogu (`7291:10917`) jest instancją `cta — cta`: **`primary-cta` #CF411A**, pigułka **r100**, SemiBold **600**, 16/20, napis `white-off-bg` #FFFDFB | `7291:10917` | DOM | 🟢 zmierzone (7+7): `rgb(207,65,26)` r100 600/16px/20. Było: **atrament #3E2B22, promień 8, waga odziedziczona** — przycisk zbudowany osobno zamiast odwzorowania tej samej instancji co „dalej" w pasie dolnym (W05). Wysokość 48 zostaje i **nie jest dublowana** — mierzy ją F7; w Figmie wychodzi ze składu 14+20+14, więc centruję flexem, nie interlinią | 25 |
+| W57 | CTA dialogu (`7291:10917`) jest instancją `cta — cta`: **`primary-cta` #E55529**, pigułka **r100**, SemiBold **600**, 16/20, napis `white-off-bg` #FFFDFB | `7291:10917` | DOM | 🟢 zmierzone (7+7): `rgb(229,85,41)` r100 600/16px/20. Było: **atrament #3E2B22, promień 8, waga odziedziczona** — przycisk zbudowany osobno zamiast odwzorowania tej samej instancji co „dalej" w pasie dolnym (W05). Wysokość 48 zostaje i **nie jest dublowana** — mierzy ją F7; w Figmie wychodzi ze składu 14+20+14, więc centruję flexem, nie interlinią · **D-27.1 WYKONANE, przeb. 30: `--mp-cta` #CF411A → #E55529, przemierzone `rgb(229,85,41)` na 7+7 ramkach** | 25 · **30** |
 | W58 | „wyjdź mimo to" (`7196:10931`): **`primary-text` #3E2B22**, **wyśrodkowany** na pełnej szerokości, **bez podkreślenia**, 14/1,35 | `7196:10931` | DOM | 🟢 zmierzone (7+7): `rgb(62,43,34)` · `center` · `none` · szerokość = lico dialogu. Było `beige-3` #816D44, do lewej, podkreślone — **trzy rozjazdy w jednym elemencie**, żaden nigdy niemierzony. Zachowanie (link, nie drugi przycisk) bez zmian. Skutek: akcja nie odróżnia się już niczym od tekstu treści — **D-25.3** | 25 |
 | W59 | ramka listy PEŁNEJ (`7196:10993`): **obrys 1 px `beige-2` #C5B18A, BEZ wypełnienia**, promień 12, lico 16, rytm 8 | `7196:10993` | DOM | 🟢 zmierzone (7+7): tło `rgba(0,0,0,0)`, obrys 1 px `rgb(197,177,138)`, lico 15+1=16. Było **odwrotnie**: wypełnienie `beige-1` #F1ECDF i zero obrysu. To ten sam kształt pudełka co ramka ekranu kroku (W22) i **ta sama pomyłka co w przeb. 21** — dwa pudełka jednego kształtu, poprawione jedno. Padding 15, nie 16, z tego samego powodu co przy W22: obrys Figmy idzie DO ŚRODKA | 25 |
 | W60 | nagłówki sekcji listy pełnej (`7196:10998` „dalej", `7196:11014` „zużyte"): styl `Caption` — **DM Sans Medium 500**, 14/16, **`primary-text` #3E2B22** | `7196:10998` · `7196:11014` | DOM | 🟢 zmierzone (7+7): 500 / 14px / 16 / `rgb(62,43,34)`. Było `beige-3` #816D44 i waga odziedziczona 400 — mimo że nagłówek „w tym kroku" (W29) dostał w tym samym runtimie 500 + atrament. **Dwie klasy CSS na jedną rolę**, poprawiona jedna | 25 |
 | W61 | kreska między sekcjami (`7196:10997` / `7196:11013`): **`primary-text` #3E2B22**, 1 px, pełna szerokość | `7196:10997` · `7196:11013` | DOM | 🟢 zmierzone (7+7): `rgb(62,43,34)`. Było `beige-2` #C5B18A. Komentarz przy W25 zawężał tamten odczyt do listy SKRÓCONEJ, bo „kreska listy pełnej to inny węzeł, nieczytany" — zawężenie było uczciwe, ale wpisana w kod wartość `beige-2` **nie miała żadnego źródła**. Węzeł przeczytany: obie kreski są tym samym kolorem | 25 |
 | W62 | ghost pigułki pełnej (`7293:10935` / `7293:10938` „cta — ghost"): **kapsuła r100**, obrys **1,5 px `beige-3` #816D44** (`brązowy-2`), **SemiBold 600**, 16/20 | `7293:10935` · `7293:10938` | DOM | 🟢 zmierzone (7+7): r100, dekl. `1.5px solid`, waga 600, 16/20, obrys `rgb(129,109,68)`. Było: promień **8**, obrys 1 px `beige-2`, waga odziedziczona. **Ghost został z tyłu za poprawką W21** (przeb. 21), która naprawiła sąsiedni `.mp-tryb__primary` w tym samym bloku CSS i nazwała przyczynę — „jedna liczba rozlana po trzech miejscach". Ghost był czwartym miejscem. **Grubość 1,5 px nie jest mierzalna użyciem** przy dpr 1,25 (podłoga do jednego piksela urządzenia = 0.8px, tak samo jak 1 px) — wiersz pyta więc o deklarację ORAZ o to, że użyta równa się temu, co silnik z niej może narysować; ta sama para co przy W11 | 25 |
 | W63 | podpowiedź w pigułce pełnej (`7240:10923`): `Body small` 400, 14/1,35, **`primary-text` #3E2B22** | `7240:10923` | DOM | 🟢 zmierzone (7+7): `rgb(62,43,34)` 14/19. Było `beige-3` #816D44 — przygaszenie wpisane tam, gdzie plik rysuje zwykłą treść. Ten sam kształt co W60 | 25 |
-| W64 | odliczanie w pigułce pełnej (`7240:10922`): styl `Timer` — **DM Sans Bold 700**, `typo/Timer` = **34** (nie 48 z podpowiedzi), interlinia **1**, w stanie `0:00` barwa **`primary-cta` #CF411A**, prawo-przypięte | `7240:10922` | DOM | 🟢 zmierzone (7+7): `rgb(207,65,26)` 34px/34px waga 700 na pigułce PEŁNEJ w stanie `zero` (jedyne miejsce, gdzie forma i stan występują razem — S5). **Obawa z przeb. 25 była nietrafiona i to jest wynik**: interlinia 1 × 34 = `W.wiersz`, więc pole pisma urosło o dziesięć pikseli, a wysokość wiersza nie drgnęła — B9/C04/C05/C06 przemierzone obok, bez zmiany. Barwa jest własnością PARY (forma, stan): W66 wymaga atramentu przy minutniku biegnącym | 25 · **26** |
+| W64 | odliczanie w pigułce pełnej (`7240:10922`): styl `Timer` — **DM Sans Bold 700**, `typo/Timer` = **34** (nie 48 z podpowiedzi), interlinia **1**, w stanie `0:00` barwa **`primary-cta` #E55529**, prawo-przypięte | `7240:10922` | DOM | 🟢 zmierzone (7+7): `rgb(229,85,41)` 34px/34px waga 700 na pigułce PEŁNEJ w stanie `zero` (jedyne miejsce, gdzie forma i stan występują razem — S5). **Obawa z przeb. 25 była nietrafiona i to jest wynik**: interlinia 1 × 34 = `W.wiersz`, więc pole pisma urosło o dziesięć pikseli, a wysokość wiersza nie drgnęła — B9/C04/C05/C06 przemierzone obok, bez zmiany. Barwa jest własnością PARY (forma, stan): W66 wymaga atramentu przy minutniku biegnącym · **D-27.1 WYKONANE, przeb. 30: `--mp-cta` #CF411A → #E55529, przemierzone `rgb(229,85,41)` na 7+7 ramkach** | 25 · **26** · **30** |
 | W65 | scrim (`7196:10924` „przyciemnienie"): **BRAK obrysu, BRAK cienia, BRAK rozmycia tła**; wypełnienie `primary-text` @ 45 % mierzy F2 i nie jest tu dublowane | `7196:10924` | DOM | 🟢 zmierzone (7+7): obrys `0px`, cień `none`, `backdrop-filter` `none`. Wiersz istnieje z reguły pokrycia: własność NIERYSOWANA zapisuje się jako jawne „brak". Trzy braki są tu jedyną rzeczą, której F2 nie mówi, a która **odróżnia scrim od belki** — belka ma rozmycie tła jako swoją cechę (W03), scrim go nie ma | 25 |
 | W66 | odliczanie w pigułce ROZWINIĘTEJ przy minutniku biegnącym (`7195:11078`): `Timer` — Bold **700**, **34**/1, pole **96 px prawo-równane**, barwa `primary-text` #3E2B22 | `7195:11078` | DOM | 🟢 zmierzone (7+7): 34px/34px/700, `text-align:right`, pole 96, `rgb(62,43,34)`. Było **24 px, waga odziedziczona, bez pola**. Klatka daje `w-[96px]`; runtime ma `min-width`, bo formatuje też `G:MM:SS`, którego plik nie narysował — sztywne 96 przycięłoby godzinę. **Kontrola negatywna w tym samym wierszu**: pigułka ZWINIĘTA została przy 24 px, bo jej oracle to `Price Small` 16 (W18, otwarty) — podniesienie stopnia globalnie rozstrzygnęłoby W18 po cichu | 26 |
-| W67 | `cta — cta` pasa dolnego ekranów start / S1 / zakończenie (`7291:10911`): wypełnienie **`primary-cta` #CF411A**, promień **100**, lico 48, etykieta `Button` — SemiBold **600**, 16/20, **`white-off-bg` #FFFDFB** | `7291:10911` | DOM | 🟢 zmierzone (7+7): `rgb(207,65,26)`, r100, 600/16px/20px, `rgb(255,253,251)`, h48. Było: **atrament** i promień **8** — brąz to `cta — primary` pigułki (W21), czyli drugi poziom nacisku, nie synonim. Ósemka kart treści po raz **czwarty** na kapsule (W06, W21, W62, tu) | 26 |
+| W67 | `cta — cta` pasa dolnego ekranów start / S1 / zakończenie (`7291:10911`): wypełnienie **`primary-cta` #E55529**, promień **100**, lico 48, etykieta `Button` — SemiBold **600**, 16/20, **`white-off-bg` #FFFDFB** | `7291:10911` | DOM | 🟢 zmierzone (7+7): `rgb(229,85,41)`, r100, 600/16px/20px, `rgb(255,253,251)`, h48. Było: **atrament** i promień **8** — brąz to `cta — primary` pigułki (W21), czyli drugi poziom nacisku, nie synonim. Ósemka kart treści po raz **czwarty** na kapsule (W06, W21, W62, tu) · **D-27.1 WYKONANE, przeb. 30: `--mp-cta` #CF411A → #E55529, przemierzone `rgb(229,85,41)` na 7+7 ramkach** | 26 · **30** |
 | W68 | `cta — ghost` tego samego pasa (`7290:10944`): **BEZ wypełnienia**, obrys **1,5 px `beige-3` #816D44** (`brązowy-2`), promień **100**, **rozmycie tła blur(4px)** (BACKGROUND_BLUR r8), etykieta SemiBold 600, 16/20, `primary-text` | `7290:10944` | DOM | 🟢 zmierzone (7+7): tło `rgba(0,0,0,0)`, dekl. `1.5px solid` → użyte 0.8px przy dpr 1,25, `rgb(129,109,68)`, r100, `blur(4px)`, 600/16/20. Było: obrys **1 px atramentu**, promień 8, **zero rozmycia**. Trzeci element zestawu z rozmyciem tła (belka W10, `×` W11) i pierwszy, w którym runtime go nie miał | 26 |
 | W69 | nadtytuł zakończenia „gotowe, smacznego" (`7195:11186`): styl **H4** — DM Serif Display 400, **22/1,1**, `secondary-text (h1)` #487622, **DO LEWEJ** | `7195:11186` | DOM | 🟢 zmierzone (7+7): `DM Serif Display` 400 22px/24.2px `rgb(72,118,34)`, `text-align:start`. Było **20/24 DM Sans w atramencie**. Osobna klasa od tytułu ekranu (W38) zostaje właśnie dlatego, że tamten jest WYŚRODKOWANY, a ten nie — jedna klasa zlałaby dwie różne decyzje projektanta | 26 |
 | W70 | podtytuł zakończenia (`7195:11187`): `Body small` 400, 14/1,35, `primary-text` #3E2B22 | `7195:11187` | DOM | 🟢 zmierzone (7+7): 400 / 14px / 19 / `rgb(62,43,34)`. Runtime miał rację przed poprawką — wiersz istnieje z reguły pokrycia, nie z podejrzenia | 26 |
 | W71 | karta „pochwal się" (`7195:11189`): **BEZ wypełnienia**, obrys **1 px `beige-2` #C5B18A**, promień **12**, **lico 16**, odstęp **16** | `7195:11189` | DOM | 🟢 zmierzone (7+7): tło `rgba(0,0,0,0)`, dekl. 1 px → 0.8px przy dpr, `rgb(197,177,138)`, r12, lico 16 (obrys 1 + padding 15, jak W22/W32), gap 16. Runtime rysował ją klasą karty S1 (W39): **wypełnienie `beige-1`, zero obrysu, odstęp 8**. Piąty przypadek „dwa elementy w jednej roli" (W22↔W59, W29↔W60, W25↔W61, W21↔W62) i pierwszy, w którym różni je WYPEŁNIENIE, a nie stopień pisma. Karta S1 nietknięta — poprawka jest zakresowana atrybutem `data-mp-karta` | 26 |
 | W72 | nagłówek tej karty (`7200:10893`): styl **H4** — DM Serif Display 400, 22/1,1, `secondary-text (h1)` #487622 | `7200:10893` | DOM | 🟢 zmierzone (7+7): `DM Serif Display` 400 22px `rgb(72,118,34)`. Było **18/22 DM Sans w atramencie**, czyli ranga kroku z karty S1 — ta sama klasa niosła dwie różne rangi | 26 |
 | W73 | numer instrukcji (`7200:10895`): **KÓŁKO** — obrys 1 px `beige-3` #816D44, promień **10**, 20×20, **BEZ wypełnienia** | `7200:10895` | DOM | 🟢 zmierzone (7+7): dekl. 1 px → 0.8px przy dpr, `rgb(129,109,68)`, r10, tło `rgba(0,0,0,0)`, 20×20. Runtime rysował **samą cyfrę w pustym polu**: kółka nie było w ogóle. Ten sam kształt co W48 (kółko `i`) — element wizualny, nie rozjazd o stopień; pole 20×20 i odstęp 28 mierzy F13 i były zielone | 26 |
-| W74 | cyfra w kółku (`7200:10896`): styl `Caption` — DM Sans **Medium 500**, interlinia **16**, barwa **`beige-3` #816D44**, wyśrodkowana | `7200:10896` | DOM | 🟢 zmierzone (7+7): 500 / 16px / `rgb(129,109,68)` / center. Było: waga odziedziczona 400, interlinia 20, barwa odziedziczona (atrament). **Stopień pisma świadomie NIETKNIĘTY** (14) — `typo/Caption` czeka na **D-25.5** | 26 |
+| W74 | cyfra w kółku (`7200:10896`): styl `Caption` — DM Sans **Medium 500**, interlinia **16**, barwa **`beige-3` #816D44**, wyśrodkowana | `7200:10896` | DOM | 🟢 zmierzone (7+7): 500 / 16px / `rgb(129,109,68)` / center. Było: waga odziedziczona 400, interlinia 20, barwa odziedziczona (atrament). **Stopień pisma świadomie NIETKNIĘTY** (14) — `typo/Caption` czeka na **D-25.5** · **D-25.5 ROZSTRZYGNIĘTE (operator 2026-08-15): `typo/Caption` = 14. Stopień warunkowy staje się BEZWARUNKOWY — runtime stał przy 14 od początku, więc rozstrzygnięcie nie wymagało ANI JEDNEJ linijki kodu, tylko przemiaru. Przemierzone w przeb. 30** | 26 · **30** |
 | W75 | efekty na ekranie zakończenia: karta i **oba** CTA **BEZ cienia**; rozmycie tła ma **wyłącznie** ghost | `7195:11189` · `7291:10911` · `7290:10944` | DOM | 🟢 zmierzone (7+7): `box-shadow:none` ×3, `backdrop-filter:none` na CTA, `blur(4px)` na ghoście. Wiersz z reguły pokrycia — własność nierysowana zapisuje się jako jawne „brak" (tak samo jak W65). Asercja jest PARĄ: cień „dla głębi" przewróci pierwszą połowę, rozlane rozmycie — drugą | 26 |
-| W76 | ramka zdjęcia na ekranie zakończenia (`7195:11188`): promień **12**, wysokość **150**, wypełnienie — **dwa odczyty Figmy się nie zgadzają** | `7195:11188` | — | ⏸ **poza liczeniem, za D-23.1.** Element nie renderuje się w ogóle (ta sama przyczyna co B21: `fotoUrl` jest polem KROKU). Do tego `get_design_context` podaje wypełnienie `black` #1A1A1A, a render `get_screenshot` tej samej ramki pokazuje **jasną szarość** — dwa odczyty z jednego pliku, więc wiersz nie ma prawa być zielony ani czerwony „z jednego z nich". Do rozstrzygnięcia razem ze źródłem zdjęcia | 26 |
+| W76 | zdjęcie na ekranie zakończenia (`7195:11188`): kolumna × **150** @ **y163**, promień **12**, obrys BRAK, cień BRAK | `7195:11188` | 5× · land. | DOM | 🟢 **zmierzone w przeb. 31** (7+7): `328×150 @ y163 r12px`, `naturalWidth 656`, obrys 0, `box-shadow:none`. Druga asercja pilnuje D-23.1 dosłownie — **to samo ŹRÓDŁO co na starcie**, jedno `[data-mp-foto-glowne]` na stronę, nie drugie pole. **Wiersz zzieleniał dopiero po ROZDZIELENIU pytania:** wypełnienie ramki (dwa sprzeczne odczyty Figmy) wyszło do **W79**. Wiersz pytający o dwie rzeczy naraz, z których jedna czeka na operatora, nie ma jak zzielenieć w żadnej połowie — a promień i wysokość czekały na decyzję, która ich nie dotyczyła | 26 · **31** |
 | W77 | kreska nad pasem dolnym **na ekranie zakończenia** (`7195:11205`): pełny obrys **1 px `primary-text` #3E2B22** + wypełnienie `white-full-bg` | `7195:11205` | — | ⏸ **KANDYDAT NA KONFLIKT, poza liczeniem.** Ekran KROKU rysuje ten sam pas z **górną kreską `secondary-text (h1)` #487622** (`7195:11084`, potwierdzone w tym przebiegu przy okazji odczytu `7195:11065`) — i to jest wiersz W02, zielony od przeb. 21. Widocznie różni je **barwa kreski**, bo pozostałe trzy boki pokrywają się z krawędzią ramki. Runtime rysuje zieleń na wszystkich ekranach. Do operatora, patrz **D-26.1** | 26 |
+| W78 | wykończenie ramki zdjęcia GŁÓWNEGO: promień **12** (nie 8), `object-fit: cover`, `display:block`, obrys BRAK, cień BRAK | `7195:10901` (`get_design_context`) | 5× · land. | DOM | 🟢 **zmierzone w przeb. 31** (7+7): `r12px cover`, obrys `0px`, cień `none`. Odczyt Figmy obalił 8 px, które stały w arkuszu od pierwszej wersji runtime'u i nigdy nie miały oracle'a. **Promień zmieniono MODYFIKATOREM `.mp-tryb__foto--glowne`, a nie w `.mp-tryb__foto`**, bo zdjęcie KROKU nie ma dziś klatki w zestawie — inwentarz INTERAKCJE zna wyłącznie krok BEZ zdjęcia (`7240:10936`). Przestawienie jego promienia przy okazji byłoby zielenią z lektury kodu | **31** |
+| W79 | **wypełnienie ramek zdjęcia** (`7195:10901` i `7195:11188`): `get_design_context` daje `black` **#1A1A1A** w OBU, `get_screenshot` tych samych ramek — **jasną szarość** | `7195:10901` · `7195:11188` | — | ⏸ **poza liczeniem, decyzja operatora D-31.2.** Wiersz wydzielony z W76 w przeb. 31, żeby jedno pytanie miało jeden wiersz. **Nowa przesłanka zmierzona w tym przebiegu:** obie ramki — startowa i zakończenia — mają IDENTYCZNE wypełnienie i identyczną geometrię, obie są PUSTE (`<frame>` bez dziecka obrazowego), a w runtimie `<img>` przykrywa je w całości (`object-fit:cover`, ten sam rozmiar). To przemawia za odczytaniem #1A1A1A jako **prostokąta zastępczego pod zdjęcie**, a nie jako tła do narysowania — ale to jest wniosek `[I]`, nie odczyt, więc runtime NIE dostał żadnego tła. Pytanie do operatora: czy pod zdjęciem ma być podkład (widoczny przy wczytywaniu i przy pliku z przezroczystością), czy ramka jest wyłącznie zastępnikiem | **31** |
 | W46 | tooltip zamiennika: kolor tekstu — plik daje **surową czerń #000000, bez wiązania** (`get_variable_defs` na `7468:103138` zwraca wyłącznie `typo/Body small` i `beige 1 bg`) | `7468:103138` | — | ⏸ **KANDYDAT NA KONFLIKT, poza liczeniem.** Runtime dziedziczy `primary-text` #3E2B22, jak cała reszta zestawu. Czerń w jednym popoverze wygląda na niezwiązany domyślny, nie na decyzję — ale rozstrzyga to projektant, nie łańcuch. Do operatora, patrz **D-24.1** | 24 |
 | W47 | glif `close` tooltipa (`7473:103100`): **Material Symbols ROUNDED Medium 500, 16 px** | `7473:103100` | — | ⏸ **KANDYDAT NA KONFLIKT, poza liczeniem.** Reszta zestawu używa **Outlined** (W33: Outlined Light 300), a subset `subset-2026-08-15-v4` zawiera wyłącznie Outlined 300/400/500. Zaciągnięcie drugiej rodziny to drugi plik fontu dla jednego glifu. Do operatora, patrz **D-24.2** | 24 |
+
+**⚠ D-22.1 / D-25.5 — ZAMKNIĘTE decyzją operatora 2026-08-15: `typo/Caption` = 14.**
+Wszystkie wiersze `Caption` (W17, W26, W29, W60, W74) tracą gwiazdkę warunkowości
+i są zielone bezwarunkowo — przemierzone w przeb. 30. Runtime nie wymagał zmiany:
+stopień 14 stał w nim od początku, a sporny był wyłącznie oracle. To jest tania
+zieleń, o której warto pamiętać przy planowaniu serii: **rozstrzygnięcie operatora
+bywa zerokosztowe w kodzie i kosztuje wyłącznie jedno uzbrojenie przyrządu.**
+Zapis poniżej zostaje jako historia sporu, bo pokazuje, jak się go rozstrzygało.
 
 **⚠ D-22.1 — PRZEBIEG 23 DOKŁADA DWA DOWODY ROZSTRZYGAJĄCE, oba geometryczne.**
 `typo/H6`: fallback `get_design_context` = **24**, `get_variable_defs` = **18**, węzeł
@@ -578,6 +605,43 @@ cztery usterki na pięciu polach poziomu przepisu; poziomy niższe są czyste. T
 wynik, nie brak wyniku — reguła pokrycia pól modelu zamyka się tu jako **przemierzona
 w całości**, a nie „przejrzana". Klasa „pole modelu bez elementu w kodzie" jest zamknięta.
 
+## S · Bramka stagingowa (założona 2026-08-15, rozdział „Pomiar na stagingu")
+
+**Poza liczeniem zieleni lokalnej, ale W ŚRODKU warunku wyjścia nr 2** — łańcuch nie
+kończy się bez tej sekcji, choć matryca szerokości może być zielona bez niej. Powód:
+matryca mierzy embed w HARNESSIE, a nie embed w stronie gospodarza, i żaden jej wiersz
+nie widzi kolizji CSS, kolejności skryptów, opóźnienia CMS ani tego, czy przycisk woła
+runtime.
+
+**Zakres jest wyłącznie ODCZYTOWY** (D-32.2): nawigacja, klikanie interfejsu, asercje,
+konsola, sieć, GIF, zrzuty. Bez publikacji, bez zapisu przez Webflow MCP, bez wklejania
+embedu, bez produkcji, bez formularzy.
+
+**Wynik jest ważny wyłącznie z SHA commita**, na którym powstał. Pierwszy pomiar
+(przeb. 35) SHA **nie ma i nie może mieć** — na stronie nie ma embedu, więc nie ma czego
+przypisać; zapisane jako jawne ograniczenie, nie przemilczane.
+
+Strona pomiarowa: `https://miesna-paczka-ea5c01.webflow.io/przepisy/wolowina-teriyaki-z-brokulami-przepis`.
+Szerokości mobilne mierzone trikiem same-origin (iframe tej samej strony w tej samej stronie),
+z **kalibracją `innerWidth` do wartości docelowej** — sam rozmiar ramki nie wystarcza,
+pasek przewijania zjada ~3 px i pierwsza próba mierzyła 496/497 zamiast 499/500.
+
+| poz. | pozycja | status | przeb. |
+|---|---|---|---|
+| S1 | pływające CTA jest na stronie przepisu i **kliknięcie OTWIERA overlay** | 🔴 **CTA JEST, overlay NIE.** `.recipe-floating-cta` 276×48 przy 357 px, kliknięte naprawdę: `#mp-tryb` nie powstaje, `body` bez zmian, adres bez zmian, zero wpisów w konsoli. CTA to `<a href="#">` **bez `onclick`, bez `data-*`, bez nasłuchu** — cichy no-op | 35 |
+| S2 | runtime i parser wczytują się bez błędu, **parser przed runtime'em** | 🔴 **ŻADNEGO Z NICH NA STRONIE NIE MA.** `window.MP === undefined`. Z 46 skryptów trzy są nasze i wszystkie należą do sesji równoległej (`mpkartyprzepisu-1.0.0`, `mpkaruzelaprzepisow-1.0.0`, `mpgotowaniestart-1.2.0`). Pytanie o kolejność jest bezprzedmiotowe | 35 |
+| S3 | konsola gospodarza: **zero błędów i ostrzeżeń POCHODZĄCYCH Z EMBEDU** | 🟢 zero błędów, zero ostrzeżeń. Dwa wpisy `log`, oba CUDZE i notowane osobno: `GTM user_type = guest` oraz `[mp-mnav] Storefront routing: staging fallback…` (nawigacja mobilna). **Wynik trywialnie prawdziwy przy S2 czerwonym** — wpisany, żeby przy powtórce było z czym porównać | 35 |
+| S4 | kontrakt DOM z §5 pakietu **w komplecie**, brak opisany NAZWĄ pola | 🔴 **PÓŁ NA PÓŁ.** Brak w ogóle: `data-mp-pole`, `data-mp-surowe`, `data-mp-przepis`, `data-mp-id`, `data-mp-porcje`. **Obecne, ale PUSTE:** `data-mp-skladniki` i `data-mp-kroki` — jako `div.recipe-ing__source.w-dyn-bind-empty` i `div.recipe-steps__source.w-dyn-bind-empty`. Klasa `w-dyn-bind-empty` to sygnatura Webflow: **wiązanie CMS w szablonie JEST, pole w rekordzie PUSTE** — czyli brak treści, nie brak szablonu. To jest inne ustalenie niż „kontrakt pusty" z przeb. 33 | 35 |
+| S5 | font ikon z CDN Webflow **renderuje ligatury** (sonda `I4` z kontrolą ujemną) | 🟢 trzy `@font-face` z `cdn.prod.website-files.com/6983617613052dc9fe624303/…` (Light/Regular/Medium), wszystkie `status: loaded`. **Ligatura renderuje się:** `.recipe-rail__ctaicon` z napisem `soup_kitchen` przy `font-size: 20px` ma szerokość **20 px** — jeden glif, nie dwanaście liter (słowo dałoby ~110 px) | 35 |
+| S6 | próg 500 px zachowuje się **tak samo jak lokalnie** | 🔴 **ROZJAZD O JEDEN PIKSEL.** Staging: `innerWidth` 498 flex · 499 flex · **500 flex** · 501 none · 502 none · 520 none. Harness `prog.html`: 499 widoczny, **500 UKRYTY**. Staging ukrywa **od 501**, harness **od 500**; zapis „próg ukrycia 500" w plikach wiążących jest zgodny z obiema lekturami i dlatego się rozjechały. **Pozycja decyzyjna D-35.1** — `WYMAGANIA.md` jest plikiem wiążącym, a `.recipe-floating-cta` należy do sesji równoległej | 35 |
+| S7 | rozjazd wobec pomiaru lokalnego — **lista sprawdzonych wielkości**, nie zdanie „bez rozjazdów" | 🔴 sprawdzone: próg ukrycia **ROZJAZD 1 px** (S6) · origin fontu ikon **zgodny** · liczba wag 3 **zgodna** · renderowanie ligatury **zgodne** · `.recipe-rail` **obecna i widoczna bez przewijania** (395×547, `sticky`) — zamyka jedyną pozycję, którą kolejka przeb. 34 uznała za wartą powtórki samą z siebie · overlay, kontrakt pól kartowych i runtime **NIEPORÓWNYWALNE, bo ich na stagingu nie ma** | 35 |
+
+**Sześć z siedmiu pozycji nie da się zamknąć bez czynności operatora** (wklejenie dwóch
+embedów, uzupełnienie szablonu o §5, uzupełnienie pól CMS, rozstrzygnięcie D-35.1).
+Łańcuchowi wszystkie te czynności są zabronione — pomiar to ustalenie, nie zadanie.
+
+---
+
 ## Z · Poza pętlą lokalną (pakiet integracyjny, jednostka 10)
 
 Nie wchodzą do liczenia zieleni. Wymieniam je, żeby faza integracyjna była
@@ -602,24 +666,501 @@ wykonaniem, a nie projektowaniem — to jest wsad do jednostki 10.
 | sekcja | wierszy | 🟢 | 🔴 |
 |---|---|---|---|
 | A · parser i model | **16** | **16** | 0 |
-| B · układ i geometria | **21** | 19 | **2** |
+| B · układ i geometria | **26** | 25 | **1** |
 | C · minutniki | 17 | **17** | 0 |
 | D · lista składników | 12 | **12** | 0 |
 | E · zamienniki i tooltip | 14 | **14** | 0 |
 | F · nawigacja i stany | 15 | **15** | 0 |
 | G · porcje, wejścia, progi | 11 | **11** | 0 |
 | H · testy negatywne | 12 | **12** | 0 |
-| I · higiena | 7 | **6** | **1** |
-| W · wykończenie powierzchni | **71** | **71** | **0** |
-| **RAZEM (pętla lokalna)** | **196** | **193** | **3** |
+| I · higiena | **8** | **8** | 0 |
+| W · wykończenie powierzchni | **73** | **73** | **0** |
+| **RAZEM (pętla lokalna)** | **204** | **203** | **1** |
 | Z · poza pętlą | 9 | — | — |
 | ⏸ poza liczeniem (kandydaci na konflikt) | 5 | — | — |
+
+**TA TABELA BYŁA NIEAKTUALNA OD PRZEBIEGU 30 i nikt tego nie zauważył przez dwa
+przebiegi.** Stała na `198 / 195 / 3`, podczas gdy narracja pod nią mówiła kolejno
+198/200 i 199/200 — bo przebieg 31 dopisał akapity o B21, W76, W78, W79 i B16, a liczb
+w tabeli nie ruszył. **Wniosek do powtarzania: sumę trzeba LICZYĆ z wierszy, a nie
+utrzymywać obok nich.** Od tego przebiegu bilans jest przeliczany maszynowo, przez zliczenie
+znaczników statusu w kolumnie wyniku (`🟢` / `🔴` / `⏸`) po identyfikatorach wierszy —
+to samo pytanie, które w sekcji W brzmi „zielony z lektury kodu nie jest zielony”,
+zadane tabeli podsumowującej. Ręcznie utrzymywana suma to trzeci egzemplarz prawdy,
+a trzeci egzemplarz zawsze rozjeżdża się pierwszy.
+
+### Domiar przebiegu 35 (jednostka 4) — `M12` naprawione, `I9` ZIELONE przy 16/16
+
+Naprawa poszła w **mutację**, nie w wiersz: flaga `odOtwarcia` zapina wstrzyknięcie
+także na `MP.tryb.otworz()`, czyli przed momentem, w którym mierzy `B15`. Flaga jest
+włączona **wyłącznie dla `M12`** — dla `M9`–`M11` wcześniejsze wstrzyknięcie przesunęłoby
+moment uszkodzenia i zmieniło liczby ubocznych padnięć, czyli zerwało porównywalność
+z pomiarem jednostki 2.
+
+**Przemiar: 16/16 ZABITYCH na obu powierzchniach, `ok: true`**, obie kontrole zielone.
+`M12` zabija `B15: zero iframe’ów w overlayu` z trzema ubocznymi. **Liczby ubocznych
+wszystkich piętnastu pozostałych mutacji są co do sztuki takie same jak przed naprawą** —
+to jest dowód, że flaga nie ruszyła niczego poza swoim przypadkiem.
+
+**Regresja po naprawie:** pełna 2989 × 7 / 14 padnięć, zminifikowana 3024 × 7 / 7,
+pokrycie 193 na obu, konsola zero na czternastu ramkach, `I8` zielone (193 = 193,
+`brakWMin: []`, 5 znanych duplikatów), wszystkie ramki matryc raportują `mutacja: BRAK`.
+
+### Domiar przebiegu 35 (jednostka 2) — katalog mutacji rozszerzony do 16, jedna mutacja spudłowała
+
+**`I9` pozostaje ZIELONE dla batcha 1 i jest CZERWONE dla batcha 2** – zmierzone
+15/16 ZABITYCH, jedna `ZERO EFEKTU` (`M12-iframe`). To nie jest tautologia `B15`,
+tylko źle wycelowana mutacja, i różnica jest cała treścią trzeciego werdyktu:
+`B15: zero iframe’ów w overlayu` mierzy **przed** pierwszym `pokazKrok()`, a `M12`
+wstrzykuje `<iframe>` dopiero w opakowaniu `pokazKrok()`. W chwili pomiaru
+uszkodzenia jeszcze nie było. Naprawa należy do mutacji (wstrzyknięcie musi wejść
+przy `otworz()`), nie do wiersza.
+
+**Zmierzone batchem 2 (klasa: asercje o NIEOBECNOŚCI i o LICZBIE), powierzchnia pełna:**
+`M9-adnotacja` ZABITA (ub. 0) · `M10-wlasny-tor` ZABITA (2) · `M11-drugi-mark` ZABITA (0) ·
+`M12-iframe` **ZERO EFEKTU** · `M13-stos-widoczny` ZABITA (9) · `M14-top-bez-gornego` ZABITA (4) ·
+`M15-cta-krotsze` ZABITA (0) · `M16-overlay-absolute` ZABITA (0). Batch 1 bez zmian, 8/8.
+
+**Trzy mutacje z zerem ubocznych to trzy wiersze, które są jedynym oknem na swój defekt:**
+`M9` (adnotacja projektanta wraca do TOP-u), `M11` (drugi `<mark>`), `M15` (CTA odsunięte
+od krawędzi), `M16` (overlay na `absolute`). Gdyby któryś z tych wierszy zniknął, defekt
+przechodziłby przez całą matrycę bez śladu.
+
+## Pomiar przebiegu 37 (domiar, jednostka 3) — MATRYCA 205/209. Batch 6 (NIEOBECNOŚĆ WĘZŁA) zapala `I13` i przewraca `I9`/`I10`: brak jednego elementu urywa do 37 % matrycy
+
+Przyrost o jeden wiersz (`I13`) i **dwie czerwienie tam, gdzie przed chwilą była zieleń** — `I9` i `I10`.
+To nie jest regres: to pierwszy pomiar własności, o którą matryca dotąd nie pytała.
+
+- **Cztery mutacje, cztery urwania.** `M41`–`M44` odbierają po jednym węźle przez opakowanie
+  `Element.prototype.querySelector`. Każda kończy się werdyktem `URWANIE`, na OBU powierzchniach [V].
+  Utrata: **160 / 143 / 121 / 28** asercji przy bazie 427 (pełna) i **162 / 145 / 123 / 28** przy 432 (min).
+- **Sito miało rację, ale nie było dowodem.** 41 miejsc wskazanych składniowo w przeb. 36 stało
+  bez pomiaru przez cały przebieg; cztery pierwsze sprawdzone mutacją padły cztery na cztery.
+  **Wzorzec składniowy przewidział klasę, pomiar dał skalę** — i dopiero skala mówi, że to nie jest drobiazg.
+- **Uboczne pierwszych czterdziestu mutacji niezmienione co do sztuki** (1/16/1/9/2/1/2/0/0/2/0/3/9/4/0/0/
+  0/0/0/0/0/12/0/0/0/0/0/0/0/0/2/4/0/4/0/0/1/0/0/2) — batch 6 nie ruszył porównywalności obu powierzchni.
+- **`M43` musiał dostać zaostrzony cel z powodu, który sam w sobie jest znaleziskiem:**
+  dwie RÓŻNE asercje mają w `fixture.html` identyczną nazwę (`F11: przy wciąż zerwanym połączeniu baner
+  zostaje (kontrola negatywna)`, linie 3167 i 3174). Indeks asercji jest po nazwie, więc zlewa je w jedną
+  pozycję. `I12` to wyłapało od razu — wiersz założony w tej samej serii zapracował na siebie w tej samej serii.
+
+## Pomiar przebiegu 37 — MATRYCA 207/208. Batch 5 (wejście uszkodzone) zamknięty 40/40 na obu powierzchniach; `I12` zamienia UWAGĘ narzędzia w asercję
+
+Przyrost o jeden wiersz (`I12`) i znowu jest to wiersz o samej matrycy, nie o produkcie.
+Jedyna czerwień pozostaje ta sama: `B24`, zablokowana decyzją D-32.1.
+
+- **Batch 5 — osiem mutacji klasy WEJŚCIA USZKODZONEGO** (`A3` ×2, `A11` ×2, `A13` ×2,
+  `A12`, `A9`). Nietknięta dotąd połowa roboty parsera: batche 1–4 pytały, czy nie psuje
+  wejścia poprawnego, ten pyta, co robi z niepoprawnym. **40/40 ZABITYCH na obu
+  powierzchniach, `ok: true`, zero tautologii, zero bez efektu, zero urwań** [V].
+- **`A3` dostał mutację na KAŻDĄ stronę pary.** Wiersz, który ma ostrzegać wtedy i tylko
+  wtedy, gdy wejście jest zepsute, da się zepsuć na dwa sposoby — ciszą i fałszywym
+  alarmem — a mutacja sprawdzająca jeden z nich nie mówi nic o drugim. Stąd `M33` (parser
+  milczy na `#klucz` bez odpowiednika) i `M34` (parser zgłasza brak odpowiednika także dla
+  kluczy istniejących), celujące w PRZECIWNE asercje tego samego wiersza.
+- **Pięć z ośmiu nowych mutacji ma ZERO ubocznych padnięć**, czyli `A3` (cisza), `A11`
+  (obie asercje), `A13` (liczba wpisów) i `A12` są **jedynym oknem** na swój defekt:
+  gdyby te wiersze zniknęły, uszkodzenie przeszłoby przez całą matrycę bez śladu.
+- **Pudło zaczepu złapane STATYCZNIE, przed uzbrojeniem przeglądarki.** `M40` celowało
+  w `[data-mp-surowe]` po przekształceniu, a parser zdejmuje ten atrybut w chwili
+  przejęcia węzła na pierwszą kartę (`przepis-parser.js`, `removeAttribute`). Referencja
+  brana teraz PRZED wywołaniem oryginału. Kosztowało to jedno `grep`, a nie jeden
+  przemiar — trzeci przebieg z rzędu, w którym weryfikacja statyczna zwraca cenę
+  uzbrojenia Chrome.
+- **`I12` — cel jednoznaczny.** `M3` trafiał w trzy etykiety, `M22` w dwie; narzędzie
+  mówiło o tym od przeb. 36, ale **jako uwagę**, więc nie istniał stan, w którym coś by
+  spadło. Teraz pozycja `celeWielokrotne` wchodzi do `ok` strony. Kontrola dodatnia
+  policzona na tych samych etykietach linii bazowej: stare cele = 3 i 2 trafienia, nowe
+  = 1 i 1 [V].
+- **Regresja pełna, zero dryfu:** `matrix.html` 2989 × 7, 14 padnięć (`B24` ×7, `I5` ×7),
+  pokrycie 193 na każdej ramce, 50 kluczy odległości na każdej, konsola 0; `matrix-min.html`
+  3024 × 7, 7 padnięć (`B24`), pokrycie 193, odległości 50, konsola 0; `pokrycie.html`
+  193 = 193 i 50/50, falsyfikowalny; `prog.html` 499 widoczny / 500 ukryty, `zgodne: true`;
+  `qr.html` `ok: true`, `h4Falsyfikowalny: true`. **Sondy na żądanie wywołane, nie pominięte:**
+  `G10` `ok: true`, `F4` `ok: true` (427 asercji w ramce), `c1012seek` — `C10`/`C11`/`C12`
+  zielone na wszystkich pięciu szerokościach portretowych, a kontrola odróżnia okres
+  1000 ms od 2000 ms i stan `paused` od `running` [V]. `kolumnaTresci` 288/328/358/408/448
+  jako kontrola dodatnia inwariantu 0aa.
+
+## Pomiar przebiegu 36 — MATRYCA 207/207 LOKALNIE. Batch 3 mutacji zamknięty 24/24; dwa defekty PRZYRZĄDU znalezione przez mutacje, nie przez przegląd
+
+**Bilans: 205/206.** Jedna czerwień bez zmian – `B24`, zablokowana decyzją D-32.1.
+Przyrost o jeden wiersz (`I10`) i to znowu jest wiersz o samej matrycy, nie o produkcie.
+
+**Co zmierzono** (jedna seria, `chrome.lock` wzięty 19:27, zwolniony 19:37, zero sekund czekania):
+
+- `mutacja.html` i `mutacja.html?plik=min` – **24/24 ZABITYCH na obu**, zero tautologii,
+  zero bez efektu, **zero urwań**, kontrola dodatnia i ujemna zielone, `ok: true` [V].
+- `matrix.html` – **2989 asercji × 7 ramek, 14 padnięć** (7 × `B24`, 7 × `I5`), pokrycie **193**,
+  konsola **0** [V]. Bez zmian względem przeb. 35 mimo trzech edycji fixture’a.
+- `matrix-min.html` – **3024 × 7, 7 padnięć** (wyłącznie `B24`), pokrycie **193**, konsola **0** [V].
+- `pokrycie.html` (`I8`) – **193 = 193**, `brakWMin: []`, `tylkoPelna`/`tylkoMin` puste,
+  pięć znanych duplikatów, `falsyfikowalny: true`, kontrola dodatnia OK [V].
+- `prog.html` – 499 widoczny / 500 ukryty, `zgodne: true` na obu ramkach [V].
+- `qr.html` – bramka trzyma: 991 nie rysuje przy DOSTĘPNYM dublerze (`falsyfikowalny: true`),
+  992 i 1024 rysują `<svg>`, `wywolan: 0`, zero ostrzeżeń na desktopie, `ok: true` [V].
+- **Rozmiary niemierzone i niepotrzebne** – przebieg nie tknął ani runtime’u, ani parsera.
+  Zmiany są WYŁĄCZNIE w harnessie (`fixture*.html`, `mutacja.html`), czyli w kodzie, który
+  z definicji nie wchodzi do pakietu integracyjnego.
+
+**Dwa defekty przyrządu, oba znalezione przez mutację, żaden przez przegląd kodu.**
+Obie dereferencje (`kartaWzn` w `F8`, `dlg4` w bloku S4) stały tam od przebiegów i przechodziły
+każdą regresję – bo w zdrowym produkcie węzeł zawsze istnieje. Widać je dopiero wtedy, gdy coś
+ZEPSUJE produkt, czyli dokładnie w warunkach, dla których matryca jest budowana. To jest trzeci
+z rzędu przebieg, w którym mutacja mówi o matrycy coś, czego matryca o sobie nie wiedziała.
+
+
+**Domiar przebiegu 36 (jednostki 2 i 3) — MATRYCA 205/207, nowa czerwień `I11`.**
+Sito dereferencji (`narzedzia/sito-dereferencji.py`) znalazło **41 miejsc w bloku
+pomiarowym powierzchni źródłowej i 40 w zminifikowanej**, w których brak węzła daje
+WYJĄTEK zamiast padnięcia. Różnica jednego miejsca była nitką, za którą warto było
+pociągnąć: doprowadziła do `I11`, czyli do siedemnastu odległości mierzonych tylko
+w źródle. **Sito nie dowodzi defektu — daje listę miejsc do sprawdzenia mutacją.**
+Naprawa 41 miejsc NIE została wykonana świadomie: każde wymaga osobnego wykazania,
+że zastępnik nie da przypadkiem PRAWDY, a hurtowa podmiana bez tego wykazu byłaby
+zamianą wybuchu na cichą zieleń — czyli lekarstwem gorszym od choroby.
+
+
+**Domiar przebiegu 36 (jednostka 5) — batch 4 mutacji, warstwa DANYCH i PARSERA.**
+Katalog 32 mutacji, **32/32 zabitych na obu powierzchniach**, zero tautologii, zero
+urwań, uboczne co do sztuki równe. Regresja bez ruchu: `matrix.html` 2989 × 7 / 14
+padnięć, `matrix-min.html` 3024 × 7 / 7, pokrycie 193 na obu, konsola 0, `I8` 193=193
+i 50=50 odległości, inwariant 0aa bez rozjazdów na OBU powierzchniach.
+
+## Pomiar przebiegu 35 — MATRYCA 204/205, `I9` założone i zielone: matryca udowodniła, że umie spaść
+
+**Bilans: 204/205.** Jedna czerwień bez zmian – `B24`, zablokowana decyzją D-32.1.
+Przyrost o jeden wiersz (`I9`) i to jest wiersz o samej matrycy, nie o produkcie.
+
+- **`I9` – nowy przyrząd `harness/mutacja.html` plus blok `MP_MUTACJA` w obu fixture’ach.**
+  Odpowiada na pytanie, którego nie umiało zadać ani pokrycie, ani sito składniowe:
+  **czy wiersz, który stoi zielony, MA STAN, w którym by spadł.** Pokrycie (`I8`) pyta,
+  czy o wiersz ktoś pyta. Sito z przeb. 34 pyta, czy warunek ma operator porównania –
+  i z definicji nie znajdzie `80 === 0 + 80`, bo tam operator jest.
+- **Mechanika wymuszona przez fixture, nie wybrana.** Blok pomiarowy biegnie RAZ, przy
+  wczytaniu, i trzyma stan w domknięciu. Mutacja per asercja wymaga więc świeżego
+  dokumentu na mutację – czyli ramki. Ta sama figura co `pokrycie.html`: N+1 ramek
+  pod JEDNĄ pieczęcią, wszystkie o nazwie innej niż `360`, więc `MP_BEZ_HISTORII` i
+  porównanie like-for-like.
+- **Mutacje psują PRODUKT, nigdy przyrząd.** Sześć z ośmiu to `!important` w arkuszu
+  (regresja stylu), jedna podmienia `CSSStyleDeclaration.setProperty` dla `--mp-bottom-h`
+  (publikacja kłamie), jedna owija publiczną `MP.przepis.podzielWszystkieKarty()`
+  (nagłówek odbudowany zamiast zostawiony). Mutacja dotykająca `sprawdz()` albo etykiet
+  mierzyłaby samą siebie.
+- **Wynik: 8/8 ZABITYCH na obu powierzchniach**, zero tautologii, zero mutacji bez
+  efektu, obie kontrole przeszły. Liczby ubocznych padnięć **identyczne co do sztuki**
+  na pełnej i zminifikowanej (1/16/1/9/2/1/2/0) – to jest niezależne potwierdzenie
+  `I8` z drugiej strony: gdyby artefakt był o coś nie pytany, mutacja psująca tę rzecz
+  dałaby po obu stronach różny rozmiar zniszczeń.
+- **`M8` ma ZERO ubocznych i to jest najciekawsza liczba tego przebiegu.** Nagłówek
+  odbudowany (ten sam napis, ta sama klasa, inny węzeł) wywraca **wyłącznie** asercję
+  `A9`, i to tę wzmocnioną w przeb. 34. Przed wzmocnieniem ten defekt nie miał w całej
+  matrycy ani jednego wiersza, który by go zobaczył – 2989 asercji przeszłoby komplet.
+  Wzmocnienie z przeb. 34 nie było kosmetyką; było jedynym oknem na tę klasę defektu.
+- **Trzy werdykty, nie dwa.** `ZERO EFEKTU` jest zdaniem o MUTACJI (selektor nie trafił,
+  funkcji nie było), nie o wierszu. Zliczanie go do tautologii byłoby fałszywym alarmem
+  tej samej klasy co „zero padnięć na wierszu, o który się nie pyta”.
+- **Regresja po zmianie fixture’ów – zero ruchu:** pełna **2989 × 7, 14 padnięć**
+  (7 × `B24`, 7 × `I5`), zminifikowana **3024 × 7, 7 padnięć** (`B24`), pokrycie **193**
+  na obu, konsola **zero na czternastu ramkach**, `I8` zielone (193 = 193, `brakWMin: []`,
+  pięć znanych duplikatów), `prog.html` 499 widoczny / 500 ukryty `zgodne: true`,
+  `qr.html` bramka trzyma (991 nie rysuje przy dostępnym dublerze, 992 i 1024 rysują
+  `<svg>`, `wywolan: 0`). Blok mutacji nie woła `sprawdz()`, więc pokrycia nie rusza –
+  i pomiar to potwierdza, zamiast na tym poprzestać.
+- **Rozmiary bez zmian** – przebieg nie dotknął ani runtime’u, ani parsera. Cała praca
+  poszła w przyrząd, czyli kosztowała zero znaków budżetu embedu.
+
+## Pomiar przebiegu 34 — MATRYCA 203/204, `G10` przemierzone, `I8` założone i zielone
+
+**Bilans ruszył się o jeden wiersz w górę i o jeden wiersz w bok, a najważniejsze
+z tego przebiegu nie jest ani jednym, ani drugim.** Najważniejsze jest to, że wiersz
+opisany w przebiegu 33 jako „wymagający nowej zdolności przyrządu" miał tę zdolność
+od dwudziestu sześciu przebiegów, tylko rejestr pokrycia nie umiał jej zobaczyć.
+
+- **`G10` 🟢 z pomiaru** (dotąd 🟢 z przebiegu 8 i od tamtej pory nietknięte).
+  Sonda `MP_MATRYCA.g10()` na OBU powierzchniach, wynik co do wartości identyczny:
+  scrim `true → false → true`, `krok 4 z 9`, jeden minutnik `pozostalo 1934`,
+  zaznaczony `skrobia-ziemniaczana`, **tożsamość węzła korzenia zachowana**,
+  szerokość kolumny treści po obrocie **390**. Stan przed obrotem jest NIETRYWIALNY
+  z założenia sondy (`zaznaczone !== ''`) — na pustym stanie „bez utraty stanu"
+  nie miałoby czego stracić.
+- **`I8` — nowy wiersz, nowy przyrząd `harness/pokrycie.html`.** Zbiory pokrycia obu
+  powierzchni **równe (193 = 193)**, kierunek twardy `brakWMin: []`, kontrola ujemna
+  i dodatnia komparatora przechodzą.
+- **Znalezisko ilościowe, którego nie miał kto zrobić: powierzchnie mierzą różną
+  LICZBĄ RAZY.** Pełna 427 asercji na ramkę, zminifikowana 432 — różnica **dokładnie 5**,
+  i to nie szacunek, tylko wielozbiór etykiet: `B16` ×3 różne asercje, `B21` i `W78`,
+  każda po dwa egzemplarze na powierzchni zminifikowanej. **Przebieg 33 opisał tę
+  samą rzecz prozą i policzył SIEDEM** („B16 ×2, I4, B21 ×2, W78, B16/D-15.1").
+  Liczba z pomiaru to pięć. Różnica jest drobna i dlatego pouczająca: proza liczyła
+  z pamięci o edycjach, przyrząd liczy z powierzchni.
+- **Duplikaty ZOSTAJĄ i to jest decyzja, nie zaniechanie.** Reguła `I8` jest kierunkowa:
+  brak asercji w MIN wywraca wiersz, nadmiar jest raportowany i dopuszczony. Dwa
+  egzemplarze stoją w dwóch stanach powierzchni, więc usunięcie ich zamieniłoby
+  mocniejszy oracle na schludniejszy plik — a to jest dokładnie ta wymiana, po której
+  `B7` przechodził jako `80 = 0 + 80` przez dwadzieścia sześć przebiegów.
+- **Regresja bez niespodzianek.** Pełna: **2989 asercji × 7 ramek, 14 padnięć**
+  (7 × `B24`, 7 × `I5` źródłowe), pieczęć `1786812123834`. Zminifikowana: **3024 × 7,
+  7 padnięć — wyłącznie `B24`**, pieczęć `1786812149302`. Konsola **zero na czternastu
+  ramkach**. `prog.html`: 499 widoczny / 500 ukryty, `zgodne: true`. `qr.html`: bramka
+  trzyma (991 nie rysuje przy DOSTĘPNYM dublerze, `falsyfikowalny: true`; 992 i 1024
+  rysują `<svg>`; `window` puste; dubler `wywolan: 0`; zero ostrzeżeń na desktopie).
+- **Dwie asercje wzmocnione po przeglądzie „co by to obaliło" (jednostka 3), obie
+  na OBU powierzchniach.** `A9: nagłówek sekcji nietknięty` stał na
+  `!!querySelector('.mp-pole__tytul')` — pytał o istnienie węzła, a wiersz obiecuje
+  nietknięcie, więc przekształcenie burzące nagłówek i budujące nowy przechodziło.
+  Teraz świadek brany PRZED przekształceniem, asercja pyta o tożsamość węzła, treść
+  i rodzica, z kontrolą dodatnią na niepustej treści (`tożsamość true · treść
+  „Wskazówka"`). `C07: pełna ma podpowiedź, primary i rząd ghostów` stał na trzech
+  `!hidden` — czyli „czy ktoś ich nie schował", nie „czy się rysują"; to ta sama
+  różnica, na której `I4` zzieleniało z pustki w przeb. 31. Kryterium to teraz
+  `getClientRects().length` plus niezerowa wysokość podpowiedzi (`prostokątów 1/1/1
+  · hPodp 38`). Liczba asercji bez zmian — zastąpione, nie dołożone.
+- **`I8` przeszło swój pierwszy prawdziwy test na własnej zmianie tego przebiegu:**
+  po symetrycznej edycji obu fixture'ów `brakWMin: []` i `tylkoWMin: []`. Gdyby edycja
+  poszła tylko do powierzchni pełnej, stara etykieta wyszłaby w `brakWMin`, a nowa
+  w `tylkoWMin` — czyli dokładnie ten rozjazd, który przez dziesięć przebiegów nikogo
+  nie zawiadamiał.
+- **Etap 0a niewykonany JEDENASTY przebieg z rzędu** — `outerWidth === 0`, sprawdzone
+  na starcie serii, nie założone.
+- **Szósta pułapka `javascript_tool`, ta sama rodzina co piąta:** odczyt `qr.html`
+  zwrócił `"wersja": "[BLOCKED: JWT token]"` zamiast `2.0.4` — narzędzie uznało ciąg
+  wersji za sekret i podmieniło WARTOŚĆ, nie zgłaszając tego jako błędu. Pomiar ocalał
+  tylko dlatego, że ta sama treść jedzie drugim polem (`deklaracjaTresc` =
+  `qrcode-generator@2.0.4 MIT`). **Wniosek do powtarzania: pole, które wygląda na
+  token, wersję albo hash, czytaj DWOMA drogami albo nie wnioskuj z jego braku.**
+
+## POKRYCIE — matryca mierzy teraz samą siebie (mechanizm założony w przeb. 33)
+
+**Po co.** Bilans wyżej odpowiada na pytanie „ile wierszy jest zielonych". Nie odpowiadał
+na pytanie o klasę niżej: **„o ile wierszy przyrząd w ogóle pyta"**. Przez dziesięć
+przebiegów te dwa zdania rozjeżdżały się po cichu, bo nic ich nie porównywało.
+
+**Mechanizm.** `sprawdz()` zapisuje identyfikatory wierszy z PREFIKSU etykiety (do
+pierwszego dwukropka) i wystawia je jako `wynik.pokrycie`. Liczone w chwili wywołania,
+nie grepem po pliku — etykieta bywa składana w locie (`'A2 · H9: ' + k[0]`) i analiza
+statyczna takiej nie widzi, więc meldowałaby brak pokrycia tam, gdzie pomiar jest.
+Prefiks, a nie cała etykieta, bo `W69: … — H4: DM Serif Display` niesie „H4" jako
+poziom nagłówka z Figmy, nie jako wiersz matrycy. Wiersz współdzielony zapisuje się
+w prefiksie jawnie, po separatorze.
+
+**Trzeciego egzemplarza prawdy tu nie ma** — i to było warunkiem projektowym, po nauce
+z tabeli Bilansu. Listy wierszy nie kopiujemy do harnessu: harness mówi, o co PYTAŁ,
+matryca mówi, co ISTNIEJE, a porównanie się liczy. Gdyby oczekiwana lista stała
+w `matrix.html`, rozjechałaby się z matrycą tak samo jak ręcznie utrzymywana suma.
+
+**Pomiar przeb. 33: 191/208 wierszy A–I i W ma asercję z własnym identyfikatorem,
+identycznie na OBU powierzchniach** (przedtem: 191 pełna / 178 zminifikowana).
+Siedemnaście pozostałych rozkłada się na trzy klasy, i tylko trzecia jest długiem:
+
+1. **Mierzone własnym przyrządem, poza matrycą szerokości (8).** `A8` → `nojs.html`
+   (wzrokowo — ramka bez `allow-scripts` nie wyśle `postMessage`), `G7` i `H8` →
+   `prog.html`, `I3` → `qr.html`, `B18` → inwariant odległości liczony przez
+   `matrix.html` z `wynik.odleglosci` (50 własności × 7 ramek), `I1` i `I2` → konsola
+   z `wynik.konsola`, `W3` → jawny odsyłacz do B17 („nie duplikować").
+2. **⏸ poza liczeniem, z definicji bez asercji (5):** W18, W46, W47, W77, W79.
+3. **DŁUG: cztery wiersze zielone bez żadnego przyrządu — `A1`, `A4`, `C08`, `G10`.**
+   Zielone kolejno od przebiegów 3, 3, 15 i 8 i od tamtej pory nieprzemierzone.
+   To ta sama klasa co B7 i U-2: nie istnieje stan, w którym by spadły. **Nie
+   przestawiam ich na czerwień** — nie ma dowodu defektu, jest brak dowodu zgodności,
+   a to dwie różne rzeczy i mieszanie ich psuje matrycę w drugą stronę. Są pozycją
+   numer jeden kolejki i pierwszą rzeczą, którą to pokrycie znalazło.
+
+   **KOREKTA PRZEBIEGU 34 — `G10` nigdy nie był długiem i klasyfikacja wyżej jest
+   błędna, a błąd ma czytelną przyczynę.** Przyrząd istniał: `MP_MATRYCA.g10()` stoi
+   w `matrix.html` i `matrix-min.html` od przebiegu 8 i mierzy dokładnie to, co wiersz
+   obiecuje — obrót ramki 844×390 → 390×844 → 844×390 z porównaniem stanu przed i po.
+   Przebieg 33 zapisał go jako „potrzebuje nowej zdolności przyrządu" i zaprojektował
+   od nowa drogę, którą już zbudowano; przebieg 34 zaczął od wywołania funkcji, która
+   tam leżała, i dostał zieleń na obu powierzchniach w dwóch minutach.
+
+   **Przyczyna jest własnością rejestru, nie pomyłką jednego ogniwa, więc zostaje
+   zapisana jako ograniczenie:** rejestr liczy identyfikatory z wywołań `sprawdz()`
+   WEWNĄTRZ fixture'a, a sondy `f4`, `g10`, `c1012`, `c1012seek` mieszkają w RODZICU —
+   i muszą tam mieszkać, bo ramka nie przewymiaruje sama siebie ani nie odczyta historii
+   rodzica. **Rejestr melduje więc brak pokrycia wszędzie tam, gdzie przyrząd jest
+   piętro wyżej.** To ta sama pułapka co „pustka przyrządu kontra pustka pomiaru"
+   z przebiegu 20, tylko o piętro przesunięta: brak ODCZYTU wygląda tu identycznie
+   jak brak PRZYRZĄDU. Klasa 1 wyżej wylicza takie wiersze ręcznie (`A8`, `G7`, `H8`,
+   `I3`, `B18`, `I1`, `I2`, `W3`) — i to wyliczenie było niekompletne o `G10`, `F4`
+   i rodzinę `C10`–`C12`. **Zanim kolejne ogniwo ogłosi wiersz długiem, ma sprawdzić
+   `matrix.html` i `matrix-min.html` na obecność sondy o tej nazwie** — koszt: jeden
+   `grep`, cena pominięcia: przebieg zaprojektowany od zera dla czegoś gotowego.
+
+   **Po korekcie dług pokrycia liczy JEDEN wiersz: `A1`** — i on jest długiem innego
+   rodzaju, bo blokuje go rozjazd treści wiersza z kodem (pozycja decyzyjna), a nie
+   brak przyrządu.
+
+**Czego ten mechanizm NIE mierzy, żeby nikt go nie przecenił.** Pyta „czy istnieje
+asercja z tym identyfikatorem", nie „czy asercja mierzy to, co wiersz obiecuje".
+Wiersz z asercją tautologiczną liczy się tu jako pokryty — B7 miał identyfikator
+i przechodził jako `80 = 0 + 80` przez dwadzieścia sześć przebiegów. Pokrycie jest
+sitem grubym, zakładanym dlatego, że sita grubego nie było wcale.
 
 **⏸ poza liczeniem:** W18 (stopień czasu w pigułce zwiniętej), **W46** (czerń tekstu
 tooltipa), **W47** (`Material Symbols Rounded` na jednym glifie), **W76** (wypełnienie
 ramki zdjęcia zakończenia — dwa sprzeczne odczyty Figmy, za D-23.1), **W77** (barwa kreski
 nad pasem dolnym: zieleń na ekranie kroku, atrament na zakończeniu). Każdy czeka na jedno
 zdanie operatora, żaden nie blokuje pozostałych wierszy.
+
+**Stan piątki po sesji rozstrzygnięć 2026-08-15 (aktualizacja przeb. 30).** Dwa z pięciu
+mają już odpowiedź operatora, a mimo to **nie zzieleniały i nie wolno ich zzielenić
+z lektury kodu**: **W47** (`close` → ujednolicić do Outlined, D-24.2) czeka na **B16**,
+bo dziś runtime rysuje `×` substytutem Unicode, a nie glifem z subsetu — dopóki
+`@font-face` nie jest wpięty, „rodzina fontu ikon" nie jest własnością, którą da się
+zmierzyć w przeglądarce; **W77** (barwa kreski nad pasem na zakończeniu) dostała
+D-26.1 „zieleń z Webflow #487622", co potwierdza WARTOŚĆ zmiennej, ale nie odpowiada
+na pytanie tego wiersza — czy ekran zakończenia ma kreskę atramentową zamiast zielonej.
+To jest różnica między rozstrzygnięciem tokenu a rozstrzygnięciem rysunku i wpisuję ją
+jawnie, zamiast domknąć wiersz najbliższą pasującą decyzją. **W46** (czerń tooltipa,
+D-24.1) i **W18** (stopień czasu w pigułce zwiniętej) nie mają odpowiedzi w ogóle.
+**W76** czeka razem z B21 na wykonanie D-23.1.
+
+**Pomiar przebiegu 33 (stan końcowy): MATRYCA 202/203, jedna czerwień — B24. Bilans
+się nie ruszył i to jest cała treść tego przebiegu.**
+
+Nie przybył ani jeden zielony wiersz, a mimo to matryca mówi dziś o produkcie więcej
+niż wczoraj — bo przybyły dwie rzeczy, których wynik zliczany na wierszach nie pokazuje:
+
+- **Powierzchnia zminifikowana przestała być ślepa na trzynaście wierszy.** `A14`, `A15`,
+  `A16`, `B20`, `W32`–`W40` (pasek meta, selektor porcji, tytuł ekranu, karta S1) miały
+  asercje **wyłącznie w `fixture.html`**. Blok dopisał je przebieg 23 do powierzchni
+  pełnej i nigdy nie odbił w zminifikowanej; przebiegi 31 i 32, nie znajdując tam bloku,
+  doszywały swoje asercje (B16, I4, B21, W78) w innym miejscu pliku, co utrwaliło rozjazd.
+  Przez dziesięć przebiegów `matrix-min.html` meldował **„ZERO padnięć"** o wierszach,
+  o które nie pytał — a to jest powierzchnia, której artefakt **faktycznie pojedzie
+  do embedu**. Po przeniesieniu bloku: **2989 asercji × 7 ramek, 7 padnięć, wyłącznie
+  B24**, pieczęć `1786811040415`. Trzynaście wierszy przeszło na artefakcie zminifikowanym
+  za pierwszym uruchomieniem — czyli defektu tam nie było. **To nie znaczy, że pomiar był
+  zbędny: „nie ma defektu" i „nikt nie sprawdzał" to dwa różne zdania i tylko jedno z nich
+  wolno postawić w raporcie.**
+- **`I6` przestało być zielone z lektury.** Szczegóły w wierszu; asercja mierzy plik
+  źródłowy, ma kontrolę pozytywną ekstraktora i sprawdza domknięcie listy G1–G12.
+
+**Skutek uboczny przeniesienia, zapisany świadomie:** siedem asercji (B16 ×2, I4, B21 ×2,
+W78, B16/D-15.1) stoi teraz na powierzchni zminifikowanej **w dwóch miejscach i dwóch
+stanach** — w bloku przeniesionym i tam, gdzie doszyły je przebiegi 31–32. Nie usuwam
+duplikatów: dwa stany to mocniejszy oracle niż jeden, i dokładnie tego zabrakło B7.
+Ale **strukturalna bliźniaczość obu powierzchni nie jest przywrócona** i nie należy
+udawać, że jest — to pozycja dla kolejnego ogniwa, wraz z asercją pilnującą, żeby
+zbiory `wynik.pokrycie` obu powierzchni **były równe**. Dziś są (191 = 191); nic
+poza czujnością tego nie trzyma.
+
+**Stan końcowy przebiegu 33 po jednostce 5** (spłata długu pokrycia — `A4` i `C08`):
+pełna **2989 asercji × 7 ramek, 14 padnięć** (7 × B24, 7 × I5 źródłowe), pieczęć
+`1786811474319`; zminifikowana **3024 asercje × 7 ramek, 7 padnięć — wyłącznie B24**,
+pieczęć `1786811487099`. **Zero nowych padnięć.** Konsola zero na czternastu ramkach.
+**Pokrycie 193/208 na obu powierzchniach.** Dług pokrycia zszedł z czterech wierszy
+do dwóch: zostają `A1` (rozjazd treści wiersza z kodem — pozycja decyzyjna) i `G10`
+(wymaga przestawiania wymiarów własnej ramki w trakcie pomiaru).
+
+**Liczby niżej opisują stan po jednostkach 1–4, przed spłatą długu** — zostawiam je
+dla porównania, bo pokazują przyrost pokrycia 191 → 193 przy niezmienionym bilansie.
+
+**Pomiar pełnej powierzchni:** 2954 asercje × 7 ramek, **14 padnięć — 7 × B24 i 7 × I5
+źródłowe** (121 928 zn., pada z definicji, do embedu nie idzie źródło), pieczęć
+`1786811000000`. **Konsola: zero błędów i ostrzeżeń na czternastu ramkach.** Inwariant
+odległości: **50 własności × 7 ramek, zero rozjazdów**. `prog.html` bez regresji
+(499 widoczny / 500 ukryty, `zgodne: true`). **`qr.html` przemierzone po raz pierwszy
+od przebiegu 28** — bramka trzyma: 991 nie rysuje **przy dostępnym dublerze biblioteki**
+(`falsyfikowalny: true`), 992 i 1024 rysują `<svg>`, `window` puste, dubler
+`wywolan: 0`, zero ostrzeżeń na desktopie.
+
+**Etap 0a (porównanie ekranowe 1:1) niewykonany DZIESIĄTY przebieg z rzędu** — okno
+Chrome `outerWidth === 0`, dpr 1,25. Sprawdzone na starcie serii, nie założone.
+
+**Pomiar przebiegu 32 (stan końcowy): MATRYCA 202/203, jedna czerwień — B24.**
+
+Przebieg przeszedł przez 200/200 i **sam ten stan był powodem, żeby matrycę powiększyć.**
+Kolejność jest tu ważniejsza od liczb: najpierw **I4 🔴 → 🟢** (bez dotknięcia jednej linii
+runtime'u — cała jednostka poszła w PRZYRZĄD), matryca pokazała zero czerwieni, a wtedy
+pytanie „czy to znaczy, że jest zrobione" dało odpowiedź „nie": **U-2 i U-4 były znane
+od przebiegu 29, opisane w STAN.md prozą i nie miały ani jednego wiersza.** Zieleń
+200/200 mówiła prawdę o tym, o co matryca pytała, i nieprawdę o produkcie.
+
+Dwa nowe wiersze, oba zmierzone, oba z kontrolą dodatnią:
+
+- **B24 (U-4) 🔴 7/7** — slot znaku marki jest pustym pudełkiem o poprawnej geometrii.
+  Jedyna czerwień w matrycy i **jedyna, która nie jest wykonalna wewnątrz łańcucha**
+  (D-32.1: brak assetu w Webflow, brak danych wektorowych z Figmy, zakaz rysowania ścieżki).
+- **B26 (U-1) 🟢 7/7** — reguła składania zmierzona jako tożsamość w stanie nietrywialnym
+  (`132 = 52 + 80`). Wiersz B7 pytał o to samo od przebiegu 6 i **przechodził jako
+  `80 = 0 + 80`**, bo stos jest pusty w stanie, w którym kończy się blok pomiarowy.
+  Zieleń, której nie da się zepsuć, nie jest pomiarem — jest tautologią z ładnym opisem.
+  Przy okazji zmierzone: **żaden z dziewięciu kroków nie wnosi pigułki sam z siebie**,
+  stos zapełnia się dopiero po geście uruchomienia minutnika.
+- **B25 (U-2) 🟢 7/7 — i ten wynik OBALA zgłoszenie.** Defekt opisany w przeb. 29
+  już nie istnieje; lista niosła go trzy przebiegi po naprawie. **Sprawdzanie starych
+  pozycji jest pracą tej samej klasy co mierzenie nowych**, tylko tańszą i regularnie
+  pomijaną, bo nie wygląda na postęp.
+
+Wstrzymanych decyzyjnie pozostaje pięć (W18, W46, W47, W77, W79); są poza liczeniem
+zgodnie z konwencją tej tabeli i **nie wolno czytać zieleni jako „nie ma już pytań
+do operatora”.**
+
+Powierzchnia pełna: **2 884 asercje × 7 ramek, 7 padnięć** — wyłącznie I5 źródłowe
+(121 928 zn., z definicji nad progiem, bo to plik z komentarzami), pieczęć `1786809152228`.
+Powierzchnia zminifikowana: **2 779 asercji × 7 ramek, ZERO padnięć**, pieczęć
+`1786809182404` — to jest **spłata długu z przebiegu 31**, który przebudował `min.js`,
+dopisał asercje do obu harnessów i skończył okno przed uruchomieniem `matrix-min.html`.
+**Konsola: zero błędów i ostrzeżeń na czternastu ramkach.** Bramka fontu na każdej
+z czternastu ramek: `wczytanych krojów: 6 · check() tak`. Inwariant odległości (B18):
+**zero rozjazdów na 50 własnościach × 7 ramek**; kontrola dodatnia `kolumnaTresci`
+zmienia się zgodnie z szerokością (288 / 328 / 358 / 408 / 448 · 812 · 635).
+`prog.html` bez regresji: 499 start widoczny, 500 ukryty, `zgodne: true` po obu stronach.
+Rozmiary artefaktów (`wc -m`): runtime min. **40 713 zn.** (zapas **4 287**),
+parser min. **39 592 zn.** (zapas **5 408**).
+
+Okno Chrome `hidden` **dziewiąty przebieg z rzędu** (`outerWidth === 0`, dpr 1,25),
+więc porównania ekranowego 1:1 (etap 0a) znowu nie było — świadomie, bo bez widocznego
+okna byłoby porównaniem czegoś z niczym. To jest jedyny etap pętli, który stoi
+niewykonany od dziewięciu przebiegów, i przy zielonej matrycy staje się pozycją
+numer jeden, a nie przypisem.
+
+**Poprzedni zapis — pomiar przebiegu 31 (stan końcowy): MATRYCA 198/200,
+a po czwartej jednostce tego samego przebiegu 199/200.** Bilans zmienił się na obu
+stronach ułamka, więc wypisuję go po składnikach zamiast podać różnicę: **B21 🔴 → 🟢**
+(D-23.1 wykonane), **W76 ⏸ → 🟢** (weszło do liczenia, +1 w mianowniku), **W78 nowy 🟢**
+(+1 i +1), **W79 nowy ⏸** (poza liczeniem, nie rusza ułamka). **Czerwone dwa: B16 · I4** —
+jedna robota, font ikon. Wstrzymanych decyzyjnie sześć: W18, W46, W47, W77, W79 i pytanie
+o rysunek zakończenia.
+
+Powierzchnia pełna: **2 856 asercji × 7 ramek, 7 padnięć** — wyłącznie I5 źródłowe
+(117 906 zn., z definicji nad progiem), pieczęć `1786807678296`. Powierzchnia
+zminifikowana: **2 751 asercji, ZERO padnięć**, pieczęć `1786807735982`, runtime
+**39 648 zn.**, zapas do progu 45 000 = **5 352**. **Konsola: zero błędów i ostrzeżeń
+na czternastu ramkach.** Inwariant odległości (B18): **zero rozjazdów** — mapa 25 własności
+identyczna na wszystkich siedmiu ramkach. `prog.html` bez regresji: 499 start widoczny,
+500 ukryty, `zgodne: true` po obu stronach.
+
+**Pierwsza seria padła na dwóch ramkach POZIOMYCH i znowu nie był to defekt runtime'u.**
+B21 i W76 raportowały `797` tam, gdzie oracle `innerWidth − 32` chciał `812` — różnica
+dokładnie **15 px**, czyli szerokość klasycznego paska przewijania, który desktopowy
+Chrome rysuje w poziomie (TOP się tam przewija), a w portrecie nie. Poprawny oracle to
+`top.clientWidth − 32`. **To czwarta odsłona tej samej pułapki** (B1 w przeb. 22, G01
+w przeb. 24, krawędź pigułki w przeb. 30) i pierwsza, w której było wiadomo z góry, czego
+szukać — koszt spadł z serii diagnostycznej do jednego spojrzenia na liczbę. Uboczna
+obserwacja do sprawdzenia kiedy indziej: raportowane przez harness `kolumnaTresci` dla
+ramek poziomych podaje `812` i `635`, czyli liczy razem z paskiem — pole raportowe, nie
+asercja, ale ta sama arytmetyka.
+
+
+**Pomiar przebiegu 30 (stan końcowy): MATRYCA 195/198.** Dwa nowe wiersze (**B22**, **B23**)
+i oba zielone z pomiaru; **E6 przepisane** pod U-7. Trzy czerwone bez zmiany, wszystkie
+decyzyjno-wykonawcze: **B16 · B21 · I4**. Powierzchnia pełna **2 807 asercji × 7 ramek,
+14 padnięć** — 7 × I5 (źródło z definicji nad progiem: 116 838 zn.) i 7 × B21 (znana
+czerwień), pieczęć `1786805639242`. Powierzchnia **zminifikowana: 2 702 asercje, ZERO
+padnięć**, pieczęć `1786805762983`. **Konsola: zero błędów i ostrzeżeń na czternastu
+ramkach.** `prog.html` bez regresji: 499/500 `zgodne: true` po obu stronach.
+Runtime zminifikowany **39 536 zn.** — zapas do progu I5 stopniał z 654 do **464**.
+
+**Pierwsza seria tego przebiegu padła na sześciu wierszach i żaden nie był defektem
+runtime'u.** Dwa razy `elementFromPoint` w orientacji poziomej trafiał w scrim „obróć
+telefon" (poprawne zachowanie, złe oczekiwanie), a raz krawędź kolumny liczona
+z `getBoundingClientRect()` rozjeżdżała się o 15 px z paskiem przewijania, który
+w poziomie się pojawia, a w portrecie nie. **Nowa asercja jest artefaktem i ma własne
+usterki** — to trzeci przebieg z rzędu, w którym pierwszy wynik pomiaru jest wynikiem
+o przyrządzie. Zanim wiersz zrobi się czerwony, sprawdź, czy pyta o to, co myśli.
 
 **Pomiar przebiegu 28 (stan końcowy): MATRYCA 193/196.** Trzy czerwone, wszystkie
 decyzyjne: **B16 · B21 · I4**. Regresja po wpięciu biblioteki QR do parsera:
