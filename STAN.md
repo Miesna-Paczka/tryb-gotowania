@@ -9742,3 +9742,30 @@ Pages, a w polu Webflow stoją dwa `<script src>` o łącznej długości ~180 zn
 `WYMAGANIA.md` jest plikiem wiążącym, więc progu nie ruszam. **Pozycja dla operatora:**
 albo próg zostaje i trzeba ciąć kod, albo §4 wymaga przeredagowania pod transport przez
 Pages — z podbiciem hasha w „Plikach wiążących" w tym samym ruchu.
+
+### POMIAR PO PUBLIKACJI — 2026-08-16, build `401b09d` przez Pages, `mpGotowanieStart 1.5.0`
+
+Transport `[V]`: Pages oddaje **45 030** B, `sha256` zgodny co do bitu z lokalnym artefaktem;
+strona ładuje `mpgotowaniestart-1.5.0.js`.
+
+| pozycja | wynik |
+|---|---|
+| `D-39.16` krok 1 — pełna lista | **12 wierszy**, `teraz 0 · dalej 12`, brak etykiety „w tym kroku", brak przycisku „zobacz pozostałe", reszta **rozwinięta** ✓ |
+| `D-39.18` bez sesji | `ekran: 'start'`, „tryb gotowania" ✓ |
+| `D-39.18` sesja `{krok:4}` → ponowne wejście | **`ekran: 'wznowienie'`**, „wróć do gotowania" / „zacznij od nowa" ✓ |
+| `D-39.18` CTA wznowienia | **`krok 4 z 9`** — wraca na właściwy krok, nie na pierwszy ✓ |
+| `D-39.18` ghost „zacznij od nowa" | `krok 1 z 9` ✓ |
+| rotation lock, ramka 844×390 | scrim `display:flex`, zakrywa **844×390**, „obróć telefon" ✓ |
+| ta sama ramka 390×844 | scrim `none` ✓ |
+| `D-39.17` zwolnienie blokady przy zamknięciu | `wakeLock()` → `null` ✓ |
+
+**`D-39.17` — POZYTYWNEGO POTWIERDZENIA NIE MAM I NIE UDAJĘ, ŻE MAM.**
+Zmierzone: API jest (`request` to `function`), runtime prosi (stan idzie `null` → `false`),
+czyli **wywołanie następuje** — ale kończy się odmową. Odmowa jest w tym przypadku
+**zgodna ze specyfikacją Wake Lock API, nie objawem usterki**: przeglądarka odrzuca żądanie,
+gdy dokument nie jest widoczny, a ramka pomiarowa ma `document.hidden === true` i pozostaje
+ukryta nawet po wymuszeniu renderowania zrzutem. **Tego wiersza nie da się zamknąć na
+zielono tym przyrządem** — potrzebny jest widoczny dokument, czyli telefon operatora.
+Sprawdzian dla operatora, dwa równoważne: `MP.tryb.wakeLock()` ma zwrócić `true`, albo
+po prostu ekran nie gaśnie w trakcie gotowania. Ścieżka ponowienia po powrocie do karty
+jest w kodzie i to ona pokrywa przypadek „odmówiono, bo karta była w tle".
