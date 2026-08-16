@@ -473,7 +473,54 @@ Konsekwencja `D-39.2`: sesja harmonogramowa nie ma kogo poprosić o `python -m h
 więc harness lokalny jest dla łańcucha niedostępny **z definicji, nie przez awarię**.
 `harness/*.html` zostaje w repo jako przyrząd do sesji interaktywnych.
 
-**D-39.7 · Embed przechodzi na stały adres `@main` + purge jsDelivr.** Wymóg operatora:
+**D-39.7 ODWOŁANE 2026-08-16 — POMIAR JE OBALIŁ. Treść zostaje jako zapis błędu.**
+`@main` + purge **NIE DZIAŁA** i moja „weryfikacja" była wadliwa w sposób, który warto
+nazwać, bo jest powtarzalny: sprawdziłem, że endpoint purge **odpowiada** `200`, i
+zapisałem to jako dowód, że **treść się odświeża**. To dwie różne rzeczy, a ja
+zmierzyłem tańszą z nich i nazwałem ją drugą. Ta sama klasa błędu co `F2`, gdzie
+`.click()` mierzył podpięcie handlera i był brany za osiągalność przycisku.
+
+Pomiar rozstrzygający, po pushu `6b700fb` `[V]`:
+
+| adres | rozmiar | co to znaczy |
+|---|---|---|
+| `@6b700fb` (niezmienny) | **43 978** | origin ma nowy build |
+| `@main` przed purge | 43 794 | stary |
+| `@main` po purge, `status: finished` | **43 794** | **purge nie ruszył rozwiązania gałęzi** |
+| `@main` po purge + 25 s | 43 794 | to nie jest kwestia propagacji |
+| `@main?v=<sha>` | 43 794 | query stringu jsDelivr nie honoruje przy rozwiązywaniu |
+| `fastly.jsdelivr.net@main` | 43 794 | mirror dzieli to samo rozwiązanie |
+
+**Przyczyna: jsDelivr cache'uje ODWZOROWANIE gałęzi na commit osobno od pliku.**
+Purge czyści plik pod ścieżką, ale ścieżka `@main` dalej wskazuje stary commit.
+Żaden zabieg po stronie adresu tego nie omija.
+
+**D-39.8 · Stały adres — dwa działające warianty, oba zmierzone.**
+`cdn.statically.io/gh/lukaszwerecik/tryb-gotowania/main/…` oddaje **43 978**, bajt
+w bajt zgodne z `6b700fb` (`sha256 688a1fad…`), `content-type: application/javascript`,
+`age: 88 s` po pushu — czyli gałąź rozwiązuje świeżo. Wada: `cache-control: max-age=86400`,
+więc przeglądarka trzyma kopię dobę.
+**GitHub Pages — NIEWŁĄCZONE** (`lukaszwerecik.github.io/tryb-gotowania/…` → 404) i to
+jest wariant rekomendowany: jedno ustawienie w repo, brak trzeciej strony, Pages podaje
+`max-age=600`, więc pętla pomiarowa odświeża się w dziesięć minut bez żadnego purge.
+
+**D-39.9 · Prawo usuwania w `.git` DZIAŁA — `CLAUDE.md` mówi w tej sprawie nieprawdę.**
+Zdanie „zgoda `allow_cowork_file_delete` obejmuje drzewo robocze, ale NIE wnętrze `.git`"
+(powtórzone też w `DEPLOY.md` §3) zostało obalone pomiarem: po udzieleniu zgody
+`rm .git/<plik>` przechodzi, zombie `zombie-lock-1786819612535594150` z 2026-08-15
+usunięty, pełny cykl `add` → `rm --cached` → `rm` **nie zostawia ani jednego `.lock`** `[V]`.
+Konsekwencja: łańcuch może commitować wielokrotnie w przebiegu, a nie raz.
+**Nie poprawiam `CLAUDE.md` ani `DEPLOY.md` — to nie jest mój katalog i nie mój plik
+wiążący. Zgłaszam rozjazd, zgodnie z regułą „powiedz, nie naprawiaj".**
+
+**D-39.10 · REGRESJA W SZABLONIE — blok `<style>` z progiem 500 px ZNIKNĄŁ przy podmianie
+adresów.** Zmierzone na stagingu: **zero reguł `@media` z progiem 500 px w całym
+dokumencie**, a arkusz Webflow ustawia `.recipe-floating-cta{display:none}` w regule
+bazowej ORAZ w `@media 991` i `@media 767` `[V]`. Znaczy to, że **przycisk startu jest
+niewidoczny na każdej szerokości i trybu gotowania nie da się w tej chwili otworzyć
+ze strony.** Blok trzeba przywrócić w tym samym polu, nad znacznikami `<script>`.
+
+**D-39.7 (ODWOŁANE) · Embed przechodzi na stały adres `@main` + purge jsDelivr.** Wymóg operatora:
 nie zmieniać linku w szablonie przy każdym commicie. `@latest` odpada (wskazuje tag),
 `@<SHA>` odpada (to jest właśnie ta zmiana). `@main` samo w sobie odpada z powodu
 opisanego w `DEPLOY.md` (cache kilkanaście godzin) — **ale endpoint purge znosi tę
