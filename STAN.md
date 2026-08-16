@@ -9627,3 +9627,70 @@ Nie robię tego w tej sesji, bo katalog mutacji mierzy się harnessem lokalnym, 
 łańcucha niedostępny (`D-39.2` / `D-39.6`).
 
 **Artefakty:** runtime **44 338** znaków (zapas 662), parser **39 944**.
+
+### PRZEBIEG TESTERSKI — 2026-08-16, build `a20e82a` przez Pages, iframe 390 px
+
+#### Działa (zmierzone)
+
+Wejście z CTA → ekran startowy · selektor porcji `1–7` z gaszeniem na obu granicach ·
+**przeliczanie gramatur** (1 porcja → „0,5 pomarańczy", 2 → „1 pomarańcza") ·
+nawigacja 1→9 i wstecz · `wstecz` wyłączony na kroku 1 · **`dalej` z kroku 9 → ekran
+`koniec`** („ugotowane", „wróć do przepisu" / „zamknij tryb gotowania", pasek postępu
+pełny 235/235,4) · checkbox przełącza się i **przeżywa zmianę kroku** · akordeon
+przełącza stan, etykietę i `aria-expanded` · `×` → `S2` → „wyjdź mimo to" ·
+**przycisk wstecz przeglądarki zamyka overlay** · zero błędów w konsoli.
+
+**Automatyczne oznaczanie zużytych DZIAŁA** — pełna seria po dziewięciu krokach `[V]`,
+składniki wędrują `dalej` → `teraz` → `zużyty`:
+
+| krok | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+|---|---|---|---|---|---|---|---|---|---|
+| teraz | 0 | 3 | 4 | 1 | 1 | 1 | 1 | 1 | 2 |
+| dalej | 0 | 9 | 5 | 4 | 3 | 2 | 1 | 1 | 0 |
+| **zużyty** | 0 | 0 | **3** | **7** | **8** | **9** | **10** | **11** | **11** |
+
+**Minutniki działają w komplecie** `[V]`: badge jest `<button>`, trafialny palcem,
+`aria-label` „włącz minutnik: brokuły" · tap → pigułka „brokuły 3:00 ⌃ Różyczki są
+**jaskrawozielone bez gwiazdek**" (potwierdza `D-39.15` na żywo) · **drugi tap tego samego
+badge'a nie dubluje** (1 pigułka) · minutnik z drugiego kroku → 2 pigułki · **trzeci →
+dialog `S4`, pigułek dalej 2** · `S4` wymienia oba biegnące, „zakończ" zdejmuje wskazany
+i zamyka dialog. Odliczanie idzie: pigułka założona na `3:00` pokazywała `1:29`.
+*(Dwie próbki 4 s od siebie dały tę samą wartość — to dławienie karty w tle, nie usterka;
+dowodem ruchu jest przebyta droga 3:00 → 1:29.)*
+
+#### CZTERY ZNALEZISKA
+
+**1. WAKE LOCK NIE ISTNIEJE, A JEST W SPECYFIKACJI.** W `tryb-gotowania.js` **zero**
+wystąpień `wakeLock` / `noSleep` / czegokolwiek pokrewnego; jedyne trafienie na „lock" to
+komentarz o `screen.orientation.lock()`. `navigator.wakeLock` jest w przeglądarce dostępne
+(`true`). Specyfikacja go wymienia: `WYMAGANIA.md` §106 („S5 — wake lock") oraz
+`INTERAKCJE.md` `I-23` („powrót do karty po wygaszeniu ekranu … `[U]` wake lock, Aneks 6").
+**Dla trybu gotowania to nie jest detal:** telefon leży na blacie, ręce ma się w cieście,
+a ekran gaśnie w połowie kroku. Ekran `S5` opisuje sytuację PO wygaszeniu — czyli plik
+zakłada, że wygaszenie bywa, ale mechanizm mający je opóźniać nie powstał.
+
+**2. EKRAN WZNOWIENIA `S1` JEST NIEOSIĄGALNY — trzeci przypadek tej samej klasy.**
+Sesja zapisuje się poprawnie (`{"krok":1,"porcje":2,"znacznik":…}`), `MP.tryb.sesja.wznow()`
+wywołane ręcznie ustawia `ekran: 'wznowienie'`, etykietę „wróć do gotowania" i CTA „wróć do
+gotowania" `[V]`. **Ale ponowne wejście z przycisku daje `ekran: 'start'`** — nikt `wznow()`
+nie woła. Dokładnie ten sam wzorzec co `uruchomZKroku` (minutniki, `D-39.14`) i co
+`pokazEkran('koniec')` (`D-39.13`): funkcja gotowa, wyzwalacza brak. **Trzy razy ta sama
+klasa defektu w jednym produkcie to nie przypadek — to brak testu, który pyta „czy z
+interfejsu da się tu dojść".**
+
+**3. „NAJPIERW POKAŻ SKŁADNIKI" PROWADZI DO PUSTEJ LISTY.** Ghost z ekranu startowego robi
+`pokazKrok(1)` + `przelaczListe(true)`. Zmierzone: `krok 1 z 9`, `listaOtwarta: true`,
+**`wierszy: 0`**. Krok 1 tego przepisu ma `skladniki: []`, więc użytkownik prosi o składniki
+i dostaje pustkę. Cel „krok 1" był poprawny, gdy istniał osobny ekran PEŁNEJ listy;
+po jego usunięciu przycisk stracił przedmiot. Naprawa jest decyzją, nie oczywistością:
+pierwszy krok ZE składnikami, czy zbiorczy widok wszystkich sekcji.
+
+**4. EKRAN STARTOWY BEZ ZDJĘCIA I BEZ PASKA META.** Model: `fotoUrl: null`, `foto: null`,
+`meta: []`, przy czym strona przepisu ma duże zdjęcie dania. Renderer zachowuje się
+poprawnie (nie rysuje pustych ramek) — **brakuje DANYCH**. Do rozstrzygnięcia, czy to luka
+w CMS, czy parser nie sięga po te pola.
+
+**Drobiazg bez rozstrzygnięcia:** na kroku 9 suma wierszy wynosi 13 (2+0+11), a na
+pozostałych 12. Jeden składnik liczony dwa razy albo pojawiający się w dwóch sekcjach.
+
+**Nadal otwarte:** obcięcie listy o 13 px (`D-39.12`, wymaga niewyhamowanego przyrządu).
