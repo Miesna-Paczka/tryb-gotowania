@@ -9803,3 +9803,43 @@ przez wyjście z trybu i wejście od nowa. Teraz symetria jest pełna — `wstec
 → `start`, `dalej` z kroku N → `koniec`, oba przyciski zawsze aktywne.
 
 **Artefakt:** 45 056 znaków (próg miękki 45 000 — patrz pozycja decyzyjna wyżej).
+
+### `D-39.20` ZAMKNIĘTE + ASPEKT ZDJĘCIA GŁÓWNEGO — 2026-08-16
+
+**Zdjęcie wróciło** `[V]`: atrybut `data-mp-foto-glowne` jest na stronie, `model.fotoUrl`
+niepusty, na ekranie startowym `[data-mp-foto-ekranu]` **358×150, `zaladowane: true`**,
+`object-fit: cover`, `border-radius: 12px`, plik źródłowy 569×366.
+
+**ASPEKT: zgodny CO DO PIKSELA przy 360, rozjeżdża się na każdej innej szerokości.**
+Figma daje ramkę zdjęcia **328×150** i robi to spójnie na WSZYSTKICH trzech ekranach,
+które ją mają — start `7195:10901`, wznowienie `7196:10900`, zakończenie `7448:128447`.
+Proporcja projektowa: **2,187**.
+
+Runtime przypina **`height: 150px` na sztywno**, a szerokość bierze z kolumny treści,
+więc proporcja jest funkcją szerokości ekranu `[V]`:
+
+| szerokość | 320 | **360** | 390 | 440 | 478 |
+|---|---|---|---|---|---|
+| pudełko | 288×150 | **328×150** | 358×150 | 408×150 | 446×150 |
+| proporcja | 1,920 | **2,187** | 2,389 | 2,720 | 2,976 |
+
+**Przy 360 jest dokładnie tak, jak w pliku. Przy 440 (iPhone Pro Max) zdjęcie jest
+o jedną czwartą bardziej płaskie, niż zaprojektowano**, a że `object-fit: cover`,
+kadr traci góra-dół — nie ma zniekształcenia, jest przycięcie.
+
+**Czy to jest niezgodność z projektem — NIE ROZSTRZYGAM SAM, bo plik nie odpowiada.**
+Figma rysuje jedną szerokość (360) i nie mówi, co ma być niezmiennikiem: wysokość
+150 czy proporcja 328:150. Obie interpretacje odtwarzają plik przy 360 i rozchodzą się
+poza nim. **Argument za proporcją:** cała reszta układu jest płynną kolumną, więc jedyny
+element o stałej wysokości zachowuje się inaczej niż wszystko wokół, a różnica rośnie
+z szerokością. **Argument za 150:** rytm pionowy ekranu startowego (tytuł na y=254,
+meta na y=318) jest w pliku policzony przy wysokości 150 i zmiana wysokości przesunie
+wszystko poniżej.
+**Zmiana byłaby jednolinijkowa** (`aspect-ratio: 328 / 150` zamiast `height: 150px`),
+ale rusza rytm pionowy trzech ekranów, więc czeka na rozstrzygnięcie operatora.
+
+**Ograniczenie przyrządu, powiedziane wprost:** `Page.captureScreenshot` na tej karcie
+**przekracza 30 s i pada** (renderer wyhamowany — pułapka §1.1/§3 katalogu). Ramkę
+pomiarową ustawiłem tym razem w polu widzenia, ale pikseli i tak nie dostaję.
+**Wizualnym przyrządem tego zadania jest telefon operatora i nie mam dla niego
+zamiennika w tej sesji.**
