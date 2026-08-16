@@ -326,7 +326,22 @@
        intuicja o notchu; jeśli belka ma dostać zapas u góry, to jest decyzja, nie fix. */
     '#' + ID + ' .mp-tryb__bottom{position:absolute;left:0;right:0;bottom:0;' +
       'padding-bottom:env(safe-area-inset-bottom,0px);' +
-      'background:var(--mp-bialy-pelny);' +
+      /* D-39.24 · PAS DOLNY WG NAV BARU WŁAŚCIWEJ STRONY — polecenie operatora
+         2026-08-16: „opacity 80 % i 8 px bluru, analogicznie do nav baru na
+         właściwej stronie". **Wzorzec ODCZYTANY, nie przyjęty z opisu:**
+         `.site-nav__links` na stronie przepisu ma `backdrop-filter: blur(8px)`
+         i `background: rgba(255,253,251,0.8)` [V] — czyli biel ZŁAMANA `--mp-bialy`
+         (#FFFDFB) przy 80 %, nie biel pełna.
+         **To nadpisuje dwa wcześniejsze ustalenia i zapisuję to wprost, zamiast
+         udawać, że ich nie było:** `W01` mówił, że pas dolny jest jednym z dwóch
+         miejsc bieli PEŁNEJ, a `W09/W10` przyjęły mapowanie „promień Figmy / 2",
+         które dawało blur 4. Operator wskazał inny oracle — żywy nav bar — i ma
+         pierwszeństwo przed odczytem z pliku.
+         Cień zostaje: nav strony go nie ma, ale pas dolny overlaya oddziela treść
+         przewijaną pod spodem, a nie stoi na tle strony. Gdyby miał zniknąć, jest
+         to osobna decyzja i osobny wiersz. */
+      'background:color-mix(in srgb,var(--mp-bialy) 80%,transparent);' +
+      'backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);' +
       'box-shadow:0 -1px 2px 0 rgba(62,43,34,.05),0 -4px 8px -2px rgba(62,43,34,.10)}' +
     /* W02 (przeb. 21): kreska 1 px `secondary-text (h1)` #487622 nad pasem dolnym.
        PSEUDOELEMENT, nie `border-top` — i to nie jest ozdobnik implementacyjny.
@@ -718,8 +733,21 @@
        na klatce produkcyjnej `7196:10982` (`7273:10878` i dalsze) wiąże to samo, bez
        nadpisania wypełnienia. Sprawdzone na OBU pudełkach, bo lekcja W22 brzmiała
        „zanim naprawisz wiersz, sprawdź, o które pudełko pyta". [V] */
-    '#' + ID + ' .mp-tryb__wiersz[data-stan="zuzyty"] .mp-tryb__nazwa-skl{' +
+    /* D-39.25 · PRZEKREŚLENIE NIESIE „WYKORZYSTANY", NIEZALEŻNIE OD TEGO, KTO TAK
+       ORZEKŁ — polecenie operatora 2026-08-16. Do tej zmiany przekreślenie dostawał
+       wyłącznie stan `zużyty` (nadany przez postęp przepisu), a odhaczenie ręczne
+       zmieniało tylko pudełko checkboxa. Użytkownik widział więc dwa różne
+       wykończenia dla tej samej informacji: „ten składnik jest już użyty".
+       To domyka kierunek z `D-39.4`: rozłączne mają być STANY, a nie ich delty
+       wizualne. Dawne `G2` („odhaczony BEZ przekreślenia") jest tym samym
+       unieważnione w całości — nie zostawiam go jako obowiązującego. */
+    '#' + ID + ' .mp-tryb__wiersz[data-stan="zuzyty"] .mp-tryb__nazwa-skl,' +
+    '#' + ID + ' .mp-tryb__wiersz[data-odhaczony] .mp-tryb__nazwa-skl{' +
       'text-decoration:line-through}' +
+    /* D-39.26 — wiersz z sekcji „zużyte" nie daje się odznaczyć (polecenie
+       operatora). Kursor i cel dotyku znikają razem z możliwością kliknięcia,
+       inaczej przycisk obiecywałby akcję, której nie wykona. */
+    '#' + ID + ' .mp-tryb__wiersz[data-stan="zuzyty"] .mp-tryb__ptaszek{cursor:default}' +
     /* E5 — marker w liście: kropkowane podkreślenie nazwy + kółko `i` ZARAZ ZA
        nazwą (C2, rozstrzygnięcie operatora), odstęp 8 px (§3.14: 182 − 174). */
     '#' + ID + ' .mp-tryb__wiersz[data-mp-zamiennik] .mp-tryb__nazwa-skl{' +
@@ -1495,7 +1523,19 @@
     ptaszek.setAttribute('aria-checked', zaznaczone[s.key] ? 'true' : 'false');
     ptaszek.setAttribute('aria-label', s.etykieta);
     el('span', 'mp-tryb__cel', ptaszek).setAttribute('aria-hidden', 'true');
-    ptaszek.addEventListener('click', function () { odhacz(s.key); });
+    /* D-39.26 · SKŁADNIKA Z SEKCJI „ZUŻYTE" NIE DA SIĘ ODZNACZYĆ — polecenie
+       operatora 2026-08-16. Ten stan nadaje POSTĘP PRZEPISU, nie użytkownik:
+       składnik został zużyty w kroku, który jest już za nami, więc odznaczenie
+       twierdziłoby coś nieprawdziwego o przebiegu gotowania.
+       `disabled` na przycisku, nie sam brak nasłuchu: bez niego przycisk byłby
+       nadal skupialny klawiaturą i czytnik ekranu ogłaszałby go jako aktywny.
+       `aria-disabled` obok, bo `role="checkbox"` nie dziedziczy stanu z `disabled`. */
+    if (stanWiersza === 'zuzyty') {
+      ptaszek.disabled = true;
+      ptaszek.setAttribute('aria-disabled', 'true');
+    } else {
+      ptaszek.addEventListener('click', function () { odhacz(s.key); });
+    }
 
     var nazwa = el('span', 'mp-tryb__nazwa-skl', li);
     nazwa.textContent = s.etykieta;
@@ -1846,6 +1886,11 @@
           if (p) p.setAttribute('aria-checked', nowa ? 'true' : 'false');
         });
     }
+    /* D-39.27 — zapis PO każdej zmianie odhaczenia, nie tylko przy zmianie kroku.
+       Bez tego odhaczenie zrobione i nietknięte niczym innym ginęłoby przy
+       zamknięciu karty — a to jest dokładnie ten moment, w którym użytkownik
+       odkłada telefon. Zapis jest tani (jeden `setItem`) i idempotentny. */
+    zapiszSesje();
     return nowa;
   }
 
@@ -2273,7 +2318,16 @@
   function zapiszSesje() {
     var id = idPrzepisu();
     if (!id || typeof localStorage === 'undefined') return null;
-    var dane = { krok: stan.krok, porcje: stan.porcje, znacznik: Date.now() };
+    /* D-39.27 · ODHACZENIA IDĄ DO ZAPISU — polecenie operatora 2026-08-16:
+       „status zużyte powinien być persystentny, póki użytkownik go nie odznaczy".
+       Do tej zmiany `zaznaczone` żyło wyłącznie w pamięci modułu: przeżywało zmianę
+       kroku (zmierzone), ale ginęło przy zamknięciu trybu, przeładowaniu strony
+       i powrocie przez wznowienie — czyli w każdej sytuacji, w której zapis sesji
+       w ogóle ma sens. Zapisujemy KLUCZE, nie cały obiekt: klucz składnika jest
+       stabilny między porcjami, a ilości i etykiety przeliczają się z modelu. */
+    var klucze = Object.keys(zaznaczone);
+    var dane = { krok: stan.krok, porcje: stan.porcje,
+                 zaznaczone: klucze, znacznik: Date.now() };
     try { localStorage.setItem(KLUCZ + id, JSON.stringify(dane)); } catch (e) { return null; }
     return dane;
   }
@@ -2500,6 +2554,17 @@
        strony jest `<body>`, więc blokada musi objąć oba elementy. Poprzednie
        wartości zapamiętujemy osobno — nadpisanie ich na stałe zostawiłoby artykuł
        niedziałający po zamknięciu trybu. */
+    /* D-39.27 — odhaczenia wracają z zapisu przy KAŻDYM otwarciu, nie tylko przy
+       wznowieniu. Operator powiedział „póki go nie odznaczy", a nie „póki nie wyjdzie":
+       gdyby przywracanie wisiało na `wznow()`, wejście przez „zacznij od nowa" albo
+       przez jawny `{krok:N}` gubiłoby odhaczenia bez żadnego komunikatu.
+       Nie nadpisujemy tego, co już jest w pamięci — otwarcie w tej samej sesji
+       nie może cofnąć kliknięcia sprzed sekundy. */
+    (function () {
+      var s = czytajSesje();
+      if (!s || !s.zaznaczone || !s.zaznaczone.length) return;
+      s.zaznaczone.forEach(function (k) { zaznaczone[k] = true; });
+    })();
     if (poprzedniOverflow === null) {
       poprzedniOverflow = document.documentElement.style.overflow;
       poprzedniOverflowBody = document.body ? document.body.style.overflow : null;

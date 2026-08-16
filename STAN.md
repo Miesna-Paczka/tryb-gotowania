@@ -9929,3 +9929,37 @@ zamrożony, „ani w górę, ani w dół".
    pokazał na końcu, że lista jest cała i że przewinęła się poprawnie.
 
 **Artefakt:** 45 370 znaków (próg miękki 45 000 — pozycja decyzyjna operatora).
+
+### CZTERY POLECENIA OPERATORA — 2026-08-16, wykonane
+
+**`D-39.24` · Pas dolny wg nav baru właściwej strony.** Wzorzec **ODCZYTANY, nie przyjęty
+z opisu**: `.site-nav__links` ma `backdrop-filter: blur(8px)` i
+`background: rgba(255,253,251,0.8)` `[V]` — czyli biel **złamana** `--mp-bialy` (#FFFDFB)
+przy 80 %. Pas dolny miał dotąd biel PEŁNĄ, nieprzezroczystą, i zero rozmycia.
+**Nadpisuje to dwa wcześniejsze ustalenia i nie chowam tego:** `W01` („pas dolny jest
+jednym z dwóch miejsc bieli pełnej") i `W09/W10` (mapowanie „promień Figmy / 2" → blur 4).
+Operator wskazał inny oracle i ma pierwszeństwo przed odczytem z pliku.
+**Pytanie otwarte:** belka górna została na `blur(4px)` — jest nav barem tak samo jak pas
+dolny, więc albo ma iść na 8, albo `W09/W10` obowiązuje dla niej dalej. Nie zmieniam bez
+polecenia, bo to nie było w zleceniu.
+
+**`D-39.25` · Przekreślenie niesie „wykorzystany", niezależnie od tego, kto tak orzekł.**
+`[data-odhaczony]` dostaje `line-through` na równi z `[data-stan="zuzyty"]`. Domyka
+kierunek `D-39.4`; dawne `G2` („odhaczony BEZ przekreślenia") **unieważnione w całości**.
+
+**`D-39.26` · Składnika z sekcji „zużyte" nie da się odznaczyć.** `disabled` na przycisku,
+nie sam brak nasłuchu — inaczej pozostałby skupialny klawiaturą i ogłaszany przez czytnik
+jako aktywny; `aria-disabled` obok, bo `role="checkbox"` nie dziedziczy stanu z `disabled`.
+Kursor zdjęty razem z akcją.
+
+**`D-39.27` · Odhaczenia są persystentne.** Do tej zmiany `zaznaczone` żyło wyłącznie
+w pamięci modułu — przeżywało zmianę kroku, ginęło przy zamknięciu i przeładowaniu.
+Trzy zmiany naraz, bo każda z osobna zostawia dziurę:
+zapis niesie **klucze** składników (stabilne między porcjami, w przeciwieństwie do ilości
+i etykiet) · `zapiszSesje()` woła się teraz **po każdym odhaczeniu**, nie tylko przy zmianie
+kroku, bo odłożenie telefonu jest najczęstszym końcem sesji · przywracanie wisi na
+**otwarciu**, nie na `wznow()`, żeby „zacznij od nowa" i wejście przez `{krok:N}` też je
+dostawały. Nie nadpisuje pamięci bieżącej sesji.
+
+**Artefakt:** 45 793 znaki. Próg miękki 45 000 przekroczony o 793, limit twardy 50 000
+z zapasem 4 207. **Pozycja decyzyjna operatora czeka już trzeci przebieg.**
