@@ -84,7 +84,17 @@ Aneks pomiarowy **v1.3**:
 `git/content/handoffs/ANEKS-POMIAR--tryb-gotowania-embed--v1.3.md`
 sha256: `6ab07c4f6f10d000fe42c3f4728809061dca3bd17a5b5fcbc6aeeb3cf87c54fe`
 
-Wymagania **v1.8** (D-35.1 rozstrzygnięte definitywnie 2026-08-15: przycisk startu
+Wymagania **v1.9** (2026-08-16 — **próg znakowy 45 000 ZASTĄPIONY BUDŻETEM**: transfer
+≤ 20 kB gzip na artefakt oraz `otworz()` ≤ 50 ms na desktopie. Wprowadzone przez łańcuch
+na wyraźne polecenie operatora („wprowadzaj"). Przesłanka starego progu — limit pola
+custom code Webflow — zniknęła razem z przejściem na GitHub Pages; w polu stoją dziś dwa
+znaczniki `<script src>`. Przy tej samej zmianie: znaczniki embedu dostają `defer`,
+a zapis o `<mark>` oznaczony jako wycofany (D-39.15):
+`git/tech/tryb-gotowania/WYMAGANIA.md`
+sha256: `82f187fc58bed55f40cbfbbc9ba286d6485e8fdb1746e9a5465ae3993647d7ad`
+(poprzednie — v1.8: `6ba45bb732c6c2b837a9915c36ef95cbd82ad348934125a27363ff8efc0bd509`)
+
+~~Wymagania v1.8~~ (D-35.1 rozstrzygnięte definitywnie 2026-08-15: przycisk startu
 WIDOCZNY do 500 px WŁĄCZNIE, UKRYTY od 501 px. Wcześniejsze „próg ukrycia 500" dawało
 się czytać dwojako i było czytane dwojako — harness ukrywał NA 500, strona pokazywała
 DO 500. Zmienione w tym samym ruchu: `min-width:501px` w obu fixture'ach, ramka 501
@@ -10056,3 +10066,31 @@ co daje się zmierzyć na tle 285-kilobajtowego zdjęcia obok.
 **Rekomendacja: przeredagować §4 `WYMAGANIA.md` — zamiast progu znakowego wpisać budżet
 transferu (np. ≤ 20 kB gzip na artefakt) i budżet czasu `otworz()` (np. ≤ 50 ms na
 desktopie).** Oba są mierzalne i oba mówią o tym, co naprawdę boli.
+
+### `D-39.29` · WYMAGANIA v1.9 — próg znakowy zastąpiony budżetem. WPROWADZONE
+
+Na wyraźne polecenie operatora („wprowadzaj"). **Plik wiążący zmieniony, hash podbity
+w tym samym ruchu** — sekcja „Pliki wiążące" wyżej, `82f187fc…`, poprzedni `6ba45bb7…`.
+
+**Co weszło do §4:**
+- **Transfer ≤ 20 kB gzip na artefakt**, mierzony `curl -H "Accept-Encoding: gzip"`
+  na adresie produkcyjnym. Stan: runtime 12,9 · parser 15,3.
+- **`otworz()` ≤ 50 ms na desktopie**, mierzone `performance.now()` wokół wywołania.
+  Stan: 25,1 ms. Przekroczenie znaczy „podziel budowę overlaya", a nie „skracaj kod".
+- **Limitu znakowego NIE MA i nie wolno go odtwarzać.** Twarde 50 000 dotyczyło pola
+  custom code i odeszło razem z drogą wklejania; gdyby artefakt kiedyś do niej wrócił,
+  wraca limit — ale wtedy zmienia się DROGA INTEGRACYJNA i to ją trzeba opisać.
+- **`defer` jako wymóg** wraz z uzasadnieniem i jawnym zakazem `async` (nie gwarantuje
+  kolejności, więc runtime mógłby wystartować przed parserem).
+- Zapis o `<mark>` oznaczony jako wycofany (`D-39.15`) — inaczej §4 dalej wymagałby
+  czegoś, czego w produkcie nie ma.
+
+**`defer` wpisane też do szablonu Webflow** (`set_page_freeform_code`, po odczycie
+bezpośrednio przed zapisem — §2.6 katalogu pułapek). Oba znaczniki mają teraz `defer`,
+komentarz w polu niesie powód i zakaz `async`. **Publish po stronie operatora.**
+
+**Skutek uboczny do zapamiętania:** od tej chwili `MP` pojawia się PÓŹNIEJ niż dotąd
+(po sparsowaniu HTML). Nic to nie psuje, bo wiązanie czeka w pętli, ale **każdy pomiar
+robiony tuż po `load` musi to uwzględnić** — sonda czytająca `window.MP` synchronicznie
+zaraz po wczytaniu strony może teraz zobaczyć `undefined` tam, gdzie wcześniej widziała
+obiekt. To nie będzie regres produktu, tylko regres przyrządu; nie mylić.

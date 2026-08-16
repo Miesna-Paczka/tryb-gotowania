@@ -1,4 +1,16 @@
-# WYMAGANIA — runtime trybu gotowania v1.7 (2026-08-15)
+# WYMAGANIA — runtime trybu gotowania v1.9 (2026-08-16)
+
+Zmiana v1.9 (2026-08-16): **próg znakowy 45 000 ZASTĄPIONY BUDŻETEM TRANSFERU I CZASU.**
+Decyzja operatora, wprowadzona przez łańcuch na wyraźne polecenie („wprowadzaj").
+Powód jest zmierzony, nie porządkowy: **przesłanka progu przestała istnieć**. Próg
+pochodził z limitu pola custom code Webflow (50 000 znaków), do którego artefakt był
+WKLEJANY; od 2026-08-16 oba pliki jadą z GitHub Pages, a w polu stoją dwa znaczniki
+`<script src>` o łącznej długości ~180 znaków. Liczba znaków źródła przestała cokolwiek
+znaczyć dla wdrożenia i mierzyła rzecz, która nikogo nie boli.
+Zmierzone tego dnia: runtime **12,9 kB gzip**, parser **15,3 kB gzip**, wobec
+**285 kB** jednego zdjęcia w treści tej samej strony — czyli cały tryb gotowania waży
+dziesięć razy mniej niż jedna fotografia obok. Nowe wielkości mierzą to, co realnie
+kosztuje: transfer do przeglądarki i czas przed pierwszą klatką interfejsu.
 
 Zmiana v1.8 (2026-08-15): **D-35.1 ROZSTRZYGNIĘTE definitywnie przez operatora** —
 przycisk startu jest widoczny do **500 px WŁĄCZNIE** i ukryty **od 501 px** w górę.
@@ -152,14 +164,31 @@ widoczny też w podglądzie Webflow (CR6) — harness go odtwarza.
 ## 4. Reguły budowy
 
 Vanilla JS, ES2019+, bez zależności poza biblioteką QR (~10 kB, do SVG, spec §8);
-zależność ZADEKLAROWANA w kodzie, nie zakładana. Jeden plik runtime'u; limit
-twardy 50 000 znaków (droga integracyjna przez embed), cel **< 45 000**. Próg dotyczy
-**OBU artefaktów wysyłanych do embedu** — runtime'u i parsera — bo od wpięcia biblioteki
-QR (D-13.1) oba są plikami tej samej klasy i oba jadą tą samą drogą. Zapas do limitu
-twardego zostaje wtedy 5 000 znaków (10 %) po każdej stronie: próg miękki ma być
-sygnałem, a nie awarią wdrożenia, a przy 42 000 zapalałby się przy każdej jednostce
-wykończeniowej i przestałby cokolwiek znaczyć. `<mark>`
-z `box-decoration-break: clone` (instrukcja §3). Typografia i tokeny: DM Sans;
+zależność ZADEKLAROWANA w kodzie, nie zakładana. Jeden plik runtime'u.
+
+**BUDŻET (v1.9) — dwie wielkości, obie mierzalne, obie dotyczą OBU artefaktów
+(runtime i parser):**
+
+1. **Transfer ≤ 20 kB gzip na artefakt.** Mierzy się tym, co idzie po sieci, a nie
+   długością źródła: `curl -s -H "Accept-Encoding: gzip" -o /dev/null -w "%{size_download}"`
+   na adresie produkcyjnym. Stan 2026-08-16: runtime 12,9 · parser 15,3.
+2. **`MP.tryb.otworz()` ≤ 50 ms na desktopie.** Mierzy się `performance.now()` wokół
+   wywołania, na żywej stronie, przy zamkniętym overlayu. Stan 2026-08-16: **25,1 ms**.
+   Próg 50 ms jest dobrany tak, żeby telefon z niskiej półki (4–6× wolniejszy) mieścił
+   się w granicach odczuwalności; przekroczenie znaczy „podziel budowę overlaya na
+   szkielet i dosyłkę po pierwszej klatce", a nie „skracaj kod".
+
+**Limitu znakowego NIE MA i nie należy go odtwarzać.** Twarde 50 000 dotyczyło pola
+custom code i przestało obowiązywać razem z drogą wklejania. Jeżeli artefakt wróci
+kiedyś do wklejania w pole Webflow, limit wraca razem z nią — i wtedy jest to zmiana
+DROGI INTEGRACYJNEJ, którą trzeba tu opisać, a nie sam próg.
+
+**Znaczniki embedu mają `defer`** — oba pliki nie wykonują nic przed pierwszym tapnięciem,
+a skrypt wiążący czeka na `window.MP` w pętli, więc `defer` zdejmuje je z drogi krytycznej
+bez żadnego kosztu. Kolejność (parser przed runtime'em) jest przy `defer` zachowana.
+
+`<mark>` z `box-decoration-break: clone` (instrukcja §3) — **WYCOFANE 2026-08-16
+(D-39.15), zakreślenia nie ma w produkcie.** Typografia i tokeny: DM Sans;
 Caption 14→12, Body Small 14, Body Large 18→16; cień `drop_shadow_ui` dokładnie
 wg HANDBACK decyzja 11 (ambient 0/−1 blur 2 α5% · key 0/−4 blur 8 spread −2 α10%,
 baza #3E2B22, rzucany DO GÓRY); belka 72;
