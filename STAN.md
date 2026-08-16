@@ -9476,3 +9476,59 @@ Kontrola przeciwna jest tu istotna: gdyby wypełnienie checkboxa było bezwarunk
 (`ramka:false`, `wiecej:false`), podczas gdy kroki 3–9 tak. Może być poprawne (krok bez
 przypisanych składników), może być defektem danych CMS albo renderera. **Nie badałem** —
 zgłaszam jako lead, nie jako ustalenie.
+
+### SMOKE TEST CAŁEGO EMBEDA — 2026-08-16, staging opublikowany, iframe 390 px
+
+`[U]` **D-39.11 · Obrys ramki zachowuje #C5B18A, kreska separatora zawsze #3E2B22.**
+Operator, wprost. Stan zmierzony JUŻ TO SPEŁNIA (`obrysRamki rgb(197,177,138)`,
+`borderTop rgb(62,43,34)`) — **żadna zmiana w kodzie nie jest potrzebna**, wpis służy temu,
+żeby następna sesja nie „naprawiała" tej różnicy jako niespójności.
+
+#### Działa (zmierzone)
+
+Wejście z CTA → ekran startowy · „zacznij gotować" → `krok 1 z 9` · nawigacja 1→2→3, wstecz
+do 2, do przodu do 9 · **granica górna trzyma** (dalej na 9 nie wychodzi poza zakres) ·
+checkbox `aria-checked` false→true i **przeżywa przejście na inny krok i powrót** ·
+`×` → dialog `S2` → „wyjdź mimo to" zamyka overlay (`data-otwarty` zdjęty) · TOP przewijalny
+(850/844) · akordeon przełącza stan, etykietę („zobacz pozostałe" ↔ „zwiń") i `aria-expanded`.
+
+#### PIĘĆ ZNALEZISK
+
+**1. MINUTNIKI NIE RENDERUJĄ SIĘ W OGÓLE — największe.** Model ma je na krokach **4** (180 s,
+„brokuły"), **6** (5400 s, „wołowina") i **7** (180 s, „sos"). Na ekranie kroku 4 jest wyłącznie
+napis `mp-tryb__czas` = „3 min". Przeskan wszystkich dziewięciu kroków: **jedyna klasa czasowa
+w całym drzewie to `mp-tryb__czas`, 9 sztuk** — zero `pigulka`, `odliczanie`, `kropka`, zero
+kontrolki startu. `przyciskowWTop` na kroku 4 = 13, czyli 12 ptaszków + wywoływacz; **badge czasu
+nie jest przyciskiem**. Cała rodzina wierszy o minutnikach (`C09`–`C12`, `F7`, limit dwóch,
+dialog `S4`) nie ma dziś czego mierzyć na stagingu.
+
+**2. ROZWINIĘTA LISTA JEST OBCIĘTA O 13 PX I NIE DA SIĘ DO NICH DOTRZEĆ.** Po ustaniu przejścia:
+`.mp-tryb__reszta` → `scrollHeight 311 / clientHeight 298`, `overflow: hidden`, sam kontener
+nieprzewijalny, a TOP ma zapas **6 px** (850/844). **Poprawka z 2026-08-15 JEST na miejscu**
+(`.mp-tryb__reszta` ma `flex: 0 0 auto`) **i jest niewystarczająca**: obaj przodkowie mają
+`flex-shrink: 1` — `.mp-tryb__ramka-skladnikow` (528,4 px) i `.mp-tryb__blok-skladnikow`
+(552,4 px). To jest to samo zgłoszenie operatora („rozwinięcie uniemożliwia przewijanie"),
+uznane wtedy za zamknięte.
+
+**Wykluczenie przyrządu, zanim nazwałem to defektem:** karta jest wyhamowana
+(`document.hidden === true` w ramce i w rodzicu), więc przejścia CSS mogą nie postępować — ale
+`r.style.height === ''` dowodzi, że `domknij()` WYKONAŁ się poprawnie i oddał wysokość CSS-owi.
+Zmierzone 298 px jest więc wynikiem UKŁADU, nie zamrożonej animacji. Pomiar layoutu w karcie
+w tle pozostaje wiarygodny (skill §1.1).
+
+**3. PRZYCISK „+" PRZY PORCJACH JEST MARTWY.** `−` działa (7 → 6 → … → 1), `+` nie zwiększa
+nigdy i raportuje `disabled: true` **zarówno przy 7, jak i przy 1**. Przy wartości 1 `−` NIE jest
+wyłączony. Wygląda na nieodświeżany stan `disabled` albo odwróconą granicę — **nie diagnozowałem
+dalej**, bo nie znam zamierzonego zakresu porcji.
+
+**4. EKRAN ZAKOŃCZENIA JEST NIEOSIĄGALNY NAWIGACJĄ.** Na kroku 9 „dalej" jest widoczny, ma
+etykietę „dalej" i **nie robi nic** (`pokazKrok(10)` zwraca `null`); `ekranTeraz()` zostaje `null`.
+Klatka `10 · zakończenie — prośba o zdjęcie` istnieje w Figmie i nie ma do niej drogi.
+
+**5. Krok 1 bez składników to DANE, nie renderer.** Model: `kroki[0].skladniki = []`, kolejne
+mają 3 / 4 / 1. Renderer zachowuje się poprawnie, nie rysując pustej ramki. **Do sprawdzenia
+w CMS**, czy krok 1 ma nie mieć składników.
+
+**Uwaga poboczna:** licznik porcji startuje z **7**, bo `mpGotowanieStart` czyta
+`[data-mp-porcje-etykieta]` ze strony, a nie `porcjeBazowe` z modelu (`2`). To jest zamierzone
+w tamtym skrypcie; odnotowuję, żeby nikt nie szukał błędu w runtimie.
