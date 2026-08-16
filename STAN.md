@@ -391,12 +391,65 @@ Artefakt **43 978 znaków** (było 43 968), zapas do progu miękkiego 45 000 = *
 Odtwarzalność builda potwierdzona przed zmianą: `terser -c -m` na `HEAD:tryb-gotowania.js`
 dał plik **identyczny co do bajtu** z `tryb-gotowania.min.js` (`sha256 2d6b5433…`) `[V]`.
 
-### Co zostaje otwarte
+### Jednostka 2 (zgłoszenie operatora nr 2, ptaszek) — ROZSTRZYGNIĘTA Z FIGMY, WNIOSEK ODWROTNY DO ZAPOWIEDZI
 
-Separatory (zgłoszenie nr 3) — zdjęte z żywego arkusza: dziesięć reguł z obramowaniem,
-z tego **dziewięć `var(--mp-beige-2)` (#C5B18A) i jedna `var(--mp-beige-3)` (#816D44)
-na `.mp-tryb__karta-numer`** `[V]`. To jest jedyny odstający kolor w arkuszu;
-czy odstaje ZGODNIE z projektem, rozstrzyga odczyt klatki, nie ten zapis.
+**Migracji na ligatury Material NIE ROBIMY i byłaby regresem.** Hand-off zapowiadał:
+„subset v4 ma `check_box_outline_blank` i `check_box` — migracja trywialna, ale wariant
+wybiera Figma". Figma wybrała **żadnego z dwóch**. Odczyt `get_design_context` na
+`7273:10878` (`składnik — zużyty`, komponent `checkbox` = `I7273:10878;7224:10918`) `[V]`:
+
+- pudełko **16×16**, `border-radius:3px`, obrys 1 px `primary-text` #3E2B22;
+- stan zaznaczony: **wypełnienie** `primary-text` #3E2B22;
+- w środku **znak tekstowy `✓`**, DM Sans **SemiBold 600**, **10 px**, interlinia **1,5**,
+  kolor `white-full-bg` **#FFFFFF**, wyśrodkowany;
+- odstęp do nazwy **8 px**; nazwa DM Sans Regular **14 px**/1,35, `line-through`.
+
+To jest pudełko z obrysem i znakiem tekstowym, a nie glif ikonowy. **`✓` jako stała
+treść jest ZGODNE z projektem**, a `.mp-tryb__ptaszek` w runtimie ma dziś dokładnie te
+liczby, razem z `color:transparent` w stanie pustym (czyli znak jest w DOM-ie i
+niewidoczny) i wypełnieniem przy `[data-odhaczony]`. **Zgłoszenie nr 2 w brzmieniu
+„każdy wiersz ma tę samą treść niezależnie od stanu, delta to samo przekreślenie" jest
+FAŁSZYWE wobec arkusza** — delta jest w wypełnieniu i kolorze znaku, nie w treści.
+
+**Ale operator coś widział i to jest osobny, prawdziwy defekt — `D-39.4`.**
+Figma rysuje `składnik — zużyty` z pudełkiem **WYPEŁNIONYM** i **jednocześnie** z nazwą
+przekreśloną (potwierdzone renderem `7196:10993`: pięć wierszy sekcji „zużyte" ma
+ciemne pudełka z białym ptaszkiem). Runtime wypełnia pudełko **wyłącznie** przy
+`[data-odhaczony]`; przy `[data-stan="zuzyty"]` daje **samo przekreślenie**, więc
+składnik zużyty ma pudełko PUSTE. Z zewnątrz to wygląda dokładnie jak „ptaszek nie
+reaguje na stan".
+
+**To koliduje z wierszem `W42`** („stan zużyty niesie WYŁĄCZNIE przekreślenie") i
+z notatką `G2` przy tej regule. Kolizji NIE rozstrzygam sam, mimo reguły „wygląd
+rozstrzyga Figma": `W42` nie jest odczytem, tylko **zapisanym rozstrzygnięciem stanu**,
+a zlanie „odhaczony teraz" z „zużyty wcześniej" ma konsekwencję dla czytelności
+ekranu `S1`, którą hand-off wprost nazywa. **Pozycja dla operatora, patrz niżej.**
+
+### Jednostka 3 (separatory) — NIE ROZSTRZYGNIĘTA, dwa przyrządy Figmy MÓWIĄ CO INNEGO
+
+Arkusz żywy, zdjęty ze stagingu `[V]`: dziesięć reguł z obramowaniem, z tego
+**dziewięć `var(--mp-beige-2)` (#C5B18A) i jedna `var(--mp-beige-3)` (#816D44)
+na `.mp-tryb__karta-numer`**.
+
+Figma, obie linie rozdzielające w bloku składników (`7196:10997` i `7196:11013`,
+296×1): `get_design_context` zwraca `bg-[var(--primary-text,#3e2b22)]` — **atrament,
+bez krycia**, dla obu. `get_screenshot` tej samej klatki nadrzędnej pokazuje linie
+**jasne, beżowo-szare**, wyraźnie jaśniejsze niż tekst obok.
+
+**To jest dokładnie ten sam rozjazd przyrządów co w wierszu `W79`** (`get_design_context`
+→ #1A1A1A, `get_screenshot` → jasna szarość, obie ramki zdjęcia). Drugie wystąpienie
+tej samej pary czyni z niej **regułę, nie wypadek: przy 1-pikselowych i wypełnionych
+prostokątach eksport kodu gubi krycie warstwy.** Wniosek operacyjny:
+**nie wolno zmieniać koloru separatora na podstawie samego `get_design_context`.**
+Potrzebny jest odczyt krycia warstwy — `get_variable_defs` albo próbka piksela z renderu.
+Do czasu odczytu runtime zostaje na `beige-2` bez zmiany.
+
+### Co zostaje otwarte (poza powyższym)
+
+Rytmy `D11`/`D13`, `B25` do przeprojektowania albo wycofania oraz dziewięć substytutów
+Unicode — nietknięte. Wszystkie trzy wymagają harnessu lokalnego (`D11`, `D13`, `B25`)
+albo dalszych odczytów rozmiarów z Figmy (substytuty), a harness był w tym przebiegu
+niedostępny (`D-39.2`).
 
 ## PRZEBIEG 20 (2026-08-15) — OSTATNI W KADENCJI. Licznik dobity, MATRYCA 112/118, sześć czerwonych to sześć decyzji operatora. Piąta pułapka narzędzia. Zadanie wyłączone
 
