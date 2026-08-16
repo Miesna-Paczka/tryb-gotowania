@@ -9986,3 +9986,73 @@ w sekcji „w tym kroku" i składnik w sekcji „zużyte" wyglądają teraz **id
 drugi nie. Rozróżnienie niesie wyłącznie NAGŁÓWEK SEKCJI. Nie zgłaszam tego jako usterki,
 bo oba wykończenia są rozstrzygnięciami operatora, ale zapisuję, żeby nie zostało odkryte
 po raz drugi jako niespodzianka.
+
+### OCENA CIĘŻARU I PRĘDKOŚCI — 2026-08-16, build `43b9cda`
+
+#### 1. Bandwidth Webflow: embed kosztuje ZERO i to jest najważniejsza liczba
+
+Od `D-39.8` oba artefakty jadą z GitHub Pages, więc **nie obciążają rozliczenia Webflow
+w ogóle**. Po stronie Webflow zostaje wyłącznie ~180 B znaczników `<script src>` w HTML
+oraz zarejestrowany skrypt wiążący (~0,5 kB gzip).
+
+Zmierzone `[V]`, wszystko po kompresji, jeden odczyt strony przepisu:
+
+| co | rozmiar gzip | kto płaci |
+|---|---|---|
+| HTML strony przepisu | **52,7 kB** | Webflow |
+| 10 zarejestrowanych skryptów strony | ~5,5 kB łącznie | Webflow |
+| **jedno zdjęcie w treści** | **285 kB** (drugie 139 kB) | Webflow |
+| `tryb-gotowania.min.js` | **12,9 kB** | GitHub Pages |
+| `przepis-parser.min.js` | **15,3 kB** | GitHub Pages |
+
+**Skala:** pojedyncze zdjęcie na stronie waży **dziesięć razy więcej** niż cały tryb
+gotowania razem z parserem. Optymalizacja bandwidthu Webflow przez cięcie tego kodu jest
+zajmowaniem się 0 % problemu — i to jest odpowiedź na pytanie o próg 45 000.
+GitHub Pages serwuje `content-encoding: gzip`, **brotli NIE** (`br` zwraca plik surowy).
+
+#### 2. Koszt wykonania w przeglądarce — zmierzone, desktop
+
+| operacja | czas |
+|---|---|
+| `MP.przepis.zaladuj()` — parsowanie całego przepisu z DOM | **3,1 ms** |
+| `naPorcje()` — przeliczenie modelu | **0,8 ms** |
+| **`otworz()`** — budowa overlaya + wstrzyknięcie 135 reguł CSS | **25,1 ms** |
+| pierwsze wejście w krok | 18,6 ms |
+| kolejny krok (średnia z 9) | **6,2 ms**, najgorszy 7,3 ms |
+| zmiana porcji | **0,1 ms** |
+
+Overlay ekranu startowego to **30 węzłów** wobec 679 na samej stronie. Runtime **nic nie
+robi do pierwszego `otworz()`** — koszt startu to wyłącznie parsowanie i kompilacja
+85,7 kB rozpakowanego JS.
+
+**Jedyna pozycja warta uwagi: `otworz()` 25 ms na desktopie.** Telefon z niskiej półki
+jest 4–6× wolniejszy, więc realnie **100–150 ms** — to jest powyżej progu „natychmiast"
+(100 ms). Koszt jednorazowy, po tapnięciu, więc akceptowalny; ale gdyby kiedyś rósł,
+to jest miejsce do podziału budowy overlaya na „szkielet + reszta po pierwszej klatce".
+Przewijanie kroków (6 ms) i selektor porcji (0,1 ms) mają zapas dwóch rzędów wielkości.
+
+#### 3. Jedyna konkretna rekomendacja: `defer` na obu znacznikach
+
+Oba skrypty stoją w stopce jako **klasyczne `<script src>`**, więc blokują parsowanie HTML
+w swoim miejscu i pobierają się **sekwencyjnie** (28,2 kB jeden po drugim).
+`defer` zdejmuje je z drogi krytycznej całkowicie i **nic nie kosztuje**, bo nic nie
+wykonuje się przy starcie: zarejestrowany skrypt wiążący i tak czeka na `window.MP`
+w pętli co 400 ms przez 20 s, a runtime budzi się dopiero na tapnięcie.
+
+```html
+<script defer src="https://lukaszwerecik.github.io/tryb-gotowania/przepis-parser.min.js"></script>
+<script defer src="https://lukaszwerecik.github.io/tryb-gotowania/tryb-gotowania.min.js"></script>
+```
+
+Kolejność przy `defer` jest zachowana (parser przed runtime'em), więc zależność nie pęka.
+
+#### 4. Wniosek o progu 45 000
+
+**Próg stracił przesłankę i utrzymywanie go kosztuje więcej, niż daje.** Powstał z limitu
+pola custom code Webflow (50 000 znaków), do którego kod był WKLEJANY. Dziś w polu stoją
+dwa znaczniki, a artefakt jedzie CDN-em. Realnym kosztem rozmiaru jest teraz wyłącznie
+czas parsowania JS, a 12,9 kB po kompresji jest o rząd wielkości poniżej czegokolwiek,
+co daje się zmierzyć na tle 285-kilobajtowego zdjęcia obok.
+**Rekomendacja: przeredagować §4 `WYMAGANIA.md` — zamiast progu znakowego wpisać budżet
+transferu (np. ≤ 20 kB gzip na artefakt) i budżet czasu `otworz()` (np. ≤ 50 ms na
+desktopie).** Oba są mierzalne i oba mówią o tym, co naprawdę boli.
