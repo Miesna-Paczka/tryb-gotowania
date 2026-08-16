@@ -9437,3 +9437,42 @@ Webflow. Dopisane sekcje:
 jest twardy" — **to nie było zmierzone**. Wersji 2203-znakowej nie wysłałem ani razu; przyciąłem
 komentarz prewencyjnie, ufając opisowi narzędzia. Skill mówi na podstawie pomiaru, że limit
 **nie jest egzekwowany**. `[X]` dla mojego zdania; obowiązuje wpis w skillu.
+
+### POMIAR PO PUBLIKACJI — 2026-08-16, staging wypchnięty przez operatora
+
+**Wszystko, co czekało na deploy, zmierzone i zielone** `[V]`, iframe 390 px:
+
+| co | wynik |
+|---|---|
+| wersja wiązania | `mpgotowaniestart-1.4.0.js` |
+| martwe wiązanie w stopce | **0** wystąpień |
+| klik w CTA | `ekranTeraz() === 'start'` · „tryb gotowania" · „zacznij gotować" · „najpierw pokaż składniki" |
+| „zacznij gotować" | `krok 1 z 9` |
+| separator (`.mp-tryb__wiecej`) | `rgb(62,43,34)` = **#3E2B22** na krokach 3 · 5 · 7 · 9 |
+| zużyty — pudełko | `rgb(62,43,34)`, znak `rgb(255,255,255)`, obrys atramentowy |
+| zużyty — nazwa | `line-through` |
+| **kontrola przeciwna:** teraz — pudełko | `rgba(0,0,0,0)` tło i znak, czyli PUSTE |
+
+Kontrola przeciwna jest tu istotna: gdyby wypełnienie checkboxa było bezwarunkowe, wiersz
+`teraz` też byłby ciemny i pomiar wyglądałby tak samo dobrze. Padłaby dopiero ta kontrola.
+
+**Dwa zastrzeżenia, które zapisuję zamiast zaokrąglić do sukcesu:**
+
+1. **Separator ma dziś jeden kontekst, więc zmierzona jest WARTOŚĆ, nie RÓWNOŚĆ.**
+   `.mp-tryb__wiecej` renderuje się wyłącznie wewnątrz `.mp-tryb__ramka-skladnikow`
+   (`wWRamce: true` na każdej ramce). Przed zmianą reguła bazowa dawała `beige-2`, ale
+   zawężenie z `W25` i tak nadpisywało ją atramentem **w jedynym istniejącym kontekście** —
+   czyli **na ekranie prawdopodobnie nic się nie zmieniło**, a zmiana usuwa rozjazd LATENTNY,
+   który wyszedłby przy pierwszym wywoływaczu postawionym poza ramką. Uczciwie: nie mam dowodu,
+   że to była ta niespójność, którą operator zobaczył.
+
+2. **Kandydat na tę, którą zobaczył, jest inny i NIEROZSTRZYGNIĘTY:** w tym samym bloku stoją
+   obok siebie **obrys ramki `rgb(197,177,138)` = #C5B18A** i **kreska separatora #3E2B22**.
+   Dwie linie, ten sam blok, wyraźnie różne barwy. Figma daje separatorom `primary-text`,
+   a obrysu ramki nie czytałem. **Pozycja do rozstrzygnięcia przez operatora albo do odczytu
+   z klatki** — nie zmieniam obrysu bez jednego z tych dwóch.
+
+**Obserwacja poboczna, niezweryfikowana:** krok 1 nie renderuje ramki składników ani wierszy
+(`ramka:false`, `wiecej:false`), podczas gdy kroki 3–9 tak. Może być poprawne (krok bez
+przypisanych składników), może być defektem danych CMS albo renderera. **Nie badałem** —
+zgłaszam jako lead, nie jako ustalenie.
