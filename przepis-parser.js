@@ -124,9 +124,21 @@
     });
   }
 
-  // `**tekst**` → <mark>. Escapowanie idzie pierwsze, więc treść z CMS nie wstrzyknie HTML-u.
-  function zMarkerem(s) {
-    return escapeHtml(s).replace(/\*\*([^*]+)\*\*/g, '<mark>$1</mark>');
+  /* D-39.15 — `**tekst**` → SAM TEKST. Zakreślenie usunięte z produktu decyzją
+     operatora 2026-08-16 („usuńmy efekt highlightu zupełnie, jest nieutrzymywalny").
+     Do tej zmiany funkcja zwracała `<mark>$1</mark>`, a runtime malował to na atrament
+     z wybitą bielą (W53/W54).
+
+     Znaczniki ZDEJMUJEMY, a nie zostawiamy: pola `*Html` idą przez `innerHTML`, więc
+     `**…**` wyświetliłoby się dosłownie, z gwiazdkami. Dokładnie to widać było
+     2026-08-16 w podpowiedzi minutnika („Różyczki są **jaskrawozielone**"), bo ta
+     jedna powierzchnia brała pole SUROWE zamiast `*Html`.
+
+     Escapowanie zostaje i zostaje PIERWSZE — to ono, a nie brak `<mark>`, sprawia,
+     że treść z CMS nie wstrzyknie HTML-u. Wynik nie zawiera już żadnego znacznika,
+     więc nazwa `zMarkerem` byłaby po tej zmianie nieprawdą o funkcji. */
+  function bezZakreslen(s) {
+    return escapeHtml(s).replace(/\*\*([^*]+)\*\*/g, '$1');
   }
 
   function naLiczbe(s) {
@@ -244,8 +256,8 @@
     function domknij() {
       if (!biezacy) return;
       biezacy.tekst = biezacy._linie.join(' ').trim();
-      biezacy.tekstHtml = zMarkerem(biezacy.tekst);
-      biezacy.kryteriumHtml = biezacy.kryterium ? zMarkerem(biezacy.kryterium) : null;
+      biezacy.tekstHtml = bezZakreslen(biezacy.tekst);
+      biezacy.kryteriumHtml = biezacy.kryterium ? bezZakreslen(biezacy.kryterium) : null;
       if ((biezacy.tekst.match(/\*\*/g) || []).length > 2) blad('krok "' + biezacy.tytul + '" ma więcej niż jeden marker — limit to jeden na krok');
       delete biezacy._linie;
       if (biezacy.minutnik && biezacy.czas) blad('krok "' + biezacy.tytul + '" ma czas: i minutnik: naraz — wygrywa minutnik');
@@ -680,9 +692,9 @@
       }),
       kroki: (dane.kroki || []).map(function (k) {
         return {
-          tytul: k.tytul, tekst: k.tekst || '', tekstHtml: zMarkerem(k.tekst || ''),
+          tytul: k.tytul, tekst: k.tekst || '', tekstHtml: bezZakreslen(k.tekst || ''),
           czas: k.czas || null, minutnik: k.minutnik || null,
-          kryterium: k.kryterium || null, kryteriumHtml: k.kryterium ? zMarkerem(k.kryterium) : null,
+          kryterium: k.kryterium || null, kryteriumHtml: k.kryterium ? bezZakreslen(k.kryterium) : null,
           foto: k.foto || null, fotoUrl: null, skladniki: k.skladniki || []
         };
       })

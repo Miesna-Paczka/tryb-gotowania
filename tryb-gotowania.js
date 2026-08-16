@@ -526,21 +526,20 @@
       'text-align:center;cursor:pointer;-webkit-appearance:none;appearance:none}' +
 
     '#' + ID + ' .mp-tryb__opis{margin:0;font-size:16px;line-height:24px}' +
-    /* W53/W54 (przeb. 25) — zakreślenie `<mark>` jest CIEMNE z wybitym tekstem, nie
-       jasne. Klatka SPEC §3.13 `7229:10893`: prostokąt `marker — cel koloru`
-       (`7231:10894`) ma wypełnienie `primary text` #3E2B22 z `mix-blend-multiply`,
-       a zakreślona fraza jest w niej związana z `white full bg` #FFFFFF — nie surową
-       bielą, tylko ZMIENNĄ, więc to decyzja projektowa, nie sztuczka makiety.
-       Runtime rysował dotąd odwrotność: tło `beige-1` #F1ECDF i tekst odziedziczony
-       `--mp-atrament`, czyli ciemne na jasnym.
-       `mix-blend-multiply` NIE przechodzi do CSS-a: w Figmie prostokąt leży POD
-       tekstem i mnoży się z podłożem, u nas `<mark>` ZAWIERA tekst, więc blend
-       zmieszałby też wybitą biel z tłem i skasował ją. Multiply #3E2B22 na
-       `white-off-bg` #FFFDFB daje (61,5 · 42,7 · 33,5) ≈ #3E2B22, więc płaskie
-       wypełnienie odtwarza skutek co do zaokrąglenia. Mierzymy SKUTEK, nie mechanizm. */
-    '#' + ID + ' .mp-tryb__opis mark{background:var(--mp-atrament);' +
-      'color:var(--mp-bialy-pelny);' +
-      '-webkit-box-decoration-break:clone;box-decoration-break:clone}' +   /* R14 */
+    /* D-39.15 · ZAKREŚLENIE USUNIĘTE Z PRODUKTU — decyzja operatora 2026-08-16,
+       wprost: „usuńmy efekt highlightu zupełnie, jest nieutrzymywalny".
+       Stała tu reguła malująca `<mark>` na atrament z wybitą bielą (W53/W54,
+       `box-decoration-break: clone`, R14). Zdjęta razem ze ŹRÓDŁEM: parser nie
+       produkuje już `<mark>`, tylko zdejmuje `**…**` i zostawia sam tekst
+       (`bezZakreslen()` w `przepis-parser.js`). Usunięcie po jednej stronie
+       zostawiłoby albo martwą regułę, albo gwiazdki na ekranie.
+       **Skutek dla matrycy, do rozliczenia, a nie do przemilczenia:** wiersze
+       `W53`, `W54` i `R14` tracą przedmiot, a mutacja `M5-mark-blok` (cel `B14`,
+       „marker łamie się z wierszem") przestanie cokolwiek psuć i wyjdzie
+       `ZERO EFEKTU`. Trzy wiersze do WYCOFANIA i jedna mutacja do zdjęcia
+       z katalogu — nie do zostawienia na zielono.
+       Cofnięcie: przywróć tę regułę ORAZ `<mark>$1</mark>` w parserze; jedno bez
+       drugiego daje stan pośredni, który wygląda na usterkę. */
     /* B16 — font ikon w RUNTIMIE. Trzy statyczne subsety, nie oś zmienna: `font-weight`
        syntetyczny dałby cichy fałsz (waga „by wyglądała", a nie „byłaby"). `@font-face`
        stoi POZA zakresem `#ID`, bo reguła at-rule nie zagnieżdża się w selektorze —
@@ -1272,7 +1271,12 @@
     m.el.primary.textContent = m.stan === 'zero' ? 'uruchom ponownie' : 'zatrzymaj';
     m.el.odliczanie.textContent = formatOdliczania(m.pozostalo);
     m.el.nazwa.textContent = m.nazwa;
-    m.el.podpowiedz.textContent = m.podpowiedz || '';
+    /* D-39.15 — `innerHTML`, nie `textContent`, i to NIE jest rozluźnienie granicy.
+       Pole niesie wynik `bezZakreslen()`, czyli tekst ESCAPOWANY i pozbawiony
+       znaczników; pod `textContent` encje (`&amp;`, `&quot;`) pokazałyby się
+       dosłownie. Zmiana idzie w parze z przejściem na `kryteriumHtml` przy
+       `uruchomZKroku` — poprzednio szło tu pole SUROWE i stąd gwiazdki na ekranie. */
+    m.el.podpowiedz.innerHTML = m.podpowiedz || '';
     m.el.szewron.textContent = '⌃';   // I-16: `up` = zwiń; klatki z `down` to dryf Figmy
   }
 
@@ -1394,10 +1398,15 @@
     return uruchomMinutnik({
       nazwa: opcje.nazwa || krok.minutnik.nazwa,
       sekundy: krok.minutnik.sekundy,
-      /* `krok.kryterium`, nie `kryteriumHtml`: pole idzie przez `textContent`,
-         więc znacznik i tak nie zostałby zrenderowany, a wpuszczanie HTML-a
-         w miejsce, które go nie potrzebuje, jest niepotrzebną powierzchnią. */
-      podpowiedz: opcje.podpowiedz || krok.kryterium || null,
+      /* D-39.15 — `kryteriumHtml`, nie `kryterium`. Poprzedni komentarz w tym miejscu
+         uzasadniał odwrotny wybór zdaniem, że nie ma po co wpuszczać HTML-a tam,
+         gdzie go nie trzeba. **Przesłanka była fałszywa**: pole `*Html` nie jest
+         surowym HTML-em z CMS-u, tylko wynikiem `escapeHtml()` z jednym niegdyś
+         dozwolonym znacznikiem — a po `D-39.15` bez żadnego. Skutkiem tamtego wyboru
+         było to, że jedyna powierzchnia biorąca pole SUROWE wyświetlała gwiazdki
+         Markdown dosłownie (zmierzone 2026-08-16: „Różyczki są **jaskrawozielone**"),
+         podczas gdy akapit kroku obok renderował to samo poprawnie. */
+      podpowiedz: opcje.podpowiedz || krok.kryteriumHtml || null,
       rozwinieta: !!opcje.rozwinieta
     });
   }

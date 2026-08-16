@@ -9596,3 +9596,34 @@ i cały wątek zamyka się jako artefakt karty w tle.
 komentarz przy `uruchomZKroku`), ale źródłem jest `krok.kryterium`, które niesie znacznik
 Markdown. Albo źródłem ma być tekst czysty, albo pole ma iść przez `kryteriumHtml`. Nie
 ruszam — to wybór, nie usterka implementacji.
+
+### D-39.15 · ZAKREŚLENIE USUNIĘTE Z PRODUKTU — decyzja operatora 2026-08-16
+
+„Usuńmy efekt highlightu zupełnie. Jest nieutrzymywalny." Wykonane **po obu stronach naraz**,
+bo usunięcie po jednej zostawia albo martwą regułę CSS, albo gwiazdki Markdown na ekranie:
+
+- **Parser:** `zMarkerem()` → `bezZakreslen()`. Zwraca `escapeHtml(s)` z `**…**` ZDJĘTYM
+  (`$1`), a nie zamienionym na `<mark>`. Nazwa zmieniona, bo funkcja o nazwie „z markerem",
+  która markery usuwa, jest nieprawdą o kodzie. Cztery wywołania podmienione.
+- **Runtime:** reguła `.mp-tryb__opis mark{…}` usunięta w całości (atrament + wybita biel +
+  `box-decoration-break: clone`).
+- **Podpowiedź minutnika:** źródłem jest teraz `krok.kryteriumHtml`, nie `krok.kryterium`,
+  a renderem `innerHTML`, nie `textContent`. To była JEDYNA powierzchnia biorąca pole surowe
+  i stąd brały się gwiazdki. `innerHTML` nie rozluźnia granicy: pole jest escapowane i po tej
+  zmianie nie zawiera już żadnego znacznika, natomiast pod `textContent` encje (`&amp;`)
+  wyświetlałyby się dosłownie.
+
+**Sprawdzone na funkcji, nie na oko** (pięć przypadków, `node`):
+`"Różyczki są **jaskrawozielone** i dają"` → `"Różyczki są jaskrawozielone i dają"` ·
+`"a **b** i **c**"` → `"a b i c"` · `"**cale zdanie**"` → `"cale zdanie"` ·
+`"bez znacznikow"` bez zmian · **`"znak < i & razem"` → `"znak &lt; i &amp; razem"`**,
+czyli escapowanie żyje i to ono, a nie brak `<mark>`, trzyma granicę wstrzyknięcia.
+
+**DŁUG DO ROZLICZENIA, zapisany żeby nie został zielenią z uznania:** wiersze `W53`, `W54`
+i `R14` tracą przedmiot, a mutacja `M5-mark-blok` (cel `B14`) przestanie cokolwiek psuć
+i wyjdzie `ZERO EFEKTU`. **Trzy wiersze do WYCOFANIA i jedna mutacja do zdjęcia z katalogu** —
+zostawienie ich na zielono byłoby tą samą klasą fałszu co `B25` mierzące nieistniejący ekran.
+Nie robię tego w tej sesji, bo katalog mutacji mierzy się harnessem lokalnym, a ten jest dla
+łańcucha niedostępny (`D-39.2` / `D-39.6`).
+
+**Artefakty:** runtime **44 338** znaków (zapas 662), parser **39 944**.
