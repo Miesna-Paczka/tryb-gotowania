@@ -9532,3 +9532,67 @@ w CMS**, czy krok 1 ma nie mieć składników.
 **Uwaga poboczna:** licznik porcji startuje z **7**, bo `mpGotowanieStart` czyta
 `[data-mp-porcje-etykieta]` ze strony, a nie `porcjeBazowe` z modelu (`2`). To jest zamierzone
 w tamtym skrypcie; odnotowuję, żeby nikt nie szukał błędu w runtimie.
+
+### POPRAWKI DO CZTERECH ZNALEZISK — 2026-08-16. DWA NAPRAWIONE, JEDNO BYŁO MOIM BŁĘDEM, JEDNO WYCOFANE
+
+**`[X]` ZNALEZISKO 3 (martwy „+" przy porcjach) BYŁO ARTEFAKTEM MOJEGO POMIARU, nie defektem.**
+Przemiar ze ŚWIEŻYMI referencjami po każdym kliknięciu: `2 → 1` (minus gaśnie na dole),
+`1 → 2 → … → 7` (plus gaśnie na górze), zakres `[1,7]` = `PORCJE_MIN`/`PORCJE_MAX` `[V]`.
+Selektor jest bez zarzutu. **Mechanizm mojej pomyłki wart zapisania:** `ustawPorcje()` woła
+`pokazEkran()`, które PRZEBUDOWUJE TOP, więc referencje pobrane raz przed pętlą wskazywały
+na węzły ODCZEPIONE. Odczepiony przycisk **nadal wykonuje swój listener** przy `.click()`
+(domknięcie sięga stanu modułu, nie elementu), więc licznik dalej się zmieniał — ale
+`disabled` odświeżał się już tylko na węzłach NOWYCH, których nie czytałem. Stąd „minus
+działa, plus martwy". **Reguła: w pętli po interfejsie, który się przerysowuje, pobieraj
+referencję po każdym kliknięciu.**
+
+**ZNALEZISKO 4 (ekran zakończenia) — NAPRAWIONE, `D-39.13`.** `dalej` na ostatnim kroku
+wołało `pokazKrok(N+1)`, a to zwraca `null` poza zakresem — przycisk był widoczny i nie robił
+nic. Teraz na ostatnim kroku prowadzi do `pokazEkran('koniec')`. Granica z `stan.widok`,
+nie ze stałej. Cofnięcie: przywróć jednolinijkowy listener.
+
+**ZNALEZISKO 1 (minutniki) — NAPRAWIONE, `D-39.14`.** `uruchomZKroku()` miało jedynego
+wywołującego w publicznym API, czyli nikogo z interfejsu. Badge `.mp-tryb__czas` jest teraz
+`<button>` na krokach z minutnikiem i uruchamia kafel; strażnik po nazwie nie pozwala
+podwoić tego samego minutnika. Krok bez minutnika zostaje `<span>`.
+**Dowód, że maszyneria działa i brakowało wyłącznie wyzwalacza:** wywołanie
+`MP.tryb.minutniki.zKroku(krok4)` na żywym stagingu dało obiekt, jeden kafel w `stos`
+i pigułkę „brokuły 3:00 ⌃ …" `[V]`.
+**NIENARYSOWANE (I-14):** plik nie rysuje stanu przed uruchomieniem, więc wybór wyzwalacza
+jest decyzją, nie odczytem — badge zamiast osobnego przycisku, uzasadnienie przy regule.
+**Pozycja dla operatora.**
+
+**`[X]` ZNALEZISKO 2 (13 px obcięcia) — POPRAWKA WYCOFANA PRZED WYSYŁKĄ, USTALENIE COFNIĘTE
+DO PODEJRZENIA.** Napisałem wcześniej, że wykluczyłem przyrząd, bo `style.height === ''`
+dowodzi wykonania `domknij()`. **Ten dowód był za słaby i tak trzeba go czytać:** dowodzi,
+że kod zdjął wartość z atrybutu `style`, a nie że wysokość nie jest w tej chwili sterowana
+ZAMROŻONYM PRZEJŚCIEM CSS. Karta jest wyhamowana (`document.hidden === true` w ramce i
+w rodzicu, także po wymuszeniu renderowania zrzutem), a `transition: height 220ms` wisi na
+tym właśnie elemencie.
+
+Eksperyment rozstrzygający, który obalił moją diagnozę:
+
+| próba | wynik |
+|---|---|
+| bez niczego | 311/298 |
+| `flex:0 0 auto` na dzieciach TOP | 311/298 |
+| **`flex-shrink:0` na WSZYSTKICH potomkach TOP** | **311/298** |
+| `flex:0 0 auto` na samej ramce składników | 311/298 |
+| `min-height` wprost | **311/311** |
+
+**Ściskanie flexem nie jest przyczyną** — gdyby było, trzecia próba by je zdjęła.
+Reguła `.mp-tryb__top > *{flex:0 0 auto}` została z kodu USUNIĘTA: nie zmieniła ani jednego
+piksela, a zmiana bez zmierzonego skutku nie wchodzi do produktu.
+
+**Czego potrzeba, żeby to rozstrzygnąć:** przyrządu, który nie jest wyhamowany. Najtańszym
+dostępnym jest telefon operatora — objaw zgłosił gołym okiem, więc gołe oko go potwierdzi
+albo obali na opublikowanym buildzie. Jeżeli na telefonie lista jest pełna, defektu nie ma
+i cały wątek zamyka się jako artefakt karty w tle.
+
+**Artefakt:** 44 483 znaki, zapas do progu 45 000 = **517**. Topnieje.
+
+**Znalezisko poboczne z testu pigułki, niezałatane:** podpowiedź minutnika renderuje
+`**jaskrawozielone**` dosłownie, z gwiazdkami. Pole idzie przez `textContent` (świadomie —
+komentarz przy `uruchomZKroku`), ale źródłem jest `krok.kryterium`, które niesie znacznik
+Markdown. Albo źródłem ma być tekst czysty, albo pole ma iść przez `kryteriumHtml`. Nie
+ruszam — to wybór, nie usterka implementacji.

@@ -195,6 +195,13 @@
       '-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;' +
       'gap:' + W.odstep + 'px;' +
       'padding:' + W.paddingTop + 'px ' + W.margines + 'px var(--mp-bottom-h,' + W.nawigacja + 'px)}' +
+    /* D-39.12 WYCOFANE tego samego dnia, przed wysyłką — patrz STAN.md.
+       Miała tu stanąć reguła `.mp-tryb__top > *{flex:0 0 auto}` jako naprawa
+       obcięcia listy o 13 px. NIE STOI, bo hipoteza o ściskaniu flexem została
+       OBALONA eksperymentem: `flex-shrink:0` nałożone na WSZYSTKIE potomki TOP-u
+       nie zmieniło ani jednego piksela (311/298 przed i po), podczas gdy
+       `min-height` wprost naprawiało pomiar natychmiast (311/311). Zmiana bez
+       zmierzonego skutku nie wchodzi do produktu. */
 
     /* belka — wyłącznie rozmycie tła, BEZ cienia (C4, zweryfikowane na 29 klatkach) */
     /* W09/W10 (przeb. 21): krycie 80 %, nie 72 %, oraz rozmycie 4 px, nie 12 px.
@@ -509,6 +516,14 @@
        w Figmie, pozycja na liście decyzji „zostawić czy ujednolicić". Odwzorowuję
        plik, bo hierarchia prawdy każe iść za pomiarem, nie za intuicją. */
     '#' + ID + ' .mp-tryb__czas[data-stan="bez"]{font-size:12px;color:var(--mp-beige-3)}' +
+    /* D-39.14 — badge z minutnikiem jest `<button>`, więc trzeba zdjąć z niego to,
+       co przeglądarka dokłada przyciskom: obrys, własny krój i wyrównanie tekstu.
+       Bez tego identycznie wyglądający element miałby inny font i inną wysokość niż
+       badge bez minutnika, a §3.2 mówi wprost, że klasa bez `font-family` cicho
+       spada na Arial. Geometria (26 px, promień 13, dopełnienie 12) zostaje z reguły
+       bazowej i się nie zmienia — pomiary wiersza kroku pozostają ważne. */
+    '#' + ID + ' button.mp-tryb__czas{border:0;font-family:inherit;font-weight:inherit;' +
+      'text-align:center;cursor:pointer;-webkit-appearance:none;appearance:none}' +
 
     '#' + ID + ' .mp-tryb__opis{margin:0;font-size:16px;line-height:24px}' +
     /* W53/W54 (przeb. 25) — zakreślenie `<mark>` jest CIEMNE z wybitym tekstem, nie
@@ -1150,7 +1165,20 @@
     // NIENARYSOWANE (G1) / I-04/I-05: krok → krok wyłącznie tapem, bez swipe.
     // Luka rozstrzygnięta ZANIECHANIEM: dowodem jest asercja negatywna sekcji H
     // (`touchstart`/`pointerdown`/`swipe` 0 ×), nie sam ten znacznik.
-    dalej.addEventListener('click', function () { pokazKrok(stan.krok + 1); });
+    /* D-39.13 · Z OSTATNIEGO KROKU „dalej" PROWADZI NA EKRAN ZAKOŃCZENIA.
+       Do tej poprawki wołało `pokazKrok(N + 1)`, a `pokazKrok` zwraca `null` poza
+       zakresem — więc przycisk był widoczny, miał normalną etykietę i NIE ROBIŁ NIC.
+       Zmierzone na stagingu 2026-08-16: na `krok 9 z 9` `dalej` widoczny, po kliknięciu
+       `ekranTeraz()` dalej `null`, etykieta bez zmian. Klatka `10 · zakończenie —
+       prośba o zdjęcie` istnieje w Figmie i nie było do niej ŻADNEJ drogi z interfejsu:
+       `pokazEkran('koniec')` miało dotąd jedynego wywołującego w publicznym API.
+       Granicę czytam z `stan.widok`, a nie ze stałej — liczba kroków jest cechą
+       przepisu, nie runtime'u. Gdy widoku nie ma, zachowanie zostaje bez zmian. */
+    dalej.addEventListener('click', function () {
+      var N = stan.widok && stan.widok.kroki ? stan.widok.kroki.length : 0;
+      if (N && stan.krok >= N) return pokazEkran('koniec');
+      return pokazKrok(stan.krok + 1);
+    });
     wstecz.addEventListener('click', function () { pokazKrok(stan.krok - 1); });
     /* F2/I-07: `×` w belce NIE zamyka overlaya — otwiera dialog S2. Zamknięcie jest
        o jeden tap dalej i to jest cała treść tego wiersza. Brzmienia są placeholderami
@@ -1769,10 +1797,48 @@
     var rzad = el('div', 'mp-tryb__rzad-kroku', top);
     var nazwaKroku = el('h3', 'mp-tryb__nazwa-kroku', rzad);
     nazwaKroku.textContent = krok.tytul || '';
-    var czas = el('span', 'mp-tryb__czas', rzad);
+    /* D-39.14 · BADGE CZASU JEST WYZWALACZEM MINUTNIKA, gdy krok go ma.
+       Zmierzone na stagingu 2026-08-16: model niesie minutniki na krokach 4 (180 s
+       „brokuły"), 6 (5400 s „wołowina") i 7 (180 s „sos"), a w całym drzewie na
+       wszystkich dziewięciu krokach jedyną klasą czasową był `mp-tryb__czas` — zero
+       pigułek, zero odliczania, zero kontrolki startu. `uruchomZKroku()` istniało
+       i miało **jedynego wywołującego w publicznym API**, czyli nikogo z interfejsu.
+       Cała rodzina zachowań minutnika (kafel, odliczanie, limit dwóch, dialog S4)
+       była martwym kodem, a badge — samym napisem.
+
+       NIENARYSOWANE (I-14). Plik daje parę klatek „krok bez pigułki" → „krok
+       z pigułką" i **nie rysuje stanu przed uruchomieniem**, więc wyzwalacza nie ma
+       skąd odczytać — to jest decyzja, nie odczyt, i tak ją znakuję.
+       Wybrałem badge, bo: (1) już niesie czas tego minutnika, więc nie dokłada
+       nowego elementu do policzonej geometrii wiersza; (2) `data-stan="minutnik"`
+       już go odróżnia od „czas" i „bez", więc rozróżnienie istniało zanim cokolwiek
+       na nim wisiało; (3) alternatywa — osobny przycisk — zmienia rozkład
+       `.mp-tryb__rzad-kroku` i wymagałaby odczytu z Figmy, którego nie ma.
+       Do rozstrzygnięcia przez operatora: czy wyzwalaczem ma być badge, czy osobny
+       przycisk. Do tego czasu badge, bo funkcja bez wyzwalacza nie istnieje.
+
+       Krok bez minutnika zostaje `<span>` — element nieinteraktywny nie ma być
+       przyciskiem tylko dlatego, że sąsiedni nim jest. */
+    var maMinutnik = !!krok.minutnik;
+    var czas = el(maMinutnik ? 'button' : 'span', 'mp-tryb__czas', rzad);
     czas.textContent = krok.badge;
     czas.setAttribute('data-stan',
-      krok.minutnik ? 'minutnik' : (krok.czas === 'bez minutnika' ? 'bez' : 'czas'));
+      maMinutnik ? 'minutnik' : (krok.czas === 'bez minutnika' ? 'bez' : 'czas'));
+    if (maMinutnik) {
+      czas.type = 'button';
+      // NIENARYSOWANE brzmienie: pipeline treści (tryb ui)
+      czas.setAttribute('aria-label', 'włącz minutnik: ' + (krok.minutnik.nazwa || ''));
+      czas.addEventListener('click', function () {
+        /* Powtórny tap na tym samym kroku NIE dokłada bliźniaczego kafla. Bez tego
+           strażnika dwa tapnięcia zjadałyby cały limit dwóch minutników jednym
+           minutnikiem, a trzeci — już cudzy — dostawałby dialog S4 bez powodu.
+           Porównanie po nazwie, bo to jedyna cecha, którą krok nadaje kaflowi. */
+        var nazwa = krok.minutnik.nazwa || '';
+        var juzBiegnie = minutniki.some(function (m) { return m.nazwa === nazwa; });
+        if (juzBiegnie) return null;
+        return uruchomZKroku(krok);
+      });
+    }
 
     var opis = el('p', 'mp-tryb__opis', top);
     opis.innerHTML = krok.tekstHtml || '';    // R14: <mark>, nigdy prostokąt-atrapa
