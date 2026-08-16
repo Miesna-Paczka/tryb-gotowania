@@ -328,6 +328,76 @@ design--2026-08-12.md` §2+§4 (wymiary tooltipa, markery, decyzje operatora) ·
 11. **Zamknięcie łańcucha**: raport decyzji z propozycją taga `v1.0.0`; push, tag
     i zaplanowanie fazy integracyjnej = operator.
 
+## SESJA `tryb-gotowania-domkniecie` (2026-08-16) — jednorazowa, przejmująca po sesji z 08-15
+
+**Wejście:** `LOCK` przeterminowany (`1970-…`), `STOP` brak, drzewo robocze czyste,
+`HEAD = db6ced6`. `chrome.lock` nie istniał (= wolny), wzięty na nazwę
+`tryb-gotowania-domkniecie` i zweryfikowany zgodnie z `PROTOKOL-ARBITRAZU.md` §2.3.
+
+### Rejestr decyzji
+
+**D-39.1 · Figma DZIAŁA na tym koncie — blokada uprawnień z hand-offu jest OBALONA.**
+`get_metadata` na `T0QnV1TrpngJhq2m1E9ZlI`, zestaw `7195:10893`, zwraca pełne drzewo
+(92 226 znaków, 31 klatek najwyższego poziomu) `[V]`. Odmowy nie było. Hand-off
+zapowiadał, że seat `View` na planie `starter` może odmówić — **zapowiedź nie
+sprawdziła się i nie wolno jej dziedziczyć**. Uwaga wykonawcza: odpowiedź przekracza
+limit kontekstu narzędzia i ląduje w pliku; czyta się ją `jq`/`python`, nie wprost.
+Cofnięcie: brak — to ustalenie o narzędziu, nie zmiana produktu.
+
+**D-39.2 · Serwer statyczny na 8123 NIE ODPOWIADAŁ przez cały przebieg.**
+Nawigacja na `http://localhost:8123/…/harness/fixture.html` kończy się
+`chrome-error://chromewebdata/` `[V]`. To sesja harmonogramowa — operatora nie ma,
+więc serwera nie ma kto uruchomić. **Skutek: harness lokalny (429 asercji × 7 ramek,
+mutacja, pokrycie, próg) był w tym przebiegu NIEDOSTĘPNY w całości.** Pomiar
+przeniesiony na staging, który jest publiczny i nie wymaga operatora.
+Tani sygnał na przyszłość, tańszy niż tytuł strony: `location.href` po nawigacji —
+przy odmowie połączenia Chrome podmienia go na `chrome-error://chromewebdata/`,
+a `document.title` zostaje `"localhost"` i **wygląda jak poprawnie wczytana strona**.
+To jest szósta pułapka przyrządu, obok katalogu z §8 hand-offu.
+
+**D-39.3 · Belka dostaje `z-index:2`.** Uzasadnienie i pomiar: wiersz `F2b` w matrycy.
+Wybór dotyczy kolejności układania, której Figma nie koduje; rozstrzygnięty samodzielnie
+na podstawie `GEOMETRIA.md` §1 („belka i BOTTOM są NAKŁADKAMI") — czyli z pliku
+wiążącego, nie z uznania. Cofnięcie: usuń `z-index:2` z reguły `.mp-tryb__belka`
+w `tryb-gotowania.js` i przebuduj `terser -c -m`.
+
+### Jednostka 1 (zgłoszenie operatora nr 1) — ZAMKNIĘTA POMIAREM
+
+**Objaw operatora był prawdziwy, a diagnoza z hand-offu — nie.** Hand-off podejrzewał,
+że „dialog renderuje się niewidocznie albo jego CTA nie odpowiada". Zmierzone:
+dialog renderuje się **poprawnie** — `626×211 @ 16,229`, `visibility:visible`,
+`opacity:1`, tło `rgb(255,255,255)`, scrim `display:flex` z kryciem 0,45,
+`elementFromPoint` w środku dialogu zwraca `DIV.mp-tryb__dialog` `[V]`.
+
+Prawdziwa przyczyna: **do `×` nie da się trafić palcem.** `.mp-tryb__top`
+(`position:absolute;inset:0`) leży w drzewie PO belce i obie mają `z-index:auto`,
+więc TOP przykrywa belkę w hit-teście. Przezroczystość nie zdejmuje przechwytywania
+zdarzeń. Pomiar i naprawa: wiersz `F2b`.
+
+**Metodyczne, do przeniesienia dalej niż ten wiersz:** `element.click()` omija
+trafianie w punkt. Każda asercja o zachowaniu STEROWNIKA, która woła `.click()` na
+referencji zdobytej przez `querySelector`, mierzy podpięcie handlera, a nie
+osiągalność przycisku — i przechodzi na produkcie, w który nie da się kliknąć.
+**W harnessie do zmiany są wszystkie takie miejsca**, nie tylko to jedno; sito
+`narzedzia/sito-dereferencji.py` ich nie widzi, bo pyta o `null`, nie o trafienie.
+
+**Ważność pomiaru:** staging na `@5be768d`. Kod dialogu i kolejność dzieci korzenia
+są w `5be768d` i w `HEAD` **identyczne** — sprawdzone `git diff 5be768d..HEAD --
+tryb-gotowania.js`, zmiany dotyczą wyłącznie `flex:0 0 auto` na `.mp-tryb__reszta`
+i domknięcia przejścia wysokości. Pomiar jest więc ważny dla obu.
+
+**Zmiana w produkcie:** `tryb-gotowania.js` + przebudowa `terser -c -m`.
+Artefakt **43 978 znaków** (było 43 968), zapas do progu miękkiego 45 000 = **1 022**.
+Odtwarzalność builda potwierdzona przed zmianą: `terser -c -m` na `HEAD:tryb-gotowania.js`
+dał plik **identyczny co do bajtu** z `tryb-gotowania.min.js` (`sha256 2d6b5433…`) `[V]`.
+
+### Co zostaje otwarte
+
+Separatory (zgłoszenie nr 3) — zdjęte z żywego arkusza: dziesięć reguł z obramowaniem,
+z tego **dziewięć `var(--mp-beige-2)` (#C5B18A) i jedna `var(--mp-beige-3)` (#816D44)
+na `.mp-tryb__karta-numer`** `[V]`. To jest jedyny odstający kolor w arkuszu;
+czy odstaje ZGODNIE z projektem, rozstrzyga odczyt klatki, nie ten zapis.
+
 ## PRZEBIEG 20 (2026-08-15) — OSTATNI W KADENCJI. Licznik dobity, MATRYCA 112/118, sześć czerwonych to sześć decyzji operatora. Piąta pułapka narzędzia. Zadanie wyłączone
 
 **Wejście:** trzy hashe zgodne [V] (`6ab07c4f…`, `5d0ac198…`, `194a604d…`), `STOP` brak,

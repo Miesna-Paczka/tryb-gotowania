@@ -203,7 +203,34 @@
        Figma liczy promień jądra, a CSS `blur()` odchylenie standardowe. Mapowanie
        idzie na listę decyzji jako [I]: obowiązuje, dopóki operator nie zmierzy
        inaczej na urządzeniu. Przedtem runtime miał 12 px, czyli trzykrotność. */
+    /* D-38.1 · `z-index:2` NA BELCE — bez tego `×` jest NIEKLIKALNY palcem.
+       Zmierzone na stagingu `@5be768d` 2026-08-16, `document.elementsFromPoint`
+       w środku przycisku: stos od wierzchu to `DIV.mp-tryb__top` (658×668),
+       dopiero pod nim `BUTTON.mp-tryb__zamknij`. `trafia:false`.
+       Przyczyna: `belka` jest PIERWSZYM dzieckiem korzenia (kolejność zmierzona:
+       belka · top · bottom · scrim), wszystkie z `z-index:auto`, więc o malowaniu
+       i o trafieniu decyduje kolejność w drzewie — a `.mp-tryb__top` ma
+       `position:absolute;inset:0`, czyli przykrywa CAŁY overlay, w tym belkę.
+       Wizualnie nikt tego nie widział, bo TOP jest przezroczysty; przezroczystość
+       nie zdejmuje jednak przechwytywania zdarzeń. BOTTOM jest w drzewie PO TOP-ie,
+       więc jego przyciski działały — i to właśnie dlatego objaw wyglądał na
+       „tylko iks nie działa".
+       Dlaczego to nie zostało złapane wcześniej: `element.click()` OMIJA trafianie
+       w punkt, więc pomiar programowy zwracał `dialog: true` i mechanizm wyglądał
+       na sprawny. Asercja o zachowaniu przycisku musi wołać `elementFromPoint`,
+       nie `.click()` na referencji.
+       Dlaczego 2, a nie 1: `.mp-tryb__ptaszek` ma `z-index:1`, a `.mp-tryb__top`
+       nie tworzy kontekstu układania (`z-index:auto`), więc ptaszki uczestniczą
+       w kontekście KORZENIA i przy `1` remisowałyby z belką, wygrywając kolejnością
+       w drzewie — lista przewijana wchodziłaby NA belkę zamiast pod jej rozmycie.
+       Powyżej zostaje tooltip (3) i scrim dialogów (4) — oba mają być nad belką.
+       Cofnięcie: usuń `z-index:2` z tej reguły; objawem powrotu jest
+       `elementFromPoint` w środku `×` zwracający `.mp-tryb__top`.
+       Zmierzone po poprawce (wstrzyknięcie reguły na żywo, ta sama sesja):
+       `trafia:true`, `wierzch: BUTTON.mp-tryb__zamknij`, a kliknięcie w element
+       ZWRÓCONY przez `elementFromPoint` otwiera dialog `S2`. */
     '#' + ID + ' .mp-tryb__belka{position:absolute;top:0;left:0;right:0;height:' + W.belka + 'px;' +
+      'z-index:2;' +
       'box-shadow:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);' +
       'background:color-mix(in srgb,var(--mp-bialy) 80%,transparent);' +
       'display:flex;align-items:center;gap:' + W.odstep + 'px;' +
