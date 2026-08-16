@@ -9769,3 +9769,37 @@ zielono tym przyrządem** — potrzebny jest widoczny dokument, czyli telefon op
 Sprawdzian dla operatora, dwa równoważne: `MP.tryb.wakeLock()` ma zwrócić `true`, albo
 po prostu ekran nie gaśnie w trakcie gotowania. Ścieżka ponowienia po powrocie do karty
 jest w kodzie i to ona pokrywa przypadek „odmówiono, bo karta była w tle".
+
+### DWA ZGŁOSZENIA OPERATORA Z OGLĄDU — 2026-08-16. I BŁĄD METODY, KTÓRY JE PRZEPUŚCIŁ
+
+**Błąd metody, najpierw, bo to on jest przyczyną obu przeoczeń.** Cały przebieg testerski
+z tego dnia był STRUKTURALNY: liczby wierszy, flagi, `getComputedStyle`, wartości z API.
+**Ani jeden zrzut ekranu overlaya nie powstał** — ramka pomiarowa stała pod
+`left:-99999px`, więc żaden zrzut nie mógł jej objąć. Reguła, która to pokrywa, była
+napisana i zignorowana: `mp-pomiar-i-pulapki` §1.4 („matryca kompletności to element ×
+breakpoint × **mierzona właściwość**… jeden zrzut ekranu zamyka tę lukę taniej niż
+kolejna tabela"). **Brakujący szczegół, którego reguła nie miała: ramka musi stać
+W POLU WIDZENIA.** Do dopisania do skilla.
+
+**`D-39.20` · BRAK ZDJĘCIA GŁÓWNEGO — przyczyna po stronie Webflow, kod jest sprawny.**
+Parser bierze zdjęcie z `document.querySelector('[data-mp-foto-glowne]')`
+(`zdjecieGlowne()`); **na stronie przepisu tego atrybutu NIE MA** — zmierzone. Zdjęcie
+bohatera to `img.recipe-hero__img` (343×240) w `.recipe-hero__photo`.
+**Dowód przez wstrzyknięcie, nie przez rozumowanie:** po dodaniu atrybutu na ten obrazek
+`model.fotoUrl` przestaje być `null`, a ekran wznowienia dostaje `[data-mp-foto-ekranu]`
+o wymiarach **358×150** `[V]`. Czyli `zdjecieEkranu()`, przepust `fotoUrl` do widoku
+(D-23.1) i oba ekrany działają — brakuje jednego atrybutu w Designerze.
+**Zgłoszenie nr 4 z przebiegu testerskiego („ekran startowy bez zdjęcia") było WŁAŚCIWIE
+zdiagnozowane jako brak danych, ale zaniżone co do wagi**: opisałem je jako lukę CMS-u
+do sprawdzenia, zamiast dociec, że chodzi o jeden atrybut i podać go operatorowi.
+Dotyczy OBU ekranów pełnoekranowych — startowego i wznowienia.
+
+**`D-39.19` · „wstecz" z kroku 1 był martwy — NAPRAWIONE.** Zmierzone na stagingu:
+`disabled: true`, szerokość 44, klik zostawia `krok 1 z 9`. Tak było zaprojektowane
+(`wstecz.disabled = (n === 1)`) i jest to **ta sama pomyłka co na drugim krańcu przepisu**
+(`D-39.13`): oba krańce traktowano jako ścianę, choć za każdym stoi ekran. Skutek dla
+użytkownika: po wejściu w gotowanie nie było już drogi do selektora porcji inaczej niż
+przez wyjście z trybu i wejście od nowa. Teraz symetria jest pełna — `wstecz` z kroku 1
+→ `start`, `dalej` z kroku N → `koniec`, oba przyciski zawsze aktywne.
+
+**Artefakt:** 45 056 znaków (próg miękki 45 000 — patrz pozycja decyzyjna wyżej).

@@ -1178,7 +1178,21 @@
       if (N && stan.krok >= N) return pokazEkran('koniec');
       return pokazKrok(stan.krok + 1);
     });
-    wstecz.addEventListener('click', function () { pokazKrok(stan.krok - 1); });
+    /* D-39.19 · Z KROKU 1 „wstecz" WRACA NA EKRAN STARTOWY.
+       Zgłoszenie operatora 2026-08-16: „przycisk wstecz z pierwszego kroku
+       uniemożliwia powrót na ekran startowy, jest nieinteraktywny". Tak było
+       zaprojektowane — `pokazKrok()` ustawiało `wstecz.disabled = (n === 1)` — i to
+       jest ta sama pomyłka co na drugim końcu przepisu (`D-39.13`): oba krańce
+       traktowano jako ŚCIANĘ, podczas gdy za każdym stoi ekran. Skutek: po wejściu
+       w gotowanie nie było już drogi do selektora porcji inaczej niż przez wyjście
+       z trybu i wejście od nowa.
+       Symetria jest teraz pełna: `wstecz` z kroku 1 → `start`, `dalej` z kroku N →
+       `koniec`. Wyłączanie przycisku zdjęte razem z przyczyną — przycisk, który
+       ma dokąd prowadzić, nie ma powodu być wygaszony. */
+    wstecz.addEventListener('click', function () {
+      if (stan.krok <= 1) return pokazEkran('start');
+      return pokazKrok(stan.krok - 1);
+    });
     /* F2/I-07: `×` w belce NIE zamyka overlaya — otwiera dialog S2. Zamknięcie jest
        o jeden tap dalej i to jest cała treść tego wiersza. Brzmienia są placeholderami
        (pipeline treści, tryb ui); wiersz matrycy dotyczy obecności i zachowania. */
@@ -2341,7 +2355,11 @@
     rysujKrok(krok);
     przeliczBottom();
     ustawPostep(n, N);
-    stan.czesci.wstecz.disabled = n === 1;
+    /* D-39.19 — `wstecz` NIE jest już wygaszane na kroku 1: prowadzi na ekran
+       startowy, więc ma dokąd prowadzić. Linia zostaje jako jawne włączenie,
+       a nie milczące usunięcie — inaczej przycisk odziedziczyłby `disabled`
+       po poprzednim renderze i objaw wróciłby bez śladu w kodzie. */
+    stan.czesci.wstecz.disabled = false;
     /* Zapis przy KAŻDEJ zmianie kroku, nie przy zamknięciu: sesja urywa się
        zamknięciem karty albo wygaszeniem telefonu, czyli dokładnie wtedy, gdy
        żaden handler zamknięcia nie zdąży się wykonać. */
