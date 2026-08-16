@@ -580,6 +580,50 @@ z opcjami, `akcjaEkranu('primary')` nie ma na czym działać i **przycisk „zac
 gotować" nie robi nic — czyli objaw tej samej rodziny co iks.** Do zmierzenia
 osobno, przed dalszą pracą nad wyglądem.
 
+### ZGŁOSZENIE OPERATORA: „ląduję od razu na kroku 1, zamiast na ekranie startowym" — PRZYCZYNA ZNALEZIONA, NAPRAWA PO STRONIE WEBFLOW
+
+**Runtime jest niewinny i to zostało wykazane, a nie założone.** Wywołanie
+`otworz(widok, {ekran:'start', model, porcje})` — dokładnie to, co stoi w bloku
+custom code szablonu — daje `ekranTeraz() === 'start'`, etykietę „tryb gotowania"
+i przycisk „zacznij gotować" `[V]`. Ta sama strona kliknięta w CTA daje `krok 1 z 9`.
+
+**Rozstrzygnął dopiero ślad wywołań**, nie czytanie kodu: opakowałem `MP.tryb.otworz`
+i `MP.tryb.pokazKrok` w iframie i kliknąłem przycisk. Ślad ma **jedną** pozycję:
+
+```
+otworz | ekran=undefined | krok=1 | kluczy=1
+```
+
+Czyli klik woła `otworz(widok, {krok:1})` — **jeden klucz, bez `ekran`** — a nie to,
+co stoi w custom code. `otworz` idzie wtedy gałęzią `else if (opcje.krok)` i pomija
+ekran startowy. **Jest to dokładnie przypadek, przed którym ostrzega komentarz w źródle
+przy tej poprawce**: „embed wiążący przycisk musi przestać podawać `{krok:1}`, żeby
+poprawka była widoczna". Poprawka weszła 2026-08-15, wiązanie nie.
+
+**Winowajcą jest ZAREJESTROWANY SKRYPT, nie custom code.** `mpGotowanieStart` **1.3.0**,
+zastosowany do stopki tej strony, utworzony **2026-08-16 18:15**, czyli nowszy niż moja
+poprawka i **nie jest to zapomniany relikt — to czyjaś bieżąca praca**. Środek:
+
+```js
+window.MP.tryb.otworz(window.MP.przepis.naPorcje(window.MP.przepis.zaladuj(),n),{krok:1});
+```
+
+**Drugi skutek tego samego skryptu, wart osobnego zdania:** ma `ev.stopPropagation()`,
+więc **blok custom code w stopce nigdy nie dochodzi do głosu** — jego nasłuch wisi na
+`document`, a zdarzenie ginie na kontenerze. Dlatego ślad ma jedno wywołanie, a nie dwa,
+i dlatego poprawianie samego custom code niczego by nie dało. **Dwa wiązania tego samego
+przycisku to stan, który trzeba zlikwidować, a nie zsynchronizować.**
+
+**Sprawdzone i wykluczone po drodze:** site-level freeform (brak), page head (brak),
+duplikat nasłuchu (licznik w fazie przechwytywania: 1 zdarzenie), brak danych CMS
+(model kompletny: 9 kroków, 12 składników, `porcjeBazowe: 2`, zero ostrzeżeń).
+
+**Naprawa NIE NALEŻY DO TEJ SESJI — to zapis do Webflow, a mam zakaz.** Skrypt jest
+też cudzy (utworzony dziś przez równoległą pracę), więc podbicie go bez uzgodnienia
+byłoby edycją w poprzek. Propozycja dla operatora: `mpGotowanieStart` **1.4.0**,
+zmiana jednej linii — `{krok:1}` → `{ekran:'start',model:m,porcje:n}` — plus usunięcie
+martwego nasłuchu z bloku custom code, żeby wiązanie zostało JEDNO.
+
 ### Co zostaje otwarte (poza powyższym)
 
 Rytmy `D11`/`D13`, `B25` do przeprojektowania albo wycofania oraz dziewięć substytutów
