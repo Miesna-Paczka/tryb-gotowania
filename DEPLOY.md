@@ -1,5 +1,51 @@
 # DEPLOY — komendy do wklejenia, w brzmieniu, które DZIAŁA
 
+> ## Brzmienie obowiązujące od 2026-08-16: `git -C <ścieżka>`, bez `cd`
+>
+> ```powershell
+> git -C 'C:\Users\andrz\Claude\git\tech\tryb-gotowania' push origin main
+> ```
+>
+> **Wszystkie znane awarie tego deployu miały jedną przyczynę: dwie linijki zamiast
+> jednej.** Warianty z `cd` padły 2026-08-16 dwa razy z rzędu, za każdym razem inaczej
+> i za każdym razem myląco:
+> `fatal: invalid refspec 'C:\Users\andrz\Claude\git\tech\tryb-gotowania'` (linijki
+> skleiły się przy wklejaniu, więc ścieżka trafiła do gita jako DRUGI refspec) oraz
+> `fatal: not a git repository` (`cd` nie doszło, powłoka została w innym katalogu).
+> Żaden z tych komunikatów nie mówi „masz problem z wklejaniem", oba wyglądają na
+> uszkodzone repozytorium — a repozytorium było za każdym razem całe, sprawdzone.
+>
+> **`git -C` znosi całą tę klasę awarii**, bo nie ma drugiej linijki, którą można zgubić
+> albo skleić, i nie zależy od tego, gdzie stoi powłoka. Ta sama flaga działa na
+> wszystko: `git -C '<ścieżka>' log --oneline -3`, `git -C '<ścieżka>' status`.
+> Apostrofy wokół ścieżki są zawsze bezpieczne i konieczne, gdy ścieżka ma spację.
+>
+> Blok z `cd` niżej zostaje jako zapis tego, co zawiodło — nie jako zalecenie.
+
+## Adres embedu: GitHub Pages, stały, bez podmiany przy commicie (od 2026-08-16)
+
+```html
+<script src="https://lukaszwerecik.github.io/tryb-gotowania/przepis-parser.min.js"></script>
+<script src="https://lukaszwerecik.github.io/tryb-gotowania/tryb-gotowania.min.js"></script>
+```
+
+**Po pushu NIE robi się nic** — Pages przebudowuje się samo, w praktyce poniżej minuty,
+a nagłówek to `cache-control: max-age=600` `[V]` (odczytany 2026-08-16, nie z dokumentacji).
+Pętla wygląda więc tak: push → odczekaj do minuty → twarde przeładowanie strony.
+
+**Czego NIE używać i dlaczego — zmierzone, nie przewidziane:**
+`@main` na jsDelivr **nie odświeża się nawet po purge**. jsDelivr cache'uje ODWZOROWANIE
+gałęzi na commit osobno od pliku; purge czyści plik pod ścieżką, a ścieżka `@main` dalej
+wskazuje stary commit. Zmierzone przy `6b700fb`: `@6b700fb` → 43 978 B, `@main` przed
+purge → 43 794, po purge ze `status: finished` → **43 794**, po kolejnych 25 s → 43 794,
+z `?v=<sha>` → 43 794, przez `fastly.jsdelivr.net` → 43 794 `[V]`.
+`@<SHA>` działa, ale wymaga edycji szablonu przy każdym commicie — czyli tego, co ta
+zmiana likwiduje.
+
+**Wersja przestała być widoczna w adresie i to jest realna cena.** Reguła „wynik pomiaru
+ważny wyłącznie z zapisanym SHA" nie znika, tylko zmienia nośnik: SHA bierze się teraz
+z `git rev-parse HEAD` przed serią i zapisuje w tabeli pomiarowej.
+
 Notatka powstała 2026-08-15 po tym, jak trzy podane przeze mnie warianty tej samej komendy
 padły z rzędu — za każdym razem z powodu środowiskowego, nie merytorycznego. Zapisuję ją,
 żeby nikt nie odtwarzał tego z pamięci po raz czwarty.
