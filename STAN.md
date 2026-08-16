@@ -9963,3 +9963,26 @@ dostawały. Nie nadpisuje pamięci bieżącej sesji.
 
 **Artefakt:** 45 793 znaki. Próg miękki 45 000 przekroczony o 793, limit twardy 50 000
 z zapasem 4 207. **Pozycja decyzyjna operatora czeka już trzeci przebieg.**
+
+### `D-39.28` + potwierdzenie zachowania sekcji — 2026-08-16
+
+**Belka górna na `blur(8px)`**, tak jak pas dolny. Rozstrzygnięcie operatora na wprost
+zadane pytanie. **`W09/W10` przestaje obowiązywać w części dotyczącej rozmycia** —
+mapowanie „promień Figmy / 2 → blur 4" było wnioskiem `[I]` przyjętym *do czasu pomiaru
+na urządzeniu*; pomiar żywego `.site-nav__links` jest tym pomiarem i daje 8. Krycie 80 %
+z tamtego ustalenia **zostaje** — ta część się potwierdziła. Oba pasy mają teraz jedno
+wykończenie i jedno źródło: nav bar właściwej strony.
+
+**Potwierdzone z kodu, nie z pamięci: odhaczenie NIE przenosi składnika do „zużytych".**
+`przepis-parser.js`: `kopia.skladnikiZuzyte = skladniki.filter(s => pierwszeUzycie[s.key] < i)`
+— przynależność do sekcji jest wyłącznie funkcją numeru kroku wobec pierwszego użycia
+składnika. W logice sekcji **nie ma ani jednego odwołania do `zaznaczone`**. Odhaczenie
+zmienia wyłącznie wykończenie wiersza (`data-odhaczony`), a przeniesienie robi postęp
+przepisu. Zamierzone i potwierdzone przez operatora.
+
+**Skutek uboczny do odnotowania, wynikły z `D-39.25` + `D-39.26`:** odhaczony składnik
+w sekcji „w tym kroku" i składnik w sekcji „zużyte" wyglądają teraz **identycznie**
+(wypełnione pudełko + przekreślenie), a zachowują się różnie — pierwszy da się odznaczyć,
+drugi nie. Rozróżnienie niesie wyłącznie NAGŁÓWEK SEKCJI. Nie zgłaszam tego jako usterki,
+bo oba wykończenia są rozstrzygnięciami operatora, ale zapisuję, żeby nie zostało odkryte
+po raz drugi jako niespodzianka.

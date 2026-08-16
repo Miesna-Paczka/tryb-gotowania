@@ -255,7 +255,16 @@
        ZWRÓCONY przez `elementFromPoint` otwiera dialog `S2`. */
     '#' + ID + ' .mp-tryb__belka{position:absolute;top:0;left:0;right:0;height:' + W.belka + 'px;' +
       'z-index:2;' +
-      'box-shadow:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);' +
+      /* D-39.28 — belka idzie na `blur(8px)`, tak jak pas dolny (`D-39.24`).
+         Rozstrzygnięcie operatora 2026-08-16 na wprost zadane pytanie: oba pasy są
+         nav barami, więc oba biorą wykończenie z `.site-nav__links` strony
+         (`blur(8px)`, biel złamana 80 % — odczytane [V]).
+         **`W09/W10` przestaje obowiązywać w części dotyczącej rozmycia.** Mapowanie
+         „promień Figmy / 2 → blur 4" było wnioskiem `[I]`, oznaczonym wtedy jako
+         przyjęte do czasu pomiaru na urządzeniu; pomiar żywego nav baru jest tym
+         pomiarem i daje 8. Krycie 80 % z tamtego ustalenia zostaje bez zmian —
+         ta część się potwierdziła. */
+      'box-shadow:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);' +
       'background:color-mix(in srgb,var(--mp-bialy) 80%,transparent);' +
       'display:flex;align-items:center;gap:' + W.odstep + 'px;' +
       'padding:0 ' + W.margines + 'px}' +
