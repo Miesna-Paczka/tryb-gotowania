@@ -9412,3 +9412,28 @@ i dwa komentarze — dlaczego adres jest stały i dlaczego wiązania tu nie ma.
 (`ekranTeraz() === 'start'`, etykieta „tryb gotowania", przycisk „zacznij gotować"),
 a stamtąd „zacznij gotować" → `krok 1 z 9`. Dopiero z ekranu kroku dają się zmierzyć
 `D-39.4` i `D-39.5`, które czekają na renderowany wiersz.
+
+### UTRWALENIE LEARNINGÓW — skill `mp-pomiar-i-pulapki`, 2026-08-16
+
+Na polecenie operatora („utrwal ten learning"). Zapisane tam, a nie tutaj, bo `STAN.md` jest
+pamięcią TEGO łańcucha, a to są ustalenia o narzędziach, potrzebne każdej sesji dotykającej
+Webflow. Dopisane sekcje:
+
+- **§1.2** — `resize_window` zwraca sukces i zmienia okno, a `innerWidth` zostaje (390 → 658,
+  940 → 1536). Iframe jest przyrządem domyślnym do progów.
+- **§1.8** — `.click()` mierzy podpięcie handlera, nie osiągalność; predykat to `elementFromPoint`.
+- **§2.6** — rozszerzone: „bezpośrednio przed zapisem" jest dosłowne. Blok odczytany na początku
+  sesji zawierał regułę `@media`, którą operator w międzyczasie świadomie usunął; zapis złożony
+  z tamtego odczytu przywróciłby ją i zrobił dwa źródła prawdy. Plus obowiązek wymienienia
+  w raporcie, co blok zawierał przed zmianą — API nie ma historii wersji.
+- **§2.7** — potwierdzone 404 na `update_registered_script` oraz osobny krok `add_page_script`.
+- **§2.8 (nowa)** — wiązanie zachowania mieszka w trzech miejscach, a odczyty custom code widzą
+  dwa; przyrządem rozstrzygającym jest ślad wywołań, nie lektura kodu.
+- **§3.4** — przy cienkich prostokątach rozstrzyga `get_design_context`, nie render.
+- **§3.5 (nowa)** — jsDelivr `@main` i purge; GitHub Pages jako adres stały.
+- **§4.6 (nowa)** — „sprawdziłeś, że narzędzie ODPOWIADA, czy że TREŚĆ się zmieniła?".
+
+**Sprostowanie własnego wpisu z tej sesji.** Napisałem wyżej „limit 2000 znaków na skrypt inline
+jest twardy" — **to nie było zmierzone**. Wersji 2203-znakowej nie wysłałem ani razu; przyciąłem
+komentarz prewencyjnie, ufając opisowi narzędzia. Skill mówi na podstawie pomiaru, że limit
+**nie jest egzekwowany**. `[X]` dla mojego zdania; obowiązuje wpis w skillu.
