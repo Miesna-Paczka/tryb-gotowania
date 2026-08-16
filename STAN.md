@@ -444,6 +444,48 @@ prostokątach eksport kodu gubi krycie warstwy.** Wniosek operacyjny:
 Potrzebny jest odczyt krycia warstwy — `get_variable_defs` albo próbka piksela z renderu.
 Do czasu odczytu runtime zostaje na `beige-2` bez zmiany.
 
+### ROZSTRZYGNIĘCIA OPERATORA — 2026-08-16, po raporcie tej sesji
+
+**D-39.4 · Zużyty niesie OBIE delty.** „Zużyte wymagają zarówno odhaczenia checkboxa,
+jak i przekreślenia tekstu" — operator, wprost. Zgodne z odczytem `7273:10878`.
+WYKONANE: selektor `[data-stan="zuzyty"] .mp-tryb__ptaszek` dołączony do reguły
+wypełnienia. Atrybut istnieje i jest ustawiany w linii ~1398 (`teraz · dalej · zuzyty`),
+używa go już zielony `W42` na przekreśleniu — więc selektor nie może być martwy.
+**Dawne `G2` odwrócone w części dotyczącej rozłączności wykończeń**: rozłączne mają
+być STANY, nie ich delty wizualne. `W42` nieaktualny, `W42b` zamknięty.
+
+**D-39.5 · Separatory noszą #3E2B22.** Operator, wprost. **To zdejmuje blokadę
+„rozjazdu przyrządów Figmy" opisaną wyżej — i rozstrzyga ją po stronie
+`get_design_context`, nie renderu.** Zapisuję to jako ustalenie o PRZYRZĄDZIE,
+bo jest przenośne: przy 1-pikselowych prostokątach **wierzyć eksportowi kodu**,
+a jasność w `get_screenshot` czytać jako artefakt skalowania renderu, nie jako krycie.
+Odwraca to wniosek, który zapisałem godzinę wcześniej z ostrożności; wiersz `W79`
+(ramki zdjęcia, `#1A1A1A` wobec jasnej szarości) należy przemierzyć przy tej samej
+hipotezie, zamiast dalej trzymać go wstrzymanego.
+WYKONANE: `.mp-tryb__wiecej` ma atrament w regule BAZOWEJ; zawężenie z `W25`
+(`.mp-tryb__ramka-skladnikow .mp-tryb__wiecej`) traci nadpisanie koloru i zostaje
+przy samym rytmie. `.mp-tryb__linia` miała atrament już wcześniej. **Przyczyną
+zgłoszenia nr 3 była właśnie ta para: ta sama kreska miała dwa kolory zależnie od
+tego, czy stała w ramce składników.**
+
+**D-39.6 · Koniec pracy na serwerze lokalnym; powierzchnią pomiaru jest staging.**
+Konsekwencja `D-39.2`: sesja harmonogramowa nie ma kogo poprosić o `python -m http.server`,
+więc harness lokalny jest dla łańcucha niedostępny **z definicji, nie przez awarię**.
+`harness/*.html` zostaje w repo jako przyrząd do sesji interaktywnych.
+
+**D-39.7 · Embed przechodzi na stały adres `@main` + purge jsDelivr.** Wymóg operatora:
+nie zmieniać linku w szablonie przy każdym commicie. `@latest` odpada (wskazuje tag),
+`@<SHA>` odpada (to jest właśnie ta zmiana). `@main` samo w sobie odpada z powodu
+opisanego w `DEPLOY.md` (cache kilkanaście godzin) — **ale endpoint purge znosi tę
+przeszkodę i jest sprawdzony w tej sesji: `GET https://purge.jsdelivr.net/gh/…@main/…`
+zwraca 200, a `@main` rozwiązuje się 200/43 794 B** `[V]`. Nowy krok po każdym pushu
+należy do łańcucha, nie do operatora, i **Webflow nie jest już dotykany między testami**.
+**Cena, którą trzeba zapisać, bo inaczej wróci jako zaskoczenie:** `@main` jest
+referencją RUCHOMĄ, więc pomiar przestaje sam z siebie nieść wersję. Reguła
+z `DEPLOY.md` („wynik pomiaru ważny wyłącznie z zapisanym SHA") **nie znika, tylko
+zmienia nośnik**: SHA bierze się teraz z `git rev-parse HEAD` przed serią i zapisuje
+w tabeli, zamiast odczytywać go z adresu w `<script src>`.
+
 ### Co zostaje otwarte (poza powyższym)
 
 Rytmy `D11`/`D13`, `B25` do przeprojektowania albo wycofania oraz dziewięć substytutów

@@ -612,11 +612,13 @@
     /* Rytm 12 daje tu ODSTĘP RODZICA, więc własny `margin-top` wywoływacza musi
        zniknąć, inaczej 12 zrobiłoby się 24. W liście PEŁNEJ rytm wynosi 8 i margines
        zostaje — dlatego reguła jest zawężona do tej ramki, a nie zmienia klasy.
-       W25: kreska pod listą SKRÓCONĄ jest `primary-text`. Zawężenie jest tu równie
-       świadome: kreska listy PEŁNEJ to inny węzeł Figmy (`.mp-tryb__linia`), nieczytany
-       — nie wolno jej przemalować odczytem, który jej nie dotyczy. */
-    '#' + ID + ' .mp-tryb__ramka-skladnikow .mp-tryb__wiecej{margin-top:0;' +
-      'border-top-color:var(--mp-atrament)}' +
+       W25 malowało tu kreskę atramentem, a zawężenie było wtedy świadome: kreska
+       poza ramką to inny węzeł Figmy i nie wolno jej było przemalować odczytem,
+       który jej nie dotyczy. **D-39.5 zdejmuje to zawężenie** — operator rozstrzygnął
+       kolor separatorów globalnie (#3E2B22), więc atrament stoi teraz w regule
+       BAZOWEJ `.mp-tryb__wiecej`, a tutaj zostaje wyłącznie rytm. Nadpisanie koloru
+       byłoby od tej chwili martwe i udawałoby, że kontekst coś zmienia. */
+    '#' + ID + ' .mp-tryb__ramka-skladnikow .mp-tryb__wiecej{margin-top:0}' +
     /* Lista składników kroku (W3). Skok 31 = wiersz 19 + odstęp 12 (§3.2);
        wiersz z markerem ma 20 px, bo kółko `i` jest o 1 px wyższe od tekstu
        (§3.14) — dlatego wysokość wiersza jest TREŚCIĄ, nie stałą. */
@@ -639,9 +641,19 @@
       'margin-right:8px;padding:0;border:1px solid var(--mp-atrament);border-radius:3px;' +
       'background:transparent;cursor:pointer;font-size:10px;line-height:15px;font-weight:600;' +
       'color:transparent;text-align:center}' +
-    /* NIENARYSOWANE (G2): odhaczony w bieżącym kroku = checkbox wypełniony + ✓, BEZ przekreślenia.
-       Przekreślenie niesie „składnik już zużyty" i zlanie obu odbiera stan S1 czytelność. */
-    '#' + ID + ' .mp-tryb__wiersz[data-odhaczony] .mp-tryb__ptaszek{' +
+    /* Odhaczony w bieżącym kroku = checkbox wypełniony + ✓, BEZ przekreślenia.
+       (Dawne NIENARYSOWANE G2; przekreślenie niesie „składnik już zużyty".) */
+    /* D-39.4 · ZUŻYTY DOSTAJE OBIE RZECZY NARAZ: wypełniony checkbox ORAZ przekreślenie.
+       Rozstrzygnięcie operatora 2026-08-16, wprost: „zużyte wymagają zarówno odhaczenia
+       checkboxa, jak i przekreślenia tekstu". Zgodne z odczytem `7273:10878`
+       (`składnik — zużyty`): pudełko `primary-text` #3E2B22, znak `✓` bielą pełną,
+       DM Sans SemiBold 10 px/1,5 — i jednocześnie nazwa `line-through`.
+       To ODWRACA dawne G2 w części dotyczącej rozłączności obu delt: rozłączne mają
+       być „odhaczony" i „zużyty" jako STANY, a nie ich wykończenia. Wiersz `W42`
+       („przekreślenie jest CAŁĄ deltą") jest przez to nieaktualny — patrz `W42b`.
+       Cofnięcie: usuń selektor `[data-stan="zuzyty"]` z listy niżej. */
+    '#' + ID + ' .mp-tryb__wiersz[data-odhaczony] .mp-tryb__ptaszek,' +
+    '#' + ID + ' .mp-tryb__wiersz[data-stan="zuzyty"] .mp-tryb__ptaszek{' +
       'background:var(--mp-atrament);border-color:var(--mp-atrament);color:var(--mp-bialy-pelny)}' +
     '#' + ID + ' .mp-tryb__nazwa-skl{flex:0 1 auto;min-width:0;overflow:hidden;' +
       'white-space:nowrap;text-overflow:ellipsis}' +
@@ -701,7 +713,15 @@
        odpowiedzi. Tam, gdzie Figma nazywa regułę, runtime ma nazywać ją tak samo. */
     '#' + ID + ' .mp-tryb__wiecej{display:flex;align-items:center;' +
       'justify-content:space-between;width:100%;height:22px;' +
-      'margin-top:12px;padding:12px 0 0;border:0;border-top:1px solid var(--mp-beige-2);' +
+      /* D-39.5 · kreska wywoływacza jest `primary-text` #3E2B22, nie `beige-2`.
+         Rozstrzygnięcie operatora 2026-08-16, wprost: „separatory noszą kolor
+         3E2B22". Zdejmuje zawężenie z W25, które malowało atramentem WYŁĄCZNIE
+         kreskę wewnątrz ramki składników i zostawiało tę samą kreskę poza ramką
+         na beżu — a dwa kolory jednej linii zależnie od kontekstu to właśnie
+         zgłoszenie operatora nr 3 („kolory separatorów niespójne").
+         Cofnięcie: `var(--mp-beige-2)` z powrotem tutaj oraz przywrócenie
+         `border-top-color` w regule zawężonej dwadzieścia linii wyżej. */
+      'margin-top:12px;padding:12px 0 0;border:0;border-top:1px solid var(--mp-atrament);' +
       'box-sizing:content-box;background:transparent;cursor:pointer;color:inherit;' +
       'font-size:14px;line-height:19px;text-align:left}' +
     '#' + ID + ' .mp-tryb__wiecej-glif{width:16px;height:22px;' +
