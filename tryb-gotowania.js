@@ -1688,11 +1688,19 @@
       : !!ukrytaWymuszona;
 
     if (ukryta) {
+      /* D-39.17 — przeglądarka zwalnia wake lock sama przy schowaniu karty.
+         Zerujemy własny uchwyt, żeby stan modułu nie twierdził, że trzymamy coś,
+         czego już nie mamy; o samo `release()` nie prosimy, bo jest po fakcie. */
+      blokadaEkranu = null;
       bieglyPrzyUkryciu = minutniki.filter(function (m) {
         return m.zatrzymany == null && m.pozostalo > 0;
       });
       return null;
     }
+    /* Powrót do karty — blokadę trzeba wziąć PONOWNIE. Bez tej linii wake lock
+       działałby dokładnie raz, do pierwszego przełączenia aplikacji, i wyglądałby
+       na zaimplementowany. */
+    trzymajEkran();
 
     /* Dogonienie czasu PRZED oceną: przy wygaszonym ekranie interwał chodzi rzadziej
        albo wcale, więc `m.pozostalo` bywa nieaktualne dokładnie w tym momencie. */
@@ -1858,7 +1866,26 @@
       foto.src = krok.fotoUrl;
       foto.alt = '';
     }
-    if (krok.skladnikiTeraz && krok.skladnikiTeraz.length) {
+    /* D-39.16 · BLOK SKŁADNIKÓW POWSTAJE, GDY JEST COKOLWIEK DO POKAZANIA —
+       nie tylko wtedy, gdy krok ma własne składniki „w tym kroku".
+       Zmierzony objaw: krok 1 tego przepisu ma `skladniki: []`, więc bramka
+       `skladnikiTeraz.length` wycinała CAŁY blok — razem z sekcjami „dalej"
+       i „zużyte". Skutek: ghost „najpierw pokaż składniki" prowadził na krok 1
+       z `listaOtwarta: true` i **zerem wierszy**; użytkownik prosił o składniki
+       i dostawał pustkę. Pomiar 2026-08-16: krok 1 `teraz=0 dalej=0 zużyty=0`,
+       krok 2 `teraz=3 dalej=9` — dziewięć pozycji istniało i było wycinane
+       bramką, która pytała o coś innego.
+       Po zmianie krok 1 pokazuje wszystkie składniki przepisu w sekcji „dalej",
+       czyli dokładnie to, czego oczekuje operator od pierwszego kroku
+       (rozstrzygnięcie 2026-08-16). Nie potrzeba do tego ani nowego pola CMS,
+       ani nowego ekranu — pełna lista jest w modelu (`m.skladniki`, 12 pozycji)
+       i już dziś zasila sekcje „dalej"/„zużyte".
+       Etykieta „w tym kroku" i jej lista renderują się WYŁĄCZNIE przy niepustym
+       `skladnikiTeraz`: pusty nagłówek nad niczym wyglądałby na usterkę. */
+    var maTeraz = !!(krok.skladnikiTeraz && krok.skladnikiTeraz.length);
+    var maPozostale = !!((krok.skladnikiDalej || []).length ||
+                         (krok.skladnikiZuzyte || []).length);
+    if (maTeraz || maPozostale) {
       /* W26/W29 — DWA napisy, obydwa narysowane w Figmie i obydwa nieobecne
          w runtimie do przebiegu 22: nagłówek „składniki" (`7477:12562`) NAD ramką
          i etykieta „w tym kroku" (`7195:10936`) W ramce. To nie jest microcopy
@@ -1866,11 +1893,13 @@
       var blok = el('div', 'mp-tryb__blok-skladnikow', top);
       el('p', 'mp-tryb__naglowek-skladnikow', blok).textContent = 'składniki';
       var ramka = el('div', 'mp-tryb__ramka-skladnikow', blok);
-      el('p', 'mp-tryb__etykieta-sekcji', ramka).textContent = 'w tym kroku';
-      var lista = el('ul', 'mp-tryb__skladniki', ramka);
-      krok.skladnikiTeraz.forEach(function (s) {
-        lista.appendChild(wierszSkladnika(s, krok, 'teraz'));
-      });
+      if (maTeraz) {
+        el('p', 'mp-tryb__etykieta-sekcji', ramka).textContent = 'w tym kroku';
+        var lista = el('ul', 'mp-tryb__skladniki', ramka);
+        krok.skladnikiTeraz.forEach(function (s) {
+          lista.appendChild(wierszSkladnika(s, krok, 'teraz'));
+        });
+      }
       /* D5: lista skrócona pokazuje WYŁĄCZNIE „w tym kroku"; reszta jest o jeden tap
          dalej. NIENARYSOWANE (G7) / D7: cel prowadzi do listy PEŁNEJ (wszystkie trzy sekcje) —
          zmieniamy etykietę, nie cel, więc tekst jest tu placeholderem. */
@@ -1882,11 +1911,16 @@
       reszta.setAttribute('data-mp-lista-pelna', '');
       var maReszte = sekcjePozostale(krok, reszta);
       stan.czesci.reszta = maReszte ? reszta : null;
+      /* D-39.16 — gdy krok nie ma własnych składników, „pozostałe" NIE chowają się
+         za tapem: przycisk „zobacz pozostałe" ma sens wyłącznie jako zestawienie
+         „to teraz / reszta dalej". Bez „teraz" chowałby jedyną treść bloku przed
+         samym sobą — użytkownik dostałby ramkę z nagłówkiem i niczym w środku. */
+      if (!maTeraz && maReszte) reszta.setAttribute('data-otwarta', '');
 
       /* Przycisk istnieje tylko wtedy, gdy JEST co rozwijać. Wcześniej stał zawsze
          i prowadził na ekran listy nawet wtedy, gdy poza „w tym kroku" nie było
          ani jednej pozycji — czyli obiecywał treść, której nie ma. */
-      if (maReszte) {
+      if (maTeraz && maReszte) {
         var wiecej = el('button', 'mp-tryb__wiecej', ramka);
         wiecej.type = 'button';
         wiecej.setAttribute('aria-expanded', stan.listaOtwarta ? 'true' : 'false');
@@ -2323,6 +2357,55 @@
      w podglądzie na desktopie. Stan poprzedni zapamiętany, nie nadpisany na stałe. */
   var poprzedniOverflow = null;
 
+  /* ================= wake lock (D-39.17) =====================================
+     WYMAGANIA §106 („S5 — wake lock") i INTERAKCJE `I-23`. Do 2026-08-16 tego
+     mechanizmu NIE BYŁO w kodzie ani w jednym miejscu — zmierzone przeglądem
+     całego pliku i sondą `navigator.wakeLock` na żywej stronie (API dostępne,
+     runtime nieużywający). Ekran `S5` opisuje sytuację PO wygaszeniu, więc plik
+     od początku zakładał, że wygaszenie bywa; brakowało tego, co je opóźnia.
+
+     Cztery rzeczy, których ta implementacja NIE robi, i każda jest celowa:
+     (1) nie obiecuje, że zadziała — `wakeLock` nie istnieje na części przeglądarek
+         (m.in. Safari poniżej 16.4), więc brak API jest zwykłą ścieżką, nie błędem;
+     (2) nie woła `console.warn` — konsola jest mierzoną powierzchnią (wiersz I1);
+     (3) nie trzyma blokady po zamknięciu overlaya — zwolnienie idzie w `zamknijWewn`,
+         bo blokada przeżywająca tryb gotowania byłaby wadą, nie funkcją;
+     (4) nie zakłada, że blokada przeżyje schowanie karty. Przeglądarka zwalnia ją
+         SAMA przy `visibilitychange`, i to jest udokumentowane zachowanie, a nie
+         usterka — dlatego przy powrocie do karty prosimy o nią PONOWNIE.
+     Stan wystawiony do pomiaru przez `MP.tryb.wakeLock()`: `null` (nie proszono),
+     `true` (trzymana), `false` (proszono i nie wyszło — brak API albo odmowa). */
+  var blokadaEkranu = null;
+  var wakeStan = null;
+
+  function trzymajEkran() {
+    if (!stan.korzen || !stan.korzen.hasAttribute('data-otwarty')) return wakeStan;
+    var api = global.navigator && global.navigator.wakeLock;
+    if (!api || typeof api.request !== 'function') { wakeStan = false; return wakeStan; }
+    if (blokadaEkranu) return wakeStan;
+    try {
+      api.request('screen').then(function (b) {
+        /* Overlay mógł się zamknąć, zanim obietnica wróciła — wtedy blokadę
+           zwalniamy od razu, zamiast trzymać ją dla zamkniętego ekranu. */
+        if (!stan.korzen || !stan.korzen.hasAttribute('data-otwarty')) {
+          try { b.release(); } catch (e) {}
+          return;
+        }
+        blokadaEkranu = b;
+        wakeStan = true;
+        b.addEventListener('release', function () { blokadaEkranu = null; });
+      }, function () { wakeStan = false; });
+    } catch (e) { wakeStan = false; }
+    return wakeStan;
+  }
+
+  function puscEkran() {
+    if (blokadaEkranu) { try { blokadaEkranu.release(); } catch (e) {} }
+    blokadaEkranu = null;
+    wakeStan = null;
+    return wakeStan;
+  }
+
   function otworz(widok, opcje) {
     opcje = opcje || {};
     zbuduj();
@@ -2344,8 +2427,24 @@
          brak obu     → EKRAN STARTOWY.
        Uwaga dla wywołującego: `{krok:1}` NIE jest tym samym co brak opcji i dalej omija
        start — embed wiążący przycisk musi przestać je podawać, żeby poprawka była widoczna. */
+    /* D-39.17 — blokada ekranu żyje dokładnie tyle, co otwarty tryb gotowania. */
+    trzymajEkran();
+    /* D-39.18 · WZNOWIENIE JEST TERAZ OSIĄGALNE Z INTERFEJSU.
+       Do tej poprawki `sesja.wznow()` miało JEDYNEGO wywołującego w publicznym API,
+       czyli nikogo z interfejsu: sesja zapisywała się poprawnie, ekran `S1` istniał,
+       a wejście z przycisku zawsze pokazywało ekran startowy. Trzeci przypadek tej
+       samej klasy w tym produkcie, obok minutników (`D-39.14`) i ekranu zakończenia
+       (`D-39.13`) — funkcja gotowa, wyzwalacza brak.
+       Warunek operatora (2026-08-16, wprost): `S1` pokazuje się **tylko wtedy, gdy
+       użytkownik przeszedł już do właściwego gotowania** — zatwierdził porcje
+       i wszedł w krok. Test jest darmowy i dokładnie równoważny: `zapiszSesje()`
+       ma **jedno** wywołanie w całym pliku, w `pokazKrok()`. Istnienie zapisu
+       ZNACZY WIĘC „był na kroku"; samo obejrzenie ekranu startowego nie zapisuje nic.
+       Jawne `{ekran:…}` i `{krok:…}` mają pierwszeństwo — wywołujący, który wie,
+       czego chce, nie może dostać ekranu, o który nie prosił. */
     if (opcje.ekran) { stan.krok = opcje.krok || stan.krok; pokazEkran(opcje.ekran); }
     else if (opcje.krok) pokazKrok(opcje.krok);
+    else if (czytajSesje() && wznow()) { /* S1 — ekran ustawiony przez `wznow()` */ }
     else pokazEkran('start');
     /* NIENARYSOWANE (G11) / F4 / I-09: wpis historii dokładamy PO zbudowaniu widoku. Gdyby szedł przed,
        a budowa rzuciła, w historii zostałby wpis bez overlaya do zamknięcia. */
@@ -2368,6 +2467,7 @@
   function zamknijWewn(zHistorii) {
     if (!stan.korzen) return;
     stan.korzen.removeAttribute('data-otwarty');
+    puscEkran();   // D-39.17 — blokada nie przeżywa trybu gotowania
     zamknijTooltip();
     zamknijDialog();
     if (poprzedniOverflow !== null) {
@@ -2403,6 +2503,11 @@
     listaOtwarta: function () { return stan.listaOtwarta; },
     ekran: pokazEkran,
     ekranTeraz: function () { return stan.ekran; },
+    /* D-39.17 — stan blokady ekranu wystawiony do POMIARU, nie do sterowania:
+       `null` nie proszono · `true` trzymana · `false` proszono i nie wyszło
+       (brak API albo odmowa). Bez tego wiersz matrycy musiałby wnioskować
+       o blokadzie z zachowania telefonu, czyli z niczego mierzalnego. */
+    wakeLock: function () { return wakeStan; },
     /* F12: produkcja woła bez argumentu przez nasłuch `visibilitychange`;
        pomiar wymusza stan, bo karta pomiarowa jest w tle na stałe. */
     widocznosc: naWidocznosc,

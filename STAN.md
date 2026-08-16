@@ -9694,3 +9694,51 @@ w CMS, czy parser nie sięga po te pola.
 pozostałych 12. Jeden składnik liczony dwa razy albo pojawiający się w dwóch sekcjach.
 
 **Nadal otwarte:** obcięcie listy o 13 px (`D-39.12`, wymaga niewyhamowanego przyrządu).
+
+### CZTERY ROZSTRZYGNIĘCIA OPERATORA WYKONANE — 2026-08-16
+
+**`D-39.16` · Krok bez własnych składników pokazuje CAŁĄ listę przepisu.**
+Bramka `if (krok.skladnikiTeraz.length)` wycinała **cały** blok razem z sekcjami
+„dalej" i „zużyte", więc na kroku 1 (`skladniki: []`) nie było ani jednego wiersza,
+a ghost „najpierw pokaż składniki" prowadził donikąd. Teraz blok powstaje, gdy jest
+cokolwiek do pokazania; etykieta „w tym kroku" i jej lista renderują się tylko przy
+niepustym „teraz"; przy braku „teraz" reszta wchodzi **rozwinięta**, a przycisk
+„zobacz pozostałe" się nie renderuje — chowałby jedyną treść bloku przed samym sobą.
+**Nowe pole CMS nie jest potrzebne:** pełna lista siedzi w modelu (`m.skladniki`,
+12 pozycji) i już dziś zasila „dalej"/„zużyte".
+
+**`D-39.17` · Wake lock zaimplementowany.** `navigator.wakeLock.request('screen')`
+brany przy otwarciu i **ponawiany po powrocie do karty** — przeglądarka zwalnia go sama
+przy schowaniu, więc bez ponowienia działałby dokładnie raz i wyglądałby na gotowy.
+Zwalniany w `zamknijWewn`, czyli blokada nie przeżywa trybu gotowania. Brak API
+(Safari < 16.4) jest zwykłą ścieżką, nie błędem, i **nie zapala konsoli** — konsola
+jest mierzoną powierzchnią (`I1`). Stan wystawiony jako `MP.tryb.wakeLock()`:
+`null` / `true` / `false`.
+
+**`D-39.18` · Ekran wznowienia `S1` osiągalny.** Przy wejściu bez jawnego `ekran`/`krok`
+runtime sprawdza zapis sesji i pokazuje `S1`. **Warunek operatora („tylko gdy przeszliśmy
+do właściwego gotowania") jest spełniony bez dodatkowego pola:** `zapiszSesje()` ma
+**jedno** wywołanie w całym pliku, w `pokazKrok()`, więc istnienie zapisu ZNACZY „był na
+kroku" — samo obejrzenie ekranu startowego nie zapisuje nic.
+**Wymagało też zmiany po stronie Webflow:** `mpGotowanieStart` **1.5.0** przestaje
+podawać `ekran:'start'`, bo jawna wartość ma pierwszeństwo i blokowałaby `S1` na zawsze.
+Zarejestrowany i zastosowany do strony.
+
+**Rotation lock — JUŻ ISTNIAŁ, nie budowałem drugiego.** `@media (orientation:landscape)`
+zakrywa overlay pełnoekranowym scrimem `.mp-tryb__scrim-poziom` z napisem „obróć telefon".
+`screen.orientation.lock()` jest świadomie NIEUŻYWANE (komentarz w kodzie, WYMAGANIA §1:
+nie istnieje na iOS). Dokładanie drugiego mechanizmu do tej samej rzeczy byłoby wprost
+tym, przed czym ostrzega `mp-pomiar-i-pulapki` §4.2.
+
+### PRÓG 45 000 PRZEKROCZONY — 45 030 znaków, i to jest pozycja decyzyjna, nie awaria
+
+Runtime po tych zmianach ma **45 030** znaków wobec progu miękkiego **45 000**
+(`WYMAGANIA` §4, v1.7, D-28.1). Limit twardy 50 000 zostaje z zapasem **4 970**.
+**Nie ukrywam tego i nie obchodzę przez cięcie kodu**, bo przesłanka progu zmieniła się
+w tej samej sesji: próg pochodzi z „drogi integracyjnej przez embed", czyli z limitu pola
+custom code, do którego artefakt był WKLEJANY. Od `D-39.8` artefakt jedzie przez GitHub
+Pages, a w polu Webflow stoją dwa `<script src>` o łącznej długości ~180 znaków.
+**Limit platformy przestał dotyczyć tego pliku.**
+`WYMAGANIA.md` jest plikiem wiążącym, więc progu nie ruszam. **Pozycja dla operatora:**
+albo próg zostaje i trzeba ciąć kod, albo §4 wymaga przeredagowania pod transport przez
+Pages — z podbiciem hasha w „Plikach wiążących" w tym samym ruchu.
