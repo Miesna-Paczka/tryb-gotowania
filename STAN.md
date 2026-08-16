@@ -533,6 +533,53 @@ z `DEPLOY.md` („wynik pomiaru ważny wyłącznie z zapisanym SHA") **nie znika
 zmienia nośnik**: SHA bierze się teraz z `git rev-parse HEAD` przed serią i zapisuje
 w tabeli, zamiast odczytywać go z adresu w `<script src>`.
 
+### POMIAR STAGINGOWY po przejściu na Pages — 2026-08-16, `HEAD = f1dd0cf`, staging na `4c157ff`
+
+Przyrząd: **iframe wewnątrz strony przepisu**, nie `resize_window` — ten drugi nie zmienia
+`innerWidth` w tej konfiguracji (zmierzone dziś dwa razy: żądanie 390 i 940 zostawiało
+658, potem 1536). Iframe daje `innerWidth` równy zadanej szerokości co do piksela na
+wszystkich piętnastu ramkach `[V]`.
+
+**Transport `[V]`:** obie ramki na wszystkich piętnastu szerokościach ładują skrypty
+z GitHub Pages. Pages oddaje `44 005` B, `sha256` zgodny co do bitu z lokalnym
+`tryb-gotowania.min.js`; parser tak samo. Nagłówek **`cache-control: max-age=600`**
+odczytany, nie zacytowany z dokumentacji — to zamyka `[I]` z wcześniejszej propozycji.
+Przebudowa Pages po pushu zajęła **poniżej dwóch minut**.
+
+**Próg widoczności CTA przesunął się z 500 na 478/479** (operator zrezygnował z reguły
+własnej na rzecz najmniejszego breakpointu Webflow) `[V]`:
+
+| szerokość | 320 | 360 | 390 | 440 | **478** | **479** | 480 | 481 | 500 | 501 | 600 … 992 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| `.recipe-floating-cta` | flex | flex | flex | flex | **flex** | **none** | none | none | none | none | none |
+
+**Uwaga o granicy, nie o produkcie:** przy `innerWidth === 479`
+`matchMedia('(max-width:479px)')` daje FAŁSZ. To jest ta sama pułapka zaokrąglenia
+`innerWidth`, którą katalog przyrządów opisuje dla progu 500/501 — realny viewport jest
+o ułamek szerszy niż raportowana liczba całkowita. **Pasmo widoczności to więc `≤478`
+mierzone tym przyrządem, a sama granica 479 jest nierozstrzygalna bez przyrządu
+o rozdzielczości subpikselowej.** Praktycznie bez znaczenia (telefony: 360–430), ale
+**urządzenia raportujące 480 straciły przycisk** — wcześniej mieściły się w paśmie do 500.
+
+**Zgłoszenie operatora nr 1 ZAMKNIĘTE NA ZIELONO NA STAGINGU** `[V]`:
+`belka z-index: 2`, `elementFromPoint` w środku `×` → **`TRAFIA`**, i to samo dla
+`wstecz` oraz `dalej`. Wiersz `F2b` przechodzi na zielono.
+
+**`D-39.4` i `D-39.5` — NIE ZMIERZONE NA RENDEROWANYM WIERSZU, zostają 🟡.**
+Reguły są na stagingu na pewno (plik zgodny co do bitu), ale to dowód na OBECNOŚĆ
+reguły, nie na jej SKUTEK, a te dwa zdania różnią się dokładnie tak jak `F2` od `F2b`.
+Przeszkoda: przez wejście z przycisku strony overlay staje na ekranie startowym i nie
+udało się z niego zejść do kroku — `akcjaPrimary.click()` nie przesuwa ekranu.
+
+**Lead do sprawdzenia w następnej sesji, możliwy defekt:** `MP.tryb.ekranTeraz()`
+zwraca **`null`** po otwarciu przez handler strony (`otworz(model, {ekran:'start', …})`),
+podczas gdy otwarcie bez argumentów tego samego dnia dawało `'start'`. Model jest
+kompletny i niesporny — 9 kroków, 12 składników, `porcjeBazowe: 2`, **zero ostrzeżeń** —
+więc to nie jest brak danych CMS. Jeżeli stan ekranu nie ustawia się przy wejściu
+z opcjami, `akcjaEkranu('primary')` nie ma na czym działać i **przycisk „zacznij
+gotować" nie robi nic — czyli objaw tej samej rodziny co iks.** Do zmierzenia
+osobno, przed dalszą pracą nad wyglądem.
+
 ### Co zostaje otwarte (poza powyższym)
 
 Rytmy `D11`/`D13`, `B25` do przeprojektowania albo wycofania oraz dziewięć substytutów
