@@ -9383,3 +9383,32 @@ bo mount blokuje `rm`.
   opisie 3- i 4-wierszowym wszystko przesuwa się o różnicę, gap stały 16. Zdjęcie
   i lista składników są **niezależnie opcjonalne** (są klatki z jednym bez drugiego).
   Sprostowane w GEOMETRIA §3.15; nie jest to zmiana wymagań, tylko poprawka odczytu.
+
+### ZAPIS DO WEBFLOW — 2026-08-16, na wyraźną zgodę operatora („potwierdzam, jesteś jedynym pracującym łańcuchem")
+
+Pierwszy zapis tej sesji do Webflow. Zakres zgody: `mpGotowanieStart` oraz blok custom
+code stopki szablonu „przepisy Template". **Publish pozostaje po stronie operatora.**
+
+**1. `mpGotowanieStart` 1.4.0 zarejestrowany i zastosowany do strony** (`id` bez zmian:
+`mpgotowaniestart`; strona ma teraz wersję `1.4.0` w stopce). Zmiana jednej linii:
+`{krok:1}` → `{ekran:'start',model:m,porcje:n}`. Reszta źródła nietknięta co do znaku —
+bramka gotowości runtime'u, delegacja na `[data-mp-gotowanie-cta]`, odczyt porcji z DOM.
+
+**Pułapka narzędzia, do katalogu:** `update_registered_script` zwraca **404
+`resource_not_found`** na `script_id`, który `get_registered_script` czyta bez problemu.
+Nowa wersja powstaje przez **`register_inline_script` z tym samym `display_name`** —
+Webflow dokłada wtedy wersję pod tym samym `id`, zamiast tworzyć drugi skrypt. `[V]`
+Drugi krok jest osobny i łatwo go pominąć: **rejestracja wersji NIE zmienia wersji
+ZASTOSOWANEJ na stronie** — trzeba `add_page_script` z nowym numerem, inaczej strona
+dalej podaje starą.
+
+**Limit 2000 znaków na skrypt inline jest twardy.** Pierwsza wersja komentarza dała
+2203 znaki; uzasadnienie mieszka w `STAN.md`, w skrypcie stoi jedno zdanie i odsyłacz.
+
+**2. Blok custom code stopki: martwe wiązanie usunięte.** Zostały dwa `<script src>`
+i dwa komentarze — dlaczego adres jest stały i dlaczego wiązania tu nie ma.
+
+**Stan oczekiwany po Publish, do zmierzenia:** klik w CTA → ekran startowy
+(`ekranTeraz() === 'start'`, etykieta „tryb gotowania", przycisk „zacznij gotować"),
+a stamtąd „zacznij gotować" → `krok 1 z 9`. Dopiero z ekranu kroku dają się zmierzyć
+`D-39.4` i `D-39.5`, które czekają na renderowany wiersz.
