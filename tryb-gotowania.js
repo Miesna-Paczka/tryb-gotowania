@@ -596,7 +596,29 @@
        „rozwinięcie listy uniemożliwia przewijanie" (zgłoszenie operatora). */
     '#' + ID + ' .mp-tryb__reszta{overflow:hidden;height:0;display:flex;' +
       'flex:0 0 auto;flex-direction:column;gap:8px}' +
-    '#' + ID + ' .mp-tryb__reszta[data-otwarta]{height:auto}' +
+    /* D-39.21 · STAN OTWARTY NIE MOŻE NICZEGO PRZYCIĄĆ — `overflow:visible` obok
+       `height:auto`. Zgłoszenie operatora wracało od kilkunastu przebiegów w dwóch
+       przebraniach: „rozwinięcie uniemożliwia przewijanie" i „lista urwana".
+       Zmierzone: przy rozwiniętej liście `.mp-tryb__reszta` ma `scrollHeight 311`
+       przy `clientHeight 298` — trzynaście pikseli treści siedzi pod `overflow:hidden`,
+       w kontenerze, który sam nie jest przewijalny, a TOP ma wtedy zaledwie 30 px
+       zapasu. Z zewnątrz to jest dokładnie „ekran zablokowany".
+       **Przyczyny tych 298 px NIE USTALIŁEM i tego nie ukrywam** — `transition:none`,
+       `height:auto` i `overflow:visible` na samym kontenerze, a także `flex-shrink:0`
+       na wszystkich potomkach TOP-u, nie zmieniły ani jednego piksela; jedyne, co
+       działało, to `min-height` wprost. Przyrząd tej sesji (karta wyhamowana,
+       `Page.captureScreenshot` pada po 30 s) nie pozwala pójść dalej.
+       **Dlatego zmiana nie celuje w przyczynę, tylko w SKUTEK, i jest tak dobrana,
+       żeby skutek był niemożliwy niezależnie od przyczyny:** `overflow:hidden`
+       potrzebne jest WYŁĄCZNIE do animacji zwijania. W stanie otwartym nie pełni
+       żadnej funkcji, a jedyne, co może zrobić, to schować treść. Zdjęte —
+       cokolwiek ustawia wysokość na 298, treść wyjdzie poza pudełko i będzie
+       widoczna, bo `.mp-tryb__ramka-skladnikow` ma `overflow:visible`.
+       `min-height` dokładam jako drugi bezpiecznik: pudełko nie może być niższe
+       od własnej zawartości, więc rytm bloku też się nie posypie.
+       Cofnięcie: usuń `overflow` i `min-height` z tej reguły. */
+    '#' + ID + ' .mp-tryb__reszta[data-otwarta]{height:auto;overflow:visible;' +
+      'min-height:max-content}' +
     /* `flex:0 0 auto` na DZIECIACH — bez tego akordeon nie otwiera się w ogóle
        i objaw jest mylący. Kontener jest kolumną flex, więc przy `height:0`
        domyślne `flex-shrink:1` ściska każde dziecko do zera; `scrollHeight`
@@ -2052,7 +2074,16 @@
       /* Po otwarciu oddajemy wysokość CSS-owi (`[data-otwarta]{height:auto}`):
          zostawiona wartość w pikselach zamroziłaby kontener i pozycja zaznaczona
          po rozwinięciu przestałaby zmieniać jego rozmiar. */
-      r.style.height = r.hasAttribute('data-otwarta') ? '' : '0px';
+      var otwarta = r.hasAttribute('data-otwarta');
+      r.style.height = otwarta ? '' : '0px';
+      /* D-39.21 — DRUGI BEZPIECZNIK, liczbowy. Reguła CSS `min-height:max-content`
+         nie zadziałała w pomiarze (pudełko zostało na 298 px przy zawartości 311),
+         a `min-height` podane W PIKSELACH zadziałało od razu. Nie wiem, dlaczego
+         słowo kluczowe nie rozwiązuje się w tym układzie, i nie zgaduję — biorę
+         drogę, która jest zmierzona. Wysokość zawartości mamy tu za darmo:
+         to ta sama liczba, którą chwilę wcześniej policzyliśmy na cel animacji.
+         Zerowane przy zwijaniu, żeby zwinięte pudełko mogło zejść do zera. */
+      r.style.minHeight = otwarta ? (r.scrollHeight + 'px') : '';
     }
     if (trwanie === 0 || document.hidden) { domknij(); return stan.listaOtwarta; }
 
@@ -2340,6 +2371,19 @@
   function pokazKrok(n) {
     if (!stan.widok) return null;
     stan.ekran = null;
+    /* D-39.22 · ZMIANA KROKU ZAWSZE ZWIJA LISTĘ — polecenie operatora 2026-08-16,
+       dosłownie: „gdy klikam dalej bądź wstecz, lista powinna się automatycznie
+       zwijać, zawsze, bez wyjątku". Do tej poprawki `stan.listaOtwarta` przeżywało
+       przejście, a `rysujKrok` odtwarzało rozwinięcie na nowym kroku (był na to
+       nawet jawny komentarz: „render świeżego kroku przy otwartej liście NIE
+       animuje"). Rozwinięcie jest odpowiedzią na PYTANIE O TEN KROK — „co jeszcze
+       będzie potrzebne" — więc przeniesione na następny krok odpowiada na pytanie,
+       którego nikt nie zadał, i przy okazji zabiera ekran w chwili, gdy użytkownik
+       chce przeczytać nową instrukcję.
+       Zerowanie stoi TU, a nie w obsłudze przycisków, bo `pokazKrok` jest jedyną
+       drogą do kroku — wpięcie w `dalej`/`wstecz` ominęłoby wznowienie sesji
+       i skok z ekranu startowego. */
+    stan.listaOtwarta = false;
     trybBottomu(true);
     var N = stan.widok.kroki.length;
     if (n < 1 || n > N) return null;

@@ -9843,3 +9843,45 @@ ale rusza rytm pionowy trzech ekranów, więc czeka na rozstrzygnięcie operator
 pomiarową ustawiłem tym razem w polu widzenia, ale pikseli i tak nie dostaję.
 **Wizualnym przyrządem tego zadania jest telefon operatora i nie mam dla niego
 zamiennika w tej sesji.**
+
+### `D-39.21` · OBCIĘCIE LISTY — ZAMKNIĘTE PRZEZ USUNIĘCIE SKUTKU, NIE PRZYCZYNY
+
+**Klasa błędu, bo to jest ważniejsze niż sama poprawka.** Wracał od kilkunastu przebiegów,
+bo za każdym razem mierzyłem ŚCIEŻKĘ PROGRAMOWĄ zamiast ścieżki użytkownika:
+`top.scrollTop = 200` ustawia się nawet wtedy, gdy palcem przewinąć się nie da, tak samo
+jak `element.click()` odpala handler przycisku, w który nie można trafić (`F2b`).
+**To jest ta sama pomyłka drugi raz w tym samym produkcie** i tym razem kosztowała
+kilkanaście przebiegów. Reguła do skilla: *pomiar, który obchodzi wejście użytkownika,
+nie jest pomiarem tego, co robi użytkownik.*
+
+**Druga część klasy: uporczywe szukanie PRZYCZYNY przyrządem, który jej nie widzi.**
+Cztery przebiegi eksperymentów (`flex-shrink:0` na wszystkich potomkach, `transition:none`,
+`height:auto`, `overflow:visible` na kontenerze) nie ruszyły ani jednego piksela;
+`Page.captureScreenshot` pada po 30 s. **Przyczyny 298 px nadal NIE ZNAM.**
+Zamiast szukać jej dalej — usunąłem możliwość zaistnienia skutku.
+
+**Poprawka celuje w skutek i jest tak dobrana, żeby był niemożliwy niezależnie od
+przyczyny.** `overflow:hidden` na `.mp-tryb__reszta` jest potrzebne **wyłącznie do
+animacji zwijania**; w stanie otwartym nie pełni żadnej funkcji poza chowaniem treści.
+Zdjęte w stanie otwartym, plus bezpiecznik liczbowy `min-height` ustawiany z JS
+(reguła `min-height:max-content` w pomiarze NIE zadziałała, `min-height` w pikselach
+zadziałało od razu — biorę drogę zmierzoną, nie tę, która powinna działać).
+
+**Zmierzone na żywym stagingu przez wstrzyknięcie obu części** `[V]`:
+
+| | przed | po |
+|---|---|---|
+| `.mp-tryb__reszta` | 311 / **298** | 311 / **311** |
+| obcięte piksele | **13** | **0** |
+| zapas przewijania TOP | 30 px | **43 px** |
+| odstęp ostatniego wiersza od przycisku „zwiń" | — | 25 px (bez nachodzenia) |
+
+**`D-39.22` · Zmiana kroku ZAWSZE zwija listę** — polecenie operatora, dosłownie
+„zawsze, bez wyjątku". Zerowanie `stan.listaOtwarta` stoi w `pokazKrok()`, bo to jedyna
+droga do kroku; wpięcie w `dalej`/`wstecz` ominęłoby wznowienie sesji i skok z ekranu
+startowego. Przy okazji zmniejsza ekspozycję na `D-39.21`: rozwinięta lista nie wędruje
+już między krokami.
+
+**Artefakt:** 45 165 znaków. Próg miękki 45 000 przekroczony o 165 — pozycja decyzyjna
+opisana wyżej (przesłanka progu zniknęła razem z przejściem na Pages), limit twardy
+50 000 z zapasem 4 835.
