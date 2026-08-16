@@ -9885,3 +9885,47 @@ już między krokami.
 **Artefakt:** 45 165 znaków. Próg miękki 45 000 przekroczony o 165 — pozycja decyzyjna
 opisana wyżej (przesłanka progu zniknęła razem z przejściem na Pages), limit twardy
 50 000 z zapasem 4 835.
+
+### `D-39.23` · „ZABLOKOWANY EKRAN" — PRZYCZYNA ZNALEZIONA I NAZWANA: ŁAŃCUCHOWANIE PRZEWIJANIA
+
+**Usterka wracała od kilkunastu przebiegów, bo szukałem jej w złym elemencie.**
+Nie chodziło o `.mp-tryb__reszta` ani o obcięte 13 px. Chodziło o to, że **gest
+przewijania w ogóle nie docierał do TOP-u — uciekał na artykuł pod overlayem.**
+
+**Pomiar prawdziwym gestem** (kółko przez sterownik przeglądarki, nie `top.scrollTop = n`),
+ramka 440 px, krok 3, lista rozwinięta:
+
+| | przed | po |
+|---|---|---|
+| `TOP.scrollTop` po flicku w dół | **0** | **81,6** z 81 możliwych |
+| `window.scrollY` po tym samym geście | **500** | **0** |
+| flick ponad granicę | — | zostaje 81,6, strona 0 |
+| flick w górę | — | wraca do 0, strona 0 |
+
+**Mechanizm.** Zapas przewijania TOP-u jest mały (kilkadziesiąt pikseli), więc flick
+natychmiast dobija do granicy. Przy `overscroll-behavior: auto` przeglądarka oddaje
+resztę gestu przodkowi — i przewija się ARTYKUŁ, niewidocznie, bo overlay jest
+`position:fixed`. Każdy następny gest zaczyna się już na stronie. Z zewnątrz: ekran
+zamrożony, „ani w górę, ani w dół".
+
+**Poprawka ma dwie części i obie są konieczne:**
+1. `overscroll-behavior-y: contain` na `.mp-tryb__top` — gest zostaje w overlayu.
+2. `overflow:hidden` **także na `<body>`**. Sam `documentElement` NIE wystarcza i to
+   jest zmierzone: przy `htmlOvf === 'hidden'` strona i tak przewinęła się do 500.
+   Kontekstem przewijania tej strony jest `<body>`. Przywracane oba, w jednej gałęzi
+   `zamknijWewn` — rozdzielenie zostawiłoby artykuł zablokowany po wyjściu z trybu.
+
+**TRZY BŁĘDY METODY, które kazały temu trwać kilkanaście przebiegów** — do skilla:
+
+1. **`top.scrollTop = 200` przewija także wtedy, gdy palcem się nie da.** Ta sama klasa
+   co `.click()` wobec `elementFromPoint` (`F2b`). Pomiar, który omija wejście
+   użytkownika, nie mierzy tego, co robi użytkownik. **Drugi raz ta sama pomyłka.**
+2. **`curl` na CDN nie mówi nic o tym, co wykonuje przeglądarka.** Pages oddawał nowy
+   plik, hash się zgadzał, a karta wykonywała **starą wersję z cache'u** (`max-age=600`)
+   — arkusz na żywo miał wciąż `{height:auto}` bez `overflow:visible`. Przez to uznałem
+   własną poprawkę za nieskuteczną. Sprawdzian jest jeden: **czytaj regułę z żywego
+   arkusza**, a odświeżaj przez `fetch(url,{cache:'reload'})`.
+3. **Ramka pomiarowa pod `left:-99999px` uniemożliwia zrzut ekranu** — a to zrzut
+   pokazał na końcu, że lista jest cała i że przewinęła się poprawnie.
+
+**Artefakt:** 45 370 znaków (próg miękki 45 000 — pozycja decyzyjna operatora).

@@ -191,7 +191,24 @@
 
     /* TOP — pełna wysokość klatki. Belka i BOTTOM są NAKŁADKAMI (GEOMETRIA §1),
        więc treści nie skracamy; oddajemy jej dopełnienie równe ich wysokościom. */
+    /* D-39.23 · `overscroll-behavior: contain` — TO JEST PRZYCZYNA „ZABLOKOWANEGO
+       EKRANU", szukana od kilkunastu przebiegów, i ma nazwę: ŁAŃCUCHOWANIE
+       PRZEWIJANIA (scroll chaining).
+       Zmierzone prawdziwym gestem 2026-08-16 (kółko przez sterownik przeglądarki,
+       nie `scrollTop=`): przy `zapas` 24–103 px gest kończył się `TOP.scrollTop === 0`
+       i **`window.scrollY === 500`** — przewinął się ARTYKUŁ POD OVERLAYEM, a overlay
+       ani drgnął. Overlay jest `position:fixed`, więc ruch strony pod spodem jest
+       niewidoczny; z zewnątrz wygląda to dokładnie jak zamrożony ekran.
+       Mechanizm: zapas przewijania TOP-u jest mały (kilkadziesiąt pikseli), więc
+       flick natychmiast dobija do granicy, a przy `overscroll-behavior: auto`
+       przeglądarka oddaje resztę gestu przodkowi. Każdy następny gest zaczyna się
+       już na stronie, nie na overlayu — stąd „ani w górę, ani w dół".
+       Dowód rozstrzygający: ten sam gest w ten sam punkt, po odsłonięciu TOP-u,
+       daje `scrollTop: 24` z 24 możliwych i `window.scrollY: 0`.
+       `contain` zatrzymuje gest w overlayu i nie rusza niczego innego — nie blokuje
+       przewijania TOP-u, tylko odcina jego wyciek na zewnątrz. */
     '#' + ID + ' .mp-tryb__top{position:absolute;inset:0;overflow-y:auto;' +
+      'overscroll-behavior-y:contain;' +
       '-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;' +
       'gap:' + W.odstep + 'px;' +
       'padding:' + W.paddingTop + 'px ' + W.margines + 'px var(--mp-bottom-h,' + W.nawigacja + 'px)}' +
@@ -2418,6 +2435,7 @@
      więc bez tej blokady defekt byłby niewidoczny w pomiarze i widoczny dopiero
      w podglądzie na desktopie. Stan poprzedni zapamiętany, nie nadpisany na stałe. */
   var poprzedniOverflow = null;
+  var poprzedniOverflowBody = null;   // D-39.23 — patrz `otworz`
 
   /* ================= wake lock (D-39.17) =====================================
      WYMAGANIA §106 („S5 — wake lock") i INTERAKCJE `I-23`. Do 2026-08-16 tego
@@ -2476,8 +2494,18 @@
        działa w całości poza selektorem porcji, bo `naPorcje` to funkcja modelu. */
     if (opcje.model) stan.model = opcje.model;
     if (opcje.porcje) stan.porcje = opcje.porcje;
-    if (poprzedniOverflow === null) poprzedniOverflow = document.documentElement.style.overflow;
+    /* D-39.23 — `overflow:hidden` na `<html>` NIE WYSTARCZA i to jest zmierzone,
+       nie przypuszczane: przy `documentElement` ustawionym na `hidden` gest
+       przewinął stronę do `window.scrollY === 500`. Kontekstem przewijania tej
+       strony jest `<body>`, więc blokada musi objąć oba elementy. Poprzednie
+       wartości zapamiętujemy osobno — nadpisanie ich na stałe zostawiłoby artykuł
+       niedziałający po zamknięciu trybu. */
+    if (poprzedniOverflow === null) {
+      poprzedniOverflow = document.documentElement.style.overflow;
+      poprzedniOverflowBody = document.body ? document.body.style.overflow : null;
+    }
     document.documentElement.style.overflow = 'hidden';
+    if (document.body) document.body.style.overflow = 'hidden';
     stan.korzen.setAttribute('data-otwarty', '');
     /* WEJŚCIEM DOMYŚLNYM JEST EKRAN STARTOWY (poprawka 2026-08-15, zgłoszenie operatora).
        Do tej poprawki `else` szedł prosto w `pokazKrok(opcje.krok || 1)`, więc `ekranStart()`
@@ -2534,7 +2562,12 @@
     zamknijDialog();
     if (poprzedniOverflow !== null) {
       document.documentElement.style.overflow = poprzedniOverflow;
+      /* D-39.23 — przywracamy OBA, w tej samej gałęzi. Rozdzielenie ich na dwa
+         warunki dałoby stan, w którym artykuł zostaje zablokowany po zamknięciu
+         trybu, i nikt by tego nie powiązał z trybem gotowania. */
+      if (document.body) document.body.style.overflow = poprzedniOverflowBody || '';
       poprzedniOverflow = null;
+      poprzedniOverflowBody = null;
     }
     if (zHistorii) wpisHistorii = false; else zdejmijZHistorii();
   }
