@@ -11320,3 +11320,101 @@ Poprawiony na `2 łyżka oliwy` z jawną adnotacją, że to wygląda źle w CMS 
   właściwą ostrością.
 
 **Artefakt parsera:** 40 710 znaków, **15 690 B gzip** (budżet 20 kB).
+
+### `D-39.49/50` · GRAMY ZAMIAST SZTUK + REDAKCJA PISZE POPRAWNĄ POLSZCZYZNĄ — 2026-08-17
+
+Dwa rozstrzygnięcia operatora, oba **odwracające moje wcześniejsze odpowiedzi**.
+
+**`D-39.49` · etykieta produktowa zdjęta, zostają gramy.** Operator: *„design nie
+pokazuje sztuk, usunąłem to (…) wskazywanie liczby sztuk jest pozbawione sensu,
+lepiej liczyć w gramach"*. Odmówiłem tej zmiany godzinę wcześniej, powołując się
+na „design pokazuje sztuki" jako udokumentowane rozstrzygnięcie — **a operator
+właśnie je z projektu wycofał, więc broniłem przesłanki, która już nie istniała.**
+Nadpisywanie `kopia.etykieta` usunięte; `s.produkt` zostaje (wiązanie ze sklepem),
+pole `kopia.opakowania` skasowane po sprawdzeniu, że nikt go nie czytał.
+
+**`D-39.50` · indeks odwrotny form — i tu miał rację, a ja się wykręcałem.**
+Napisałem operatorowi „pisz `2 łyżka oliwy`, tak ma być". Odpowiedź: *„to nie jest
+angielski, a polski (…) nie możemy pokazywać w szablonie tekstu «na odwal się»"*.
+
+**Zmierzone `[V]`, i to zmienia ciężar sprawy:** surowe pole stoi na stronie
+w `div[data-mp-skladniki]` z **`display:none`** — użytkownik go nie widzi, **ale
+jest w źródle HTML**, a właśnie o czytelność surowego zapisu dla crawlerów AI chodzi
+w wymogu SEO/GEO z WYMAGANIA §3. „3 łyżka skrobi" trafiało do indeksu. Objaw był
+więc gorszy, niż zakładaliśmy obaj — nie tylko brzydki w edytorze.
+
+Rozwiązanie: `FORMA_DO_BAZY` — mapa **każdej formy z `ODMIANY` na hasło**.
+`odmien()`, `jednostkaDzielna()` i ostrzeżenie z `D-39.48` idą teraz przez nią.
+**Regułę zniesiono, nie obeszto:** redakcja pisze naturalnie, parser dobiera formę.
+
+**Zmierzone `[V]`:**
+
+| | 1 porcja | 2 porcje | 5 porcji |
+|---|---|---|---|
+| wejście `łyżka` | łyżka | łyżki | łyżek |
+| wejście **`łyżki`** | **łyżka** | **łyżki** | **łyżek** |
+| wejście **`jajka`** | **jajko** | **jajka** | **jajek** |
+| `g` | g | g | g |
+
+Pełna ścieżka na modelu, baza 2 porcje: `3 łyżki skrobi` → **2 porcje „3 łyżki"
+· 4 porcje „6 łyżek" · 8 porcji „12 łyżek"**; `300 g piersi` → 600 g → 1200 g.
+**Zero ostrzeżeń** przy poprawnie napisanej polszczyźnie. **Zero kolizji form**
+między hasłami tabeli (sprawdzone programowo przy budowie indeksu, `__kolizje`).
+
+#### Znalezisko uboczne o KONTRAKCIE — ważne dla `D-39.47`
+
+Przy tym pomiarze wyszło, że szablon **nie używa nazw, których oczekuje parser**:
+na stronie są `div[data-mp-skladniki]`, `div[data-mp-zrodlo]` i `p[data-mp-karta-pytanie]`,
+a **`[data-mp-pole]` nie występuje ani razu** (`iloscPol: 0`).
+
+**Konsekwencja: `D-39.47` (pola kartowe czytane domyślnie) nadal nie znajdzie
+niczego** — nie dlatego, że jest wyłączone, tylko dlatego, że szuka innego atrybutu
+niż ten, który szablon wystawia. Karty `co-mozesz-zmienic` SĄ na stronie i są
+renderowane przez własny mechanizm strony.
+**Pozycja dla operatora:** albo szablon dostaje `data-mp-pole`/`data-mp-surowe`,
+albo parser uczy się nazw `data-mp-zrodlo`. Drugie jest tańsze i nie rusza szablonu,
+ale wiąże parser z konwencją, której nie on ustala. **Nie wybieram sam.**
+
+**Artefakt parsera:** 40 825 znaków, **15 745 B gzip** (budżet 20 kB).
+Hand-off: rozdz. 3.1 i 3.2 **przepisane w całości** — reguła się odwróciła.
+
+### `D-39.51` · PARSER CZYTA DWIE KONWENCJE — wariant B — 2026-08-17
+
+Operator wybrał wariant B po przedstawieniu rachunku zysk/strata: **parser uczy się
+nazw szablonu**, zamiast szablon uczyć się nazw parsera.
+
+**Struktura zmierzona na stagingu `[V]`** — odpowiada naszej jeden do jednego:
+
+| szablon | parser (dotąd) |
+|---|---|
+| `div[data-mp-karty="<nazwa>"]` — grupa | `[data-mp-pole="<nazwa>"]` |
+| `div[data-mp-zrodlo]` — surowy tekst | `[data-mp-surowe]` |
+
+Czytamy odtąd **oba zestawy**. `podzielKarty` (wstrzykiwanie na stronę) **nietknięte**
+— WYMAGANIA §3 dalej obowiązuje.
+
+**Cena wariantu B, nazwana i przyjęta:** parser zależy od konwencji, której nie
+ustala. Dlatego doszedł **sygnał dryfu**: surowe źródło (`[data-mp-surowe]`
+albo `[data-mp-zrodlo]`) leżące POZA nazwanym kontenerem daje ostrzeżenie.
+Ostrzegamy wyłącznie w tym przypadku — przepis bez pól kartowych milczy, bo brak
+kart nie jest usterką. To zamienia jedyną realną wadę tego wariantu — ciche
+zgaśnięcie zamienników — w coś, co widać w panelu.
+
+**Zmierzone na żywym DOM-ie stagingu `[V]`** (sama logika selektorów, przed publikacją):
+
+| | wynik |
+|---|---|
+| stara logika (`[data-mp-pole]`) znalazłaby | **0 pól** |
+| nowa logika znalazła | **`co-mozesz-zmienic` (370 zn.) · `wskazowka` (320 zn.)** |
+| ostrzeżenie o dryfie | 0 (nic osieroconego) |
+| klucze wpisów `co-mozesz-zmienic` | `#skrobia`, `#limonka` |
+| trafiają w klucze składników (11) | **oba** |
+
+**Predykcja po publikacji:** na kroku ze skrobią i na kroku z limonką pojawi się
+marker zamiennika; przy pozostałych składnikach markera NIE BĘDZIE i **to jest
+poprawne, nie brak** — marker dostaje tylko klucz, który ma wpis.
+
+**Artefakt parsera:** 41 304 znaki, **15 932 B gzip** (budżet 20 kB, zapas 4,5 kB).
+
+**Uwaga o zapasie:** parser urósł dziś z 15 225 na 15 932 B gzip. Do progu zostaje
+4,5 kB. Nie jest to jeszcze problem, ale przy tym tempie warto obserwować.

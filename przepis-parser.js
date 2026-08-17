@@ -89,10 +89,12 @@
   var DZIELNE = { 'łyżka': 1, 'łyżeczka': 1, 'szklanka': 1, 'garść': 1, 'szczypta': 1 };
 
   function jednostkaDzielna(jednostka) {
-    var baza = String(jednostka || '').split('|')[0].toLowerCase();
-    if (!baza) return true;
-    if (DZIELNE[baza]) return true;
-    return !ODMIANY[baza];      // g, ml, kg, cm, l — spoza tabeli, dzielne
+    /* D-39.50 — przez indeks odwrotny, żeby „łyżki" było dzielne tak samo jak
+       „łyżka". Wcześniej forma odmieniona trafiała do gałęzi „spoza tabeli"
+       i przypadkiem też wychodziła dzielna — ale z niewłaściwego powodu. */
+    var baza = bazaJednostki(jednostka);
+    if (!baza) return true;     // g, ml, kg, cm, l — spoza tabeli, dzielne
+    return !!DZIELNE[baza];
   }
 
   /* `D-39.48` · JEDNOSTKI MIARY, KTÓRE SŁUSZNIE SIĘ NIE ODMIENIAJĄ.
@@ -116,12 +118,54 @@
      Zapis „3 ząbki czosnku" renderuje się jako „3 ząbki" przy każdej liczbie porcji
      i **nie było na to żadnego sygnału** — pułapka zgłoszona przez sesję równoległą
      2026-08-17, wdrożona na polecenie operatora. */
+  /* `D-39.50` · INDEKS ODWROTNY — REDAKCJA PISZE POPRAWNĄ POLSZCZYZNĄ.
+     Zgłoszenie operatora 2026-08-17, i miał rację, a moja poprzednia odpowiedź
+     („pisz `2 łyżka oliwy`, tak ma być") była wykrętem: **to nie jest angielski,
+     tylko polski, i pole CMS nie może zawierać tekstu „na odwal się".**
+
+     Zmierzone `[V]`: surowe pole stoi na stronie w `div[data-mp-skladniki]`
+     z `display:none` — użytkownik go nie widzi, ale **jest w źródle HTML**,
+     a właśnie o czytelność surowego zapisu dla crawlerów AI chodzi w wymogu
+     SEO/GEO z WYMAGANIA §3. „3 łyżka skrobi" trafiało więc do indeksu.
+
+     Rozwiązanie: mapa KAŻDEJ formy z `ODMIANY` na jej klucz bazowy. Dzięki temu
+     `3 łyżki skrobi` parsuje się tak samo jak `3 łyżka skrobi` i odmienia się
+     poprawnie przy każdej liczbie porcji. Redakcja pisze naturalnie, parser robi
+     resztę — czyli odwrotnie niż dotąd.
+
+     Kolizje form między hasłami rozstrzygamy **pierwszym wpisem i zapisujemy je
+     do wykrycia**, zamiast po cichu nadpisywać: `liście` należy do `liść`,
+     ale `cebule` tylko do `cebula`. Gdyby dwa hasła dzieliły formę, wygrywa
+     wcześniejsze w tabeli, a `KOLIZJE_ODMIAN` mówi które. */
+  var FORMA_DO_BAZY = (function () {
+    var mapa = Object.create(null);
+    var kolizje = [];
+    Object.keys(ODMIANY).forEach(function (baza) {
+      mapa[baza] = baza;
+      ODMIANY[baza].forEach(function (forma) {
+        var f = String(forma).toLowerCase();
+        if (mapa[f] && mapa[f] !== baza) { kolizje.push(f + ': ' + mapa[f] + ' vs ' + baza); return; }
+        if (!mapa[f]) mapa[f] = baza;
+      });
+    });
+    mapa.__kolizje = kolizje;
+    return mapa;
+  })();
+
+  /* Sprowadza jednostkę do klucza tabeli. Zwraca `null`, gdy słowa nie znamy —
+     wtedy `odmien()` zostawia je nietknięte, a `ostrzezJednostke()` się odzywa. */
+  function bazaJednostki(jednostka) {
+    var s = String(jednostka || '').split('|')[0].toLowerCase();
+    if (!s) return null;
+    return FORMA_DO_BAZY[s] || null;
+  }
+
   function ostrzezJednostke(key, jednostka) {
     var baza = String(jednostka || '').split('|')[0].toLowerCase();
     if (!baza) return;
     if (String(jednostka).indexOf('|') >= 0) return;   // formy podane jawnie
     if (MIARY_NIEODMIENNE[baza]) return;
-    if (ODMIANY[baza]) return;
+    if (bazaJednostki(baza)) return;                  // D-39.50 — także formy odmienione
     ostrzez('składnik #' + key + ': jednostka „' + baza + '" nie jest w tabeli odmian, ' +
             'więc NIE BĘDZIE odmieniana przy zmianie porcji. Użyj mianownika liczby ' +
             'pojedynczej (np. „ząbek", nie „ząbki") albo podaj cztery formy przez ' +
@@ -132,7 +176,11 @@
   function odmien(slowo, n) {
     if (!slowo) return slowo;
     var jawne = slowo.split('|');
-    var formy = jawne.length >= 4 ? jawne : ODMIANY[slowo.toLowerCase()];
+    /* D-39.50 — najpierw formy podane jawnie, potem tabela PRZEZ INDEKS ODWROTNY,
+       żeby „łyżki" trafiało w hasło „łyżka". Bez indeksu odmieniały się wyłącznie
+       zapisy w mianowniku l. poj., czego redakcja nie ma prawa pamiętać. */
+    var baza = jawne.length >= 4 ? null : bazaJednostki(slowo);
+    var formy = jawne.length >= 4 ? jawne : (baza ? ODMIANY[baza] : null);
     if (!formy) return jawne[0];
     if (n !== Math.floor(n)) return formy[3] || formy[2];
     var abs = Math.abs(n), dz = abs % 10, st = abs % 100;
@@ -799,10 +847,42 @@
     var zrodlaPol = (opcje.pola === undefined || opcje.pola === true) ? true : opcje.pola;
     if (zrodlaPol === true) {
       zrodlaPol = {};
-      Array.prototype.forEach.call(document.querySelectorAll('[data-mp-pole]'), function (el) {
-        var nazwa = el.getAttribute('data-mp-pole');
-        if (nazwa) zrodlaPol[nazwa] = (el.querySelector('[data-mp-surowe]') || el).textContent;
-      });
+      /* `D-39.51` · CZYTAMY DWIE KONWENCJE: własną i tę, którą wystawia szablon.
+         Decyzja operatora 2026-08-17 (wariant B).
+
+         Zmierzone na stagingu `[V]`: szablon **nie używa** `data-mp-pole`. Wystawia
+         `div[data-mp-karty="<nazwa pola>"]` jako grupę, a w niej `div[data-mp-zrodlo]`
+         z surowym tekstem. Nazwy odpowiadają sobie jeden do jednego:
+         `data-mp-pole` ↔ `data-mp-karty`, `data-mp-surowe` ↔ `data-mp-zrodlo`.
+
+         **Dlaczego parser uczy się cudzej nazwy, a nie szablon naszej:** to jedyny
+         wariant, który działa bez edycji Webflow i bez uzgodnień z drugim łańcuchem.
+         Cena jest nazwana i przyjęta: parser zaczyna zależeć od konwencji, której
+         nie ustala. Gdyby ktoś przemianował `data-mp-zrodlo`, zamienniki zgasłyby
+         po cichu — dlatego niżej stoi ostrzeżenie, które robi z tego sygnał.
+         Ujednolicenie nazw ma sens dopiero przy drugim szablonie; dziś byłoby
+         zmianą w Webflow po to, żeby dokument zgadzał się sam ze sobą. */
+      Array.prototype.forEach.call(
+        document.querySelectorAll('[data-mp-pole],[data-mp-karty]'), function (el) {
+          var nazwa = el.getAttribute('data-mp-pole') || el.getAttribute('data-mp-karty');
+          if (!nazwa) return;
+          var zrodlo = el.querySelector('[data-mp-surowe],[data-mp-zrodlo]') || el;
+          zrodlaPol[nazwa] = zrodlo.textContent;
+        });
+
+      /* Sygnał na wypadek DRYFU KONWENCJI: surowe źródło, które istnieje, ale nie
+         siedzi w nazwanym kontenerze, jest niewidoczne dla parsera i nie ma jak
+         tego zauważyć inaczej. Ostrzegamy WYŁĄCZNIE w tym przypadku — przepis bez
+         pól kartowych milczy, bo brak kart to nie usterka. */
+      Array.prototype.forEach.call(
+        document.querySelectorAll('[data-mp-surowe],[data-mp-zrodlo]'), function (el) {
+          if (!el.closest || !el.closest('[data-mp-pole],[data-mp-karty]')) {
+            ostrzez('znalazłem surowe źródło pola kartowego poza nazwanym kontenerem ' +
+                    '(`[data-mp-pole]` albo `[data-mp-karty]`) — parser go NIE przeczyta, ' +
+                    'więc zamienniki z tego pola nie zadziałają. Prawdopodobnie zmieniła ' +
+                    'się konwencja atrybutów w szablonie.');
+          }
+        });
     }
     model.pola = {};
     if (zrodlaPol && typeof zrodlaPol === 'object') {
@@ -913,12 +993,23 @@
         kopia.etykieta = (liczba + ' ' + odmien(s.jednostka, doIle != null ? doIle : ile) + ' ' + s.nazwa)
           .replace(/\s+/g, ' ').trim();
       }
-      // MP: pokazujemy wielokrotność opakowania, nie surowe gramy
-      if (s.produkt && s.produkt.gramatura && s.ilosc != null) {
-        var opak = Math.ceil((s.ilosc * mnoznik) / s.produkt.gramatura);
-        kopia.opakowania = opak;
-        kopia.etykieta = opak + ' × ' + s.produkt.gramatura + ' g ' + s.nazwa;
-      }
+      /* `D-39.49` · ETYKIETA PRODUKTOWA ZDJĘTA — ZOSTAJĄ GRAMY. Decyzja operatora
+         2026-08-17: „design nie pokazuje sztuk, usunąłem to (…) wskazywanie liczby
+         sztuk jest pozbawione sensu, lepiej liczyć w gramach".
+
+         Było: `n × gramatura g nazwa`, gdzie `n` to liczba SZTUK w opakowaniu.
+         Dawało to „4 × 335 g" przy ośmiu porcjach — czyli DWA opakowania, czego
+         etykieta nie mówiła, i jednocześnie **kasowało całą pracę nad odmianą**,
+         bo powstawało od zera z pominięciem `odmien()`.
+
+         Uzasadnienie, które to trzymało („design pokazuje sztuki"), zostało przez
+         operatora **wycofane z projektu**, więc przesłanka zniknęła — to nie jest
+         cofanie cudzej decyzji, tylko usunięcie kodu po decyzji już odwołanej.
+
+         `s.produkt` NIE znika: wiązanie z produktem dalej żyje w modelu i dalej
+         służy do linkowania do sklepu. Zdejmujemy wyłącznie NADPISYWANIE etykiety.
+         Pole `kopia.opakowania` usunięte razem z nią — sprawdzone, że nikt go nie
+         czytał ani w parserze, ani w runtimie. */
       return kopia;
     });
 

@@ -70,53 +70,53 @@ To jest już zbudowane; opisuję, żeby było wiadomo, skąd co pochodzi.
 - **Ilość i jednostka są rozbierane**, żeby dało się przeliczyć porcje. Zakresy
   działają: `2–3 łyżki` odmieniają się po górnym końcu.
 
-### 3.1 `[!]` JEDNOSTKĘ PISZE SIĘ W MIANOWNIKU LICZBY POJEDYNCZEJ
+### 3.1 Jednostki — pisz normalną polszczyzną
 
-**To najdroższa cicha pułapka całej składni.** Tabela odmian jest kluczowana
-mianownikiem l. poj. — `ząbek`, `łyżka`, `szklanka`, `gałązka`.
+**Piszesz tak, jak się mówi: `3 łyżki skrobi`, `1 ząbek czosnku`, `2 jajka`.**
+Parser rozumie formy odmienione i sam dobiera właściwą przy każdej liczbie porcji.
 
-| co wpiszesz | co zobaczy użytkownik |
-|---|---|
-| `#czosnek 3 ząbek czosnku` | **„3 ząbki czosnku"** — poprawnie, przy każdej liczbie porcji |
-| `#czosnek 3 ząbki czosnku` | **„3 ząbki"** — i tak samo przy 1, 2, 5 i 8 porcjach |
+```
+#skrobia 3 łyżki skrobi ziemniaczanej
+```
+→ przy 2 porcjach „3 łyżki", przy 4 „6 łyżek", przy 8 „12 łyżek". `[V]` zmierzone.
 
-Drugi wariant **wygląda dobrze przy porcjach bazowych** i psuje się dopiero wtedy,
-gdy ktoś ruszy selektor porcji — `odmien()` przy słowie spoza tabeli zwraca je
-nietknięte.
+> **Poprzednia wersja tego rozdziału kazała pisać `3 łyżka skrobi`** — w mianowniku
+> liczby pojedynczej, bo tylko takie formy trafiały w tabelę odmian. Operator
+> słusznie to odrzucił: **to jest polski, a pole CMS nie może zawierać tekstu
+> „na odwal się"**, nawet jeśli użytkownik go nie widzi. Surowy zapis stoi
+> w źródle strony (`div[data-mp-skladniki]`, `display:none`) i **czytają go
+> crawlery AI**, o które chodzi w wymogu SEO/GEO. Od `D-39.50` parser ma indeks
+> odwrotny: każda forma z tabeli prowadzi do hasła. Regułę zniesiono, nie obeszto.
 
-**Od 2026-08-17 parser TO OSTRZEGA** (`D-39.48`): przy jednostce spoza tabeli
-dostaniesz wpis w panelu walidacji (`?debug=1`) z podpowiedzią, co wpisać.
-**Ostrzeżenie, nie błąd** — nieodmieniona jednostka nie psuje builda, tylko wygląd
-po zmianie porcji. Jednostki miary (`g`, `ml`, `kg`, `cm`, `szt`) są nieodmienne
+**Kiedy parser się odezwie:** gdy jednostki nie ma w tabeli w ŻADNEJ formie.
+Wtedy ostrzeżenie w panelu (`?debug=1`) i słowo zostaje nieodmienione przy każdej
+liczbie porcji. Jednostki miary (`g`, `ml`, `kg`, `cm`, `szt`) są nieodmienne
 z definicji i **nie wywołują ostrzeżenia**.
 
-> Uwaga na przykład wyżej: **`2 łyżka oliwy`** wygląda w polu CMS niepoprawnie
-> i tak ma być. Kluczem tabeli jest `łyżka`; „2 łyżki" zobaczy dopiero użytkownik.
-
-Piszesz więc **`3 ząbek czosnku`**, choć to wygląda niepoprawnie w polu CMS.
-Odmienia parser, nie redakcja.
-
-**Furtka dla słów spoza tabeli:** podaj cztery formy rozdzielone pionową kreską,
+**Furtka dla słów spoza tabeli** — cztery formy przez pionową kreskę,
 w kolejności **[1 · 2–4 · 5+ · dopełniacz l. poj. dla ułamków]**:
 
 ```
 #szalotka 2 szalotka|szalotki|szalotek|szalotki
 ```
 
-### 3.2 `[!]` `@produkt` KASUJE CAŁĄ PRACĘ NAD ODMIANĄ
+### 3.2 `@produkt` NIE zmienia już etykiety
 
-Gdy składnik ma `@slug-produktu`, etykieta **powstaje od zera** według wzoru
-`n × gramatura g nazwa` — cokolwiek redakcja napisała o ilości i jednostce,
-przestaje mieć znaczenie w trybie gotowania.
+Wiązanie z produktem MP (`@slug-produktu`) służy do **powiązania ze sklepem**.
+Etykieta składnika powstaje normalną ścieżką — ilość × mnożnik porcji, jednostka
+odmieniona, nazwa redakcji:
 
-**`n` to liczba SZTUK, nie opakowań** — decyzja projektowa, bo `gramatura-produktu`
-ma format „2 x 330 g", czyli opakowanie zawiera n sztuk po N g.
+```
+#kurczak 300 g piersi z kurczaka @filet-z-piersi-kurczaka
+```
+→ 2 porcje: „300 g piersi z kurczaka" · 4 porcje: „600 g" · 8 porcji: „1200 g".
 
-> **`[!]` Konsekwencja, której etykieta nie mówi:** przy 8 porcjach wyjdzie
-> **„4 × 335 g"** — a to są **dwa opakowania**, nie cztery i nie jedno. Użytkownik
-> patrzący na listę zakupów nie ma jak tego odczytać.
-> **Pozycja decyzyjna operatora**, nie usterka: albo etykieta zaczyna mówić
-> o opakowaniach, albo zostaje przy sztukach świadomie.
+> **Do 2026-08-17 było inaczej i to była pułapka.** Etykieta powstawała od zera jako
+> `n × gramatura g nazwa`, gdzie `n` to liczba SZTUK w opakowaniu — dawało to
+> „4 × 335 g" przy ośmiu porcjach (czyli dwa opakowania, czego napis nie mówił)
+> **i kasowało całą pracę nad odmianą**, bo omijało `odmien()`.
+> Zdjęte decyzją operatora: *„wskazywanie liczby sztuk jest pozbawione sensu,
+> lepiej liczyć w gramach"*.
 
 ### 3.3 `[!]` KAŻDY SKŁADNIK MUSI WYSTĄPIĆ W `skladniki:` JAKIEGOŚ KROKU
 
@@ -308,9 +308,10 @@ ją bez słowa.
 Do przejścia przed oddaniem przepisu:
 
 1. Każdy składnik ma unikalny `#klucz`, bez duplikatów.
-2. Składniki, które MP sprzedaje, mają `@slug-produktu` — i pamiętasz, że wtedy
-    etykieta powstaje od zera jako `n × gramatura g nazwa` (rozdz. 3.2).
-2a. **Jednostki w mianowniku liczby pojedynczej** (`ząbek`, nie `ząbki`) — rozdz. 3.1.
+2. Składniki, które MP sprzedaje, mają `@slug-produktu` — wiązanie ze sklepem,
+    etykiety już nie zmienia (rozdz. 3.2).
+2a. **Jednostki normalną polszczyzną** (`3 łyżki`, `1 ząbek`) — parser rozumie
+    formy odmienione, rozdz. 3.1.
 2b. **Każdy klucz składnika występuje w `skladniki:` jakiegoś kroku** — rozdz. 3.3.
 3. Każdy krok zaczyna się od `== tytuł`; przed pierwszym `==` nie ma nic.
 4. `skladniki:` w kroku wymienia **tylko te, których używa ten krok** — reszta
