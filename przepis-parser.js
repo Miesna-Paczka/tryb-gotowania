@@ -12,7 +12,13 @@
  *   <div id="mp-tryb-gotowania"
  *        data-tytul="{{name}}"
  *        data-porcje-bazowe="{{porcje-bazowe}}"
- *        data-czas="{{czas-przygotowania}}" hidden></div>
+ *        data-czas="{{czas-minuty}}" hidden></div>
+ *
+ * `D-39.59` — nagłówek mówił `{{czas-przygotowania}}` i było to NIEAKTUALNE.
+ * Odczyt itemu CMS 2026-08-17 `[V]`: `czas-przygotowania` = „30 min" (text),
+ * `czas-minuty` = 30 (liczba), a embed niesie `data-czas="30"` — czyli liczbę.
+ * Wiązanie idzie z `czas-minuty`. `czas-przygotowania` NIE MA odbiorcy — ani u nas,
+ * ani na szablonie — i jest tekstowym duplikatem, którym nie da się liczyć.
  *
  *   <!-- ukryta Collection List po `produkty-w-przepisie` -->
  *   <div data-mp-produkt
@@ -56,7 +62,7 @@
   'use strict';
 
   var UŁAMKI = { '½': 0.5, '¼': 0.25, '¾': 0.75, '⅓': 1 / 3, '⅔': 2 / 3, '⅛': 0.125 };
-  var KLUCZE_KROKU = ['czas', 'minutnik', 'skladniki', 'kryterium', 'foto'];
+  var KLUCZE_KROKU = ['czas', 'minutnik', 'skladniki', 'kryterium', 'inaczej', 'foto'];
 
   /* `D-39.57` (CR `inaczej:`) · ZNACZNIKI ZNANE, ALE NIEOBSŁUGIWANE.
      Zgłoszenie sesji treściowej 2026-08-17: `instrukcja-pisania-przepisow.md`
@@ -73,11 +79,13 @@
      znaczników, które **istniały w dokumentach**. Dopisuj tu każdy odrzucony
      i zawieszony, zamiast liczyć, że ktoś przeczyta zmianę w instrukcji. */
   var KLUCZE_NIEOBSLUGIWANE = {
-    'inaczej': 'rozgałęzienie kroku — zawieszone, patrz CR z 2026-08-17; ' +
-               'napisz je jako drugie zdanie treści kroku',
     'wariant': 'odrzucone 2026-08-12 (kolizja z taksonomią kart) — ' +
-               'użyj drugiego zdania treści kroku'
+               'użyj `inaczej:` albo drugiego zdania treści kroku'
   };
+  /* `D-39.59` — `inaczej` ZDJĘTE z tej listy tego samego dnia, w którym tu trafiło.
+     Ostrzeżenie z `D-39.57` doradzało „napisz to jako drugie zdanie", a generator
+     szablonu (`generuj-html.mjs`, `KLUCZE`) **rozpoznawał ten znacznik od początku**
+     i renderował go do czytelnego HTML-u. Rada była więc błędna, a nie tylko zbędna. */
   var JEDNOSTKI_UŁAMKOWE = ['łyżka', 'łyżeczka', 'szklanka'];
 
   /* Odmiana przez liczebnik. Polski ma cztery formy istotne dla przepisu, więc
@@ -386,6 +394,26 @@
     function domknij() {
       if (!biezacy) return;
       biezacy.tekst = biezacy._linie.join(' ').trim();
+      /* `D-39.59` · ROZGAŁĘZIENIE DOKLEJA SIĘ JAKO DRUGIE ZDANIE TREŚCI.
+         Decyzja operatora 2026-08-17 po ujawnieniu, że ten sam znacznik ma trzech
+         konsumentów i trzy różne odpowiedzi: generator szablonu renderował go do
+         osobnego `<em>Inaczej: …</em>`, sesja treściowa zawiesiła go w instrukcji,
+         a nasz parser wypuszczał do treści RAZEM ZE SŁOWEM „inaczej:".
+
+         **Wyciek był realny, nie hipotetyczny** — przepis „Kurczak teriyaki" używa
+         `inaczej:` w kroku „rozgrzej olej" i publikuje to dziś `[V]`.
+
+         Dlaczego dopisanie do treści, a nie osobny wiersz w widoku: w zestawie
+         Figmy **nie ma klatki** dla rozgałęzienia (0 trafień na `inaczej` i `wariant`),
+         a dwie klatki — `7457:12536` i `7468:103101` — niosą je jako drugie zdanie
+         akapitu kroku. Rysunek już odpowiedział na to pytanie.
+
+         Strona zachowuje bogatszy render z `generuj-html.mjs`; tryb gotowania
+         dostaje zdanie; słowo „inaczej:" nie wycieka nigdzie. Pole `krok.inaczej`
+         zostaje w modelu osobno, gdyby widok kiedyś chciał je wyróżnić. */
+      if (biezacy.inaczej) {
+        biezacy.tekst = (biezacy.tekst + ' ' + biezacy.inaczej).replace(/\s+/g, ' ').trim();
+      }
       biezacy.tekstHtml = bezZakreslen(biezacy.tekst);
       biezacy.kryteriumHtml = biezacy.kryterium ? bezZakreslen(biezacy.kryterium) : null;
       /* `D-39.47` · LIMIT „jeden `**marker**` na krok" USUNIĘTY. Decyzja operatora
@@ -413,7 +441,7 @@
         domknij();
         biezacy = {
           tytul: s.slice(2).trim(), tekst: '', tekstHtml: '', czas: null, minutnik: null,
-          kryterium: null, foto: null, fotoUrl: null, skladniki: [], _linie: []
+          kryterium: null, inaczej: null, foto: null, fotoUrl: null, skladniki: [], _linie: []
         };
         return;
       }
@@ -431,6 +459,7 @@
       if (m && KLUCZE_KROKU.indexOf(m[1].toLowerCase()) >= 0) {
         var k = m[1].toLowerCase(), v = m[2].trim();
         if (k === 'czas') biezacy.czas = v;
+        else if (k === 'inaczej') biezacy.inaczej = v;
         else if (k === 'minutnik') biezacy.minutnik = parsujMinutnik(v);
         else if (k === 'kryterium') biezacy.kryterium = v;
         else if (k === 'foto') biezacy.foto = v;

@@ -44,7 +44,7 @@ To jest już zbudowane; opisuję, żeby było wiadomo, skąd co pochodzi.
 | `<script type="text/plain" id="mp-skladniki">` | `skladniki` | lista składników |
 | `<script type="text/plain" id="mp-kroki">` | `kroki` | kroki przepisu |
 | `<script type="text/plain" id="mp-wartosci-porcja">` | `wartosci-porcja` | kcal i makro w pasku meta |
-| `<div id="mp-tryb-gotowania" data-tytul data-porcje-bazowe data-czas>` | `name`, `porcje-bazowe`, `czas-przygotowania` | tytuł, baza do przeliczeń, czas całkowity |
+| `<div id="mp-tryb-gotowania" data-tytul data-porcje-bazowe data-czas>` | `name`, `porcje-bazowe`, **`czas-minuty`** | tytuł, baza do przeliczeń, czas całkowity |
 | `<img data-mp-foto-glowne>` | `zdjecie-glowne` | zdjęcie na ekranie startowym, wznowienia i zakończenia |
 | `<img data-mp-foto-kroku>` (galeria) | `zdjecia-krokow` | zdjęcia przypisywane krokom przez `foto:` |
 | `<div data-mp-produkt …>` (ukryta lista) | `produkty-w-przepisie` | podmiana gramatur na opakowania MP |
@@ -150,6 +150,9 @@ Rozgrzej patelnię, wrzuć mięso i nie mieszaj przez pierwszą minutę.
   „w tym kroku"; reszta rozkłada się na „dalej" i „zużyte" **automatycznie**, po tym,
   w którym kroku składnik pojawia się pierwszy raz. Redakcja tego nie ustawia.
 - **`foto: 03`** dopasowuje zdjęcie z galerii po numerze w nazwie pliku.
+- **`inaczej:`** — rozgałęzienie kroku („a jeśli u ciebie inaczej, to tamto").
+  Na stronie renderuje się jako osobny wtręt, w trybie gotowania **dokleja się jako
+  drugie zdanie treści** (`D-39.59`). Budżet: **maks jedno zdanie**.
 - **`**tekst**` w treści NIE RYSUJE NICZEGO.** `bezZakreslen()` zdejmuje gwiazdki
   i zwraca sam tekst (`D-39.15`). **Limit „jeden na krok" USUNIĘTY** (`D-39.47`) —
   była to reguła podnosząca błąd i pilnująca składni bez konsekwencji.

@@ -11635,3 +11635,45 @@ Stan „wykorzystane" nadaje wyłącznie postęp przepisu.
 **Artefakty:** parser 41 954 znaki / **16 272 B gzip** · runtime 50 470 znaków /
 **13 971 B gzip**. Runtime zmalał trzeci raz z rzędu — usuwanie mechanik waży mniej
 niż ich opis.
+
+### `D-39.59` · `inaczej:` WCHODZI DO PARSERA + SPROSTOWANIE O `czas-przygotowania`
+
+**Odpowiedź, którą dałem łańcuchowi szablonu godzinę temu, była BŁĘDNA.**
+Napisałem im, że czytamy `czas-przygotowania`. Nie czytamy.
+
+Odczyt itemu CMS `[V]`: **`czas-przygotowania` = „30 min" (text)** oraz
+**`czas-minuty` = 30 (liczba)**. Embed ma `data-czas="30"` — gołą liczbę, czyli
+**wiązanie idzie z `czas-minuty`**. Nagłówek `przepis-parser.js` i tabela kontraktu
+w hand-offie mówiły `czas-przygotowania` — **oba były nieaktualne i oba poprawione**.
+
+**Redundancja jest RZECZYWISTA, nie pozorna.** Dwa pola niosą tę samą informację,
+a to bez odbiorcy jest tekstowe („30 min"), więc nie da się nim liczyć i może
+rozjechać się z liczbą. Ten sam wzorzec: **`liczba-porcji` = „2 porcje" (text)**
+wobec **`porcje-bazowe` = 2 (liczba)**, którego używamy. Odpowiedź dla łańcucha
+szablonu: **`czas-przygotowania`, `liczba-porcji`, `poziom-trudnosci`,
+`naglowek-karuzeli`, `produkty-karuzela` — ŻADNEGO z nich nie czytamy.**
+Sprawdzone gremialnie: zero trafień w obu plikach.
+
+**`inaczej:` wchodzi do `KLUCZE_KROKU` i dokleja się jako drugie zdanie treści.**
+Decyzja operatora. Trzech konsumentów miało trzy odpowiedzi: generator szablonu
+renderował `<em>Inaczej: …</em>`, sesja treściowa zawiesiła znacznik, a nasz parser
+wypuszczał go do treści **razem ze słowem „inaczej:"**.
+
+**Wyciek był realny i publikowany dziś `[V]`:** przepis „Kurczak teriyaki", krok
+„rozgrzej olej", `inaczej: Zamiast smażyć, upiecz kostki w 220°C…`.
+
+Zmierzone na tym prawdziwym kroku po zmianie:
+
+```
+błędy: 0   ostrzeżenia: 0
+krok.inaczej → "Zamiast smażyć, upiecz kostki w 220°C przez 20 minut…"
+tekst → "…aż szczypta skrobi **od razu zasyczy**. Zamiast smażyć, upiecz kostki…"
+czy wyciekło słowo "inaczej:" → false
+```
+
+**`inaczej` ZDJĘTE z `KLUCZE_NIEOBSLUGIWANE` tego samego dnia, w którym tam trafiło**
+(`D-39.57`). Ostrzeżenie doradzało „napisz to jako drugie zdanie", podczas gdy
+generator szablonu obsługiwał znacznik od początku — **rada była błędna, nie tylko
+zbędna.** Na liście zostaje `wariant`.
+
+**Artefakt parsera:** 41 982 znaki, **16 268 B gzip** (budżet 20 kB, zapas 4,2 kB).
