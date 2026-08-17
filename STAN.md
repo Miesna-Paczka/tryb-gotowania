@@ -10497,3 +10497,33 @@ zachowana: zużyty dostaje obie delty (zaznaczony glif + przekreślenie nazwy).
 asercje `B16`/`I4` pytają o 5 i wymagają przebazowania na 13.
 
 **Artefakt:** 46 630 znaków, **12 951 B gzip** (budżet 20 kB).
+
+### WARIANTU WYPEŁNIONEGO NIE MA W WEBFLOW — sprawdzone w rejestrze fontów, 2026-08-17
+
+Operator: „wariant wypełniony jest w plikach woff Webflow". **Sprawdzone przez
+Webflow MCP `list_fonts` na `6983617613052dc9fe624303` `[V]`: trzynaście fontów
+własnych, z czego Material Symbols to DOKŁADNIE TRZY pliki** —
+`MaterialSymbolsOutlined-Light/Regular/Medium.woff2`, wagi 300/400/500,
+i **`axes: []` przy każdym**, czyli żadnych osi zmiennych. Reszta to DM Sans
+(woff2 + ttf) i DM Serif Display. Wariantu `Filled` ani osi `FILL` w rejestrze nie ma.
+
+To jest zgodne z pomiarem w przeglądarce (`FILL 0` i `FILL 1` renderują się
+identycznie) i z deklaracją runtime'u, który ładuje dokładnie te trzy pliki.
+Dwa niezależne przyrządy, ten sam wynik.
+
+**Trzy wyjścia, wszystkie wykonalne, wybór należy do operatora:**
+
+1. **Zostaje obrysowany** (stan opublikowany). Spójny mechanizm, inny obraz niż Figma.
+2. **Hybryda wierna Figmie:** wraca pudełko CSS (16×16, promień 3, obrys 1 px,
+   wypełnienie atramentem po zaznaczeniu), a w środku zamiast znaku `✓` staje
+   ligatura **`check`** bielą. **`check` JEST w subsecie — zmierzone: 20,0 px przy
+   kontroli ujemnej 325,6** `[V]`. Daje dokładnie obraz z `7273:10878` i jednocześnie
+   spełnia intencję „ikony z Material", tylko na innym podziale ról: pudełko rysuje
+   CSS, ptaszek niesie font. Koszt: kilka linii, zero nowych plików.
+3. **Dogranie wariantu wypełnionego do Webflow** (statyczna instancja `FILL 1` albo
+   font zmienny z osią). Wtedy `check_box` wygląda jak w Figmie. **Zapis do Webflow
+   i subset są poza zakresem tego łańcucha** (pin: subset należy do sesji CMS,
+   tylko do odczytu) — to zlecenie operatora.
+
+Wariant 2 wygląda na najtańszy sposób pogodzenia obu celów i **nie jest tym, co
+operator polecił** — dlatego stoi jako propozycja, a nie jako wykonanie.
