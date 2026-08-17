@@ -10344,3 +10344,48 @@ znaczyłoby, że prześwitu nie ma i poprawka nie weszła.
 
 **Artefakt:** 45 775 znaków, **12 812 B gzip** (budżet 20 kB zachowany).
 Składnia źródła i artefaktu zweryfikowana `new Function()`.
+
+### `D-39.32` · SZEWRONY NA LIGATURY MATERIAL — 2026-08-17
+
+Zgłoszenie operatora po potwierdzeniu `D-39.31`: „część ikon to wciąż symbole
+markowane, np. szewron w dół rozwijający listę składników".
+
+**Rozstrzygnięte odczytem Figmy, nie wyborem.** `7304:13193`, w wierszu `row`
+z etykietą `zobacz pozostałe`: TEKST o treści `keyboard_arrow_down`,
+`Material Symbols Outlined` Regular, **16 px**, interlinia 1,35, `#3e2b22`
+(`--primary-text`), pudełko **16×22** `[V]`. Szewron pigułki minutnika —
+`7240:10921`, wiersz z „duś ragù" i „0:00" — ten sam opis, `keyboard_arrow_up`.
+
+**Figma ma DWA POKOLENIA tego wiersza i to trzeba było rozstrzygnąć, a nie
+uśrednić.** Starsze (`7211:10914`, `7240:10966`): znak `⌄` U+2304 w DM Sans,
+wiersz 19 px, etykieta 288 px. Nowsze: ligatura, wiersz 22 px, etykieta 280 px.
+**Piętnaście wystąpień ligatury wobec dwóch substytutu** — bierzemy nowsze.
+Gdyby proporcja była odwrotna, migracja byłaby REGRESEM; dokładnie tak skończyła
+się jednostka 2 (ptaszek), gdzie Figma kazała zostawić znak tekstowy.
+
+**Obecność ligatur w subsecie ZMIERZONA przed zmianą, nie założona.** Sonda
+szerokości na foncie z CDN Webflow, `font-size:20px`: trzynaście nazw po **20,0 px**
+przy kontroli ujemnej **505,6 px** `[V]` — w tym `keyboard_arrow_down`,
+`keyboard_arrow_up`, `close`, `refresh`, `add`, `remove`, `check_box`. Bez tego
+sprawdzenia brak glifu w subsecie wypisałby użytkownikowi SŁOWO zamiast ikony.
+
+**Geometria CSS nie wymagała zmiany** — `.mp-tryb__wiecej-glif` i `.mp-tryb__szewron`
+miały już 16×22 przy `font-size:16px`, czyli pudełko z Figmy co do piksela. Zmieniła
+się wyłącznie treść i rodzina (klasa `mp-ikona`). Cztery miejsca: budowa wywoływacza,
+przełączanie po kliknięciu, szewron pigułki, konstrukcja wiersza pigułki.
+
+**`LIGATURY` rośnie z 5 na 7 — asercje `B16`/`I4` pytają `szerLig.length === 5`
+i MUSZĄ zostać przebazowane na 7.** To zamierzone przebazowanie zbioru, nie regres;
+zapisuję wprost, żeby następna sesja nie wzięła czerwieni za defekt produktu.
+
+#### Czego świadomie NIE ruszyłem i dlaczego — pozycje decyzyjne
+
+| substytut | co mówi Figma | dlaczego stoi |
+|---|---|---|
+| `−` `+` (porcje) | `7263:10729/10732`: znaki **U+2212 / U+002B w DM Sans Medium 20 px** | Figma sama używa tu znaków tekstowych. Migracja na `remove`/`add` byłaby sprzeczna z projektem — ten sam kształt pomyłki co przy ptaszku |
+| `×` (2 miejsca) | `7473:103100`: ligatura **`close`**, ale `Material Symbols **Rounded** Medium`, `#000000` **bez zmiennej** | Znak rozstrzygnięty, ale rodzina i kolor przeczą całej reszcie pliku (wszędzie Outlined + `--primary-text`). Nie wybieram sam między „ligatura w naszym Outlined" a „import rodziny Rounded" |
+| `↻` (baner offline) | `7202:10894`: **wektor SVG 20×20**, nie font — mimo że `refresh` istnieje jako ligatura | Figma porzuca tu font. Podmiana na ligaturę byłaby moją decyzją, nie odczytem |
+| `hourglass` (start) | Outlined **Light (300)**, 32 px, `#487622` | Inna waga niż reszta interfejsu; działa, ale warto wiedzieć, że subset musi nieść trzy wagi |
+
+**Artefakt:** 46 172 znaki, **12 860 B gzip** (budżet 20 kB zachowany).
+Składnia źródła i artefaktu zweryfikowana `new Function()`.

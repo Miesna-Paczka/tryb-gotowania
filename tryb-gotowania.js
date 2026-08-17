@@ -54,8 +54,12 @@
      kropkę i wyglądała jak ikona, której nie ma. Teraz nieznana nazwa idzie
      do `ostrzezenie()` i renderuje się PUSTO — bo słowo w miejscu ikony widać
      natychmiast, a kropka udaje sukces. */
+  /* D-39.32 — lista rośnie z 5 na 7. Asercje `B16`/`I4` w harnessie pytają
+     `szerLig.length === 5` i po tej zmianie MUSZĄ zostać przebazowane na 7;
+     to jest zamierzone przebazowanie zbioru, nie regres. */
   var LIGATURY = ['hourglass', 'local_dining', 'leaderboard',
-                'arrow_back', 'arrow_forward'];
+                'arrow_back', 'arrow_forward',
+                'keyboard_arrow_down', 'keyboard_arrow_up'];
 
   /* Font ikon — trzy wagi subsetu, hosting **Webflow** (D-15.1, rozstrzygnięte
      pomiarem w przeb. 31: `FontFace.load()` z obcego originu przechodzi, więc CORS
@@ -1420,7 +1424,12 @@
        dosłownie. Zmiana idzie w parze z przejściem na `kryteriumHtml` przy
        `uruchomZKroku` — poprzednio szło tu pole SUROWE i stąd gwiazdki na ekranie. */
     m.el.podpowiedz.innerHTML = m.podpowiedz || '';
-    m.el.szewron.textContent = '⌃';   // I-16: `up` = zwiń; klatki z `down` to dryf Figmy
+    /* D-39.32 — szewron pigułki minutnika też jest ligaturą. Odczyt `7240:10921`
+       (wiersz `row` z „duś ragù" i „0:00"): tekst `keyboard_arrow_up`, Outlined
+       Regular 16 px, pudełko 16×22 `[V]`. `.mp-tryb__szewron` ma już te wymiary.
+       I-16 zostaje: `up` = zwiń; klatki z `down` to dryf Figmy. */
+    m.el.szewron.textContent = 'keyboard_arrow_up';
+    m.el.szewron.setAttribute('data-mp-ligatura', 'keyboard_arrow_up');
   }
 
   function tyk() {
@@ -1447,7 +1456,7 @@
       kropka: el('span', 'mp-tryb__kropka', wiersz),
       nazwa: el('span', 'mp-tryb__nazwa-min', wiersz),
       odliczanie: el('span', 'mp-tryb__odliczanie', wiersz),
-      szewron: el('span', 'mp-tryb__szewron', wiersz),
+      szewron: el('span', 'mp-tryb__szewron mp-ikona', wiersz),   // D-39.32
       podpowiedz: el('p', 'mp-tryb__podpowiedz', p),
       primary: el('button', 'mp-tryb__primary', p),
       ghosty: el('div', 'mp-tryb__ghosty', p)
@@ -2087,8 +2096,29 @@
         el('span', 'mp-tryb__wiecej-tekst', wiecej).textContent =
           stan.listaOtwarta ? 'zwiń' : 'zobacz pozostałe';
         var glif = el('span', 'mp-tryb__wiecej-glif', wiecej);
+        /* D-39.32 · SZEWRON WYWOŁYWACZA TO LIGATURA MATERIAL, NIE ZNAK UNICODE.
+           Zgłoszenie operatora 2026-08-17, wprost: „szewron skierowany w dół,
+           służący do rozwijania listy składników" wciąż jest substytutem.
+           Rozstrzygnięte odczytem, nie wyborem: `7304:13193` w wierszu `row`
+           z etykietą `zobacz pozostałe` to TEKST o treści `keyboard_arrow_down`,
+           `Material Symbols Outlined` Regular, 16 px, interlinia 1,35,
+           `#3e2b22` = `--primary-text`, pudełko 16×22 `[V]`.
+           **Figma ma dwa pokolenia tego wiersza i to trzeba było rozstrzygnąć,
+           a nie uśrednić:** starsze (`7211:10914`, `7240:10966`) ma znak `⌄`
+           U+2304 w DM Sans, wiersz 19 px, etykieta 288 px; nowsze ma ligaturę,
+           wiersz 22 px, etykieta 280 px. Piętnaście wystąpień ligatury wobec
+           dwóch substytutu — bierzemy nowsze. Gdyby liczby były odwrotne,
+           migracja byłaby REGRESEM, dokładnie jak przy ptaszku (jednostka 2).
+           Geometria CSS nie wymaga zmiany: `.mp-tryb__wiecej-glif` ma już
+           16×22 przy `font-size:16px`, czyli dokładnie pudełko z Figmy.
+           Obecność ligatur w subsetcie ZMIERZONA, nie założona: sonda szerokości
+           na foncie z CDN Webflow daje `keyboard_arrow_down` i `keyboard_arrow_up`
+           po 20,0 px przy kontroli ujemnej 505,6 px `[V]` 2026-08-17. Bez tego
+           sprawdzenia brak glifu w subsetcie wypisałby użytkownikowi SŁOWO. */
+        glif.className += ' mp-ikona';
         // NIENARYSOWANE (G5) / I-15 `down` = rozwiń · I-16 `up` = zwiń — dwa glify, nie obrót
-        glif.textContent = stan.listaOtwarta ? '⌃' : '⌄';
+        glif.textContent = stan.listaOtwarta ? 'keyboard_arrow_up' : 'keyboard_arrow_down';
+        glif.setAttribute('data-mp-ligatura', stan.listaOtwarta ? 'keyboard_arrow_up' : 'keyboard_arrow_down');
         glif.setAttribute('aria-hidden', 'true');
         stan.czesci.wiecej = wiecej;
         wiecej.addEventListener('click', function () { przelaczListe(); });
@@ -2163,7 +2193,10 @@
       var tekst = stan.czesci.wiecej.querySelector('.mp-tryb__wiecej-tekst');
       var gl = stan.czesci.wiecej.querySelector('.mp-tryb__wiecej-glif');
       if (tekst) tekst.textContent = nowa ? 'zwiń' : 'zobacz pozostałe';
-      if (gl) gl.textContent = nowa ? '⌃' : '⌄';
+      if (gl) {                                     // D-39.32 — ligatura, nie substytut
+        gl.textContent = nowa ? 'keyboard_arrow_up' : 'keyboard_arrow_down';
+        gl.setAttribute('data-mp-ligatura', nowa ? 'keyboard_arrow_up' : 'keyboard_arrow_down');
+      }
     }
 
     /* Animujemy PIKSELE, nie `auto`. Kolejność jest wiążąca: najpierw zapisujemy
