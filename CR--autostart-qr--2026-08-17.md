@@ -72,3 +72,29 @@ o niskim DPI; przy 192 px moduł ma ≈ 4,7 px.
 
 Odnotowujemy to tu wyłącznie po to, żeby ktoś, kto trafi na pusty albo przycięty kod,
 znalazł obie przyczyny w jednym miejscu.
+
+---
+
+## Dopisek z 2026-08-17 (po weryfikacji na stagingu) — rozmiar kodu 192 → 96
+
+Rozstrzygnięcie z sekcji „Sprawa pokrewna" **zostało przez operatora ODWRÓCONE**
+po obejrzeniu efektu na żywo. Zapisuję obie wersje, żeby nikt nie czytał tego
+dokumentu jako spójnego od początku — nie był.
+
+**Było:** slot rośnie 96 → 192, parser zostaje przy 192 zgodnie ze spec §8.
+**Jest:** slot zostaje 96×96, **parser schodzi na 96** (`QR_ROZMIAR`).
+Operator, wprost: *„chcę, żeby parser generował QR w rozmiarze 96×96; problemem
+nie jest rozmiar slotu, a rozmiar generowany przez parser"*.
+
+**Konsekwencja dla Was: `spec-tryb-gotowania-v1.md` §8 podaje 192 i przestaje być
+zgodny z produktem.** Prosimy o poprawkę na 96 albo o zapis, że rozmiar jest
+własnością szablonu, a nie spec. Proponowane brzmienie:
+
+> Kod QR renderuje się w rozmiarze slotu `[data-mp-qr]` przygotowanego przez
+> szablon; obecnie 96 × 96 px.
+
+**Dane do decyzji, gdyby wracała:** przy `viewBox 180` i 41 modułach bok 96 px
+daje moduł ≈ 2,1 px CSS (≈ 4,3 px fizyczne na ekranie HiDPI, wartość graniczna
+na 1×). Bok 192 px dawał moduł ≈ 4,3 px CSS. Przy 96 px w slocie 192 px kod był
+przycinany do 25 % powierzchni i **nie dawał się zeskanować** — to była usterka,
+którą ta zmiana usuwa; wybór między 96 a 192 dotyczy już tylko zapasu czytelności.

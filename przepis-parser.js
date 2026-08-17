@@ -3266,7 +3266,31 @@
      Bramka szerokości ZOSTAJE bez zmian (spec §8, wiersz H4): blok QR istnieje
      wyłącznie na desktopie. Przestała za to oszczędzać transfer — kod jedzie
      w pliku niezależnie od szerokości i to jest cena wariantu B. */
-  var QR_ROZMIAR = 192;          /* spec §8 */
+  /* `D-39.40` · ROZMIAR KODU 96, NIE 192 — decyzja operatora 2026-08-17, wprost:
+     „chcę, żeby parser generował QR w rozmiarze 96×96; problemem nie jest rozmiar
+     slotu, a rozmiar generowany przez parser".
+
+     **ODSTĘPSTWO OD SPEC §8**, która podaje 192, i zapisuję to jako odstępstwo,
+     a nie jako odczyt. Spec żyje w `git/content/przepisy-hub/spec-tryb-gotowania-v1.md`,
+     czyli u drugiego łańcucha — zgłoszenie dopisane do `CR--autostart-qr--2026-08-17.md`,
+     dokumentu NIE ruszam.
+
+     Przesłanka zmiany jest zmierzona: slot `.recipe-qr__code` ma **96×96**
+     z `overflow:hidden` (`--_dimensions---cards-c--qr-size`), więc SVG o boku 192
+     był przycinany do **25 % powierzchni** — widoczny zostawał sam lewy górny
+     znacznik pozycjonujący, bez prawego górnego i lewego dolnego. Kod w tym stanie
+     jest niemożliwy do zeskanowania. Zrzut potwierdził to wprost `[V]`.
+
+     **Cena, świadomie przyjęta:** przy `viewBox 180` i 41 modułach moduł ma
+     96/180 × 4 ≈ **2,1 px CSS**. Na ekranie HiDPI to ~4,3 px fizycznego piksela
+     i skanuje się dobrze; na wyświetlaczu 1× jest to wartość graniczna. Gdyby
+     kiedyś okazało się to za mało, właściwą naprawą jest POWIĘKSZENIE SLOTU
+     i podniesienie tej stałej razem z nim — nie rozjeżdżanie ich ponownie.
+
+     Alternatywa rozważona i odrzucona: `width:100%;height:auto` zamiast pikseli.
+     Byłaby odporna na zmianę slotu, ale rozmiar przestałby być wartością
+     nazwaną i audytowalną w jednym miejscu, a ten kod trzyma liczby jawnie. */
+  var QR_ROZMIAR = 96;
   var QR_KOLOR = '#2b2118';
 
   function rysujQR(selektor) {

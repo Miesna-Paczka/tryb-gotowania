@@ -10944,3 +10944,38 @@ chwilę wcześniej kod był narysowany. **Przyczyny nie ustaliłem i tego nie uk
 usunięcia, a dwa kolejne czyste wejścia (dwa różne przepisy) rysowały kod poprawnie.
 Najprawdopodobniej stan po moich własnych manipulacjach ramką pomiarową, nie defekt
 produktu — ale to jest hipoteza, nie ustalenie. Do obserwacji przy następnym wejściu.
+
+### `D-39.40` · ROZMIAR QR 192 → 96, PO STRONIE PARSERA — 2026-08-17
+
+**Operator odwrócił własne rozstrzygnięcie sprzed godziny** po obejrzeniu efektu
+na żywo, i słusznie: *„chcę, żeby parser generował QR w rozmiarze 96×96; problemem
+nie jest rozmiar slotu, a rozmiar generowany przez parser"*. Poprzednia decyzja
+(slot rośnie do 192) była moją rekomendacją — **zapisuję obie, żeby nikt nie czytał
+tej historii jako spójnej od początku.**
+
+`QR_ROZMIAR: 192 → 96`. Zweryfikowane w artefakcie: `setAttribute("width",96)`
+i `setAttribute("height",96)` `[V]`. Dwa pozostałe wystąpienia „192" w pliku należą
+do tablic kodowania biblioteki QR i nie mają z tym nic wspólnego — sprawdzone
+kontekstem, nie liczbą trafień.
+
+**ODSTĘPSTWO OD SPEC §8**, która podaje 192. Spec żyje w
+`git/content/przepisy-hub/spec-tryb-gotowania-v1.md`, czyli u drugiego łańcucha —
+dokumentu NIE ruszam, zgłoszenie dopisane do `CR--autostart-qr--2026-08-17.md`
+razem z jawnym odnotowaniem, że wcześniejszy zapis w tym samym CR-ze został
+odwrócony.
+
+**Cena, przyjęta świadomie:** przy `viewBox 180` i 41 modułach bok 96 px daje moduł
+≈ **2,1 px CSS** (≈ 4,3 px fizyczne na HiDPI, wartość graniczna na 1×). Bok 192
+dawał ≈ 4,3 px CSS. **Ale porównanie 96 wobec 192 dotyczy już tylko zapasu
+czytelności** — usterką był kod PRZYCIĘTY do 25 %, a ta zmiana ją usuwa. Gdyby
+2,1 px kiedyś okazało się za mało, właściwą naprawą jest powiększenie slotu
+**i podniesienie tej stałej razem z nim**, nie rozjeżdżanie ich ponownie.
+
+Alternatywa rozważona i odrzucona: `width:100%;height:auto` zamiast pikseli —
+odporna na zmianę slotu, ale rozmiar przestałby być wartością nazwaną
+i audytowalną w jednym miejscu.
+
+**Artefakt parsera:** 39 977 znaków, **15 358 B gzip** (budżet 20 kB).
+Składnia źródła i artefaktu zweryfikowana `new Function()`.
+**Predykcja do sprawdzenia po publikacji:** slot 96×96, SVG 96×96, widoczne 100 %,
+trzy znaczniki pozycjonujące na swoich miejscach.
