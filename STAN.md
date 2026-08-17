@@ -10896,3 +10896,51 @@ Składnia źródła i artefaktu zweryfikowana `new Function()`.
 
 **UWAGA WDROŻENIOWA: zmiana jest w PARSERZE.** Podbicie wersji tylko przy runtimie
 zostawi stary parser w cache'u Pages i QR się nie pojawi.
+
+### WERYFIKACJA PO WDROŻENIU — 2026-08-17, build `3fe758b` na Pages
+
+Sprawdzone na stagingu po pushu i publikacji. **Wszystkie predykcje zapisane PRZED
+pomiarem trafiły co do liczby** — to drugi raz w tym łańcuchu, gdy skuteczność
+orzeka wartość zapisana wcześniej, a nie ogląd po fakcie.
+
+| pozycja | predykcja | pomiar | |
+|---|---|---|---|
+| `D-39.38` jednostka czasu | „30 min" | **„30 min"** | ✅ |
+| `D-39.38` blok postępu | x=86 w=188 | **x=86 w=188** | ✅ |
+| `D-39.38` przycisk zamknięcia | x=304 | **x=304** | ✅ |
+| `D-39.38` znak marki | x=16 w=51 | x=16 w=51 | ✅ |
+| `D-39.32/33/34/35` glify | same ligatury | `close · hourglass · local_dining · leaderboard · remove · add · arrow_back · arrow_forward` | ✅ |
+| `D-39.36` checkbox | blank ↔ check_box | **`check_box_outline_blank` → `check_box`** po odhaczeniu | ✅ |
+| `D-39.36` cel dotyku | zachowany | struktura `ptaszek-glif` + `mp-tryb__cel` | ✅ |
+| `D-39.37` zakończenie | tekst z Figmy, CTA aparatu | nadtytuł, „pochwal się swoim daniem", trzy wiersze, primary „zrób zdjęcie", ghost „wróć do przepisu" | ✅ |
+| `D-39.39` autostart QR | kod rysuje się sam | **rysuje się na czystym wejściu na OBU przepisach** | ✅ |
+
+Viewport ramki pomiarowej: **równo 360** (obramowanie zdjęte — przy 358 z poprzednich
+pomiarów liczby były przesunięte o 2 px i to była wada przyrządu, nie produktu).
+
+#### 🔴 ZOSTAJE: slot QR przycina kod do 25 % — POTWIERDZONE ZRZUTEM
+
+Zmierzone i obejrzane `[V]`: slot `.recipe-qr__code` ma **96×96** z `overflow:hidden`
+(`width: var(--_dimensions---cards-c--qr-size)`), SVG ma **192×192**, `viewBox 0 0 180 180`.
+**Widoczne 25 % powierzchni.** Ciasne zbliżenie potwierdza wprost: widać wyłącznie
+lewy górny znacznik pozycjonujący, kod urywa się na prawej i dolnej krawędzi, brak
+znacznika prawego górnego i lewego dolnego. **Taki kod jest niemożliwy do zeskanowania.**
+
+Czeka na zmianę operatora w Webflow: zmienna `--_dimensions---cards-c--qr-size`
+z 96 na **192**.
+
+#### Błąd metody w tej weryfikacji — wart zapisania
+
+Pierwsze zbliżenie zrobiłem na regionie **100 × 100 px zrzutu**, w którym slot zajmował
+59 px, i odczytałem z niego „kod wygląda na kompletny, widać trzy znaczniki".
+**To była nadinterpretacja artefaktu skalowania**, sprzeczna z jednoznacznym pomiarem
+DOM (96 wobec 192). Dopiero zbliżenie na sam slot pokazało prawdę.
+**Reguła: przy sprzeczności zrzutu z pomiarem geometrii wygrywa pomiar**, a zrzut
+powtarza się w ciaśniejszym kadrze — dokładnie odwrotnie niż zrobiłem za pierwszym razem.
+
+Osobno: jeden odczyt w trakcie tej sesji pokazał pusty slot na stronie, na której
+chwilę wcześniej kod był narysowany. **Przyczyny nie ustaliłem i tego nie ukrywam** —
+`MutationObserver` na slocie i jego rodzicu nie zarejestrował żadnego cudzego
+usunięcia, a dwa kolejne czyste wejścia (dwa różne przepisy) rysowały kod poprawnie.
+Najprawdopodobniej stan po moich własnych manipulacjach ramką pomiarową, nie defekt
+produktu — ale to jest hipoteza, nie ustalenie. Do obserwacji przy następnym wejściu.
