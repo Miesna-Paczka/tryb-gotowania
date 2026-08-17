@@ -646,6 +646,15 @@
       'text-align:center;cursor:pointer;-webkit-appearance:none;appearance:none}' +
 
     '#' + ID + ' .mp-tryb__opis{margin:0;font-size:16px;line-height:24px}' +
+    /* `D-39.62` — waga pogrubienia WPISANA, nie odziedziczona po przeglądarce.
+       Parser wystawia od dziś `<strong>` w `tekstHtml`/`kryteriumHtml`, a domyślna
+       wartość dla `strong` to `bolder` — czyli wartość WZGLĘDNA, liczona od wagi
+       rodzica. Przy akapicie 400 wypadnie 700, ale przy dowolnym elemencie o wadze
+       500 albo 600 (a takich jest w tym widoku szesnaście) wypadłaby inna i wynik
+       zależałby od miejsca w drzewie. 700 jest tu wagą już używaną — niesie ją
+       odliczanie minutnika i pytanie tooltipa, czyli wyróżnienie w tekście
+       o rozmiarze zbliżonym do treści kroku. */
+    '#' + ID + ' strong{font-weight:700}' +
     /* D-39.15 · ZAKREŚLENIE USUNIĘTE Z PRODUKTU — decyzja operatora 2026-08-16,
        wprost: „usuńmy efekt highlightu zupełnie, jest nieutrzymywalny".
        Stała tu reguła malująca `<mark>` na atrament z wybitą bielą (W53/W54,

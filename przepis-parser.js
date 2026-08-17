@@ -267,8 +267,25 @@
      Escapowanie zostaje i zostaje PIERWSZE — to ono, a nie brak `<mark>`, sprawia,
      że treść z CMS nie wstrzyknie HTML-u. Wynik nie zawiera już żadnego znacznika,
      więc nazwa `zMarkerem` byłaby po tej zmianie nieprawdą o funkcji. */
-  function bezZakreslen(s) {
-    return escapeHtml(s).replace(/\*\*([^*]+)\*\*/g, '$1');
+  /* `D-39.62` (operator, 2026-08-17) — `**tekst**` ZNÓW COŚ RYSUJE: pogrubienie.
+     Nazwa `bezZakreslen` opisywała stan pośredni („zdejmij gwiazdki, nie rysuj nic")
+     i po tej zmianie byłaby nieprawdą o funkcji po raz DRUGI — dlatego nazwa idzie
+     za zachowaniem: `wyroznienia`, identycznie jak w `generuj-html.mjs`. Ta sama
+     nazwa po obu stronach jest tanim sposobem, żeby następny rozjazd był widoczny
+     przy czytaniu, a nie dopiero przy oglądaniu strony.
+
+     ROZJAZD, KTÓRY TO ZAMYKA `[V]` 2026-08-17: generator strony renderował
+     `<strong>` (świadomie, jako jedyny element mikroskładni), a tryb gotowania
+     spłaszczał do gołego tekstu. Czytelnik nie widział śmieci, ale tracił
+     wyróżnienie postawione przez autora celowo — czyli objaw cichy, ten najgorszy
+     rodzaj.
+
+     BEZPIECZEŃSTWO BEZ ZMIAN: `escapeHtml` stoi PIERWSZE i to ono, a nie brak
+     znaczników w wyniku, sprawia, że treść z CMS nie wstrzyknie HTML-u. Do wyniku
+     dokładamy `<strong>` PO escapowaniu, więc jedyny znacznik, jaki może tu powstać,
+     jest nasz. Wyjście i tak szło już przez `innerHTML`. */
+  function wyroznienia(s) {
+    return escapeHtml(s).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   }
 
   function naLiczbe(s) {
@@ -422,13 +439,15 @@
       if (biezacy.inaczej) {
         biezacy.tekst = (biezacy.tekst + ' ' + biezacy.inaczej).replace(/\s+/g, ' ').trim();
       }
-      biezacy.tekstHtml = bezZakreslen(biezacy.tekst);
-      biezacy.kryteriumHtml = biezacy.kryterium ? bezZakreslen(biezacy.kryterium) : null;
+      biezacy.tekstHtml = wyroznienia(biezacy.tekst);
+      biezacy.kryteriumHtml = biezacy.kryterium ? wyroznienia(biezacy.kryterium) : null;
       /* `D-39.47` · LIMIT „jeden `**marker**` na krok" USUNIĘTY. Decyzja operatora
          2026-08-17: „usunąć, skoro markera już nie ma, to i nie ma sensu go pilnować".
-         Po `D-39.15` (2026-08-16) `bezZakreslen()` zdejmuje gwiazdki i zwraca sam
-         tekst, więc `**…**` nie rysuje NICZEGO. Reguła podnosiła BŁĄD — czyli
-         najostrzejszy sygnał, jaki ma parser — pilnując składni bez konsekwencji.
+         Powód pozostaje w mocy po `D-39.62`, choć jego przesłanka się odwróciła:
+         gdy limit znosiliśmy, `**…**` nie rysowało NICZEGO; dziś rysuje pogrubienie.
+         Reguła i tak nie wraca — pilnowała LICZBY wyróżnień, a nie ich sensu,
+         i podnosiła przy tym BŁĄD, czyli najostrzejszy sygnał, jaki ma parser.
+         Ile pogrubień znieść w jednym kroku, rozstrzyga redakcja, nie walidator.
          **Reguła bez skutku, egzekwowana jako błąd, jest pułapką:** zatrzymuje
          redakcję na czymś, czego naprawa niczego nie zmienia w produkcie.
          Zamienniki niesie pole `co-mozesz-zmienic` (`zbudujZamienniki`), z własnym
@@ -897,9 +916,9 @@
       }),
       kroki: (dane.kroki || []).map(function (k) {
         return {
-          tytul: k.tytul, tekst: k.tekst || '', tekstHtml: bezZakreslen(k.tekst || ''),
+          tytul: k.tytul, tekst: k.tekst || '', tekstHtml: wyroznienia(k.tekst || ''),
           czas: k.czas || null, minutnik: k.minutnik || null,
-          kryterium: k.kryterium || null, kryteriumHtml: k.kryterium ? bezZakreslen(k.kryterium) : null,
+          kryterium: k.kryterium || null, kryteriumHtml: k.kryterium ? wyroznienia(k.kryterium) : null,
           foto: k.foto || null, fotoUrl: null, skladniki: k.skladniki || []
         };
       })

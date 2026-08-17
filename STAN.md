@@ -11935,3 +11935,61 @@ Dodatkowo wychodzą (4 pliki): `PROMPT-KOPIA-przed-D-32.2`, `PROMPT-KOPIA-przed-
 
 **Historia zostaje.** `git rm --cached` zdejmuje z indeksu, nie z przeszłości —
 kto potrzebuje starego handoffu, znajdzie go w commitach. Pliki zostają na dysku.
+
+### `D-39.60` + `D-39.61` na Pages `[V]` 2026-08-17 18:2x
+
+Przebieg **#29**, `77845bc` → **success**. `main` niesie commit z CR-1/CR-2.
+Parser na Pages: **42 410 znaków** (przewidziane przed pomiarem: 42 410),
+`"usterka SZABLONU"` obecne, rada `użyj \`inaczej:\`` zniknęła.
+
+**Pułapka narzędziowa, dwa trafienia z rzędu `[V]`:** komendy podawane operatorowi
+blokiem wieloliniowym kończyły się `git push`, a push nie dochodził — przy czym
+`commit` przechodził (znacznik czasu `COMMIT_EDITMSG` to potwierdzał). Uruchomiony
+osobno push działał za każdym razem. Objaw zgodny z wklejeniem bloku, w którym
+ostatnia linia zostaje na prompcie bez Entera.
+
+**Wniosek operacyjny: komenda zdalna nie stoi jako ostatnia linia bloku.**
+`push` podajemy osobno. To wada konstrukcji instrukcji, nie wykonania — i kosztowała
+w tej sesji dwa fałszywe „poszło" oraz jedną rundę diagnozy szukającej przyczyny
+po stronie GitHuba.
+
+### `D-39.62` — pogrubienie działa w trybie gotowania `[V]` 2026-08-17
+
+Decyzja operatora: „ma prawo, oczywiście". Rozjazd między powierzchniami zamknięty.
+
+**Parser:** `bezZakreslen()` → **`wyroznienia()`**, `'$1'` → `'<strong>$1</strong>'`.
+Nazwa idzie za zachowaniem i jest **ta sama co w `generuj-html.mjs`** — najtańszy
+sposób, żeby następny rozjazd był widoczny przy czytaniu kodu, a nie dopiero przy
+oglądaniu strony. Stara nazwa opisywała stan pośredni i po tej zmianie byłaby
+nieprawdą o funkcji **po raz drugi**.
+
+**Widok:** `#ID strong{font-weight:700}` — waga WPISANA, nie odziedziczona.
+Domyślna wartość dla `strong` to `bolder`, czyli **względna**: przy akapicie 400
+wypadłoby 700, ale w tym widoku jest szesnaście miejsc o wadze 500/600 i wynik
+zależałby od pozycji w drzewie. 700 to waga już używana — odliczanie minutnika
+i pytanie tooltipa.
+
+**Bezpieczeństwo sprawdzone, nie założone `[V]`:**
+
+```
+wejście : Uwaga <script>alert(1)</script> i **pogrubienie** oraz "cudzysłów" & ampersand.
+wyjście : Uwaga &lt;script&gt;alert(1)&lt;/script&gt; i <strong>pogrubienie</strong> oraz &quot;…&quot; &amp; …
+```
+
+`escapeHtml` stoi PIERWSZE, `<strong>` dokładamy PO escapowaniu — jedyne znaczniki
+w wyniku są nasze (sprawdzone regexem na wszystkich `<…` w wyjściu). Wyjście i tak
+szło już przez `innerHTML`, więc powierzchnia ataku się nie zmieniła.
+
+Zmierzone też na `kryterium:` — pogrubienie działa w obu polach przechodzących
+przez `wyroznienia()`.
+
+**Limit ilościowy nie wraca**, choć jego przesłanka się odwróciła (znosiliśmy go,
+bo gwiazdki nie rysowały nic; dziś rysują). Pilnował LICZBY wyróżnień, nie ich sensu,
+i robił to błędem. Ile pogrubień znosi krok, rozstrzyga redakcja.
+
+**Artefakty:** parser 42 427 znaków / 16 705 B gzip; runtime 50 500 / 14 093 B gzip.
+Oba suche biegi bez regresji.
+
+Kontrakt dla redakcji przepisany trzeci raz w tej sesji — tym razem na „pogrubienie
+działa wszędzie", z zaleceniem używania go do **sygnału rozpoznawczego**
+(„aż szczypta skrobi **od razu zasyczy**"), nie do ozdabiania.
