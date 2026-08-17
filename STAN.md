@@ -114,9 +114,14 @@ sha256: `cd23f958944538c30836184e86a37d6b65ada5ad200f9c008408894d87adf2a9`
 v1.5: `d77fc529cfa428d18abfd8fab0adecfad6ac6b3311b05597b7b22225a1fdd313`,
 v1.4: `5d0ac1987f5d7ed4dde2e768de5502592db21f22f8eacd9dc0db8a38a41dcfca`)
 
-Interakcje **v1.5** (ekstrakcja z Figmy + rozstrzygnięcia operatorskie):
+Interakcje **v1.6** (2026-08-17 — **CTA aparatu wchodzi do v1.0**, decyzja operatora;
+korekta `I-29` i `C6`, które przypisywały CTA aparatu wyłącznie wariantowi `7448:128443`,
+podczas gdy wdrażana klatka `7195:11178` ma własne `cta — cta`. Cięcie zakresu w części
+dotyczącej mechaniki zniżkowej i uploadu OBOWIĄZUJE BEZ ZMIAN. Przy tej samej decyzji
+brzmienie pięciu ciągów zakończenia przepisane z Figmy):
 `git/tech/tryb-gotowania/INTERAKCJE.md`
-sha256: `194a604dfe1ba2c0271411e6cad25c6bf5eff3078fc024e6a5c2b6a044d86668`
+sha256: `5115a90dcad22f5776857556745aa861326661676286a23aacae88e5c7d56103`
+(poprzedni — v1.5: `194a604dfe1ba2c0271411e6cad25c6bf5eff3078fc024e6a5c2b6a044d86668`)
 
 Przed pracą policz WSZYSTKIE trzy hashe. Niezgodny którykolwiek = STOP i raport.
 (Próg ukrycia przycisku: **500**. Landscape: scrim. Pola kartowe: server-visible.
@@ -10566,3 +10571,211 @@ oraz `.icon-recipe-check` na szynie przepisu **400** (kolor #816D44).
 Bliższym rodzeństwem naszej listy składników jest szyna przepisu (ta sama strona,
 to samo zadanie: odhaczanie składników) i ona stoi na **400**, czyli tam, gdzie
 już jesteśmy. Pozycja decyzyjna operatora, koszt zmiany: jedna linia.
+
+### EKRAN ZAKOŃCZENIA — TEKST JEST ZAŚLEPKĄ, A UZASADNIENIE ZAŚLEPKI JEST NIEPRAWDZIWE
+
+Pytanie operatora 2026-08-17: dlaczego tekst jest niezgodny z Figmą, czy idzie
+z CMS-u czy jest zahardkodowany, i dlaczego CTA nie prowadzi do aparatu.
+
+**1. Zahardkodowany. Nie CMS.** `ekranKoniec()` wpisuje pięć stałych, każda
+z komentarzem `// NIENARYSOWANE brzmienie: pipeline treści`. Z CMS-u idzie
+wyłącznie tytuł przepisu (`stan.widok.tytul`).
+
+**2. Uzasadnienie „NIENARYSOWANE" jest FAŁSZYWE — tekst JEST w Figmie.**
+Zestawienie `7195:11178` (klatka wdrażana w v1.0) z kodem `[V]`:
+
+| węzeł Figmy | Figma | runtime |
+|---|---|---|
+| `7195:11186` | „gotowe, smacznego" | **zgodne** |
+| `7200:10893` | „pochwal się **swoim daniem**" | „pochwal się" |
+| `7200:10894` | „Zrób zdjęcie gotowego dania – przycisk poniżej zabierze Cię od razu do aparatu." | „zrób zdjęcie tak, jak wyszło" |
+| `7200:10897` | „Wrzuć zdjęcie na Instagrama i oznacz @miesnapaczka, jeśli polubiłeś(-aś) gotowanie z nami :)" | „oznacz nas w relacji" |
+| `7200:10900` | „...a potem wróć po więcej przepisów!" | „wróć po przepis, kiedy zechcesz" |
+
+**Cztery z pięciu ciągów rozjeżdżają się, a wszystkie cztery są w pliku
+projektowym jako węzły tekstowe.** Ktoś oznaczył je jako nienarysowane i wstawił
+zaślepki „do czasu pipeline'u treści" — i to jest ta sama klasa błędu co
+`80 = 0 + 80` i „13 px obcięcia": **twierdzenie o źródle postawione bez sprawdzenia
+źródła.** Zaślepki przeżyły, bo nic ich nie kwestionowało: matryca pytała, czy
+runtime rysuje to, co runtime rysuje.
+
+**3. CTA aparatu — sprzeczność między plikiem wiążącym a Figmą, DO ROZSTRZYGNIĘCIA
+PRZEZ OPERATORA.** `INTERAKCJE.md` I-29 i C6 mówią: „Mechanika zdjęciowa i CTA
+aparatu (`7448:128443`) **poza zakresem v1.0**", czyli przypisują aparat wyłącznie
+wariantowi z mechaniką −70 zł. **Ale `7195:11178` — klatka WDRAŻANA — ma w BOTTOM-ie
+`cta — cta` (primary) obok `cta — ghost`, a jej wiersz 1 wprost obiecuje: „przycisk
+poniżej zabierze Cię od razu do aparatu".** Zrzut operatora pokazuje te CTA jako
+„zrób zdjęcie" (primary) i „wróć do przepisu" (ghost).
+Runtime daje primary „wróć do przepisu" i ghost „zamknij tryb gotowania".
+
+Czyli cięcie zakresu z 2026-08-14 usunęło CTA aparatu **także z wariantu, który
+go ma** — albo zapis w `INTERAKCJE.md` jest niedokładny. **Nie rozstrzygam tego
+sam: `INTERAKCJE.md` jest plikiem wiążącym**, a to jest pytanie o zakres, nie
+o wygląd.
+
+**Fakt techniczny do decyzji:** strona internetowa nie umie otworzyć aplikacji
+aparatu. Jedyna droga to `<input type="file" accept="image/*" capture="environment">`
+— na iOS daje arkusz z wyborem „Zrób zdjęcie / Biblioteka", nie od razu aparat.
+Obietnica „od razu do aparatu" z wiersza 1 jest więc na webie niewykonalna
+dosłownie i sam tekst wymaga poprawki niezależnie od decyzji o CTA.
+
+**Pozycje decyzyjne (2):** (a) czy przepisać pięć ciągów zgodnie z `7195:11178`;
+(b) czy v1.0 dostaje CTA aparatu, a jeśli tak — czy `INTERAKCJE.md` I-29/C6
+wymaga korekty i przeliczenia hasha.
+
+### `D-39.37` · ZAKOŃCZENIE: TEKST Z FIGMY + CTA APARATU — WPROWADZONE 2026-08-17
+
+Obie decyzje operatora wykonane w jednym ruchu, razem z korektą pliku wiążącego.
+
+**Tekst.** Pięć ciągów przepisanych z `7195:11178`. **Jedno odstępstwo, wymuszone
+mechanizmem i zaakceptowane przez operatora:** `7200:10894` obiecuje „przycisk
+poniżej zabierze Cię od razu do aparatu"; runtime mówi „przycisk poniżej otworzy
+aparat w Instagramie", bo pierwsza wersja jest na webie niewykonalna. Pozostałe
+wiersze dosłownie z Figmy.
+
+**`[U]` DO ROZSTRZYGNIĘCIA PRZEZ PIPELINE TREŚCI, nie przeze mnie:** wiersz 2
+niesie „polubiłeś(-aś)", czyli konstrukcję z rodzajem w nawiasie. TOV odradza
+takie formy. Zostawiam DOSŁOWNIE, bo to zatwierdzone brzmienie z projektu,
+a zmiana rejestru nie jest decyzją sesji technicznej. Pozycja dla trybu `ui`.
+
+**CTA aparatu.** Primary `zrób zdjęcie` → `akcjaAparat()`, ghost `wróć do przepisu`
+→ `zamknij()`. Dawny ghost („zacznij od nowa") znika — był `NIENARYSOWANE`
+i nie ma go w klatce.
+
+**Dlaczego NIE `<input type="file" capture>` — to jest sedno i łatwo je zgubić:**
+ten element zwraca plik **do strony**, a **nie zapisuje go w galerii telefonu**.
+Użytkownik zrobiłby zdjęcie i nie miałby czego wrzucić na Instagrama. Zapis
+wymagałby uploadu, czyli mechaniki −70 zł spoza zakresu v1.0. Kombinacja
+„CTA aparatu w v1.0" + „bez uploadu" ma dokładnie jedno spójne rozwiązanie:
+oddać użytkownika aparatowi Instagrama, gdzie zdjęcie i tak ma trafić.
+
+**`[NIEZWERYFIKOWANE]` `instagram://story-camera` NIE został sprawdzony na urządzeniu.**
+Instagram wycofywał w przeszłości część schematów. Dlatego adres stoi w STAŁEJ
+(`IG_APARAT`), a nie w treści funkcji, i ma drogę zapasową: jeśli po 1,2 s karta
+wciąż jest widoczna, otwieramy profil w przeglądarce.
+**KOREKTA (2026-08-17): moja wcześniejsza ocena „najgorszy wynik to profil, nigdy
+martwy przycisk" BYŁA BŁĘDNA.** Na iOS nawigacja pod niezarejestrowany schemat
+wywołuje systemowy alert o błędzie, a droga zapasowa odpala PO nim — najgorszy
+przypadek to alert, potem profil. Ryzyko przyjęte świadomie do czasu testu.
+**Schemat zmieniony na `story-camera`** (wybór operatora): `instagram://camera`
+otwiera kompozytor nowego posta, a wiersz 2 prosi o RELACJĘ z oznaczeniem.
+Podstawa: wyszukiwanie 2026-08-17 — schematy aparatu udokumentowane, zgłoszeń
+o wycofaniu brak, ale wszystkie źródła merytoryczne z lat 2020–2022. Test na urządzeniu: 10 sekund,
+po stronie operatora. Warunek `document.hidden` **oraz** próg czasu, bo uśpiona
+karta potrafi odpalić budzik z opóźnieniem i sam `hidden` wtedy kłamie — ta sama
+pułapka co przy `transitionend`.
+
+**PLIK WIĄŻĄCY ZMIENIONY, hash podbity w tym samym ruchu** (sekcja „Pliki wiążące"):
+`INTERAKCJE.md` **v1.5 → v1.6**, `d227f876…`, poprzedni `194a604d…`.
+Korekta `I-29`, `C6` i wiersza 11 inwentarza. **To naprawa nieścisłości zapisu,
+nie zmiana zdania:** obie pozycje przypisywały CTA aparatu wyłącznie
+`7448:128443`, a klatka wdrażana ma własne `cta — cta`. Cięcie zakresu w części
+dotyczącej mechaniki zniżkowej i uploadu **obowiązuje bez zmian**.
+
+**Artefakt:** 47 114 znaków, **13 182 B gzip** (budżet 20 kB).
+
+### DELTA EKRANU STARTOWEGO wobec `7195:10894` — 2026-08-17
+
+Pomiar w ramce **360 px** (realny viewport 358 — ramka ma obramowanie), żeby liczby
+były porównywalne z klatką bez skalowania. Zestawienie pozycji bezwzględnych.
+
+| element | Figma | runtime | ocena |
+|---|---|---|---|
+| belka | 72 | 72 | ✅ |
+| znak marki | x16 w50,9 h40 | x16 w51 h40 | ✅ |
+| przycisk zamknięcia | x304 w40 h40 | x302 w40 h40 | ✅ (−2 = węższy viewport) |
+| **blok postępu** | **x86 w188** | **x83 w203** | 🔴 **15 px za szeroki** |
+| wypełnienie paska (kikut) | w8 h6 | w8 h6 | ✅ |
+| zdjęcie | x16 y88 328×150 | x16 y88 326×150 | ✅ |
+| tytuł | y254, DM Serif, `--secondary-text-(h1)` #487622, wyśrodkowany, interlinia 1,1 | y254, 22 px, #487622, wyśrodkowany, 24,2 px | ✅ |
+| meta — kontener | x16 y318 328×81 | x16 y294 326×81 | ✅ (przesunięcie: patrz niżej) |
+| meta — kolumny | x32/136/240, w88 h57 | x32/135/239, w87 h57 | ✅ |
+| meta — glify | 32×32, x60/164/268 | 32×32, x60/163/266 | ✅ |
+| **meta — wartość czasu** | **„60 min"** | **„30"** | 🔴 **brak jednostki** |
+| meta — kcal | „417 kcal" | „417 kcal" | ✅ |
+| meta — makro | „B24 W38 T10" | „B39 W26 T16" | ✅ (format zgodny) |
+| „ile porcji?" | y415 h16 | y391 h16 | ✅ (przesunięcie) |
+| selektor | y447 328×48, blok 192 | y423 326×48, blok 192 | ✅ (przesunięcie) |
+| BOTTOM | y648 h132, CTA 328×48 ×2 | y646 h132 | ✅ |
+
+#### 🔴 1. Kolumna czasu gubi jednostkę — JEDYNA usterka treściowa
+
+`zbudujMeta()` w parserze buduje jednostki dla dwóch kolumn (`+ ' kcal'`,
+`'B'+b+' W'+w+' T'+t`), a czas przepisuje **surowo**: `{ glif:'hourglass',
+wartosc: czas || '' }`.
+
+Zmierzone `[V]`: `model.czas === "30"` — pole CMS niesie **samą liczbę**.
+**Szablon strony dokłada jednostkę we własnym zakresie** — hero tego samego
+przepisu renderuje `hourglass 30 min`. Tryb gotowania tego nie robi, więc pokazuje
+gołe „30". Figma potwierdza jednostkę: `7263:10719` = „60 min".
+
+**Wniosek do wdrożenia:** dołożyć jednostkę w `zbudujMeta`, **warunkowo** —
+tylko gdy wartość jest samą liczbą (`/^\d+$/`). Bezwarunkowe doklejenie dałoby
+„30 min min" dla przepisu, w którym ktoś wpisze jednostkę ręcznie, a pole CMS
+nie ma walidacji formatu. Miejsce zmiany: `przepis-parser.js`, nie runtime —
+jednostka należy do modelu, tak samo jak „kcal".
+
+#### 🔴 2. Blok postępu o 15 px za szeroki — rytm belki, nie treść
+
+| | odstęp znak→blok | blok | odstęp blok→zamknięcie |
+|---|---|---|---|
+| Figma | 19 | **188** | 30 |
+| runtime | 16 | **203** | 16 |
+
+Runtime rozkłada **równe odstępy 16/16**, a klatka ma **asymetryczne 19/30**;
+różnicę pochłania blok, więc pasek postępu i etykieta „tryb gotowania" są szersze
+i przesunięte o 3 px w lewo. Znak marki i przycisk zamknięcia stoją prawidłowo,
+więc to jest wyłącznie sprawa szerokości środkowego elementu.
+**Wniosek:** zamiast pozwalać blokowi rosnąć, dać mu 188 px i odstępy z klatki.
+
+#### ⚪ 3. Czego NIE zmieniać — dwa fałszywe tropy
+
+**Tytuł jest ZGODNY, mimo że token mówi co innego.** `get_design_context` na
+`7195:10902` zwraca `text-[length:var(--typo/h4,32px)]`, co kusi, żeby ustawić
+32 px. **Geometria mówi 22:** węzeł ma h=48 przy DWÓCH wierszach i interlinii 1,1,
+czyli 24 px na wiersz, czyli 24/1,1 ≈ 21,8. Runtime ma 22 px i interlinię 24,2 —
+poprawnie. **To trzecie wystąpienie tej samej pułapki** (`D-22.1` przy H4, `typo/H6`
+18 wobec fallbacku 24): **fallback tokenu w eksporcie kodu kłamie, rozstrzyga
+geometria węzła.**
+
+**Przesunięcie całej kolumny o 24 px w górę NIE jest usterką.** Tytuł w klatce ma
+h=48, bo przykładowy przepis („Spaghetti bolognese z wołowiną") łamie się na dwa
+wiersze. „Kurczak teriyaki" mieści się w jednym, więc wszystko poniżej idzie
+o 24 px wyżej. Zależne od treści, nie od układu — sprawdzian: przepis o długim
+tytule powinien dać y=318 dla meta.
+
+### `D-39.38` · DWIE POPRAWKI Z DELTY EKRANU STARTOWEGO — WPROWADZONE 2026-08-17
+
+**1. Jednostka czasu — poprawka w PARSERZE, nie w runtimie.** Jednostka należy do
+modelu tak samo jak „kcal": dwie pozostałe kolumny budują ją w kodzie, a czas był
+przepisywany surowo. **Warunkowo, nie bezwarunkowo** — pole CMS nie ma walidacji
+formatu, więc doklejamy wyłącznie do samej liczby (`/^\d+$/`). Przetestowane
+tablicą wejść `[V]`: `"30"→"30 min"` · `"120"→"120 min"` · `"45 min"→"45 min"` ·
+`"1 h 20 min"` bez zmian · `"ok. 30"` bez zmian · `""` i `null` → `""`.
+Bezwarunkowe `+ ' min'` dałoby „30 min min" przy pierwszym przepisie z jednostką
+wpisaną ręcznie.
+
+**2. Odstępy belki — asymetryczne 19/30, nie równe 16/16.** `gap` zdjęty z belki,
+odstępy przeniesione w marginesy sąsiadów; dwie nowe stałe `belkaLukaZnak: 19`
+i `belkaLukaZamkniecie: 30` obok istniejącego `torPostepu: 188`.
+
+**Blok postępu ZOSTAJE `flex:1 1 auto` i to jest decyzja, nie niedopatrzenie.**
+`W.torPostepu` jest w GEOMETRIA opisane jako „tor **w klatce 360**", czyli wartość
+PRZY tej szerokości, nie stała produktu. Przy marginesach 19/30 blok wychodzi na
+360 dokładnie 188 (360 − 16 − 51 − 19 − 30 − 40 − 16 = 188), a na szerszym telefonie
+rośnie sam — czego klatka nie rozstrzyga, bo istnieje w jednej szerokości.
+**Sztywne 188 przelewałoby belkę już przy 358**, czyli w ramce, w której robiłem
+pomiar. Predykcja do sprawdzenia: przy 360 blok ma wyjść `x=86 w=188`,
+zamknięcie `x=304`.
+
+**Odtwarzalność builda PARSERA potwierdzona przed nadpisaniem** `[V]`:
+`minify(źródło sprzed zmiany)` dało plik identyczny co do znaku z zacommitowanym
+`przepis-parser.min.js` (39 579 znaków). Ten sam test co przy runtimie 2026-08-17.
+
+**Artefakty:** runtime 47 217 znaków / **13 223 B gzip** · parser 39 638 znaków /
+**15 225 B gzip**. Oba w budżecie 20 kB. Składnia obu źródeł i obu artefaktów
+zweryfikowana `new Function()`.
+
+**UWAGA WDROŻENIOWA: ta zmiana rusza OBA artefakty.** Podbicie wersji tylko przy
+runtimie zostawi stary parser w cache'u Pages (`max-age=600`) i jednostka czasu
+się nie pojawi — objaw wyglądałby jak nieskuteczna poprawka, a byłby cache'em.

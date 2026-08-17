@@ -1,4 +1,17 @@
-# INTERAKCJE — tryb gotowania, ekstrakcja z Figmy v1.5 (2026-08-14)
+# INTERAKCJE — tryb gotowania, ekstrakcja z Figmy v1.6 (2026-08-17)
+
+**Zmiana v1.6 (2026-08-17):** **CTA aparatu WCHODZI do v1.0** — decyzja operatora,
+wprost, po zgłoszeniu rozjazdu ekranu zakończenia z projektem. Korekta dotyczy
+`I-29` i `C6` i naprawia **nieścisłość zapisu, nie zmianę zdania**: obie pozycje
+przypisywały CTA aparatu wyłącznie wariantowi `7448:128443` (z mechaniką −70 zł),
+podczas gdy klatka WDRAŻANA `7195:11178` ma we własnym BOTTOM-ie `cta — cta`
+obok `cta — ghost`, a jej wiersz 1 (`7200:10894`) wprost obiecuje aparat.
+Cięcie zakresu z 2026-08-14 dotyczyło **mechaniki zniżkowej i uploadu zdjęcia**
+i w tej części OBOWIĄZUJE BEZ ZMIAN — v1.0 nadal nie czyta kwoty zniżki, nie
+renderuje uploadu i nie zna słowa „rabat". Zmienia się wyłącznie to, że primary
+CTA zakończenia istnieje i prowadzi do aparatu Instagrama.
+Przy tej samej decyzji: brzmienie pięciu ciągów ekranu zakończenia przepisane
+z `7195:11178` (były zaślepkami opisanymi jako „NIENARYSOWANE" — nieprawdziwie).
 
 **Zmiana v1.5 (2026-08-14):** poprawka z §4.2 **wprowadzona** do WYMAGANIA (v1.2 →
 v1.3) na polecenie operatora; §4.2 jest teraz zapisem wykonanej zmiany, nie propozycją.
@@ -88,7 +101,7 @@ należące do trybu gotowania (nie odziedziczone z bibliotecznych przycisków).
 | 8 | `7195:11088` | 07 · krok 7 — nastaw wodę | 2 | ON_HOVER (biblioteka) | 0 |
 | 9 | `7195:11118` | 08 · krok 8 — ugotuj makaron | 3 | ON_HOVER (biblioteka) | 0 |
 | 10 | `7195:11153` | 09 · krok 9 — połącz i podaj | 2 | ON_HOVER (biblioteka) | 0 |
-| 11 | `7195:11178` | 10 · zakończenie — **wariant wdrażany w v1.0**, bez mechaniki −70 zł | 3 | ON_HOVER (biblioteka) | 0 |
+| 11 | `7195:11178` | 10 · zakończenie — **wariant wdrażany w v1.0**, bez mechaniki −70 zł, **z CTA aparatu (v1.6)** | 3 | ON_HOVER (biblioteka) | 0 |
 | 12 | `7448:128443` | 10 · zakończenie — wariant z mechaniką −70 zł, **poza zakresem v1.0** | 3 | ON_HOVER (biblioteka) | 0 |
 | 13 | `7196:10893` | S1 · powrót do przerwanego gotowania | 3 | ON_HOVER (biblioteka) | 0 |
 | 14 | `7196:10912` | S2 · ostrzeżenie — wyjście z gotowania | 2 | ON_HOVER (biblioteka) | 0 |
@@ -150,7 +163,7 @@ nie „domyślne".
 | I-26 | tooltip nie minimalizuje minutników | — | — | [U] decyzja 8. `7468:103095` ma `BOTTOM`=80 (krok bez minutnika) — **w pliku nietestowalne** [V] | Aneks 5 |
 | I-27 | zmiana orientacji na poziomą | → scrim „obróć telefon" | — | [U] WYM §1. **Zero klatek** | Aneks 13 |
 | I-28 | wejście w overlay (loader D13) | strona → overlay | — | [U] spec §17, WYM §3. **Zero klatek** | WYM §3 |
-| I-29 | ekran zakończenia | krok 9 → `7195:11178` („pochwal się swoim daniem") | — | [U] cięcie zakresu v1.0, §4/C6. Mechanika zdjęciowa i CTA aparatu (`7448:128443`) **poza zakresem v1.0** | WYM §2 |
+| I-29 | ekran zakończenia | krok 9 → `7195:11178` („pochwal się swoim daniem") | primary → aparat Instagrama · ghost → powrót do przepisu | [U] cięcie zakresu v1.0, §4/C6, **skorygowane v1.6 (2026-08-17)**: poza zakresem zostaje **mechanika zniżkowa i upload zdjęcia** (`7448:128443`); **CTA aparatu JEST w zakresie**, bo `7195:11178` ma własne `cta — cta`, a `7200:10894` obiecuje aparat. Realizacja: schemat `instagram://story-camera` (aparat RELACJI, nie kompozytor posta) z drogą zapasową na profil — `<input capture>` odrzucone, bo zwraca plik do strony, a NIE do galerii, więc nie ma czego wrzucić na Instagrama | WYM §2 |
 | I-30 | wznowienie przerwanego gotowania | `7196:10893` (S1) → krok 6 | — | [I] pasek 197/296 ≈ 6/9 · [U] localStorage, WYM §2 | Aneks 7 |
 | I-31 | tap „sprawdź ponownie" (S3) | `7196:10932`, in-place | — | [I] copy · [U] Aneks 7 | Aneks 7 |
 | I-32 | postęp w belce | wypełnienie = `round(188 × n / N)` przy torze 188 px | — | [V] zgodne dla n=1…9 (21/42/63/84/104/125/146/167/188) | WYM §4 |

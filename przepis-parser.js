@@ -803,8 +803,24 @@
 
     /* Glify są NAZWAMI LIGATUR z klatki, nie znakami: `hourglass`, `local_dining`,
        `leaderboard`. Czy istnieją w subsecie, rozstrzyga pomiar (I4/B16), nie ten plik. */
+    /* D-39.38 · JEDNOSTKA CZASU NALEŻY DO MODELU, tak samo jak „kcal".
+       Zgłoszenie operatora 2026-08-17: ekran startowy pokazywał gołe „30",
+       a `7263:10719` rysuje „60 min". Zmierzone `[V]`: pole CMS niesie SAMĄ
+       LICZBĘ (`model.czas === "30"`), a jednostkę dokłada szablon strony we
+       własnym zakresie — hero tego samego przepisu renderuje „30 min".
+       Tryb gotowania tego nie robił, bo dwie pozostałe kolumny budują jednostkę
+       w kodzie (`+ ' kcal'`, `'B…W…T…'`), a czas był przepisywany surowo.
+
+       WARUNKOWO, nie bezwarunkowo: pole CMS nie ma walidacji formatu, więc
+       wartość może już nieść jednostkę („1 h 20 min") albo cokolwiek innego.
+       Doklejamy wyłącznie do samej liczby; wszystko poza `^\d+$` zostaje
+       nietknięte. Bezwarunkowe `+ ' min'` dałoby „30 min min" przy pierwszym
+       przepisie, w którym ktoś wpisze jednostkę ręcznie. */
+    var czasTxt = String(czas == null ? '' : czas).trim();
+    if (/^\d+$/.test(czasTxt)) czasTxt += ' min';
+
     return [
-      { glif: 'hourglass',   wartosc: czas || '' },
+      { glif: 'hourglass',   wartosc: czasTxt },
       { glif: 'local_dining', wartosc: Math.round(parseFloat(e[1].replace(',', '.'))) + ' kcal' },
       { glif: 'leaderboard',  wartosc: 'B' + b + ' W' + w + ' T' + t }
     ];

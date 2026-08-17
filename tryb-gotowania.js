@@ -137,6 +137,10 @@
     lukaCta: 12,      // §2.1 — 72 − (16 + 44)
     torPostepu: 188,  // §1.1 — tor paska postępu w klatce 360
     postepMin: 8,     // §1.1 — kikut na ekranie startowym, nie zero
+    /* D-39.38 — odstępy w belce są ASYMETRYCZNE, zmierzone na `7195:10894`
+       (znak 16–67 · blok 86–274 · zamknięcie 304–344). NIE jest to `W.odstep`. */
+    belkaLukaZnak: 19,        // znak → blok postępu
+    belkaLukaZamkniecie: 30,  // blok postępu → przycisk zamknięcia
     /* kafle `stos` — R7/R8, §2.2 */
     pigulka: 40,      // pigułka zwinięta; stan jej nie zmienia (§3.5)
     pigulkaKrotka: 126, // 16 + 34 (wiersz) + 12 + 48 (primary) + 16
@@ -325,7 +329,21 @@
          ta część się potwierdziła. */
       'box-shadow:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);' +
       'background:color-mix(in srgb,var(--mp-bialy) 80%,transparent);' +
-      'display:flex;align-items:center;gap:' + W.odstep + 'px;' +
+      /* D-39.38 · ODSTĘPY BELKI SĄ ASYMETRYCZNE — 19 przed blokiem, 30 za nim.
+         Zmierzone 2026-08-17 w ramce 360: runtime dawał **równe 16/16**, a klatka
+         `7195:10894` ma znak 16–67, blok 86–274, zamknięcie 304–344, czyli
+         **19 i 30**. Znak i przycisk zamknięcia stały prawidłowo, więc całą
+         różnicę pochłaniał blok postępu: 203 px zamiast 188.
+
+         Dlatego `gap` znika z belki, a odstępy idą w MARGINESY sąsiadów. Blok
+         zostaje `flex:1 1 auto` i to jest świadome: `W.torPostepu` (188) jest
+         opisane w GEOMETRIA jako „tor w klatce 360", czyli wartość PRZY tej
+         szerokości, nie stała produktu. Przy marginesach 19/30 blok wychodzi
+         na 360 dokładnie 188 (360 − 16 − 51 − 19 − 30 − 40 − 16), a na szerszym
+         telefonie rośnie sam — czego klatka nie rozstrzyga, bo istnieje tylko
+         w jednej szerokości. Sztywne 188 przelewałoby belkę przy 358.
+         Cofnięcie: wróć do `gap:W.odstep` i zdejmij oba marginesy. */
+      'display:flex;align-items:center;' +
       'padding:0 ' + W.margines + 'px}' +
     /* Beżowe wypełnienie i promień 8 px zdjęte razem z wstawieniem znaku: były
        wypełniaczem slotu, a nie własnością powierzchni. [I] — wniosek z tego, że
@@ -333,9 +351,11 @@
        beż byłby widoczny wyłącznie w prześwitach ścieżki. NIE zweryfikowane
        odczytem wypełnienia ramki w Figmie — pozycja na liście decyzji. */
     '#' + ID + ' .mp-tryb__znak{width:51px;height:40px;flex:0 0 auto;' +
+      'margin-right:' + W.belkaLukaZnak + 'px;' +          // D-39.38
       'color:var(--mp-atrament);line-height:0}' +
     '#' + ID + ' .mp-tryb__znak svg{display:block;width:100%;height:100%}' +
-    '#' + ID + ' .mp-tryb__postep-blok{flex:1 1 auto;min-width:0}' +
+    '#' + ID + ' .mp-tryb__postep-blok{flex:1 1 auto;min-width:0;' +
+      'margin-right:' + W.belkaLukaZamkniecie + 'px}' +    // D-39.38
     /* U-3 (defekt zgłoszony przez operatora 2026-08-15, zmierzony w przeb. 28):
        etykieta „krok X z Y" ma być WYŚRODKOWANA nad torem postępu. Miała
        `text-align: start` odziedziczone, a że jej pudełko ma dokładnie szerokość
@@ -2469,13 +2489,31 @@
     var karta = el('div', 'mp-tryb__karta', top);
     karta.setAttribute('data-mp-karta', 'pochwal-sie');
     var nagl = el('p', 'mp-tryb__karta-krok', karta);
-    nagl.textContent = 'pochwal się';        // NIENARYSOWANE brzmienie: pipeline treści
+    /* D-39.37 · BRZMIENIE Z FIGMY. Adnotacja „NIENARYSOWANE brzmienie" przy tych
+       pięciu ciągach BYŁA NIEPRAWDZIWA i kosztowała ekran niezgodny z projektem
+       aż do zgłoszenia operatora 2026-08-17. Tekst jest w `7195:11178` jako węzły
+       `7195:11186`, `7200:10893`, `7200:10894`, `7200:10897`, `7200:10900` —
+       ktoś uznał go za nienarysowany, nie otwierając klatki. Ta sama klasa błędu
+       co `80 = 0 + 80` i „13 px obcięcia": twierdzenie o źródle bez sprawdzenia
+       źródła, które przeżyło, bo matryca pytała runtime o runtime. */
+    nagl.textContent = 'pochwal się swoim daniem';     // `7200:10893`
     var lista = el('div', 'mp-tryb__karta-lista', karta);
     /* WYM §6 / C6 (H10 · H11): wariant v1.0 zakończenia jest BEZ mechaniki −70 zł.
        Runtime nie czyta kwoty zniżki, nie renderuje uploadu zdjęcia i nie zna słowa
        „rabat" — trzy wiersze to instrukcja, nie formularz. */
-    ['zrób zdjęcie tak, jak wyszło', 'oznacz nas w relacji',
-     'wróć po przepis, kiedy zechcesz'].forEach(function (tekst, i) {
+    /* JEDNO ODSTĘPSTWO OD FIGMY, WYMUSZONE MECHANIZMEM. `7200:10894` brzmi
+       „…przycisk poniżej zabierze Cię od razu do aparatu". **Na webie to jest
+       nieprawda i nie da się jej naprawić kodem**: strona nie umie otworzyć
+       aplikacji aparatu, a `<input capture>` pokazuje na iOS arkusz wyboru
+       i — co gorsza — zwraca plik DO STRONY, nie do galerii telefonu, więc
+       zdjęcia nie da się potem wrzucić na Instagrama. Obietnica z projektu
+       prowadziłaby w ślepy zaułek. Stąd CTA idzie w aparat Instagrama
+       (patrz `akcjaAparat`), a zdanie mówi to, co się naprawdę wydarzy.
+       Operator zaakceptował korektę tekstu 2026-08-17 („o to chodzi!").
+       Pozostałe dwa wiersze — dosłownie z Figmy. */
+    ['Zrób zdjęcie gotowego dania – przycisk poniżej otworzy aparat w Instagramie.',
+     'Wrzuć zdjęcie na Instagrama i oznacz @miesnapaczka, jeśli polubiłeś(-aś) gotowanie z nami :)',
+     '...a potem wróć po więcej przepisów!'].forEach(function (tekst, i) {
       var w = el('div', 'mp-tryb__karta-wiersz', lista);
       el('span', 'mp-tryb__karta-numer', w).textContent = String(i + 1);
       el('span', 'mp-tryb__karta-tekst', w).textContent = tekst;
@@ -2551,6 +2589,52 @@
   /* Cele CTA na ekranach bez nawigacji. Klatki podają BRYŁY, nie cele (I-02 mówi
      wprost: „brak celu w pliku"), więc każdy cel poniżej jest wnioskiem z WYM §5
      albo pozycją na liście decyzji — stąd `// NIENARYSOWANE:` przy trzech z sześciu. */
+  /* D-39.37 · APARAT INSTAGRAMA, NIE `<input capture>`. Rozstrzygnięcie techniczne,
+     nie estetyczne, i warto znać jego powód, zanim ktoś „uprości" to z powrotem:
+
+     `<input type="file" accept="image/*" capture="environment">` wygląda na
+     oczywistą drogę i jest ślepym zaułkiem dla TEGO zadania. Zwraca plik
+     DO STRONY, a **nie zapisuje go w galerii telefonu** — więc użytkownik robi
+     zdjęcie, po czym nie ma czego wrzucić na Instagrama. Zapisanie go wymagałoby
+     uploadu, czyli mechaniki −70 zł, która jest poza zakresem v1.0. Kombinacja
+     „CTA aparatu w v1.0" + „bez uploadu" ma dokładnie jedno spójne rozwiązanie:
+     oddać użytkownika aparatowi Instagrama, gdzie zdjęcie i tak ma trafić.
+
+     Schemat: **`instagram://story-camera`**, wybór operatora 2026-08-17 po
+     wyszukaniu. `instagram://camera` otwiera kompozytor NOWEGO POSTA, a wiersz 2
+     prosi o RELACJĘ z oznaczeniem — story-camera trafia w tę intencję wprost.
+
+     `[NIEZWERYFIKOWANE]` Schemat nie został sprawdzony na urządzeniu. Wyszukiwanie
+     2026-08-17 potwierdza, że Instagram wystawia schematy aparatu na iOS i Androidzie
+     i **nie znaleziono zgłoszeń o ich wycofaniu**, ale wszystkie merytoryczne źródła
+     są z lat 2020–2022; schematy URL psują się cicho, bez ogłoszeń. Dlatego adres
+     stoi w STAŁEJ, nie w treści funkcji.
+
+     **KOREKTA WCZEŚNIEJSZEJ OCENY RYZYKA, zapisana, bo była błędna:** twierdziłem,
+     że najgorszy przypadek to przejście na profil. Nieprawda — na iOS nawigacja pod
+     NIEZAREJESTROWANY schemat wywołuje **systemowy alert o błędzie**, a droga
+     zapasowa odpala dopiero po nim. Najgorszy przypadek to więc alert, a potem
+     profil. Ryzyko przyjęte świadomie do czasu testu; jeśli alert wystąpi,
+     alternatywą jest link uniwersalny (bez alertu, ale bez pewności wejścia
+     w aparat). Test na urządzeniu: 10 sekund, po stronie operatora. */
+  var IG_APARAT = 'instagram://story-camera';
+  var IG_PROFIL = 'https://www.instagram.com/miesnapaczka/';
+
+  function akcjaAparat() {
+    var t = Date.now();
+    var budzik = global.setTimeout(function () {
+      /* `document.hidden` odróżnia „aplikacja przejęła ekran" od „nic się nie stało".
+         Warunek czasowy obok, bo uśpiona karta potrafi odpalić budzik z opóźnieniem
+         i wtedy sam `hidden` skłamie — ta sama pułapka co przy `transitionend`. */
+      if (document.hidden || Date.now() - t > 2500) return;
+      global.open(IG_PROFIL, '_blank', 'noopener');
+    }, 1200);
+    global.addEventListener('pagehide', function () { global.clearTimeout(budzik); }, { once: true });
+    try { global.location.href = IG_APARAT; }
+    catch (err) { global.clearTimeout(budzik); global.open(IG_PROFIL, '_blank', 'noopener'); }
+    return null;
+  }
+
   function akcjaEkranu(ktory) {
     var e = stan.ekran;
     if (e === 'start') {
@@ -2566,9 +2650,16 @@
       return pokazKrok(1);
     }
     if (e === 'koniec') {
-      if (ktory === 'primary') return zamknij();
-      // NIENARYSOWANE: cel ghosta na zakończeniu — wzięte „od nowa", pozycja na liście
-      return pokazEkran('start');
+      /* D-39.37 · CTA APARATU WCHODZI DO v1.0 — decyzja operatora 2026-08-17.
+         Odwraca cięcie zakresu `C6`/`I-29` z 2026-08-14 w części dotyczącej CTA.
+         Przesłanka cięcia była nieścisła: `INTERAKCJE.md` przypisywało CTA aparatu
+         wyłącznie wariantowi `7448:128443` (z mechaniką −70 zł), a klatka WDRAŻANA
+         `7195:11178` ma w BOTTOM-ie własne `cta — cta` i wiersz obiecujący aparat.
+         Primary = aparat, ghost = powrót do przepisu (dawne zachowanie primary).
+         Ghost „zacznij od nowa" ZNIKA — był oznaczony NIENARYSOWANE i nie ma go
+         w klatce; jego rolę pełni ekran startowy osiągalny z przycisku strony. */
+      if (ktory === 'primary') return akcjaAparat();
+      return zamknij();
     }
     return null;
   }
@@ -2600,8 +2691,8 @@
       cz.etykieta.textContent = 'ugotowane';
       ustawPostep(N, N);                       // R5: pasek pełny na zakończeniu
       ekranKoniec(top);
-      cz.akcjaPrimary.textContent = 'wróć do przepisu';
-      cz.akcjaGhost.textContent = 'zamknij tryb gotowania';
+      cz.akcjaPrimary.textContent = 'zrób zdjęcie';      // D-39.37 · `cta — cta` z `7195:11178`
+      cz.akcjaGhost.textContent = 'wróć do przepisu';    // D-39.37 · `cta — ghost`
     } else if (rodzaj === 'wznowienie') {
       cz.etykieta.textContent = 'wróć do gotowania';
       ustawPostep(stan.krok, N);
