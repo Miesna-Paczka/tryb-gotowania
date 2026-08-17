@@ -143,7 +143,8 @@ Rozgrzej patelnię, wrzuć mięso i nie mieszaj przez pierwszą minutę.
 
 - **`== tytuł`** zaczyna nowy krok. Wszystko przed pierwszym `==` to **błąd**.
 - **Linie bez rozpoznanego klucza to treść kroku.** Skleją się w jeden akapit.
-- Rozpoznawane klucze: **`czas`, `minutnik`, `skladniki`, `kryterium`, `foto`**.
+- Rozpoznawane klucze: **`czas`, `minutnik`, `skladniki`, `kryterium`, `inaczej`, `foto`**
+  (`inaczej` od `D-39.59`).
   Cokolwiek innego przed dwukropkiem zostanie potraktowane jako zwykły tekst —
   parser nie ostrzeże, więc literówka w nazwie klucza jest cicha. **Sprawdzaj nazwy.**
 - **`skladniki:`** to lista kluczy po przecinku, z `#` lub bez. To one budują sekcję
@@ -264,8 +265,14 @@ skoro czas minął, a wygląda inaczej".
 
 ### 5.3 Czas całkowity przepisu (pasek meta na ekranie startowym)
 
-To **inne pole**: `czas-przygotowania` na poziomie przepisu, nie kroku. Trafia pod
+To **inne pole**: `czas-minuty` na poziomie przepisu, nie kroku. Trafia pod
 klepsydrę w pasku meta.
+
+**Uwaga na bliźniaka.** W CMS stoją obok siebie dwa pola: `czas-minuty` (liczba,
+`30`) i `czas-przygotowania` (tekst, `"30 min"`). **Tryb gotowania czyta wyłącznie
+`czas-minuty`** `[V]` — sprawdzone na itemie „Kurczak teriyaki" i na atrybucie
+`data-czas="30"` w opublikowanym embedzie. Wpis w `czas-przygotowania` nie zmieni
+niczego w trybie gotowania; jeśli oba się rozjadą, nic tego nie zauważy.
 
 **Wpisuj samą liczbę minut** — jednostkę dokłada parser (`D-39.38`, 2026-08-17).
 `30` → `30 min`. Jeśli wpiszesz `30 min`, parser tego nie ruszy i będzie dobrze;
@@ -326,7 +333,7 @@ Do przejścia przed oddaniem przepisu:
 9. **Nie używaj `**gwiazdek**` do zamienników — nic nie rysują.** Zamienniki
     idą przez pole `co-mozesz-zmienic` z `#kluczem` składnika, najwyżej dwa
     na krok — i dziś nie działają wcale, patrz rozdz. 5a.
-10. `czas-przygotowania` to sama liczba minut.
+10. `czas-minuty` to sama liczba minut (**nie** `czas-przygotowania` — patrz 5.3).
 11. `wartosci-porcja` wypełnione — inaczej znika cały pasek meta.
 12. Otwórz stronę **z `?debug=1` na końcu adresu** i sprawdź, czy nie ma paska
     walidacji u góry. Bez tego dopisku pasek nie pojawi się nawet przy błędach.

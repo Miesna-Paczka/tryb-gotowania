@@ -11677,3 +11677,38 @@ generator szablonu obsługiwał znacznik od początku — **rada była błędna,
 zbędna.** Na liście zostaje `wariant`.
 
 **Artefakt parsera:** 41 982 znaki, **16 268 B gzip** (budżet 20 kB, zapas 4,2 kB).
+
+### AWARIA DEPLOYU PAGES — run #27, `ef29c2f` — 2026-08-17
+
+**Build przeszedł (5 s), `report-build-status` przeszedł, `deploy` PADŁ (4 s).**
+
+**Sprawdzone, czy to awaria dostawy czy tylko raportowania `[V]`** — pobranie obu
+artefaktów z Pages z `cache:'reload'`:
+
+| plik | na Pages | lokalnie | wniosek |
+|---|---|---|---|
+| `przepis-parser.min.js` | **41 954 B** | 41 982 B | **STARY** — bez `D-39.59` |
+| `tryb-gotowania.min.js` | 50 470 B | 50 470 B | aktualny (v39-58) |
+
+`last-modified` obu: **13:45 GMT**, czyli poprzedni udany deploy (`e550ac4`).
+Awaria była więc realna: **Pages serwuje stan sprzed jednego commita.**
+
+**Brakuje dokładnie `D-39.59`** — czyli poprawki, która usuwa wyciek słowa
+„inaczej:" do treści kroku. Wyciek jest **publikowany w przepisie „Kurczak teriyaki"**,
+więc to nie jest zaległość kosmetyczna.
+
+**PUŁAPKA WERSJONOWANIA, warta zapamiętania:** podbicie `?v=39-59` w Webflow
+**nie odróżnia tego stanu od poprawnego**. Query string zmienia adres, ale plik pod
+nim jest ten sam — dostajemy świeży cache starego pliku i wrażenie, że wdrożone.
+**Sprawdzianem jest ROZMIAR albo obecność znacznika w treści pliku, nie `?v=`.**
+
+Przyczyny w logu nie odczytam (brak poświadczeń). Build produkujący poprawny artefakt
+przy padającym `deploy` to zwykle kolizja z równoległym wdrożeniem albo reguła
+środowiska, nie zawartość repo — ale to `[I]`, nie pomiar.
+
+**Korekta zakresu commita (operator, 2026-08-17):** `HANDBACK--dla-lancucha-szablonu`
+**nie wchodzi do repo.** To dostawa do innego łańcucha, nie stan trybu gotowania —
+repo ma nieść tylko to, co dotyczy embeda. Plik wyjęty do katalogu wyjściowego sesji.
+Do commita idą wyłącznie `STAN.md` i `HANDOFF--kontrakt-tresci-parsera` (poprawka
+`czas-przygotowania` → `czas-minuty` w rozdz. 5.3 i w liście kontrolnej poz. 10,
+plus ostrzeżenie o bliźniaczym polu tekstowym w CMS).
