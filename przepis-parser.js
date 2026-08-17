@@ -133,10 +133,16 @@
      poprawnie przy każdej liczbie porcji. Redakcja pisze naturalnie, parser robi
      resztę — czyli odwrotnie niż dotąd.
 
-     Kolizje form między hasłami rozstrzygamy **pierwszym wpisem i zapisujemy je
-     do wykrycia**, zamiast po cichu nadpisywać: `liście` należy do `liść`,
-     ale `cebule` tylko do `cebula`. Gdyby dwa hasła dzieliły formę, wygrywa
-     wcześniejsze w tabeli, a `KOLIZJE_ODMIAN` mówi które. */
+     Kolizje form między hasłami rozstrzygamy **pierwszym wpisem**, zamiast po cichu
+     nadpisywać: `liście` należy do `liść`, ale `cebule` tylko do `cebula`.
+
+     `D-39.53` (R8) · Lista kolizji **była kodem martwym** — liczyłem ją do
+     `mapa.__kolizje`, komentarz odsyłał do nieistniejącej nazwy `KOLIZJE_ODMIAN`,
+     a nie czytał jej nikt: ani parser, ani runtime, ani panel. **Piąte wystąpienie
+     wzorca „funkcja gotowa i nieosiągalna"** po `D-39.13/14/18/39` — i pierwsze,
+     które popełniłem sam, godzinę po tym, jak wypunktowałem cztery poprzednie.
+     Teraz kolizja **idzie do ostrzeżenia** i jest wystawiona w API, więc da się
+     ją zobaczyć i zaasertować. Dziś kolizji jest zero. */
   var FORMA_DO_BAZY = (function () {
     var mapa = Object.create(null);
     var kolizje = [];
@@ -254,7 +260,19 @@
 
   function formatIlosc(v, jednostka) {
     if (v == null) return '';
-    var baza = String(jednostka || '').split('|')[0].toLowerCase();
+    /* `D-39.52` (R7) · TRZECIE MIEJSCE WYWOŁANIA `D-39.50`, przeoczone przy wdrożeniu.
+       Indeks odwrotny dostały `odmien()` i `jednostkaDzielna()`; **ta funkcja nie**,
+       więc dalej porównywała SUROWY string z `JEDNOSTKI_UŁAMKOWE`.
+
+       Ironia była dokładna i trafiała wyłącznie w tę redakcję, dla której `D-39.50`
+       powstało: `formatIlosc(0.5,'łyżka')` → „½", ale `formatIlosc(0.5,'łyżki')`
+       → „0,5". Przy szklankach robiło się z tego **błąd liczbowy, nie kosmetyka**:
+       `0.25` z jednostką `szklanki` wpadało w gałąź `v < 10` i wychodziło **„0,3"**.
+
+       Zapada dopiero przy porcjach PONIŻEJ bazowych, więc typowy test na 4 porcjach
+       tego nie pokazuje — stąd przeoczenie. Znalezione przez sesję równoległą
+       suchym biegiem na wartościach skrajnych, nie przeglądem kodu. */
+    var baza = bazaJednostki(jednostka) || String(jednostka || '').split('|')[0].toLowerCase();
     var ulamkowa = JEDNOSTKI_UŁAMKOWE.indexOf(baza) >= 0;
     if (ulamkowa) {
       var u = formatUlamek(v);
@@ -903,6 +921,14 @@
     model.fotoUrl = zdjecieGlowne(opcje.fotoGlowne);
     model.meta = zbudujMeta(model.czas,
       (opcje.wartosciPorcja != null ? opcje.wartosciPorcja : tekstZeSkryptu('mp-wartosci-porcja')));
+    /* D-39.53 — kolizja form w tabeli odmian jest defektem KODU, nie treści, ale
+       panel jest jedynym miejscem, w którym cokolwiek widać. Lepiej, żeby stała
+       w ostrzeżeniach dewelopera niż nigdzie. */
+    if (FORMA_DO_BAZY.__kolizje.length) {
+      ostrzez('tabela odmian ma kolidujące formy (wygrywa wcześniejsze hasło): ' +
+              FORMA_DO_BAZY.__kolizje.join(' · '));
+    }
+    model.kolizjeOdmian = FORMA_DO_BAZY.__kolizje.slice();
     model.bledy = bledy.slice();
     model.ostrzezenia = ostrzezenia.slice();
 
@@ -987,7 +1013,14 @@
         var ile = s.ilosc * mnoznik;
         var doIle = s.iloscDo != null ? s.iloscDo * mnoznik : null;
         if (!dzielna) { ile = Math.ceil(ile - 0.001); if (doIle != null) doIle = Math.ceil(doIle - 0.001); }
-        var liczba = formatIlosc(ile, s.jednostka) + (doIle != null ? '–' + formatIlosc(doIle, s.jednostka) : '');
+        /* `D-39.54` · ZAKRES O RÓWNYCH KOŃCACH ZWIJA SIĘ DO JEDNEJ LICZBY.
+           Znalezione przez `narzedzia/suchy-bieg-porcji.js` na PIERWSZYM uruchomieniu:
+           `2–3 gałązki` przy ćwiartce bazy dawało `1–1 gałązka`, bo oba końce
+           zaokrąglają się w górę do 1 (jednostka niedzielna). „1–1" nie jest
+           zakresem, tylko artefaktem zaokrąglenia. */
+        var txtOd = formatIlosc(ile, s.jednostka);
+        var txtDo = doIle != null ? formatIlosc(doIle, s.jednostka) : null;
+        var liczba = txtOd + (txtDo != null && txtDo !== txtOd ? '–' + txtDo : '');
         kopia.iloscPrzeliczona = ile;
         // odmiana idzie po górnym końcu zakresu: "2–3 łyżki", "4–6 łyżek"
         kopia.etykieta = (liczba + ' ' + odmien(s.jednostka, doIle != null ? doIle : ile) + ' ' + s.nazwa)
@@ -3643,6 +3676,7 @@
     podzielKarty: podzielKarty,
     podzielWszystkieKarty: podzielWszystkieKarty,
     kluczLS: KLUCZ_LS,
+    kolizjeOdmian: function () { return FORMA_DO_BAZY.__kolizje.slice(); },   // D-39.53
     limitMarkerow: LIMIT_MARKEROW,
     _wewnetrzne: {
       parsujSkladniki: parsujSkladniki, parsujKroki: parsujKroki, rozbijTresc: rozbijTresc,

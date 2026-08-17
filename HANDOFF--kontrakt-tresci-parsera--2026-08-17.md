@@ -56,7 +56,7 @@ To jest już zbudowane; opisuję, żeby było wiadomo, skąd co pochodzi.
 ```
 #wolowina 500 g wołowiny mielonej @wolowina-mielona
 #cebula 1 cebula
-#oliwa 2 łyżka oliwy
+#oliwa 2 łyżki oliwy
 #passata 700 g passaty pomidorowej
 ```
 
@@ -64,9 +64,8 @@ To jest już zbudowane; opisuję, żeby było wiadomo, skąd co pochodzi.
   odwołują się do składnika. Bez spacji, bez polskich znaków (bezpieczniej), unikalny.
   Wiersz bez klucza to **błąd**, nie ostrzeżenie.
 - **Duplikat klucza to błąd.** Drugi `#cebula` w tym samym przepisie zatrzymuje build.
-- **`@slug-produktu` na końcu** wiąże składnik z produktem MP. Wtedy tryb pokazuje
-  **wielokrotność opakowania**, nie surowe gramy: `2 × 320 g wołowina mielona`.
-  Bez `@` zostaje to, co napisała redakcja.
+- **`@slug-produktu` na końcu** wiąże składnik z produktem MP — wyłącznie po to,
+  żeby dało się linkować do sklepu. **Etykiety nie zmienia** (rozdz. 3.2).
 - **Ilość i jednostka są rozbierane**, żeby dało się przeliczyć porcje. Zakresy
   działają: `2–3 łyżki` odmieniają się po górnym końcu.
 
@@ -151,10 +150,10 @@ Rozgrzej patelnię, wrzuć mięso i nie mieszaj przez pierwszą minutę.
   „w tym kroku"; reszta rozkłada się na „dalej" i „zużyte" **automatycznie**, po tym,
   w którym kroku składnik pojawia się pierwszy raz. Redakcja tego nie ustawia.
 - **`foto: 03`** dopasowuje zdjęcie z galerii po numerze w nazwie pliku.
-- **`**tekst**` w treści NIE RYSUJE JUŻ NICZEGO.** `bezZakreslen()` zdejmuje gwiazdki
-  i zwraca sam tekst (decyzja operatora `D-39.15`, 2026-08-16). Limit „jeden na krok"
-  jest nadal egzekwowany **jako błąd**, ale pilnuje składni bez skutku wizualnego —
-  patrz rozdz. 5a, gdzie opisany jest mechanizm, który zamienniki niesie naprawdę.
+- **`**tekst**` w treści NIE RYSUJE NICZEGO.** `bezZakreslen()` zdejmuje gwiazdki
+  i zwraca sam tekst (`D-39.15`). **Limit „jeden na krok" USUNIĘTY** (`D-39.47`) —
+  była to reguła podnosząca błąd i pilnująca składni bez konsekwencji.
+  Zamienniki niesie pole `co-mozesz-zmienic`, rozdz. 5a.
 
 ---
 

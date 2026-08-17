@@ -11418,3 +11418,62 @@ poprawne, nie brak** — marker dostaje tylko klucz, który ma wpis.
 
 **Uwaga o zapasie:** parser urósł dziś z 15 225 na 15 932 B gzip. Do progu zostaje
 4,5 kB. Nie jest to jeszcze problem, ale przy tym tempie warto obserwować.
+
+### `D-39.52/53/54` · DWA ZNALEZISKA SESJI RÓWNOLEGŁEJ + JEDNO Z NOWEGO NARZĘDZIA
+
+**`D-39.52` (R7) · `D-39.50` było wdrożone w DWÓCH z TRZECH miejsc wywołania.**
+Indeks odwrotny dostały `odmien()` i `jednostkaDzielna()`. **`formatIlosc()` nie** —
+dalej porównywała surowy string z `JEDNOSTKI_UŁAMKOWE`.
+
+Ironia była dokładna i trafiała **wyłącznie w tę redakcję, dla której `D-39.50`
+powstało**: kto pisał po staremu `2 łyżka oliwy`, dostawał „½ łyżki"; kto posłuchał
+nowej instrukcji i napisał `2 łyżki oliwy`, dostawał „0,5 łyżki". Przy szklankach
+to już **błąd liczbowy, nie kosmetyka** — `0.25` z jednostką `szklanki` wpadało
+w gałąź `v < 10` i wychodziło **„0,3"**.
+
+**Objaw zapada wyłącznie przy porcjach PONIŻEJ bazowych**, więc typowy sprawdzian
+na bazie albo 2× bazie go nie pokazuje. Stąd przeoczenie — i stąd wniosek niżej.
+
+**`D-39.53` (R8) · wykrywanie kolizji indeksu było KODEM MARTWYM.** Liczyłem listę
+do `mapa.__kolizje`, komentarz odsyłał do nieistniejącej nazwy `KOLIZJE_ODMIAN`,
+a nie czytał jej nikt. **Piąte wystąpienie wzorca „funkcja gotowa i nieosiągalna"**
+po `D-39.13/14/18/39` — **i pierwsze, które popełniłem sam, godzinę po tym, jak
+wypunktowałem cztery poprzednie.** Kolizja idzie teraz do ostrzeżenia i jest
+w API (`MP.przepis.kolizjeOdmian()`), więc da się ją zobaczyć i zaasertować.
+Dziś kolizji jest zero.
+
+**`D-39.54` · zakres o równych końcach zwija się do jednej liczby.** Znalezione
+przez nowe narzędzie **na pierwszym uruchomieniu**: `2–3 gałązki` przy ćwiartce
+bazy dawało **„1–1 gałązka"**, bo oba końce zaokrąglają się w górę do 1.
+„1–1" nie jest zakresem, tylko artefaktem zaokrąglenia.
+
+#### `narzedzia/suchy-bieg-porcji.js` — kontrola, która to wyłapuje
+
+Sesja równoległa zaproponowała regułę i ma rację, że jest lepsza od kolejnej listy
+kontrolnej: **przy zmianie dotykającej ilości, jednostek albo odmiany przelicz
+przepis na 1 / bazę / 2× bazę i porównaj kolumny.** Zrobiłem z tego narzędzie,
+żeby nie było zależne od tego, czy ktoś pamięta.
+
+Przykład w narzędziu jest **celowo złośliwy**: jednostki ułamkowe w formie
+odmienionej (to pomijało `formatIlosc`), jednostka miary, sztuka policzalna, wpis
+bez liczby i zakres. Wynik po poprawkach `[V]`:
+
+```
+1 porcja              | 4 porcje              | 8 porcji
+½ łyżki oliwy         | 2 łyżki oliwy         | 4 łyżki oliwy
+¼ łyżeczki cukru      | 1 łyżeczka cukru      | 2 łyżeczki cukru
+¼ szklanki mleka      | 1 szklanka mleka      | 2 szklanki mleka
+1 ząbek czosnku       | 3 ząbki czosnku       | 6 ząbków czosnku
+1 jajko               | 4 jajka               | 8 jajek
+125 g mąki            | 500 g mąki            | 1000 g mąki
+sól do smaku          | sól do smaku          | sól do smaku
+1 gałązka tymianku    | 2–3 gałązki tymianku  | 4–6 gałązek tymianku
+```
+
+**Wniosek metodyczny, rozszerzony o uwagę sesji równoległej:** obieg „przez drugą
+sesję przed wysyłką" dotyczy **tak samo kodu, jak dokumentów**. `D-39.50` nie było
+błędem projektowym — było poprawną decyzją wdrożoną w części miejsc wywołania.
+Tego nie wyłapie ani przegląd dokumentu, ani przykład na porcjach bazowych.
+Wyłapuje to **suchy bieg na wartościach skrajnych**.
+
+**Artefakt parsera:** 41 541 znaków, **16 052 B gzip** (budżet 20 kB, zapas 4,4 kB).
