@@ -10312,3 +10312,35 @@ Odtwarzalność builda POTWIERDZONA w tej sesji: `minify(źródło sprzed zmiany
 **Artefakt po zmianie:** 45 798 znaków, **12 820 B gzip** — budżet WYMAGAŃ v1.9
 (≤ 20 kB gzip) zachowany z zapasem 7,2 kB. Składnia artefaktu zweryfikowana
 `new Function()`.
+
+### `D-39.30` POTWIERDZONE PRZEZ OPERATORA + `D-39.31` prześwit nad pasem — 2026-08-17
+
+**`D-39.30` działa.** Operator potwierdził na urządzeniu. Predykcja zapisana PRZED
+pomiarem (`zapas` z 0 na 38, `ukryte` do 0) była warunkiem uznania poprawki i została
+spełniona — pierwszy raz w tym łańcuchu, gdy skuteczność zmiany orzeka liczba
+zapisana wcześniej, a nie ogląd po fakcie. **Ten tryb zamykania jednostki zostaje.**
+
+**`D-39.31` · rozpórka dostaje pełną wysokość pasa, bez odejmowania odstępu.**
+Zgłoszenie operatora natychmiast po potwierdzeniu: „brak odległości między nav barem
+a rozwiniętą listą, dosłownie 0 px, a chciałbym dystans taki, jak między górą listy
+składników a akapitem nad nią".
+
+Pierwsza wersja odejmowała `W.odstep`, żeby suma wyszła równo 80 — czyli żeby
+zachować **parytet ze starym `padding-bottom`**. To był zły cel i warto nazwać
+dlaczego: stare dopełnienie dawało prześwit **zero tak samo**, tylko nikt tego nie
+widział, bo treść chowała się pod paskiem i objaw czytało się jako „nie da się
+przewinąć". **Naprawa przewijania nie stworzyła tej wady — ona ją ujawniła.**
+Parytet z zepsutym stanem jest wymogiem, który trzeba było odrzucić, a nie utrzymać.
+
+Teraz `gap` (16) + rozpórka (`--mp-bottom-h` = 80) = 96, więc ostatni piksel treści
+ląduje **16 px nad krawędzią pasa**. Szesnaście, bo to ten sam `W.odstep`, który
+dzieli akapit kroku od bloku składników — odległość wskazana przez operatora jako
+wzorzec. Rytm od dołu jest odtąd **równy rytmowi od góry i nie jest osobną liczbą
+do pilnowania**; zmiana `W.odstep` przesunie oba naraz.
+
+**PREDYKCJA do sprawdzenia sondą:** `zapas` rośnie 38 → **54**, a po dojechaniu na
+dół `ukryte` wychodzi **−16** (dół bloku 16 px NAD krawędzią pasa). `ukryte=0`
+znaczyłoby, że prześwitu nie ma i poprawka nie weszła.
+
+**Artefakt:** 45 775 znaków, **12 812 B gzip** (budżet 20 kB zachowany).
+Składnia źródła i artefaktu zweryfikowana `new Function()`.

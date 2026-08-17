@@ -236,9 +236,19 @@
        przy dopisywaniu nowego ekranu. Pseudoelement kontenera flex JEST elementem
        flex — to jest warunek, na którym ta poprawka stoi.
 
-       `- W.odstep`: TOP ma `gap`, a `::after` jest kolejnym elementem flex, więc
-       przed rozpórką pojawia się jeszcze jedna przerwa. Bez odjęcia odstęp od dołu
-       urósłby z 80 na 96. Dopełnienie takiej przerwy nie miało.
+       `D-39.31` · ROZPÓRKA MA PEŁNĄ WYSOKOŚĆ PASA, BEZ ODEJMOWANIA ODSTĘPU.
+       Pierwsza wersja odejmowała `W.odstep`, żeby suma wyszła równo 80 — czyli
+       żeby zachować PARYTET ze starym `padding-bottom`. To był zły cel: stare
+       dopełnienie dawało prześwit ZERO tak samo, tylko nikt tego nie widział,
+       bo treść chowała się pod paskiem i problem wyglądał na brak przewijania.
+       Po naprawie przewijania zero stało się widoczne i operator zgłosił je
+       natychmiast (2026-08-17, wprost: „brak odległości między nav barem
+       a rozwiniętą listą, dosłownie 0 px").
+       Teraz: `gap` (16) + rozpórka (`--mp-bottom-h`, 80) = 96, więc ostatni piksel
+       treści ląduje **16 px nad krawędzią pasa**. Szesnaście, bo to ten sam
+       `W.odstep`, który dzieli akapit kroku od bloku składników — odległość
+       wskazana przez operatora jako wzorzec. Rytm od dołu jest więc równy rytmowi
+       od góry i nie jest osobną liczbą do pilnowania.
 
        `var(--mp-bottom-h)` bez `env()`: `przeliczBottom()` ustawia tę zmienną
        z `getBoundingClientRect().height` pasa, a pas ma safe-area już w swoim
@@ -254,7 +264,7 @@
       'gap:' + W.odstep + 'px;' +
       'padding:' + W.paddingTop + 'px ' + W.margines + 'px 0}' +
     '#' + ID + ' .mp-tryb__top::after{content:"";display:block;flex:0 0 auto;' +
-      'height:calc(var(--mp-bottom-h,' + W.nawigacja + 'px) - ' + W.odstep + 'px)}' +
+      'height:var(--mp-bottom-h,' + W.nawigacja + 'px)}' +
     /* D-39.12 WYCOFANE tego samego dnia, przed wysyłką — patrz STAN.md.
        Miała tu stanąć reguła `.mp-tryb__top > *{flex:0 0 auto}` jako naprawa
        obcięcia listy o 13 px. NIE STOI, bo hipoteza o ściskaniu flexem została
