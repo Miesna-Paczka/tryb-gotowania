@@ -11477,3 +11477,94 @@ Tego nie wyłapie ani przegląd dokumentu, ani przykład na porcjach bazowych.
 Wyłapuje to **suchy bieg na wartościach skrajnych**.
 
 **Artefakt parsera:** 41 541 znaków, **16 052 B gzip** (budżet 20 kB, zapas 4,4 kB).
+
+### `D-39.55` · „MAM W DOMU" ≠ „WYKORZYSTAŁEM" — 2026-08-17
+
+Zgłoszenie operatora: *„składniki odznaczane na starcie nie powinny być persystentne
+między krokami. Odznaczanie «mam to» vs «wykorzystałem to» są dwoma różnymi stanami"*.
+
+**To usterka w MOIM projekcie z `D-39.45`, sprzed dwóch godzin.** Uzasadniłem wtedy
+wspólny zbiór zdaniem „ten sam składnik, ten sam użytkownik" — i to było **pomylenie
+tożsamości składnika z tożsamością STANU**. Zdanie brzmiało sensownie i było fałszywe.
+
+**Objaw, który z tego wychodził:** zaznaczenie oliwy w arkuszu („mam w spiżarni")
+**przekreślało ją w kroku 1**, zanim ktokolwiek jej użył — bo przekreślenie niesie
+„zużyty" (`D-39.25`). Arkusz twierdził o przebiegu gotowania coś nieprawdziwego,
+i to na podstawie czynności, która o gotowaniu nie mówi nic.
+
+Rozdzielone na trzech poziomach:
+
+| | arkusz startowy | lista kroku |
+|---|---|---|
+| zbiór | `mamWDomu` | `zaznaczone` |
+| atrybut | `data-mam` | `data-odhaczony` |
+| wykończenie | samo wypełnione pudełko | pudełko **+ przekreślenie** |
+| zapis sesji | **NIE** | tak (`D-39.27`) |
+
+**`mamWDomu` celowo nie idzie do `localStorage`.** To stan zakupowy „na teraz",
+nie postęp gotowania; tydzień później spiżarnia jest inna, a nieaktualny stan byłby
+niewidoczny i mylący. Sprawdzone `[V]`: `zapiszSesje()` zapisuje wyłącznie
+`Object.keys(zaznaczone)`, a handler arkusza go nie woła.
+
+**Kopiowanie listy zakupów przestawione na właściwy zbiór** — kopiujemy to, czego
+NIE MA w domu (`!mamWDomu`), a nie to, co nieodhaczone w krokach. Wcześniej
+kopiowałoby się według postępu gotowania, co przy pustej liście kroków dawało
+przypadkowo poprawny wynik i zepsułoby się przy pierwszym odhaczeniu.
+
+**Znalezisko uboczne, NIEPOPRAWIONE — i sprostowanie własnego zapisu:** komentarz
+przy `D-39.18` twierdzi, że `zapiszSesje()` ma **jedno** wywołanie w całym pliku.
+Jest nieaktualny od `D-39.27`, które dołożyło drugie w `odhacz()`. Rozumowanie
+`D-39.18` stoi (oba wywołania są czynnościami NA KROKU), ale liczba jest fałszywa.
+**Pierwsza wersja tego wpisu twierdziła, że poprawiłem ten komentarz — nieprawda,
+podstawienie tekstu padło na niezgodności i tego nie sprawdziłem przed zapisem.**
+Zostaje do poprawienia przy `D-39.56`, gdzie `odhacz()` i tak znika.
+
+**Artefakt:** runtime 51 695 znaków, **14 279 B gzip** (budżet 20 kB).
+
+### `D-39.56` · ZAZNACZANIE TYLKO W ARKUSZU; SEKCJA „WYKORZYSTANE" — 2026-08-17
+
+Polecenie operatora: *„zaznaczanie składników w trakcie przepisu, wziąwszy pod uwagę
+mechanikę tooltipa, jest nieporozumieniem. Albo rybki, albo akwarium (…) użytkownik
+powinien stracić możliwość zaznaczania co wykorzystał (…) kolejne ekrany to już
+automatyczne odznaczanie i przesuwanie do sekcji «wykorzystane»"*.
+
+**Argument jest mocniejszy, niż wygląda:** wiersz kroku miał dwie mechaniki mówiące
+o tym samym (ręczne odhaczenie i automatyczne przejście do sekcji) **plus** marker
+zamiennika, który też chce tapnięcia. Trzy cele dotyku w wierszu 19 px wysokim.
+
+**Co zniknęło:**
+
+- `odhacz()` i zbiór `zaznaczone` — **usunięte w całości**. Po odebraniu krokom
+  kontrolki nie został im żaden zapisujący; zostawienie ich „na wszelki wypadek"
+  byłoby **szóstym** wystąpieniem wzorca „funkcja gotowa i nieosiągalna”.
+- Persystencja odhaczeń (`D-39.27`). **Przesłanka zniknęła razem z kontrolką** —
+  to nie jest uchylenie tamtej decyzji jako błędnej, tylko utrata przedmiotu.
+  Zapis sesji niesie odtąd `krok` i `porcje`. Stare zapisy z polem `zaznaczone`
+  czytają się bez błędu, bo nikt tego pola nie czyta.
+- `MP.tryb.odhacz` i `MP.tryb.zaznaczone` z publicznego API.
+
+**Czego NIE ruszyłem:** stan „wykorzystane" nadaje dalej **postęp przepisu**
+(`[data-stan="zuzyty"]`, liczony przez parser z pierwszego użycia składnika).
+Nazwa stanu w kodzie zostaje `zuzyty` — zmiana etykiety widocznej nie jest powodem
+do przepisywania atrybutów, selektorów i asercji.
+
+**Dostępność — i dlatego to nie jest `disabled`:** element, który niczego nie
+przełącza, **nie ma prawa być `role="checkbox"`**. Wiersz kroku dostaje `span`
+bez roli, bez `aria-checked` i bez celu dotyku 44 px; stan niesie nagłówek sekcji
+i przekreślenie. `disabled` na przycisku zostawiłoby kontrolkę ogłaszaną przez
+czytnik jako istniejącą, tylko niedostępną — a jej po prostu nie ma.
+
+**Etykieta sekcji: „zużyte" → „wykorzystane".**
+
+**Dwa napisy do użytkownika obiecywały stan, którego już nie ma** — poprawione:
+dialog S2 („zaznaczone składniki zostaną zapamiętane" → „postęp przepisu") oraz
+ogon ekranu wznowienia („zaznaczone składniki czekają" → „przepis czeka w tym samym
+miejscu"). Bez tego produkt mówiłby o funkcji, którą właśnie usunięto.
+
+**Artefakt:** runtime 50 895 znaków, **14 081 B gzip** — **mniej niż przed zmianą**
+(14 279), bo usunięcie `odhacz()` waży więcej niż dodane komentarze.
+
+**PREDYKCJE:** w arkuszu startowym checkbox działa i zmienia glif · na kroku
+checkbox jest widoczny, ale **nie reaguje na tapnięcie** · składnik przechodzi do
+sekcji **„wykorzystane"** sam, po minięciu kroku, w którym był użyty · „skopiuj
+składniki" kopiuje to, czego nie zaznaczono w arkuszu.

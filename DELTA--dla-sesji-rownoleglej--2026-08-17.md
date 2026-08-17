@@ -161,3 +161,35 @@ nie przeszedłem ponownie.
 
 **Wniosek: dokumenty tego rodzaju warto puszczać przez drugą sesję zanim trafią do
 wtyczki, a nie po.** Ten obieg zadziałał — proponuję go powtórzyć przy następnym.
+
+---
+
+## 6. Dopisek sesji równoległej — domknięcie drugiej tury (2026-08-17)
+
+**Oba znaleziska weszły.** `D-39.52` domyka R7 (`formatIlosc` bez indeksu odwrotnego),
+`D-39.53` domyka R8 (lista kolizji była kodem martwym — dziś idzie do `ostrzezenia`
+i jest wystawiona jako `MP.przepis.kolizjeOdmian()`). Sprawdzone odczytem kodu,
+nie przyjęte z opisu.
+
+**`D-39.54` wyszło z waszej uwagi metodycznej z §5, po JEDNYM uruchomieniu.**
+Uwaga brzmiała „puszczać dokumenty przez drugą sesję"; uogólnienie na kod brzmiało
+„przelicz przykładowy przepis na 1 · bazę · 2× bazę i porównaj". Narzędzie
+(`narzedzia/suchy-bieg-porcji.js`) na pierwszym przebiegu znalazło `1–1 gałązka` —
+zakres o równych końcach, artefakt zaokrąglenia jednostki niedzielnej.
+
+To jest wynik, który warto nazwać, bo zmienia status propozycji z „dobrej praktyki"
+na „mierzalnie opłacalną": **R7 i D-39.54 to dwie usterki tej samej klasy — obie
+zapadają wyłącznie poza porcjami bazowymi, obu nie widać w przeglądzie kodu ani
+w teście na 4 porcjach.** Bramka §7 instrukcji tego nie łapie, bo uruchamia parser
+raz, na porcjach bazowych.
+
+**Rozmiar.** Zmierzone `[V]` po tej turze: **16 052 B gzip przy progu 20 kB**.
+Zapasu zostało **4,4 kB**, a sam dzisiejszy dzień zjadł **800 B** (rano 15,2 kB).
+Przy tym tempie próg jest kwestią kilku takich dni, nie miesięcy — warto, żeby
+następna decyzja dokładająca kod niosła ze sobą pomiar, a nie żeby pomiar przyszedł
+dopiero przy przekroczeniu.
+
+**Zamknięte przez operatora, żeby nie wracało:** pozycja „etykieta a opakowania"
+z §4 — **nie liczymy paczek.** Uzasadnienie operatora 2026-08-17: pojemność Paczki
+jest niezależna od przelicznika porcji, więc mnożenie liczby opakowań prowadzi
+donikąd. Wiązanie `@` zostaje przy linku i tylko przy nim.

@@ -1218,6 +1218,11 @@
 
        **Pas dolny arkusza dostaje safe-area**, tak samo jak pas produktu — inaczej
        CTA wchodziłoby pod wskaźnik gestu iPhone'a. */
+    /* D-39.55 — wiersz „mam w domu" dostaje WYŁĄCZNIE wypełnione pudełko.
+       Przekreślenie zostaje zarezerwowane dla `data-odhaczony` i `[data-stan=zuzyty]`,
+       bo niesie „wykorzystany", a nie „posiadany". Bez tego rozdzielenia arkusz
+       mówiłby, że zużyłeś składniki, których jeszcze nie tknąłeś. */
+    '#' + ID + ' .mp-tryb__wiersz[data-mam] .mp-tryb__nazwa-skl{text-decoration:none}' +
     '#' + ID + ' .mp-tryb__arkusz-scrim{position:absolute;inset:0;z-index:5;display:none;' +
       'background:color-mix(in srgb,var(--mp-atrament) 45%,transparent)}' +
     '#' + ID + '[data-arkusz] .mp-tryb__arkusz-scrim{display:block}' +
@@ -1722,27 +1727,67 @@
   /* Zaznaczenia (D12) żyją POZA wierszem, w module: wiersz jest przerysowywany przy
      każdej zmianie kroku, więc stan trzymany w DOM-ie ginąłby na `pokazKrok`.
      Klucz składnika, nie indeks — ten sam składnik wraca w wielu krokach. */
-  var zaznaczone = Object.create(null);
 
-  function wierszSkladnika(s, krok, stanWiersza) {
+  /* `D-39.55` · „MAM TO W DOMU" I „WYKORZYSTAŁEM TO" TO DWA RÓŻNE STANY.
+     Zgłoszenie operatora 2026-08-17 i **usterka w moim własnym projekcie z `D-39.45`**,
+     sprzed dwóch godzin. Uzasadniłem wtedy wspólny zbiór zdaniem „ten sam składnik,
+     ten sam użytkownik" — i to było pomylenie tożsamości składnika z tożsamością
+     STANU.
+
+     W arkuszu startowym ptaszek znaczy **„mam to w domu"**: podpowiedź mówi wprost
+     „zaznacz, co masz w domu, reszta zostanie na liście zakupów". W kroku ten sam
+     ptaszek znaczy **„wykorzystałem to"** i nosi przekreślenie (`D-39.25`), które
+     jest deltą stanu ZUŻYTY. Wspólny zbiór dawał więc absurd: zaznaczenie oliwy
+     w spiżarni przekreślało ją w kroku 1, zanim ktokolwiek jej użył.
+
+     Dwa zbiory, dwa atrybuty, dwa wykończenia. `mamWDomu` **nie idzie do zapisu
+     sesji** — to stan zakupowy „na teraz", a nie postęp gotowania; tydzień później
+     spiżarnia jest inna, a nieaktualny stan byłby niewidoczny i mylący. */
+  var mamWDomu = Object.create(null);
+
+  function wierszSkladnika(s, krok, stanWiersza, opcje) {
+    opcje = opcje || {};
+    var wArkuszu = !!opcje.arkusz;
+    var zbior = wArkuszu ? mamWDomu : null;
     var li = el('li', 'mp-tryb__wiersz');
     li.setAttribute('data-mp-klucz', s.key);
     li.setAttribute('data-stan', stanWiersza);          // teraz · dalej · zuzyty
-    if (zaznaczone[s.key]) li.setAttribute('data-odhaczony', '');
+    /* Osobny atrybut, bo osobne wykończenie: `data-odhaczony` niesie przekreślenie
+       („zużyty"), `data-mam` samo wypełnione pudełko („mam"). */
+    if (wArkuszu && zbior[s.key]) li.setAttribute('data-mam', '');
 
-    var ptaszek = el('button', 'mp-tryb__ptaszek', li);
-    ptaszek.type = 'button';
+    /* `D-39.56` · W KROKU PTASZEK NIE JEST JUŻ KONTROLKĄ. Polecenie operatora
+       2026-08-17: *„albo rybki, albo akwarium"* — zaznaczanie ręczne i automatyczne
+       przenoszenie do sekcji to dwie mechaniki mówiące o tym samym, a wiersz niesie
+       jeszcze marker zamiennika, który też chce tapnięcia.
+
+       Odtąd: **zaznaczać można WYŁĄCZNIE w arkuszu startowym** (stan „mam w domu",
+       do listy zakupów). Na krokach składnik przechodzi do sekcji „wykorzystane"
+       SAM, z postępu przepisu — to samo, co robił `[data-stan=zuzyty]` od zawsze.
+
+       Konsekwencja dostępności, i dlatego to nie jest `disabled` na przycisku:
+       element, który niczego nie przełącza, **nie ma prawa być `role="checkbox"`**
+       ani celem dotyku. Czytnik ekranu ogłaszałby kontrolkę, której nie ma.
+       Wiersz kroku dostaje więc `span` bez roli, bez `aria-checked` i bez
+       `.mp-tryb__cel`; stan niesie nagłówek sekcji i przekreślenie. */
+    var ptaszek = el(wArkuszu ? 'button' : 'span', 'mp-tryb__ptaszek', li);
+    if (wArkuszu) ptaszek.type = 'button';
     /* D-39.36 — glif we własnym spanie; `textContent` na przycisku skasowałby
        `.mp-tryb__cel`. Zaznaczony wizualnie jest też składnik ZUŻYTY, nawet gdy
        użytkownik nigdy go nie tknął — `D-39.4`: ten stan nadaje postęp przepisu. */
     var ptaszekGlif = el('span', 'mp-tryb__ptaszek-glif mp-ikona', ptaszek);
     ptaszekGlif.textContent =
-      (zaznaczone[s.key] || stanWiersza === 'zuzyty') ? 'check_box' : 'check_box_outline_blank';
+      ((wArkuszu && zbior[s.key]) || (!wArkuszu && stanWiersza === 'zuzyty'))
+        ? 'check_box' : 'check_box_outline_blank';
     ptaszekGlif.setAttribute('aria-hidden', 'true');
-    ptaszek.setAttribute('role', 'checkbox');
-    ptaszek.setAttribute('aria-checked', zaznaczone[s.key] ? 'true' : 'false');
-    ptaszek.setAttribute('aria-label', s.etykieta);
-    el('span', 'mp-tryb__cel', ptaszek).setAttribute('aria-hidden', 'true');
+    if (wArkuszu) {
+      ptaszek.setAttribute('role', 'checkbox');
+      ptaszek.setAttribute('aria-checked', zbior[s.key] ? 'true' : 'false');
+      ptaszek.setAttribute('aria-label', s.etykieta);
+      el('span', 'mp-tryb__cel', ptaszek).setAttribute('aria-hidden', 'true');
+    } else {
+      ptaszek.setAttribute('aria-hidden', 'true');   // D-39.56 — sam wskaźnik stanu
+    }
     /* D-39.26 · SKŁADNIKA Z SEKCJI „ZUŻYTE" NIE DA SIĘ ODZNACZYĆ — polecenie
        operatora 2026-08-16. Ten stan nadaje POSTĘP PRZEPISU, nie użytkownik:
        składnik został zużyty w kroku, który jest już za nami, więc odznaczenie
@@ -1750,11 +1795,15 @@
        `disabled` na przycisku, nie sam brak nasłuchu: bez niego przycisk byłby
        nadal skupialny klawiaturą i czytnik ekranu ogłaszałby go jako aktywny.
        `aria-disabled` obok, bo `role="checkbox"` nie dziedziczy stanu z `disabled`. */
-    if (stanWiersza === 'zuzyty') {
-      ptaszek.disabled = true;
-      ptaszek.setAttribute('aria-disabled', 'true');
-    } else {
-      ptaszek.addEventListener('click', function () { odhacz(s.key); });
+    if (wArkuszu) {
+      /* D-39.55 — arkusz przełącza WŁASNY zbiór i nic nie zapisuje do sesji. */
+      ptaszek.addEventListener('click', function () {
+        var teraz = !mamWDomu[s.key];
+        if (teraz) mamWDomu[s.key] = true; else delete mamWDomu[s.key];
+        if (teraz) li.setAttribute('data-mam', ''); else li.removeAttribute('data-mam');
+        ptaszek.setAttribute('aria-checked', teraz ? 'true' : 'false');
+        ptaszekGlif.textContent = teraz ? 'check_box' : 'check_box_outline_blank';
+      });
     }
 
     var nazwa = el('span', 'mp-tryb__nazwa-skl', li);
@@ -1889,7 +1938,9 @@
     var tresc = el('p', 'mp-tryb__dialog-tresc', d);
     tresc.textContent = s4
       ? 'Zakończ jeden z odliczających, żeby zrobić miejsce na kolejny.'
-      : 'Minutniki przestaną odliczać, a zaznaczone składniki ' +
+      /* D-39.56 — brzmienie poprawione: „zaznaczone składniki" obiecywały stan,
+         którego użytkownik już nie tworzy. Mówimy o tym, co naprawdę przepada. */
+      : 'Minutniki przestaną odliczać, a postęp przepisu ' +
         'zostaną zapamiętane do następnego razu.';
     /* Wiersze minutników wchodzą MIĘDZY treść a CTA (§3b.1 skład S4), czyli w tym
        samym rytmie 12 px co reszta bloków — dlatego to ten sam szkielet, nie nowy. */
@@ -2104,33 +2155,20 @@
     return otworzTooltip(marker, wpis, wiersz);
   }
 
-  function odhacz(key, wartosc) {
-    var nowa = wartosc == null ? !zaznaczone[key] : !!wartosc;
-    if (nowa) zaznaczone[key] = true; else delete zaznaczone[key];
-    if (stan.korzen) {
-      Array.prototype.forEach.call(
-        stan.korzen.querySelectorAll('.mp-tryb__wiersz[data-mp-klucz="' + key + '"]'),
-        function (li) {
-          if (nowa) li.setAttribute('data-odhaczony', ''); else li.removeAttribute('data-odhaczony');
-          var p = li.querySelector('.mp-tryb__ptaszek');
-          if (p) p.setAttribute('aria-checked', nowa ? 'true' : 'false');
-          /* D-39.36 — glif niesie stan, więc trzeba go przestawić. Wiersz ZUŻYTY
-             zostaje zaznaczony niezależnie od `nowa`: jego stan nadaje postęp
-             przepisu, nie użytkownik (`D-39.26` odbiera mu nawet klikalność). */
-          var g = li.querySelector('.mp-tryb__ptaszek-glif');
-          if (g) {
-            var zuz = li.getAttribute('data-stan') === 'zuzyty';
-            g.textContent = (nowa || zuz) ? 'check_box' : 'check_box_outline_blank';
-          }
-        });
-    }
-    /* D-39.27 — zapis PO każdej zmianie odhaczenia, nie tylko przy zmianie kroku.
-       Bez tego odhaczenie zrobione i nietknięte niczym innym ginęłoby przy
-       zamknięciu karty — a to jest dokładnie ten moment, w którym użytkownik
-       odkłada telefon. Zapis jest tani (jeden `setItem`) i idempotentny. */
-    zapiszSesje();
-    return nowa;
-  }
+  /* `D-39.56` · `odhacz()` I ZBIÓR `zaznaczone` USUNIĘTE W CAŁOŚCI.
+     Po odebraniu krokom możliwości zaznaczania nie został im ŻADEN zapisujący —
+     zbiór byłby pusty zawsze, a funkcja nieosiągalna. Zostawienie ich „na wszelki
+     wypadek" byłoby szóstym wystąpieniem wzorca, który w tym pliku wypunktowano
+     już pięć razy.
+
+     Co przez to znika i dlaczego wolno: `D-39.27` (persystencja odhaczeń) opisywała
+     stan, którego użytkownik już nie tworzy — jej przesłanka zniknęła razem
+     z kontrolką. Zapis sesji niesie odtąd `krok` i `porcje`, czyli to, co naprawdę
+     jest postępem. Odczyt starych zapisów z polem `zaznaczone` jest bezpieczny:
+     nikt go nie czyta.
+
+     Stan „wykorzystane" NIE ZNIKA — nadaje go postęp przepisu (`[data-stan=zuzyty]`,
+     liczone przez parser z pierwszego użycia składnika), a nie ręczne odhaczenie. */
 
   function rysujKrok(krok) {
     var top = stan.czesci.top;
@@ -2321,7 +2359,10 @@
   function sekcjePozostale(krok, rodzic) {
     var sekcje = [
       ['dalej', krok.skladnikiDalej || [], 'dalej'],
-      ['zużyte', krok.skladnikiZuzyte || [], 'zuzyty']
+      /* D-39.56 — „wykorzystane", nie „zużyte". Polecenie operatora 2026-08-17.
+         Nazwa STANU w kodzie (`zuzyty`) zostaje bez zmian: zmiana etykiety widocznej
+         nie jest powodem do przepisywania atrybutów, selektorów i asercji. */
+      ['wykorzystane', krok.skladnikiZuzyte || [], 'zuzyty']
     ];
     var dorysowane = 0;
     sekcje.forEach(function (sek) {
@@ -2550,7 +2591,8 @@
     stan.czesci.kartaS1Tor = tor;
     stan.czesci.kartaS1Wyp = wyp;
     var ogon = el('p', 'mp-tryb__karta-ogon', karta);
-    ogon.textContent = 'minutniki nie odliczały w tle, a zaznaczone składniki czekają.';
+    // D-39.56 — bez „zaznaczonych składników": ten stan zniknął razem z kontrolką.
+    ogon.textContent = 'minutniki nie odliczały w tle, a przepis czeka w tym samym miejscu.';
     stan.czesci.kartaS1 = karta;
     return top;
   }
@@ -2619,14 +2661,14 @@
     if (!id || typeof localStorage === 'undefined') return null;
     /* D-39.27 · ODHACZENIA IDĄ DO ZAPISU — polecenie operatora 2026-08-16:
        „status zużyte powinien być persystentny, póki użytkownik go nie odznaczy".
-       Do tej zmiany `zaznaczone` żyło wyłącznie w pamięci modułu: przeżywało zmianę
-       kroku (zmierzone), ale ginęło przy zamknięciu trybu, przeładowaniu strony
-       i powrocie przez wznowienie — czyli w każdej sytuacji, w której zapis sesji
-       w ogóle ma sens. Zapisujemy KLUCZE, nie cały obiekt: klucz składnika jest
-       stabilny między porcjami, a ilości i etykiety przeliczają się z modelu. */
-    var klucze = Object.keys(zaznaczone);
-    var dane = { krok: stan.krok, porcje: stan.porcje,
-                 zaznaczone: klucze, znacznik: Date.now() };
+       **NIEAKTUALNE od `D-39.56`** — odhaczenia na krokach zniknęły razem
+       z kontrolką, więc nie ma czego zapisywać. Akapit zostaje jako zapis
+       nieboszczyka: `D-39.27` było słuszne w swoim czasie i przestało mieć
+       przedmiot, a nie zostało uchylone jako błędne. */
+    /* D-39.56 — zapisujemy POSTĘP, a nie odhaczenia: te ostatnie zniknęły razem
+       z kontrolką. Stare zapisy z polem `zaznaczone` czytają się bez błędu, bo
+       nikt tego pola nie czyta. */
+    var dane = { krok: stan.krok, porcje: stan.porcje, znacznik: Date.now() };
     try { localStorage.setItem(KLUCZ + id, JSON.stringify(dane)); } catch (e) { return null; }
     return dane;
   }
@@ -2715,8 +2757,9 @@
      `dalej`: przed startem nie ma kroku bieżącego ani zużytych, więc podział na
      trzy sekcje nie miałby desygnatu — a `dalej` jest jedynym stanem, który nie
      twierdzi nic nieprawdziwego o przebiegu gotowania.
-     Odhaczenia są WSPÓLNE z listą kroku (`zaznaczone`), bo to ten sam składnik
-     i ten sam użytkownik — zaznaczenie tutaj ma przetrwać wejście w krok. */
+     `D-39.55/56` — zaznaczenia arkusza żyją w `mamWDomu` i NIE mają nic wspólnego
+     z listą kroku: „mam w domu" to nie „wykorzystałem". Na krokach zaznaczać się
+     zresztą nie da, bo kontrolka tam nie istnieje. */
   var arkusz = null;
 
   function zbudujArkusz() {
@@ -2774,7 +2817,7 @@
      to ma się wkleić do notatek albo do wiadomości, a nie udawać dokumentu. */
   function tekstDoSchowka() {
     var skl = (stan.widok && stan.widok.skladniki) || [];
-    return skl.filter(function (s) { return !zaznaczone[s.key]; })
+    return skl.filter(function (s) { return !mamWDomu[s.key]; })
               .map(function (s) { return s.etykieta || s.nazwa || s.key; })
               .join('\n');
   }
@@ -2829,7 +2872,7 @@
     var a = zbudujArkusz();
     a.lista.textContent = '';
     var skl = (stan.widok && stan.widok.skladniki) || [];
-    skl.forEach(function (s) { a.lista.appendChild(wierszSkladnika(s, 0, 'dalej')); });
+    skl.forEach(function (s) { a.lista.appendChild(wierszSkladnika(s, 0, 'dalej', { arkusz: true })); });
     stan.korzen.setAttribute('data-arkusz', '');
     /* Ostrość wejścia klawiaturą: pierwszy element sterujący arkusza, nie cały
        dokument. Bez tego czytnik zostaje na przycisku pod scrimem. */
@@ -3050,11 +3093,7 @@
        przez jawny `{krok:N}` gubiłoby odhaczenia bez żadnego komunikatu.
        Nie nadpisujemy tego, co już jest w pamięci — otwarcie w tej samej sesji
        nie może cofnąć kliknięcia sprzed sekundy. */
-    (function () {
-      var s = czytajSesje();
-      if (!s || !s.zaznaczone || !s.zaznaczone.length) return;
-      s.zaznaczone.forEach(function (k) { zaznaczone[k] = true; });
-    })();
+    /* D-39.56 — przywracanie odhaczeń usunięte razem z odhaczeniami. */
     if (poprzedniOverflow === null) {
       poprzedniOverflow = document.documentElement.style.overflow;
       poprzedniOverflowBody = document.body ? document.body.style.overflow : null;
@@ -3148,8 +3187,6 @@
       return FONT_IKON.map(function (f) { return { waga: f[0], url: FONT_IKON_BAZA + f[1] }; });
     },
     ostrzezenia: function () { return ostrzezeniaRuntime.slice(); },
-    odhacz: odhacz,
-    zaznaczone: function () { return Object.keys(zaznaczone); },
     lista: przelaczListe,
     listaOtwarta: function () { return stan.listaOtwarta; },
     ekran: pokazEkran,
@@ -3194,7 +3231,8 @@
       el: function () { return arkusz ? arkusz.el : null; },
       otwarty: function () { return !!(stan.korzen && stan.korzen.hasAttribute('data-arkusz')); },
       kopiuj: function () { return kopiujSkladniki(arkusz ? arkusz.kopiuj : null); },
-      tekstDoSchowka: tekstDoSchowka
+      tekstDoSchowka: tekstDoSchowka,
+      mamWDomu: function () { return Object.keys(mamWDomu); }   // D-39.55
     },
     tooltip: {
       przelacz: przelaczTooltip,
