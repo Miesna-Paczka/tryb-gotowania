@@ -59,7 +59,8 @@
      to jest zamierzone przebazowanie zbioru, nie regres. */
   var LIGATURY = ['hourglass', 'local_dining', 'leaderboard',
                 'arrow_back', 'arrow_forward',
-                'keyboard_arrow_down', 'keyboard_arrow_up'];
+                'keyboard_arrow_down', 'keyboard_arrow_up',
+                'remove', 'add', 'close', 'refresh'];
 
   /* Font ikon — trzy wagi subsetu, hosting **Webflow** (D-15.1, rozstrzygnięte
      pomiarem w przeb. 31: `FontFace.load()` z obcego originu przechodzi, więc CORS
@@ -1237,10 +1238,23 @@
     var etykieta = el('p', 'mp-tryb__etykieta', blok);
     var tor = el('div', 'mp-tryb__tor', blok);
     var wypelnienie = el('div', 'mp-tryb__wypelnienie', tor);
-    var zamknij = el('button', 'mp-tryb__zamknij', belka);
+    /* D-39.34 · IKS NA LIGATURĘ `close`, W RODZINIE OUTLINED. Decyzja operatora
+       2026-08-17, wprost: „close to dobry wybór, ale potrzebujemy outlined".
+       Odczyt Figmy `7473:103100` daje ligaturę `close`, ale w `Material Symbols
+       **Rounded**` Medium i kolorze **#000000 bez zmiennej** — czyli w rodzinie,
+       której nie mamy w subsecie, i w kolorze, który przeczy całej reszcie pliku
+       (wszędzie indziej `--primary-text`). **Znak przyjmuję z Figmy, rodzinę
+       i kolor z decyzji operatora** — i zapisuję to rozdzielenie, żeby nikt nie
+       odczytał później Outlined jako mojego niedopatrzenia przy odczycie.
+       Waga 400 (z `.mp-ikona`), nie 500 z Figmy: reguła `.mp-tryb__zamknij` wagi
+       nie ustawia, a jedna waga ikon w całym overlayu jest warta więcej niż
+       zgodność z pojedynczym węzłem w obcej rodzinie. Do zmiany jedną linią,
+       gdyby operator chciał inaczej. Geometria bez zmian: 40×40, glif 20 px. */
+    var zamknij = el('button', 'mp-tryb__zamknij mp-ikona', belka);
     zamknij.type = 'button';
     zamknij.setAttribute('aria-label', 'zamknij tryb gotowania');
-    zamknij.textContent = '×';
+    zamknij.textContent = 'close';
+    zamknij.setAttribute('data-mp-ligatura', 'close');
 
     var top = el('div', 'mp-tryb__top', korzen);
 
@@ -1669,9 +1683,10 @@
     var glowa = el('div', 'mp-tryb__tooltip-glowa', t);
     var pytanie = el('p', 'mp-tryb__tooltip-pytanie', glowa);
     pytanie.textContent = wpis.pytanie || wpis.klucz || '';
-    var x = el('button', 'mp-tryb__tooltip-zamknij', glowa);
+    var x = el('button', 'mp-tryb__tooltip-zamknij mp-ikona', glowa);   // D-39.34
     x.type = 'button';
-    x.textContent = '×';
+    x.textContent = 'close';
+    x.setAttribute('data-mp-ligatura', 'close');
     x.setAttribute('aria-label', 'zamknij');
     el('span', 'mp-tryb__cel', x).setAttribute('aria-hidden', 'true');
     x.addEventListener('click', function (e) { e.stopPropagation(); zamknijTooltip(); });
@@ -1795,8 +1810,17 @@
                         'ale zdjęcia i lista zakupów mogą się nie odświeżyć.';
     var akcja = el('button', 'mp-tryb__baner-akcja', k);
     akcja.type = 'button';
-    var glif = el('span', 'mp-tryb__baner-glif', akcja);
-    glif.textContent = '↻';
+    /* D-39.35 · `↻` NA LIGATURĘ `refresh`. Decyzja operatora 2026-08-17.
+       Odczyt Figmy `7202:10894` daje tu **wektor SVG 20×20**, a nie font — mimo że
+       `refresh` istnieje jako ligatura i jest w subsecie (zmierzone, 20,0 px przy
+       kontroli ujemnej 505,6). Zapisuję to jako ODSTĘPSTWO OD FIGMY podjęte przez
+       operatora, nie jako odczyt: plik projektowy mówi „wektor", produkt dostaje
+       font. Pudełko się zgadza (20×20 w obu), więc różnica jest w nośniku glifu,
+       nie w geometrii, a jeden mechanizm ikon w całym overlayu jest wart więcej
+       niż jeden wyeksportowany plik. */
+    var glif = el('span', 'mp-tryb__baner-glif mp-ikona', akcja);
+    glif.textContent = 'refresh';
+    glif.setAttribute('data-mp-ligatura', 'refresh');
     glif.setAttribute('aria-hidden', 'true');
     el('span', 'mp-tryb__baner-tekst', akcja).textContent = 'sprawdź ponownie';
     akcja.addEventListener('click', function () { sprawdzPolaczenie(); });
@@ -2315,15 +2339,34 @@
     pyt.textContent = 'ile porcji?';       // NIENARYSOWANE brzmienie: pipeline treści
     var rzad = el('div', 'mp-tryb__porcje', top);
     var blok = el('div', 'mp-tryb__porcje-blok', rzad);
-    var minus = el('button', 'mp-tryb__porcje-krok', blok);
+    /* D-39.33 · PORCJE NA LIGATURY — rozstrzygnięte SZABLONEM, nie Figmą, i to na
+       wyraźne polecenie operatora („sprawdź, jak to jest na szablonie przepisu:
+       jeśli DM Sans — zostaw, jeśli Symbols Outlined — przełącz").
+       Zmierzone na żywym szablonie `[V]` 2026-08-17: selektor porcji strony przepisu
+       ma `.icon-text` o treści **`remove`** i **`add`**, rodzina
+       `"Material Symbols Outlined", Arial, sans-serif`, 16 px, waga **500**,
+       kolor `rgb(62,43,34)` = #3E2B22.
+       **To jest przypadek, w którym Figma NIE rozstrzyga, bo sama sobie przeczy:**
+       węzły `7263:10729/10732` dają znaki U+2212 i U+002B w DM Sans Medium 20 px.
+       Gdyby oracle'em była Figma, migracja byłaby regresem — i tak to zaraportowałem
+       przed pytaniem. Operator wskazał szablon jako rozstrzygający dla TEJ pary
+       i szablon mówi coś innego niż plik projektowy.
+       Rozmiar zostaje **20 px**, nie 16 z szablonu: przycisk overlaya ma 40×40
+       (`7263:…` = pudełko 40×20), a nie kontrolkę strony. Przenosimy MECHANIZM
+       ikony, o który operator pytał, nie skalę cudzego komponentu.
+       Waga 500 zostaje z reguły `.mp-tryb__porcje-krok`, która stoi w arkuszu PO
+       `.mp-ikona` przy równej specyficzności — czyli zgodnie z szablonem. */
+    var minus = el('button', 'mp-tryb__porcje-krok mp-ikona', blok);
     minus.type = 'button';
-    minus.textContent = '−';
+    minus.textContent = 'remove';
+    minus.setAttribute('data-mp-ligatura', 'remove');
     minus.setAttribute('aria-label', 'mniej porcji');
     var ile = el('span', 'mp-tryb__porcje-ile', blok);
     ile.setAttribute('data-mp-porcje', '');
-    var plus = el('button', 'mp-tryb__porcje-krok', blok);
+    var plus = el('button', 'mp-tryb__porcje-krok mp-ikona', blok);   // D-39.33
     plus.type = 'button';
-    plus.textContent = '+';
+    plus.textContent = 'add';
+    plus.setAttribute('data-mp-ligatura', 'add');
     plus.setAttribute('aria-label', 'więcej porcji');
     function rysujPorcje() {
       ile.textContent = stan.porcje + (stan.porcje === 1 ? ' porcja' : (stan.porcje < 5 ? ' porcje' : ' porcji'));

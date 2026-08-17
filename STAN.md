@@ -10389,3 +10389,69 @@ zapisuję wprost, żeby następna sesja nie wzięła czerwieni za defekt produkt
 
 **Artefakt:** 46 172 znaki, **12 860 B gzip** (budżet 20 kB zachowany).
 Składnia źródła i artefaktu zweryfikowana `new Function()`.
+
+### `D-39.33/34/35` · KONIEC SUBSTYTUTÓW UNICODE — 2026-08-17
+
+Trzy rozstrzygnięcia operatora, każde z innym oracle'em, i to jest w nich najciekawsze.
+
+**`D-39.33` · porcje `−`/`+` → `remove`/`add`. Rozstrzygnął SZABLON, nie Figma.**
+Polecenie operatora: „sprawdź, jak to jest na szablonie przepisu; jeśli DM Sans —
+zostaw, jeśli Symbols Outlined — przełącz". Zmierzone na żywym szablonie `[V]`:
+`.icon-text` o treści `remove` / `add`, rodzina `"Material Symbols Outlined"`,
+16 px, waga **500**, `rgb(62,43,34)`.
+**Figma mówi tu co innego** (`7263:10729/10732` — znaki U+2212 i U+002B w DM Sans
+Medium 20 px) i dlatego zgłosiłem to jako pozycję decyzyjną, zamiast migrować sam.
+Operator wskazał inny oracle i ma pierwszeństwo. **Rozmiar zostaje 20 px, nie 16
+z szablonu** — przycisk overlaya ma 40×40, a przenoszony jest MECHANIZM ikony,
+nie skala cudzego komponentu. Waga 500 wychodzi sama: `.mp-tryb__porcje-krok`
+stoi w arkuszu po `.mp-ikona` przy równej specyficzności.
+
+**`D-39.34` · `×` → `close`, rodzina Outlined.** Figma `7473:103100` daje ligaturę
+`close`, ale w `Material Symbols **Rounded**` Medium i `#000000` **bez zmiennej**.
+**Znak przyjęty z Figmy, rodzina i kolor z decyzji operatora** („close to dobry
+wybór, ale potrzebujemy outlined"). Rozdzielenie zapisane wprost, żeby Outlined
+nie zostało kiedyś odczytane jako moje niedopatrzenie przy odczycie. Waga 400,
+nie 500 — jedna waga ikon w overlayu warta więcej niż zgodność z pojedynczym
+węzłem w rodzinie, której nie mamy. Dwa miejsca: belka i tooltip zamiennika.
+
+**`D-39.35` · `↻` → `refresh`. ODSTĘPSTWO OD FIGMY, świadome.** `7202:10894` to
+**wektor SVG 20×20**, nie font. Operator wybrał ligaturę. Zapisuję jako decyzję,
+nie jako odczyt — plik projektowy mówi „wektor", produkt dostaje font. Pudełko
+zgodne w obu (20×20), więc różnica jest w nośniku glifu, nie w geometrii.
+
+**W kodzie nie ma już ANI JEDNEGO substytutu Unicode poza ptaszkiem** — a ptaszek
+zostaje, bo jednostka 2 rozstrzygnęła z Figmy (`7273:10878`), że jest znakiem
+tekstowym w pudełku, nie glifem ikonowym, i migracja byłaby regresem.
+
+`LIGATURY` rośnie **5 → 11**. **Asercje `B16`/`I4` pytają `szerLig.length === 5`
+i muszą zostać przebazowane na 11.** Zamierzone, nie regres.
+
+**Artefakt:** 46 487 znaków, **12 913 B gzip** (budżet 20 kB). Składnia źródła
+i artefaktu zweryfikowana `new Function()`.
+
+### BANER OFFLINE — odpowiedź na pytanie operatora, z odczytu kodu `[V]`
+
+Operator zapytał, czy kółeczko kręci się podczas sprawdzania i czy modal znika po
+powrocie sieci. Odpowiedź na oba pytania jest inna, niż zakłada, i lepiej to
+powiedzieć teraz niż po wdrożeniu:
+
+1. **Nic się nie kręci i nie ma czego kręcić.** W całym arkuszu jest JEDEN
+   `@keyframes` — puls kropki minutnika. Glif banera nie ma animacji.
+2. **„Sprawdź ponownie" nie wykonuje żadnego zapytania do sieci.**
+   `sprawdzPolaczenie()` to jeden synchroniczny odczyt `navigator.onLine`. Nie ma
+   stanu „trwa sprawdzanie", bo nie ma na co czekać.
+3. **Tapnięcie przy dalszym braku sieci nie daje ŻADNEJ informacji zwrotnej.**
+   Gałąź `else` woła `pokazBaner()`, a ten wychodzi na `if (baner) return baner`.
+   Z zewnątrz: przycisk nie działa. **To jest realna usterka UX, nie zamysł.**
+4. **Baner znika sam po powrocie sieci — tak.** `window.addEventListener('online',
+   ukryjBaner)`. Symetrycznie `offline` go pokazuje.
+5. **To nie jest modal, tylko kafel w `stos`** nad pasem dolnym; treść pod spodem
+   pozostaje klikalna. Modalami są S2/S4 (mają scrim).
+6. **`navigator.onLine` mówi „jest interfejs sieciowy", nie „jest internet".**
+   Wi-Fi w kawiarni bez wyjścia na świat raportuje `true`, więc baner zniknie,
+   choć nic się nie pobierze. Prawdziwy test wymaga próbnego żądania.
+
+**Pozycja decyzyjna operatora:** czy „sprawdź ponownie" ma robić realne żądanie
+(wtedy jest co animować i jest sens kręcić glifem do czasu odpowiedzi), czy zostaje
+odczytem flagi — i wtedy trzeba dać choćby komunikat „nadal brak połączenia",
+bo dziś przycisk milczy.
