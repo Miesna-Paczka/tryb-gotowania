@@ -10527,3 +10527,42 @@ Dwa niezależne przyrządy, ten sam wynik.
 
 Wariant 2 wygląda na najtańszy sposób pogodzenia obu celów i **nie jest tym, co
 operator polecił** — dlatego stoi jako propozycja, a nie jako wykonanie.
+
+### CHECKBOX NEWSLETTERA — odczyt rozstrzygający, 2026-08-17
+
+Operator wskazał embed newslettera jako miejsce, gdzie występuje wariant wypełniony.
+Odczytane ze STRUKTURY (treść skryptów blokuje sanityzator `javascript_tool` —
+pułapka §4, obejście to czytanie struktury zamiast tekstu). Kontrolkę przełączono
+programowo i **przywrócono do stanu wyjściowego** `[V]`:
+
+| | stan | glif | tło | obrys | promień | rodzina | waga |
+|---|---|---|---|---|---|---|---|
+| przed | `aria-pressed=false` | `check_box_outline_blank` | brak | brak | 0 | Material Symbols Outlined | **500** |
+| po kliknięciu | `aria-pressed=true` | **`check_box`** | brak | brak | 0 | Material Symbols Outlined | **500** |
+| po przywróceniu | `false` | `check_box_outline_blank` | brak | brak | 0 | — | — |
+
+`font-variation-settings: normal` w obu stanach.
+
+**Wniosek dwuczęściowy i obie części są istotne:**
+
+1. **Operator ma rację co do MECHANIZMU.** Newsletter robi dokładnie podmiankę glifu
+   `check_box_outline_blank` ↔ `check_box`, **bez ani jednej reguły CSS rysującej
+   pudełko** — zero tła, zero obrysu, zero promienia. Polecenie `D-39.36` było więc
+   zgodne z tym, co strona już robi, a nie odstępstwem od praktyki serwisu.
+   **Korekta do wpisu `D-39.36`:** nazwałem tę zmianę „odstępstwem od Figmy" i to
+   zostaje prawdą wobec PLIKU PROJEKTOWEGO, ale wobec ŻYWEGO SERWISU jest
+   ujednoliceniem. Obie rzeczy naraz.
+2. **Wariantu wypełnionego tam NIE MA.** Newsletter w stanie zaznaczonym pokazuje
+   ten sam obrysowany `check_box`, co nasz overlay — bo font jest ten sam i osi
+   `FILL` nie ma. Wrażenie „wypełnionego" bierze się skądinąd, patrz niżej.
+
+**Jedyna realna różnica: WAGA.** Newsletter renderuje glif w **500**, nasz overlay
+w **400** (`.mp-ikona`). Przy 500 kreski są grubsze i kwadrat czyta się jako
+cięższy — to najprawdopodobniej źródło wrażenia „wypełniony".
+
+**Serwis nie ma tu jednej odpowiedzi i dlatego nie wybieram sam:** `check_box`
+występuje na tej samej stronie w DWÓCH wagach — newsletter **500**
+oraz `.icon-recipe-check` na szynie przepisu **400** (kolor #816D44).
+Bliższym rodzeństwem naszej listy składników jest szyna przepisu (ta sama strona,
+to samo zadanie: odhaczanie składników) i ona stoi na **400**, czyli tam, gdzie
+już jesteśmy. Pozycja decyzyjna operatora, koszt zmiany: jedna linia.
