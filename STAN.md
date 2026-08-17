@@ -10779,3 +10779,120 @@ zweryfikowana `new Function()`.
 **UWAGA WDROŻENIOWA: ta zmiana rusza OBA artefakty.** Podbicie wersji tylko przy
 runtimie zostawi stary parser w cache'u Pages (`max-age=600`) i jednostka czasu
 się nie pojawi — objaw wyglądałby jak nieskuteczna poprawka, a byłby cache'em.
+
+### QR — DWIE USTERKI, DRUGA UJAWNI SIĘ DOPIERO PO NAPRAWIE PIERWSZEJ — 2026-08-17
+
+Zgłoszenie operatora: „parser nie generuje kodu QR i/lub nie wstawia go we właściwy
+slot". Zmierzone na stagingu, okno 2560 `[V]`:
+
+| co sprawdzone | wynik |
+|---|---|
+| slot `[data-mp-qr]` istnieje | **tak** — `div.recipe-qr__code`, 96×96 |
+| slot ma zawartość | **nie** — 0 dzieci, `innerHTML` pusty |
+| `MP.przepis.rysujQR` istnieje | **tak**, `function` |
+| bramka `min-width: 992px` | **przechodzi** (2560) |
+| `adresQR()` | **poprawny** — `https://miesnapaczka.pl/przepisy/…?tryb=gotowanie`, origin PRODUKCYJNY |
+| **skrypty strony wołające `rysujQR`** | **ZERO** |
+| ręczne wywołanie `MP.przepis.rysujQR()` | **rysuje** — 1 dziecko, `<svg>`, 18 306 znaków |
+
+#### 1. Generator działa. Brakuje WYWOŁANIA.
+
+`rysujQR` jest wyeksportowane w publicznym API i ma domyślny selektor
+`[data-mp-qr]` — czyli było projektowane pod automatyczne uruchomienie — ale
+**nic go nie woła: ani parser, ani runtime, ani żaden skrypt strony.**
+
+**To CZWARTE wystąpienie tego samego wzorca w tym produkcie**, obok `D-39.13`
+(ekran zakończenia), `D-39.14` (minutniki) i `D-39.18` (wznowienie sesji):
+**funkcja gotowa, przetestowana i nieosiągalna, bo nikt jej nie wywołuje.**
+Matryca tego nie łapie z definicji — pyta „czy funkcja robi, co ma robić", a nie
+„czy ktokolwiek ją wywołuje". Wniosek na przyszłość: **dla każdej funkcji
+w publicznym API należy zapytać o LICZBĘ WYWOŁUJĄCYCH, nie o poprawność.**
+
+#### 2. `[V]` KOLIZJA ROZMIARÓW — naprawa samego wywołania dałaby ĆWIARTKĘ KODU
+
+To jest powód, dla którego nie wolno tu poprawić jednej linijki i odesłać do testu:
+
+| | wartość |
+|---|---|
+| slot `.recipe-qr__code` | **96×96**, `overflow: hidden` |
+| SVG pisany przez parser | **192×192** (`QR_ROZMIAR`, spec §8) |
+| `viewBox` | `0 0 164 164` (41 modułów × cellSize 4) |
+
+Po samym dodaniu wywołania kod wszedłby do slotu w rozmiarze **dwa razy większym
+niż pudełko, które ma `overflow:hidden`** — widoczna byłaby lewa górna **ćwiartka**.
+Kod QR przycięty jest **niemożliwy do zeskanowania**, a objaw wyglądałby na nową
+usterkę renderowania, nie na kolizję wymiarów.
+
+**Spec §8 mówi 192, szablon daje 96 — to sprzeczność do rozstrzygnięcia, nie
+do uśrednienia.** Dwie drogi:
+
+- **(a) parser przestaje narzucać piksele** — zamiast `width/height` w px daje
+  `width:100%;height:auto;display:block`, więc kod wypełnia slot, jakikolwiek by
+  był. Odporne na zmiany szablonu, ale **spec §8 wymaga wtedy poprawki**, bo
+  rozmiar przestaje być własnością parsera.
+- **(b) slot w Webflow rośnie do 192×192** — spec zostaje nietknięty, zmiana po
+  stronie operatora, jedna klasa.
+
+**Rekomendacja: (b).** Przy 96 px moduł ma 96/41 ≈ **2,3 px** i skanowanie robi się
+zawodne na ekranach o niskim DPI; przy 192 px moduł ma **4,7 px**. Liczba ze spec
+jest tu merytoryczna, nie arbitralna. Ale to jest wybór operatora.
+
+#### 3. Gdzie ma stanąć wywołanie — pytanie o kontrakt, nie o kod
+
+Domyślny selektor `[data-mp-qr]` sugeruje autostart w parserze
+(`DOMContentLoaded`, ze strażnikiem „slot istnieje" i bramką 992). Zaleta:
+zero zmian w Webflow. **Ale to dokłada parserowi efekt uboczny przy wczytaniu
+strony, czyli zmienia kontrakt embedu**, a `instrukcja-pisania-przepisow.md` §6
+jest PINEM i nie należy do tego łańcucha. Alternatywa: jedna linia w skrypcie
+wiążącym szablonu, obok wiązania przycisku.
+**Do decyzji operatora — nie wprowadzam bez niej.**
+
+Dodatkowo, jeśli padnie autostart: bramka jest sprawdzana w chwili wywołania, więc
+wejście na stronę na wąskim oknie i późniejsze poszerzenie zostawi pusty slot.
+Lekarstwo to nasłuch `matchMedia(...).addEventListener('change', …)` — tanie,
+ale warto o nim zdecydować świadomie, a nie odkryć jako kolejny brak wyzwalacza.
+
+### `D-39.39` · AUTOSTART QR W PARSERZE — WPROWADZONE 2026-08-17
+
+Decyzja operatora po przedstawieniu obu dróg. **Wyzwalacz idzie do pliku w repo,
+nie do pola custom code Webflow** — uzasadnienie jest pomiarowe, nie estetyczne:
+wywołanie wpisane w szablonie jest niewidoczne dla gita, dla matrycy i dla każdego
+pomiaru, więc ginie przy pierwszej nieostrożnej edycji i nikt tego nie zauważa.
+Po czterech zgubionych wyzwalaczach w historii tego produktu (`D-39.13`, `D-39.14`,
+`D-39.18`, teraz QR) wkładanie piątego w miejsce najtrudniejsze do sprawdzenia
+byłoby proszeniem się o szósty.
+
+**Kształt:** `DOMContentLoaded` **albo natychmiast**, jeśli dokument jest już
+sparsowany. Obie drogi są konieczne i to jest pułapka warta zapamiętania —
+`defer` na znaczniku (wymóg WYMAGANIA §4 od `D-39.29`) sprawia, że skrypt wykonuje
+się PO sparsowaniu HTML, więc `readyState` bywa już `interactive` i **`DOMContentLoaded`
+nigdy nie przyjdzie**. Sam nasłuch dałby pusty slot przy `defer`; samo wywołanie
+wprost dałoby pusty slot przy znaczniku bez `defer`.
+
+**Nasłuch bramki** `(min-width: 992px)` z fallbackiem `addListener` dla starszych
+WebKitów — bramka jest sprawdzana w chwili wywołania, więc bez nasłuchu wejście na
+wąskim oknie i późniejsze poszerzenie zostawiłoby pusty slot, czyli ten sam brak
+wyzwalacza w mniejszej skali. `rysujQR` samo pilnuje slotu i bramki i czyści
+`innerHTML` przed rysowaniem, więc powtórne wywołanie jest idempotentne.
+
+**Efekt uboczny wąski z premedytacją:** bez slotu `[data-mp-qr]` albo przy oknie
+< 992 px nie dzieje się nic. **Zweryfikowane wykonaniem artefaktu BEZ `document`**
+w Node — brak wyjątku `[V]`. To istotne, bo parser bywa ładowany na stronach bez
+kodu QR i nie ma prawa się przez to wywrócić.
+
+**Kontrakt embedu: NIE ruszony.** `instrukcja-pisania-przepisow.md` §6 to pin B1
+i własność drugiego łańcucha. Zgłoszenie leży w `CR--autostart-qr--2026-08-17.md`,
+trzeci CR tego rodzaju obok `wartosci-porcja` i `zdjecie-glowne`, z proponowanym
+brzmieniem uzupełnienia do ich redakcji.
+
+**Rozmiar slotu — po stronie operatora.** Slot 96×96 z `overflow:hidden` wobec SVG
+192×192 (spec §8) dałby lewą górną **ćwiartkę** kodu, a przycięty QR jest
+nieskanowalny. **Decyzja: slot rośnie do 192×192 w Webflow**, parser zostaje przy
+192 zgodnie ze spec. Podstawa liczbowa: przy 96 px moduł ma 96/41 ≈ 2,3 px, przy
+192 px ≈ 4,7 px.
+
+**Artefakt parsera:** 39 979 znaków, **15 358 B gzip** (budżet 20 kB).
+Składnia źródła i artefaktu zweryfikowana `new Function()`.
+
+**UWAGA WDROŻENIOWA: zmiana jest w PARSERZE.** Podbicie wersji tylko przy runtimie
+zostawi stary parser w cache'u Pages i QR się nie pojawi.

@@ -3313,6 +3313,64 @@
     document.body.appendChild(box);
   }
 
+  /* ---------------------------------------------------------------- autostart QR
+
+     `D-39.39` · WYWOŁANIE, KTÓREGO NIE BYŁO. Decyzja operatora 2026-08-17.
+
+     Zmierzone na stagingu `[V]`: slot `[data-mp-qr]` istniał, `rysujQR` istniało
+     i działało (ręczne wywołanie narysowało kod), bramka 992 przechodziła,
+     `adresQR()` zwracał poprawny adres produkcyjny — a **liczba skryptów
+     wołających `rysujQR` wynosiła ZERO.** Funkcja gotowa i nieosiągalna.
+
+     **CZWARTE wystąpienie tego wzorca** po `D-39.13` (ekran zakończenia),
+     `D-39.14` (minutniki) i `D-39.18` (wznowienie sesji). Dlatego wyzwalacz idzie
+     TUTAJ, do pliku w repozytorium, a nie do skryptu w polu Webflow: wywołanie
+     wpisane w szablonie jest niewidoczne dla gita, dla matrycy i dla każdego
+     pomiaru, więc ginie przy pierwszej nieostrożnej edycji i nikt tego nie zauważy.
+     Piąty zgubiony wyzwalacz kosztowałby dokładnie tyle, co cztery poprzednie.
+
+     **Efekt uboczny jest wąski i taki ma być:** bez slotu `[data-mp-qr]` albo przy
+     oknie < 992 px nie dzieje się NIC. Na stronie bez kodu QR ten blok jest
+     bezczynny. Mimo to formalnie zmienia kontrakt embedu (parser przestaje być
+     całkowicie bierny przy wczytaniu strony), a kontrakt opisuje
+     `instrukcja-pisania-przepisow.md` §6 — **pin B1, własność drugiego łańcucha.**
+     Tego dokumentu NIE ruszam; zgłoszenie idzie osobnym change requestem
+     `CR--autostart-qr--2026-08-17.md`, tak jak przy `wartosci-porcja` i `zdjecie-glowne`.
+
+     Nasłuch `change` na bramce jest konieczny, a nie ozdobny: bramka jest
+     sprawdzana W CHWILI wywołania, więc wejście na wąskim oknie i późniejsze
+     poszerzenie zostawiłoby pusty slot — czyli ten sam brak wyzwalacza w mniejszej
+     skali. `rysujQR` samo pilnuje bramki i slotu, więc powtórne wywołanie jest
+     bezpieczne i idempotentne (czyści `innerHTML` przed rysowaniem).
+
+     Cofnięcie: usuń ten blok w całości. Publiczne `rysujQR` zostaje bez zmian. */
+  function autostartQR() {
+    if (!global.document) return;
+    if (!document.querySelector('[data-mp-qr]')) return;
+    rysujQR();
+    if (global.matchMedia) {
+      var mq = global.matchMedia('(min-width: 992px)');
+      var reaguj = function () { rysujQR(); };
+      /* `addEventListener` na `MediaQueryList` nie istnieje w starszych WebKitach,
+         a `addListener` jest tam jedyną drogą. Kolejność prób, nie założenie. */
+      if (mq.addEventListener) mq.addEventListener('change', reaguj);
+      else if (mq.addListener) mq.addListener(reaguj);
+    }
+  }
+
+  if (global.document) {
+    /* `defer` na znaczniku (WYMAGANIA §4) sprawia, że skrypt wykonuje się PO
+       sparsowaniu HTML, więc `readyState` bywa już `interactive` i zdarzenie
+       `DOMContentLoaded` NIGDY nie przyjdzie. Obie drogi są konieczne — sam
+       nasłuch dałby pusty slot przy `defer`, a samo wywołanie wprost dałoby go
+       przy znaczniku bez `defer`. */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', autostartQR, { once: true });
+    } else {
+      autostartQR();
+    }
+  }
+
   // ---------------------------------------------------------------- eksport
 
   global.MP = global.MP || {};
