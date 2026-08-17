@@ -91,14 +91,39 @@
     var ost = korzen.querySelectorAll('.mp-tryb__reszta li');
     ost = ost.length ? ost[ost.length - 1] : null;
 
+    /* v2 — POMIAR ROZSTRZYGAJĄCY. Sonda v1 pokazała `zapas=0` przy widocznie
+       uciętej treści, czyli nadmiar jest przycinany PRZED TOP-em i nie wchodzi do
+       jego obszaru przewijania. Te trzy wiersze mówią, KTÓRE pudełko kłamie o swojej
+       wysokości: szukamy takiego, które ma `c` (clientHeight) mniejsze od `s`
+       (scrollHeight) — ono przycina — oraz tego, czy `h[]` (wysokość INLINE, czyli
+       zostawiona przez animację) w ogóle jest ustawiona. `h[]=—` znaczy, że
+       `domknij()` oddał wysokość CSS-owi poprawnie; `h[]=NNNpx` znaczy, że pudełko
+       zostało zamrożone na wartości docelowej przejścia i to jest przyczyna. */
+    function box(sel, etyk) {
+      var e = korzen.querySelector(sel);
+      if (!e) return etyk + ' —\n';
+      var c = getComputedStyle(e);
+      return etyk +
+        ' h[]=' + (e.style.height || '—') +
+        ' h=' + c.height +
+        ' mh=' + c.minHeight +
+        ' ovf=' + c.overflowY +
+        ' c/s=' + liczba(e.clientHeight) + '/' + liczba(e.scrollHeight) +
+        ' b=' + liczba(e.getBoundingClientRect().bottom) + '\n';
+    }
+
     ekran().textContent =
-      'TOP  st=' + liczba(st) + ' stMax=' + liczba(stMax) +
+      'SONDA v2 · TOP st=' + liczba(st) + ' stMax=' + liczba(stMax) +
         ' sh=' + liczba(sh) + ' ch=' + liczba(ch) + ' zapas=' + liczba(sh - ch) + '\n' +
       'touch s=' + licz.start + ' m=' + licz.move + ' e=' + licz.end +
         ' dY=' + liczba(dyMax) + '  scrollEv=' + licz.scroll + '\n' +
       'lista ' + (reszta && reszta.hasAttribute('data-otwarta') ? 'ROZWINIĘTA' : 'zwinięta') +
+        '  li=' + korzen.querySelectorAll('.mp-tryb__reszta li').length +
         '  ostatni.b=' + (ost ? liczba(ost.getBoundingClientRect().bottom) : '—') +
         '  TOP.b=' + liczba(top.getBoundingClientRect().bottom) + '\n' +
+      box('.mp-tryb__reszta', 'reszta') +
+      box('.mp-tryb__ramka-skladnikow', 'ramka ') +
+      box('.mp-tryb__blok-skladnikow', 'blok  ') +
       'osb=' + (cs.overscrollBehaviorY || '?') + ' ovfY=' + cs.overflowY +
         ' html=' + (document.documentElement.style.overflow || '—') +
         ' body=' + ((document.body && document.body.style.overflow) || '—') +
