@@ -19,3 +19,40 @@ harness/_katalog_tmp.js
 
 # artefakty sond renam/rm
 .test-rename-*
+
+# ---------------------------------------------------------------------------
+# DOKUMENTY MIĘDZYŁAŃCUCHOWE — nie należą do tego repozytorium.
+# Decyzja operatora 2026-08-17: „handoff należy wypisać z repo, ten i każdy inny".
+#
+# Kryterium jest jedno i da się je zastosować bez namysłu: **czy adresatem jest
+# inna sesja/łańcuch, czy ten embed?** Handoff, handback, CR i delta to KORESPONDENCJA
+# — powstają raz, są czytane raz przez kogoś innego i po dostarczeniu nie opisują
+# już żadnego stanu. Repo ma nieść stan trybu gotowania, a nie archiwum poczty.
+#
+# Trafiały tu, bo powstają w tym katalogu roboczym — czyli z powodu mechaniki
+# narzędzia, nie z powodu przynależności. To jest dokładnie ten rodzaj przyczyny,
+# który trzeba unieszkodliwić fizycznie, a nie zapamiętać.
+#
+# Zostają natomiast dokumenty opisujące TEN embed: WYMAGANIA, PAKIET-INTEGRACYJNY,
+# GEOMETRIA, INTERAKCJE, MATRYCA, REJESTR-LUK, DEPLOY, STAN i łatki do WYMAGAŃ.
+#
+# UWAGA: sam wpis tutaj nie wypisuje plików już śledzonych — do tego potrzebny jest
+# jednorazowy `git rm --cached`. Ignorowanie działa dopiero od chwili, gdy plik
+# przestanie być w indeksie.
+# ---------------------------------------------------------------------------
+HANDOFF*.md
+HANDBACK*.md
+CR--*.md
+DELTA--*.md
+
+# Materiał promptowy łańcucha — też nie stan embeda (operator, 2026-08-17).
+# Kopie promptu i propozycje jego zmian opisują, JAK pracuje sesja, a nie CO robi
+# tryb gotowania. Mają zresztą własny dom: `git\tech\lancuchy\` trzyma SZABLON-PROMPTU,
+# PROTOKOL-ARBITRAZU i REJESTR-ZASOBOW — czyli prompt jako klasę, nie jako instancję.
+# Kopia promptu sprzed konkretnego przebiegu jest migawką instancji i starzeje się
+# w tym samym tempie, w jakim traci znaczenie.
+# `PROPOZYCJA-*` celowo szeroko: propozycja jest z definicji pismem do kogoś,
+# a nie opisem stanu. Gdy zostanie przyjęta, jej treść i tak trafia do dokumentu,
+# który stan opisuje.
+PROMPT-KOPIA-*.md
+PROPOZYCJA-*.md

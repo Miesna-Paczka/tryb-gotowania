@@ -80,8 +80,16 @@
      i zawieszony, zamiast liczyć, że ktoś przeczyta zmianę w instrukcji. */
   var KLUCZE_NIEOBSLUGIWANE = {
     'wariant': 'odrzucone 2026-08-12 (kolizja z taksonomią kart) — ' +
-               'użyj `inaczej:` albo drugiego zdania treści kroku'
+               'napisz to jako drugie zdanie treści kroku'
   };
+  /* `D-39.60` (CR-1 sesji treściowej, 2026-08-17) — z tej rady ZNIKA wzmianka
+     o `inaczej:`. Klucz jest obsługiwany, ale w NOWYCH przepisach się go nie pisze:
+     obaj konsumenci doklejają go do treści jako drugie zdanie, więc wyjście jest
+     identyczne ze zdaniem napisanym wprost. Istnieje wyłącznie po to, by STARE
+     przepisy nie pokazywały czytelnikowi słowa „inaczej:".
+     **Ostrzeżenie dostaje autor w chwili, gdy i tak poprawia tekst** — wysyłanie go
+     wtedy na ścieżkę wycofywaną znaczy, że poprawi drugi raz. O istnieniu klucza
+     dowiaduje się z kontraktu §3, nie z komunikatu przy pisaniu nowego przepisu. */
   /* `D-39.59` — `inaczej` ZDJĘTE z tej listy tego samego dnia, w którym tu trafiło.
      Ostrzeżenie z `D-39.57` doradzało „napisz to jako drugie zdanie", a generator
      szablonu (`generuj-html.mjs`, `KLUCZE`) **rozpoznawał ten znacznik od początku**
@@ -801,7 +809,9 @@
 
   function podepnijProdukty(skladniki) {
     var mapa = Object.create(null);
+    var wezlow = 0;
     Array.prototype.forEach.call(document.querySelectorAll('[data-mp-produkt]'), function (el) {
+      wezlow++;
       var slug = el.getAttribute('data-slug');
       if (!slug) return;
       var g = parsujGramature(el.getAttribute('data-gramatura'));
@@ -814,8 +824,27 @@
         sztukWOpakowaniu: g ? g.sztuk : null
       };
     });
-    skladniki.forEach(function (sk) {
-      if (!sk.produktSlug) return;
+    /* `D-39.61` (CR-2 sesji treściowej, 2026-08-17) — ODRÓŻNIENIE „brakuje jednej
+       rzeczy" od „nie ma całego źródła".
+       Zero węzłów przy niepustym wiązaniu `@` nie może być winą treści: gdyby ukryta
+       Collection Lista renderowała, to przy wypełnionym `produkty-w-przepisie` stałby
+       tu co najmniej jeden węzeł. Zmierzone `[V]` 2026-08-17 na `kurczak-teriyaki-przepis`:
+       pole wypełnione, węzłów zero — a parser oskarżał treść.
+       Bez tego rozróżnienia objaw ląduje u kogoś, kto nie ma czym go usunąć: autor
+       otwiera pole, znajduje tam produkt i albo uzna, że nie rozumie systemu, albo
+       zacznie „naprawiać" coś, co działa. Przy 18 przepisach do migracji to 18 razy.
+       `if (!wiazane.length) return;` MUSI stać przed sprawdzeniem licznika — większość
+       przepisów nie ma ani jednego `@slug` i pusty most jest wtedy stanem normalnym. */
+    var wiazane = skladniki.filter(function (sk) { return !!sk.produktSlug; });
+    if (!wiazane.length) return;
+    if (wezlow === 0) {
+      wiazane.forEach(function (sk) { sk.produkt = null; });
+      blad('ukryta lista produktów nie renderuje ANI JEDNEGO elementu [data-mp-produkt], ' +
+           'a wiązanie @ mają: #' + wiazane.map(function (sk) { return sk.key; }).join(', #') +
+           '. To usterka SZABLONU, nie treści — NIE poprawiaj pola produkty-w-przepisie.');
+      return;
+    }
+    wiazane.forEach(function (sk) {
       sk.produkt = mapa[sk.produktSlug] || null;
       if (!sk.produkt) blad('składnik #' + sk.key + ' odsyła do produktu "' + sk.produktSlug + '", którego nie ma w produkty-w-przepisie');
       else if (!sk.produkt.gramatura) blad('produkt "' + sk.produktSlug + '" ma gramaturę "' + sk.produkt.gramaturaRaw + '", której nie umiem odczytać (oczekuję "n x N g") — wielokrotność "n × …" niedostępna');
@@ -3738,7 +3767,15 @@
     limitMarkerow: LIMIT_MARKEROW,
     _wewnetrzne: {
       parsujSkladniki: parsujSkladniki, parsujKroki: parsujKroki, rozbijTresc: rozbijTresc,
-      parsujGramature: parsujGramature, zbudujZamienniki: zbudujZamienniki
+      parsujGramature: parsujGramature, zbudujZamienniki: zbudujZamienniki,
+      /* `D-39.61` — wystawione WYŁĄCZNIE po to, żeby `narzedzia/suchy-bieg-mostu-produktow.js`
+         mógł przejechać cztery przypadki mostu bez przeglądarki. Zamknięty most jest
+         jedyną gałęzią, której nie widać ani w przeglądzie kodu, ani na jednym przepisie.
+         Kolektor błędów wystawiony razem z nią: bez niego suchy bieg musiałby
+         podmieniać `Array.prototype.push`, czyli testować przez pułapkę. */
+      podepnijProdukty: podepnijProdukty,
+      bledyTeraz: function () { return bledy.slice(); },
+      wyczyscBledy: function () { bledy = []; }
     }
   };
 })(typeof window !== 'undefined' ? window : this);

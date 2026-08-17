@@ -11712,3 +11712,226 @@ repo ma nieść tylko to, co dotyczy embeda. Plik wyjęty do katalogu wyjściowe
 Do commita idą wyłącznie `STAN.md` i `HANDOFF--kontrakt-tresci-parsera` (poprawka
 `czas-przygotowania` → `czas-minuty` w rozdz. 5.3 i w liście kontrolnej poz. 10,
 plus ostrzeżenie o bliźniaczym polu tekstowym w CMS).
+
+### Weryfikacja po „deploy poszedł" — NIC NIE DOTARŁO NA GITHUB `[V]` 2026-08-17 17:5x
+
+Operator zgłosił, że deploy przeszedł. **Pomiar mówi co innego, i mówi to trzema
+niezależnymi torami, które się zgadzają.**
+
+**1. Lista przebiegów Actions** (`/actions/runs`, publiczne API):
+
+| nr | sha | próba | wynik |
+|---|---|---|---|
+| **27** | `ef29c2f` | **1** | **failure** |
+| 26 | `e550ac4` | 1 | success |
+
+**Nie ma przebiegu #28, a #27 ma `run_attempt: 1`** — czyli nie było ani nowego
+pusha, ani ponowienia zadania z interfejsu.
+
+**2. Stan gałęzi `main` na GitHubie** (`/commits/main`): wiadomość commita to wciąż
+`D-39.59 inaczej: …` z 15:39Z. **Commit `f5f7f5c` nie doszedł.**
+Lokalnie `git status -sb` → `main...origin/main [ahead 1]`.
+
+**3. Zawartość serwowana przez Pages**, dopytana z omijaniem cache (`?bust=`,
+`cache:'reload'`) — bez zmian: 41 954 znaki, `last-modified` 13:45 GMT.
+
+**Łańcuch domyka się co do znaku.** Rozmiary artefaktu w trzech commitach:
+
+```
+e550ac4 → 41 954 znaków, bez „inaczej"   ← to leży na Pages
+ef29c2f → 41 982 znaków, z „inaczej"
+f5f7f5c → 41 982 znaków, z „inaczej"     ← to leży tylko lokalnie
+```
+
+Pages serwuje dokładnie `e550ac4`, czyli **ostatni udany deploy (#26)**. To nie jest
+zwietrzały cache brzegowy — to prawdziwa treść źródła.
+
+**Wniosek: `git push` nie wykonał się.** Commit `f5f7f5c` powstał lokalnie (jest
+w logu), więc `add` i `commit` przeszły; padło albo zostało pominięte samo wypchnięcie.
+
+**Metodycznie:** „deploy poszedł" jest raportem o wykonaniu komendy, nie o skutku.
+Trzy tory pomiaru — lista przebiegów, wskaźnik gałęzi, treść na Pages — kosztowały
+minutę i były zgodne. Warto trzymać ten zestaw jako stałą procedurę po każdym pushu,
+bo każdy z nich osobno da się źle odczytać.
+
+### Sprawdzenie powtórne — zero ruchu `[V]` 2026-08-17 18:01
+
+Ten sam zestaw trzech torów, wynik identyczny co do znaku:
+
+- Actions: najwyższy przebieg to nadal **#27, `ef29c2f`, failure, próba 1**. Brak #28.
+- `main` na GitHubie: wiadomość wciąż `D-39.59 …`, `2026-08-17T15:39:50Z`.
+- Pages: parser 41 954 znaki, runtime 50 470, `last-modified` 13:45 GMT.
+- Lokalnie: `main...origin/main [ahead 1]`; `git reflog show origin/main` ma na
+  szczycie `ef29c2f … update by push` — **ostatnie udane wypchnięcie to nadal to
+  sprzed dwóch godzin.**
+
+**ZNALEZISKO O SOBIE, ważniejsze niż powyższe.** `.git/index.lock` istnieje znowu,
+znacznik czasu **18:01:10 — sekundę przed odczytem, czyli powstał od MOJEGO
+`git status`**. Git uruchamiany przez most Cowork tworzy plik blokady i nie potrafi
+go usunąć (to jest dokładnie ta przyczyna, dla której zakaz gita w CLAUDE.md
+obowiązywał do 2026-08-15, a zgoda jest warunkowa i ten katalog warunku nie spełnia).
+
+Znaczenie praktyczne: **`git push` blokady indeksu nie potrzebuje**, więc nie to
+zatrzymało wypchnięcie. Ale **`git add` i `git commit` już tak** — czyli każde moje
+„sprawdzenie" psuło operatorowi następną komendę zapisującą. Dwa razy z rzędu
+kazałem mu usuwać locka, którego sam przed chwilą założyłem.
+
+**Decyzja: w tym katalogu nie uruchamiam gita, także do odczytu.** Stan gałęzi
+odczytuję z publicznego API GitHuba, treść — z Pages. Oba tory są zewnętrzne wobec
+tego repozytorium i żadnego pliku w nim nie dotykają.
+
+### WDROŻONE `[V]` 2026-08-17 18:03
+
+Push wykonany przez operatora: `ef29c2f..f5f7f5c  main -> main`. Wcześniejsze
+„deploy poszedł" dotyczyło więc innej komendy niż push — trzy tory pomiaru miały rację.
+
+- Przebieg **#28**, `f5f7f5c`, próba 1 → **success**.
+- Pages, parser: **41 982 znaki**, `last-modified` 16:02:34 GMT, `"kryterium","inaczej"` → **obecne**.
+- Pages, runtime: 50 470 znaków, bez zmian (`D-39.59` był poprawką wyłącznie parsera).
+
+`D-39.59` jest na produkcji artefaktów. Padnięty #27 nie wymaga ponowienia — #28
+wdrożył drzewo zawierające jego zawartość.
+
+**Pozostaje podbicie `?v=` w Webflow.** Na opublikowanej stronie oba tagi mają dziś
+`?v=39-58`, więc czytelnik dostaje z cache stary parser mimo świeżego pliku na Pages.
+
+### `D-39.59` potwierdzone na stagingu `[V]` 2026-08-17 18:0x
+
+Oba tagi na stronie niosą `?v=39-59`. Model odczytany z `MP.przepis.zaladuj()`
+na „Kurczaku teriyaki", krok #3:
+
+```
+krok.inaczej : "Zamiast smażyć, upiecz kostki w 220°C przez 20 minut…"
+krok.tekst   : "…aż szczypta skrobi **od razu zasyczy**. Zamiast smażyć, upiecz…"
+/inaczej\s*:/ w tekście któregokolwiek kroku → FALSE
+```
+
+Osobne pole w modelu, doklejone drugie zdanie, **słowo „inaczej:" nie wycieka**.
+9 kroków, 0 ostrzeżeń.
+
+#### Znalezisko 1 — gwiazdki dojeżdżają do czytelnika `[I]`
+
+`krok.tekst` niesie `**od razu zasyczy**` z dosłownymi gwiazdkami. Zmierzone
+w artefakcie runtime'u: **zero wystąpień `**`, zero `strong`** — czyli warstwa
+widoku nie ma niczego, co by je zdjęło albo pogrubiło. Parser MA taką funkcję
+(`z()`: `/\*\*([^*]+)\*\*/g → "$1"`), ale **stosuje ją do pytań FAQ, nie do treści
+kroku**.
+
+`[I]`, nie `[V]`: nie udało mi się wyrenderować ekranu kroku programowo
+(`MP.tryb.otworz()` + `pokazKrok()` zostawiają `ekranTeraz() === 'start'`, klikanie
+przycisków z konsoli też nie przestawia ekranu). Wniosek opiera się na tym, że
+w widoku **nie istnieje kod, który mógłby gwiazdki obsłużyć**.
+
+Dwie drogi, decyzja Twoja:
+- **taniej:** puścić `krok.tekst` przez istniejące `z()` — gwiazdki znikają, tekst zostaje;
+- **zgodnie z intencją autora:** wyrenderować `**…**` jako `<strong>`, ale to zmiana
+  w widoku i wymaga sprawdzenia, czy design przewiduje pogrubienie w treści kroku.
+
+Trzecia droga to hand-off: zasada „nie używaj gwiazdek" już tam stoi (poz. 9),
+tylko treść w CMS jej nie przestrzega.
+
+#### Znalezisko 2 — błąd danych CMS `[V]`
+
+Panel walidacji zwraca jeden błąd:
+
+```
+składnik #kurczak odsyła do produktu "filet-z-piersi-kurczaka",
+którego nie ma w produkty-w-przepisie
+```
+
+To brak w danych, nie w kodzie — do uzupełnienia po stronie itemu CMS.
+
+### `D-39.60` + `D-39.61` — CR-1 i CR-2 sesji treściowej `[V]` 2026-08-17
+
+**CR-1** · `KLUCZE_NIEOBSLUGIWANE['wariant']` przestaje doradzać `inaczej:`.
+Nowe brzmienie: „napisz to jako drugie zdanie treści kroku". Powód mocniejszy niż
+w zgłoszeniu: ostrzeżenie trafia do autora w jedynej chwili, gdy on NA PEWNO edytuje
+ten tekst — rada na ścieżkę wycofywaną gwarantuje wtedy drugą edycję.
+
+**CR-2** · `podepnijProdukty` rozdziela „brakuje jednej rzeczy" od „nie ma całego
+źródła". Licznik `wezlow`; `wiazane` i `if (!wiazane.length) return;` PRZED
+sprawdzeniem licznika; przy zerze węzłów osobny błąd z listą kluczy i jawnym
+„NIE poprawiaj pola produkty-w-przepisie".
+
+**Nowy przyrząd:** `narzedzia/suchy-bieg-mostu-produktow.js` — cztery przypadki
+A–D, kod wyjścia 0/1. Gałąź „zero węzłów" jest strukturalnie niewidoczna dla
+zwykłego sprawdzianu: gdzie most działa, nigdy się nie wykona; gdzie nie działa,
+nie ma jak porównać jej z pozostałymi. Wynik: **cztery na cztery zgodne**
+z tabelą z CR-a. Przy okazji `_wewnetrzne` dostaje `bledyTeraz`/`wyczyscBledy` —
+bez nich test musiałby podmieniać `Array.prototype.push`, czyli sprawdzać przez pułapkę.
+
+#### SPROSTOWANIE — moje `[V]` o „błędzie danych CMS" było fałszywe
+
+Godzinę wcześniej zaraportowałem operatorowi ten sam objaw jako „brak w itemie,
+nie w kodzie" i oznaczyłem `[V]`. **Podstawą był wyłącznie komunikat panelu
+walidacji — czyli tekst, który sam napisałem.** Sesja treściowa sprawdziła pole
+w CMS ORAZ liczbę węzłów w DOM: pole wypełnione, węzłów zero. Usterka szablonu.
+
+**Kształt pomyłki do zapamiętania: komunikat diagnostyczny nie jest dowodem na to,
+co twierdzi — jest dowodem na to, że wykonała się jego gałąź.** Szczególnie gdy
+czyta go autor tego samego kodu. To siódmy przypadek w tym łańcuchu tej samej klasy.
+
+#### Znalezisko uboczne — `**pogrubienie**` rozjeżdża powierzchnie `[V]`
+
+`generuj-html.mjs` ma `wyroznienia()` → `<strong>$1</strong>`, świadomie jako jedyny
+element mikroskładni. `bezZakreslen()` w parserze zdejmuje gwiazdki do gołego tekstu.
+Zmierzone na `kurczak-teriyaki-przepis`: `krok.tekst` z gwiazdkami, `krok.tekstHtml`
+bez gwiazdek i bez `<strong>`.
+
+**Czytelnik NIE widzi gwiazdek** — sprawdzone, zanim poszedł fałszywy alarm; pierwsza
+wersja tego znaleziska twierdziła, że widzi, i była nieprawdą, bo widok bierze
+`tekstHtml`, nie `tekst`. **Traci natomiast wyróżnienie postawione świadomie.**
+
+Nie zmieniam jednostronnie: to pytanie o design kroku, nie o parser. Zmiana kosztuje
+`'$1'` → `'<strong>$1</strong>'` i nie rusza bezpieczeństwa (`escapeHtml` stoi przed
+podstawieniem, wyjście i tak idzie przez `innerHTML`). **Czeka na decyzję operatora.**
+
+Kontrakt dla redakcji poprawiony w obie strony — poprzednie „`**tekst**` NIE RYSUJE
+NICZEGO" było prawdziwe o trybie gotowania i nieprawdziwe o stronie.
+
+#### Artefakty
+
+| | znaków | gzip |
+|---|---|---|
+| `przepis-parser.min.js` | 42 410 | **16 696 B** (budżet 20 kB, zapas 3,3 kB) |
+| `tryb-gotowania.min.js` | 50 470 | 14 084 B — **identyczny co do znaku** z poprzednim |
+
+### Reguła: dokumenty międzyłańcuchowe wychodzą z repo `[U]` 2026-08-17
+
+Decyzja operatora: „handoff należy wypisać z repo, **ten i każdy inny**".
+
+**Kryterium — jedno pytanie:** czy adresatem dokumentu jest inna sesja/łańcuch,
+czy ten embed? Handoff, handback, CR i delta to **korespondencja**: powstają raz,
+są czytane raz przez kogoś innego, a po dostarczeniu nie opisują już żadnego stanu.
+Repo ma nieść stan trybu gotowania, nie archiwum poczty.
+
+**Dlaczego tu w ogóle trafiały:** bo powstają w katalogu roboczym. Czyli z powodu
+mechaniki narzędzia, nie z powodu przynależności — a to jest dokładnie ten rodzaj
+przyczyny, którego nie wolno „zapamiętać". Stąd wpis w `.gitignore`, a nie notatka.
+
+**Wychodzą (8 plików, `git rm --cached`):**
+`CR--autostart-qr`, `CR--wartosci-porcja`, `CR--zdjecie-glowne`,
+`DELTA--dla-sesji-rownoleglej`, `HANDOFF--kontrakt-tresci-parsera`,
+`HANDOFF--tresc-przepisu`, `HANDOFF-2026-08-17`.
+`HANDBACK--dla-lancucha-szablonu` nigdy nie był śledzony — nic z nim nie robimy.
+
+**Zostają** — opisują TEN embed: `WYMAGANIA`, `PAKIET-INTEGRACYJNY`, `GEOMETRIA`,
+`INTERAKCJE`, `MATRYCA`, `REJESTR-LUK`, `DEPLOY`, `STAN`, `PATCH--WYMAGANIA-*`.
+
+**Rozstrzygnięte tego samego dnia (operator): materiał promptowy też wychodzi.**
+`PROMPT-KOPIA-*.md` i `PROPOZYCJA-*.md` opisują, JAK pracuje sesja, a nie CO robi
+tryb gotowania. Mają zresztą własny dom — `git\tech\lancuchy\` trzyma SZABLON-PROMPTU,
+PROTOKOL-ARBITRAZU i REJESTR-ZASOBOW, czyli prompt jako KLASĘ. Kopia promptu sprzed
+konkretnego przebiegu jest migawką INSTANCJI i starzeje się w tym samym tempie,
+w jakim traci znaczenie.
+
+`PROPOZYCJA-*` wzięte szeroko celowo: propozycja jest z definicji pismem do kogoś,
+a nie opisem stanu — a gdy zostanie przyjęta, jej treść trafia do dokumentu,
+który stan opisuje.
+
+Dodatkowo wychodzą (4 pliki): `PROMPT-KOPIA-przed-D-32.2`, `PROMPT-KOPIA-przed-D-36.1`,
+`PROPOZYCJA-ZMIANY-PROMPTU--przeb-36`, `PROPOZYCJA-promptu-harmonogramu-v2`.
+**Razem 11 plików wypisanych z indeksu.**
+
+**Historia zostaje.** `git rm --cached` zdejmuje z indeksu, nie z przeszłości —
+kto potrzebuje starego handoffu, znajdzie go w commitach. Pliki zostają na dysku.
