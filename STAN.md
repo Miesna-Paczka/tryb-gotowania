@@ -10094,3 +10094,156 @@ komentarz w polu niesie powód i zakaz `async`. **Publish po stronie operatora.*
 robiony tuż po `load` musi to uwzględnić** — sonda czytająca `window.MP` synchronicznie
 zaraz po wczytaniu strony może teraz zobaczyć `undefined` tam, gdzie wcześniej widziała
 obiekt. To nie będzie regres produktu, tylko regres przyrządu; nie mylić.
+
+### PRZEWIJANIE ROZWINIĘTEJ LISTY — 2026-08-17, sesja `tryb-gotowania-domkniecie`
+
+Zgłoszenie operatora, trzeci raz: *„gdy rozwijam listę składników, nie mogę przewinąć
+w dół do jej końca; kilkukrotnie wracałeś z fałszywą informacją, że problem został
+rozwiązany"*. Powierzchnia: staging `miesna-paczka-ea5c01.webflow.io`, kod z GitHub
+Pages = `origin/main` = **`43b9cda`** (lokalne `HEAD` = `1be0be3`, **2 commity przed
+operatorem, niewypchnięte**).
+
+#### 1. PRZYRZĄD NIE UMIE ZADAĆ GESTU DO RAMKI — pomiar unieważniony kontrolą
+
+Mierzyłem w `iframe` 386 px osadzonej w tej samej stronie (ta sama technika, co
+2026-08-16). Gest kółkiem przez sterownik, punkt wewnątrz listy:
+
+| | przed | po geście |
+|---|---|---|
+| `TOP.scrollTop` (zapas 107) | 0 | **0** |
+| `scrollY` dokumentu RAMKI | 0 | 0 |
+| `scrollY` strony ZEWNĘTRZNEJ | 0 | **500** |
+
+Wyglądało to na dokładne potwierdzenie zgłoszenia i **prawie tak to zaraportowałem.**
+Kontrola to obaliła: **zamknąłem overlay**, przez co dokument ramki odzyskał 5443 px
+zapasu i pełną przewijalność, po czym powtórzyłem **ten sam gest w ten sam punkt**:
+
+| | po geście |
+|---|---|
+| `scrollY` RAMKI (zapas 5443) | **0** |
+| `scrollY` strony zewnętrznej | **500** |
+
+**`mcp__claude-in-chrome__computer` / `scroll` nie dostarcza zdarzenia kółka do
+zawartości `iframe` — kieruje je do dokumentu najwyższego poziomu, niezależnie od
+tego, co jest pod kursorem.** Wniosek jest przenośny i drogi:
+
+> **Każdy wynik przewijania zmierzony gestem W RAMCE jest nieważny.** Dotyczy to
+> także pomiaru z 2026-08-16, na którym oparto `D-39.23` (`overscroll-behavior:
+> contain`) — jego tabela „przed / po" ma tę samą wadę konstrukcyjną, więc
+> **`D-39.23` nie ma dowodu skuteczności.** Nie znaczy to, że jest błędne; znaczy,
+> że nie jest zmierzone.
+
+To jest trzecie wystąpienie tej samej rodziny błędu w tym łańcuchu (`.click()` wobec
+`elementFromPoint` · `top.scrollTop = n` wobec palca · teraz gest wobec ramki):
+**przyrząd omija warstwę, w której mieszka defekt, i wraca z zielenią.**
+
+#### 2. „13 px obcięcia listy" NIE ISTNIEJE — `D-39.21` celowało w widmo
+
+Rozkład `.mp-tryb__reszta` w stanie otwartym, staging, ramka 386 px `[V]`:
+
+| składnik | px |
+|---|---|
+| `.mp-tryb__linia` | 1 |
+| `.mp-tryb__naglowek-sekcji` | 16 |
+| `.mp-tryb__skladniki` | 360 |
+| suma dzieci | **377** |
+| 2 × `gap: 8px` | **16** |
+| **razem** | **393** |
+| `clientHeight` | **393** |
+| `scrollHeight` | 406 |
+
+**Pudełko ma dokładnie wysokość swojej zawartości.** Ostatni wiersz
+(`1 łyżeczka ziaren sezamu`) ma `bottom = 627`, kontener ma `bottom = 627` —
+**krawędzie są równe co do piksela, nic nie jest przycięte.** Różnica 13 px między
+`scrollHeight` a `clientHeight` nie jest kawałkiem listy i nigdy nim nie była.
+
+Przez trzy przebiegi liczba 13 była traktowana jako „trzynaście pikseli treści pod
+`overflow:hidden`" i to ona uzasadniła `overflow:visible`, `min-height:max-content`
+oraz liczbowy bezpiecznik `r.style.minHeight` w `domknij()`. **Reguły są dziś żywe
+na stagingu i zmierzone jako obowiązujące** (`overflow: visible`, `min-height:
+max-content`), a mimo to `scrollHeight` dalej daje 406 — bo nie miały czego naprawić.
+
+`[I]` Hipoteza o pochodzeniu tych 13 px (NIE zweryfikowana, nie wprowadzać na jej
+podstawie żadnej zmiany): `scrollHeight` zaokrągla w górę i sumuje inaczej niż
+`clientHeight` przy zagnieżdżonych kolumnach flex z `gap`. Kierunek sprawdzenia:
+policzyć `getBoundingClientRect().bottom` najniższego POTOMKA rekurencyjnie i
+porównać z krawędzią kontenera.
+
+#### 3. Geometria, która obroni się bez gestu — i ona zgłoszenie POTWIERDZA
+
+Ramka 386 × **616** px (realny telefon), krok 1, lista rozwinięta `[V]`:
+
+| | px |
+|---|---|
+| `TOP.clientHeight` | 616 |
+| `TOP.scrollHeight` | 723 |
+| **zapas przewijania** | **107** |
+| `bottom` ostatniego wiersza | **627** |
+| `bottom` TOP-u | 616 |
+
+**Ostatni wiersz stoi 11 px pod krawędzią ekranu i bez przewinięcia jest
+nieosiągalny.** Zgłoszenie operatora opisuje więc stan realny; sporne jest wyłącznie,
+czy gest go przewija — a tego tym przyrządem stwierdzić NIE MOŻNA.
+
+Kontrola wysokości: w ramce **840** px ta sama treść kończy się na `643` przy zapasie
+**0**. **To wyjaśnia, dlaczego objaw uciekał kolejnym sesjom** — mierzono w oknie
+wyższym, niż ma telefon, gdzie przewijanie w ogóle nie jest potrzebne.
+
+#### 4. Znaleziska poboczne, zmierzone przy okazji
+
+- **`defer` NIE JEST opublikowany.** Oba znaczniki na stagingu mają `defer === false`
+  `[V]`. Zmiana szablonu z `D-39.29` czeka na **Publish** operatora.
+- **W dokumencie stoją DWA elementy trybu**: pusty `#mp-tryb-gotowania` oraz żywy
+  `#mp-tryb` (belka · top · bottom · scrim · scrim-poziom). Pusty wygląda na osad po
+  starszej wersji. Nieszkodliwy, ale mylący dla każdej sondy szukającej po `id`.
+- Oba scrimy mają `display:none` w stanie kroku — **nie one przechwytują gest**;
+  `elementsFromPoint` w punkcie listy daje czysty stos aż do `.mp-tryb__top`.
+- **Blokada gita:** `.git/index.lock` jest osierocony i piaskownica nie umie go usunąć
+  (`Operation not permitted`). **Commit lokalny w tej sesji jest niemożliwy** — wbrew
+  kadencji „commit po każdej jednostce". Ten wpis nie ma commita.
+
+#### 5. Czego potrzebuję, żeby pójść dalej
+
+1. **Na jakim urządzeniu i w jakiej przeglądarce widzisz objaw.** Dotyk to inna
+   ścieżka niż kółko (`-webkit-overflow-scrolling`, `overscroll-behavior`, pasek
+   adresu zmieniający wysokość) i bez tego dobiorę zły przyrząd po raz czwarty.
+2. Przyrząd zdolny zadać gest dotykowy w wąskim viewporcie. `resize_window` **nie
+   zmienia** `innerWidth` tej karty (zostaje 2560) — zmierzone.
+
+### SONDA NA URZĄDZENIU + kontrola publikacji — 2026-08-17
+
+**Urządzenie operatora ustalone: iPhone 17 Pro Max, Chrome na iOS, dotyk.** Chrome
+na iOS to **WebKit, nie Blink** — czyli silnik, na którym w całej historii tego
+łańcucha **nie powstał ani jeden pomiar**. Wszystkie 429 asercji, cała matryca i obie
+poprawki `D-39.21` / `D-39.23` zostały dobrane na Blinku. To wyjaśnia rozjazd
+„u mnie zielone, u operatora zepsute" lepiej niż którakolwiek z dotychczasowych
+hipotez i **unieważnia założenie, że pętla lokalna cokolwiek mówi o produkcie na
+telefonie**. Pozycja wiążąca dla następnej sesji, nie dopisek.
+
+Objaw doprecyzowany: **„ekran stoi całkowicie nieruchomo".** To wyklucza „za mały
+zapas" — przy zapasie 107 px ekran ruszyłby i zatrzymał się za wcześnie. Nieruchomy
+znaczy, że gest nie dociera do kontenera wcale.
+
+**Przyrząd: `sonda-przewijania.js`** (+ `sonda-DO-WKLEJENIA.html`, ta sama treść
+z komentarzami zdjętymi, generowana z pliku źródłowego skryptem — nie kopiowana,
+żeby nie mogły się rozjechać). Odpala się wyłącznie przy `?mp-sonda=1`. Rozstrzyga
+binarnie: licznik `m` (touchmove) rośnie a `st` (scrollTop) stoi → kontener odmawia,
+przyczyna w CSS; `m` stoi → zdarzeń nie ma, przyczyna w trafianiu.
+
+Dwie własności czynią z niej przyrząd, a nie ingerencję, i **nie wolno ich zdjąć**:
+panel ma `pointer-events:none` (nie przechwyci dotknięcia, więc nie zmienia tego, co
+mierzy), a nasłuchy są `{passive:true, capture:true}` — `passive` odbiera im prawo do
+`preventDefault()`, `capture` na `document` stawia je przed każdym `stopPropagation()`
+w produkcie. Składnia zweryfikowana `new Function()` w Node `[V]`.
+
+**Idzie NIE do artefaktu, tylko do wklejenia w custom code.** Dwa powody: diagnostyka
+w artefakcie produkcyjnym zostaje tam na zawsze, a `terser -c -m` **wiesza się na
+`tryb-gotowania.js` w tej piaskownicy** (dwa uruchomienia, 120 s i 178 s, zero
+wyniku) — więc `.min.js` i tak nie dałoby się odtworzyć. Odtwarzalność builda
+pozostaje NIESPRAWDZONA w tej sesji; poprzednie potwierdzenie jest z 2026-08-15.
+
+**Kontrola publikacji operatora `[V]`:** oba znaczniki embedu mają teraz
+`defer === true`. `D-39.29` domknięte po stronie szablonu.
+(Nazwy plików wróciły jako `[BLOCKED: JWT token]` — sanityzator `javascript_tool`
+zadziałał na adresie z `github.io`. Obejście zadziałało: czytany był ODDZIELNY
+atrybut strukturalny, nie tekst adresu. Katalog pułapek §4 potwierdzony po raz drugi.)
