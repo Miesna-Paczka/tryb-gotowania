@@ -57,6 +57,27 @@
 
   var UŁAMKI = { '½': 0.5, '¼': 0.25, '¾': 0.75, '⅓': 1 / 3, '⅔': 2 / 3, '⅛': 0.125 };
   var KLUCZE_KROKU = ['czas', 'minutnik', 'skladniki', 'kryterium', 'foto'];
+
+  /* `D-39.57` (CR `inaczej:`) · ZNACZNIKI ZNANE, ALE NIEOBSŁUGIWANE.
+     Zgłoszenie sesji treściowej 2026-08-17: `instrukcja-pisania-przepisow.md`
+     wymagała od 2026-08-12 wiersza `inaczej:`, którego parser nigdy nie znał.
+     Wiersz wpadał do treści razem ze słowem „inaczej:", bez błędu i bez ostrzeżenia.
+
+     **Rozpoznawanie kluczy jest z założenia ciche** i to jest słuszne — „Uwaga:
+     nie mieszaj" ma być prozą, nie kluczem. Ale przez tę ciszę znacznik zdefiniowany
+     w spec i nigdy niezaimplementowany **wygląda identycznie jak literówka**,
+     czyli nie wygląda nijak. Ta lista przywraca różnicę: słowa, o których wiemy,
+     że ktoś może ich użyć w dobrej wierze, dostają ostrzeżenie zamiast ciszy.
+
+     To NIE jest lista wszystkich literówek — takiej nie da się napisać. To lista
+     znaczników, które **istniały w dokumentach**. Dopisuj tu każdy odrzucony
+     i zawieszony, zamiast liczyć, że ktoś przeczyta zmianę w instrukcji. */
+  var KLUCZE_NIEOBSLUGIWANE = {
+    'inaczej': 'rozgałęzienie kroku — zawieszone, patrz CR z 2026-08-17; ' +
+               'napisz je jako drugie zdanie treści kroku',
+    'wariant': 'odrzucone 2026-08-12 (kolizja z taksonomią kart) — ' +
+               'użyj drugiego zdania treści kroku'
+  };
   var JEDNOSTKI_UŁAMKOWE = ['łyżka', 'łyżeczka', 'szklanka'];
 
   /* Odmiana przez liczebnik. Polski ma cztery formy istotne dla przepisu, więc
@@ -399,6 +420,14 @@
       if (!biezacy) { blad('treść przed pierwszym krokiem: "' + s + '"'); return; }
 
       var m = s.match(/^([a-ząćęłńóśźż]+)\s*:\s*([\s\S]*)$/i);
+      /* D-39.57 — znacznik znany z dokumentów, ale nieobsługiwany: ostrzegamy
+         i PUSZCZAMY DALEJ do treści. Nie błąd, bo tekst nie ginie; nie cisza,
+         bo redakcja ma prawo wiedzieć, że jej znacznik nic nie robi. */
+      if (m && KLUCZE_NIEOBSLUGIWANE[m[1].toLowerCase()]) {
+        ostrzez('krok „' + (biezacy.tytul || '?') + '": znacznik „' + m[1].toLowerCase() +
+                ':" NIE JEST obsługiwany przez parser — wiersz trafi do treści kroku ' +
+                'razem z tym słowem. ' + KLUCZE_NIEOBSLUGIWANE[m[1].toLowerCase()] + '.');
+      }
       if (m && KLUCZE_KROKU.indexOf(m[1].toLowerCase()) >= 0) {
         var k = m[1].toLowerCase(), v = m[2].trim();
         if (k === 'czas') biezacy.czas = v;

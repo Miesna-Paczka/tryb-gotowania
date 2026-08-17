@@ -11568,3 +11568,70 @@ miejscu"). Bez tego produkt mówiłby o funkcji, którą właśnie usunięto.
 checkbox jest widoczny, ale **nie reaguje na tapnięcie** · składnik przechodzi do
 sekcji **„wykorzystane"** sam, po minięciu kroku, w którym był użyty · „skopiuj
 składniki" kopiuje to, czego nie zaznaczono w arkuszu.
+
+### `D-39.57` · ODPOWIEDŹ NA CR `inaczej:` — WARIANT B + C, ROZSTRZYGNIĘTY FIGMĄ
+
+CR sesji treściowej potwierdzony: `KLUCZE_KROKU` ma pięć pozycji, `inaczej` nie jest
+jedną z nich, wiersz wpada do treści razem ze słowem. **Odtworzone ich dokładnym
+wejściem `[V]`.**
+
+**Rozstrzygnięcie A/B zapadło ODCZYTEM FIGMY, nie preferencją.** Sesja treściowa
+sama postawiła warunek: „A tylko wtedy, gdy rysunek istnieje". Przeszukanie zestawu
+`7195:10893`: **`inaczej` — 0 trafień, `wariant` — 0 trafień.** Klatki nie ma.
+
+Ale ważniejsze jest to, co w zestawie JEST. Dwie klatki niosą rozgałęzienie
+**jako drugie zdanie treści kroku**:
+
+> `7457:12536` i `7468:103101`: „Wlej passatę i bulion (…) Wymieszaj.
+> **Jeśli nie masz passaty, zmiksuj** (…)"
+
+**To nie jest brak rysunku dla rozgałęzienia — to jest rysunek pokazujący, że
+rozgałęzienie ma być zdaniem.** Wariant B nie jest więc ustępstwem wobec braku
+klatki, tylko zgodnością z projektem. Pomiar teriyaki (39 słów, 18+18) zostaje
+w mocy jako argument za BUDŻETEM „maks jedno zdanie rozgałęzienia", a nie za
+osobnym wierszem.
+
+**Wariant C wdrożony** (`KLUCZE_NIEOBSLUGIWANE`). Zmierzone na wejściu z CR-u:
+
+```
+błędy: 0   ostrzeżenia: 1
+  → krok „zarumień mięso": znacznik „inaczej:" NIE JEST obsługiwany przez parser
+    — wiersz trafi do treści kroku razem z tym słowem. rozgałęzienie kroku —
+    zawieszone (…) napisz je jako drugie zdanie treści kroku
+tekst kroku → "Smaż, aż się zarumieni. inaczej: jeśli patelnia jest mała…"
+```
+
+Lista niesie dziś `inaczej` i `wariant`. **To nie jest lista literówek** — takiej
+nie da się napisać. To lista znaczników, które **istniały w dokumentach**; każdy
+odrzucony i zawieszony ma tu trafiać, zamiast liczyć na to, że ktoś przeczyta
+zmianę w instrukcji.
+
+### `D-39.58` · W ARKUSZU PUNKTORY, NIE CHECKBOXY — i to UNIEWAŻNIA `D-39.55`
+
+Polecenie operatora: *„inaczej przepuścimy wewnętrznie sprzeczny mechanizm (na
+starcie mogę sam wykreślać, ale na krokach już nie? użytkownika będzie to
+konfundować)"*.
+
+**Argument jest rozstrzygający i kasuje moje rozwiązanie sprzed dwóch godzin.**
+`D-39.55` rozdzielał „mam w domu" od „wykorzystałem" na dwa zbiory, dwa atrybuty
+i dwa wykończenia. Semantycznie było to poprawne i nadal tak uważam — **ale
+semantyka, której użytkownik nie odczyta z ekranu, nie jest rozwiązaniem, tylko
+drugą pułapką.** Ten sam kwadrat w dwóch miejscach, raz klikalny, raz nie, jest
+mylący niezależnie od tego, jak czysto rozdzielony jest model pod spodem.
+
+`mamWDomu` usunięte w całości. **Konsekwencja przyjęta świadomie: „skopiuj
+składniki" kopiuje odtąd CAŁĄ listę**, bo nie ma czym filtrować. Podpowiedź arkusza
+(„zaznacz, co masz w domu, reszta zostanie na liście zakupów") **przepisana** —
+obietnica bez mechanizmu byłaby trzecim wcieleniem tego samego błędu.
+
+**Punktor rysuje CSS, nie znak i nie glif fontu.** Kropka nie jest ikoną, więc nie
+ma powodu wołać o nią do subsetu ani wstawiać substytutu Unicode — tych pozbyliśmy
+się dziś w `D-39.32`–`D-39.36`. Szerokość pudełka równa checkboxowi (16 + 8), żeby
+rytm kolumny tekstu był ten sam w arkuszu i na kroku.
+
+**W całym produkcie nie ma już ani jednej kontrolki zaznaczania składnika.**
+Stan „wykorzystane" nadaje wyłącznie postęp przepisu.
+
+**Artefakty:** parser 41 954 znaki / **16 272 B gzip** · runtime 50 470 znaków /
+**13 971 B gzip**. Runtime zmalał trzeci raz z rzędu — usuwanie mechanik waży mniej
+niż ich opis.

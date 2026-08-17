@@ -1218,11 +1218,13 @@
 
        **Pas dolny arkusza dostaje safe-area**, tak samo jak pas produktu — inaczej
        CTA wchodziłoby pod wskaźnik gestu iPhone'a. */
-    /* D-39.55 — wiersz „mam w domu" dostaje WYŁĄCZNIE wypełnione pudełko.
-       Przekreślenie zostaje zarezerwowane dla `data-odhaczony` i `[data-stan=zuzyty]`,
-       bo niesie „wykorzystany", a nie „posiadany". Bez tego rozdzielenia arkusz
-       mówiłby, że zużyłeś składniki, których jeszcze nie tknąłeś. */
-    '#' + ID + ' .mp-tryb__wiersz[data-mam] .mp-tryb__nazwa-skl{text-decoration:none}' +
+    /* D-39.58 — punktor arkusza: kropka rysowana CSS-em, nie znakiem i nie glifem.
+       Szerokość pudełka równa checkboxowi (16 + 8 odstępu), żeby rytm kolumny tekstu
+       był ten sam w arkuszu i na kroku. */
+    '#' + ID + ' .mp-tryb__punktor{flex:0 0 auto;width:16px;height:16px;' +
+      'margin-right:8px;position:relative}' +
+    '#' + ID + ' .mp-tryb__punktor::after{content:"";position:absolute;left:6px;top:6px;' +
+      'width:4px;height:4px;border-radius:50%;background:var(--mp-atrament)}' +
     '#' + ID + ' .mp-tryb__arkusz-scrim{position:absolute;inset:0;z-index:5;display:none;' +
       'background:color-mix(in srgb,var(--mp-atrament) 45%,transparent)}' +
     '#' + ID + '[data-arkusz] .mp-tryb__arkusz-scrim{display:block}' +
@@ -1728,82 +1730,52 @@
      każdej zmianie kroku, więc stan trzymany w DOM-ie ginąłby na `pokazKrok`.
      Klucz składnika, nie indeks — ten sam składnik wraca w wielu krokach. */
 
-  /* `D-39.55` · „MAM TO W DOMU" I „WYKORZYSTAŁEM TO" TO DWA RÓŻNE STANY.
-     Zgłoszenie operatora 2026-08-17 i **usterka w moim własnym projekcie z `D-39.45`**,
-     sprzed dwóch godzin. Uzasadniłem wtedy wspólny zbiór zdaniem „ten sam składnik,
-     ten sam użytkownik" — i to było pomylenie tożsamości składnika z tożsamością
-     STANU.
+  /* `D-39.58` · W ARKUSZU NIE MA CHECKBOXÓW — SĄ PUNKTORY.
+     Polecenie operatora 2026-08-17: *„inaczej przepuścimy wewnętrznie sprzeczny
+     mechanizm (na starcie mogę sam wykreślać, ale na krokach już nie? użytkownika
+     będzie to konfundować)"*.
 
-     W arkuszu startowym ptaszek znaczy **„mam to w domu"**: podpowiedź mówi wprost
-     „zaznacz, co masz w domu, reszta zostanie na liście zakupów". W kroku ten sam
-     ptaszek znaczy **„wykorzystałem to"** i nosi przekreślenie (`D-39.25`), które
-     jest deltą stanu ZUŻYTY. Wspólny zbiór dawał więc absurd: zaznaczenie oliwy
-     w spiżarni przekreślało ją w kroku 1, zanim ktokolwiek jej użył.
+     Argument jest rozstrzygający i **unieważnia mój `D-39.55`**, który dwie godziny
+     wcześniej rozdzielał „mam w domu" od „wykorzystałem" na dwa zbiory. Rozdzielenie
+     było poprawne SEMANTYCZNIE i wciąż tak uważam — ale semantyka, której użytkownik
+     nie odczyta z ekranu, nie jest rozwiązaniem, tylko drugą pułapką. Ten sam kwadrat
+     w dwóch miejscach, raz klikalny, raz nie, jest mylący niezależnie od tego,
+     jak czysto rozdzielony jest model pod spodem.
 
-     Dwa zbiory, dwa atrybuty, dwa wykończenia. `mamWDomu` **nie idzie do zapisu
-     sesji** — to stan zakupowy „na teraz", a nie postęp gotowania; tydzień później
-     spiżarnia jest inna, a nieaktualny stan byłby niewidoczny i mylący. */
-  var mamWDomu = Object.create(null);
+     `mamWDomu` usunięte w całości — po odebraniu kontrolki nie ma zapisującego.
+     **Konsekwencja, którą trzeba było przyjąć:** „skopiuj składniki" kopiuje odtąd
+     CAŁĄ listę, bo nie ma czym filtrować. Podpowiedź arkusza obiecywała „zaznacz,
+     co masz w domu, reszta zostanie na liście zakupów" i została przepisana —
+     obietnica bez mechanizmu byłaby trzecim wcieleniem tego samego błędu. */
 
   function wierszSkladnika(s, krok, stanWiersza, opcje) {
     opcje = opcje || {};
     var wArkuszu = !!opcje.arkusz;
-    var zbior = wArkuszu ? mamWDomu : null;
     var li = el('li', 'mp-tryb__wiersz');
     li.setAttribute('data-mp-klucz', s.key);
     li.setAttribute('data-stan', stanWiersza);          // teraz · dalej · zuzyty
-    /* Osobny atrybut, bo osobne wykończenie: `data-odhaczony` niesie przekreślenie
-       („zużyty"), `data-mam` samo wypełnione pudełko („mam"). */
-    if (wArkuszu && zbior[s.key]) li.setAttribute('data-mam', '');
 
-    /* `D-39.56` · W KROKU PTASZEK NIE JEST JUŻ KONTROLKĄ. Polecenie operatora
-       2026-08-17: *„albo rybki, albo akwarium"* — zaznaczanie ręczne i automatyczne
-       przenoszenie do sekcji to dwie mechaniki mówiące o tym samym, a wiersz niesie
-       jeszcze marker zamiennika, który też chce tapnięcia.
+    /* `D-39.56/58` · ANI W ARKUSZU, ANI NA KROKU NIE MA KONTROLKI.
+       Na kroku stan nadaje postęp przepisu (sekcja „wykorzystane" + przekreślenie);
+       w arkuszu nie ma stanu w ogóle, więc wiersz zaczyna się punktorem.
 
-       Odtąd: **zaznaczać można WYŁĄCZNIE w arkuszu startowym** (stan „mam w domu",
-       do listy zakupów). Na krokach składnik przechodzi do sekcji „wykorzystane"
-       SAM, z postępu przepisu — to samo, co robił `[data-stan=zuzyty]` od zawsze.
+       Punktor rysuje CSS, nie znak i nie glif fontu: kropka nie jest ikoną, więc
+       nie ma powodu wołać o nią do subsetu ani wstawiać substytutu Unicode —
+       tych właśnie pozbyliśmy się dziś w `D-39.32`–`D-39.36`.
 
-       Konsekwencja dostępności, i dlatego to nie jest `disabled` na przycisku:
-       element, który niczego nie przełącza, **nie ma prawa być `role="checkbox"`**
-       ani celem dotyku. Czytnik ekranu ogłaszałby kontrolkę, której nie ma.
-       Wiersz kroku dostaje więc `span` bez roli, bez `aria-checked` i bez
-       `.mp-tryb__cel`; stan niesie nagłówek sekcji i przekreślenie. */
-    var ptaszek = el(wArkuszu ? 'button' : 'span', 'mp-tryb__ptaszek', li);
-    if (wArkuszu) ptaszek.type = 'button';
-    /* D-39.36 — glif we własnym spanie; `textContent` na przycisku skasowałby
-       `.mp-tryb__cel`. Zaznaczony wizualnie jest też składnik ZUŻYTY, nawet gdy
-       użytkownik nigdy go nie tknął — `D-39.4`: ten stan nadaje postęp przepisu. */
-    var ptaszekGlif = el('span', 'mp-tryb__ptaszek-glif mp-ikona', ptaszek);
-    ptaszekGlif.textContent =
-      ((wArkuszu && zbior[s.key]) || (!wArkuszu && stanWiersza === 'zuzyty'))
-        ? 'check_box' : 'check_box_outline_blank';
-    ptaszekGlif.setAttribute('aria-hidden', 'true');
+       Ani jedno, ani drugie nie jest `role="checkbox"` i nie ma celu dotyku:
+       element, który niczego nie przełącza, nie ma prawa być ogłaszany jako
+       kontrolka. Stan niesie nagłówek sekcji i przekreślenie. */
     if (wArkuszu) {
-      ptaszek.setAttribute('role', 'checkbox');
-      ptaszek.setAttribute('aria-checked', zbior[s.key] ? 'true' : 'false');
-      ptaszek.setAttribute('aria-label', s.etykieta);
-      el('span', 'mp-tryb__cel', ptaszek).setAttribute('aria-hidden', 'true');
+      var punktor = el('span', 'mp-tryb__punktor', li);
+      punktor.setAttribute('aria-hidden', 'true');
     } else {
-      ptaszek.setAttribute('aria-hidden', 'true');   // D-39.56 — sam wskaźnik stanu
-    }
-    /* D-39.26 · SKŁADNIKA Z SEKCJI „ZUŻYTE" NIE DA SIĘ ODZNACZYĆ — polecenie
-       operatora 2026-08-16. Ten stan nadaje POSTĘP PRZEPISU, nie użytkownik:
-       składnik został zużyty w kroku, który jest już za nami, więc odznaczenie
-       twierdziłoby coś nieprawdziwego o przebiegu gotowania.
-       `disabled` na przycisku, nie sam brak nasłuchu: bez niego przycisk byłby
-       nadal skupialny klawiaturą i czytnik ekranu ogłaszałby go jako aktywny.
-       `aria-disabled` obok, bo `role="checkbox"` nie dziedziczy stanu z `disabled`. */
-    if (wArkuszu) {
-      /* D-39.55 — arkusz przełącza WŁASNY zbiór i nic nie zapisuje do sesji. */
-      ptaszek.addEventListener('click', function () {
-        var teraz = !mamWDomu[s.key];
-        if (teraz) mamWDomu[s.key] = true; else delete mamWDomu[s.key];
-        if (teraz) li.setAttribute('data-mam', ''); else li.removeAttribute('data-mam');
-        ptaszek.setAttribute('aria-checked', teraz ? 'true' : 'false');
-        ptaszekGlif.textContent = teraz ? 'check_box' : 'check_box_outline_blank';
-      });
+      var ptaszek = el('span', 'mp-tryb__ptaszek', li);
+      var ptaszekGlif = el('span', 'mp-tryb__ptaszek-glif mp-ikona', ptaszek);
+      ptaszekGlif.textContent =
+        stanWiersza === 'zuzyty' ? 'check_box' : 'check_box_outline_blank';
+      ptaszekGlif.setAttribute('aria-hidden', 'true');
+      ptaszek.setAttribute('aria-hidden', 'true');
     }
 
     var nazwa = el('span', 'mp-tryb__nazwa-skl', li);
@@ -2757,9 +2729,9 @@
      `dalej`: przed startem nie ma kroku bieżącego ani zużytych, więc podział na
      trzy sekcje nie miałby desygnatu — a `dalej` jest jedynym stanem, który nie
      twierdzi nic nieprawdziwego o przebiegu gotowania.
-     `D-39.55/56` — zaznaczenia arkusza żyją w `mamWDomu` i NIE mają nic wspólnego
-     z listą kroku: „mam w domu" to nie „wykorzystałem". Na krokach zaznaczać się
-     zresztą nie da, bo kontrolka tam nie istnieje. */
+     `D-39.58` — w arkuszu NIE MA już zaznaczania: wiersz zaczyna się punktorem,
+     a nie checkboxem. Zaznaczać nie da się nigdzie, bo kontrolka nie istnieje
+     ani tu, ani na krokach. */
   var arkusz = null;
 
   function zbudujArkusz() {
@@ -2780,7 +2752,9 @@
     x.setAttribute('aria-label', 'zamknij listę składników');
 
     el('p', 'mp-tryb__arkusz-podpowiedz', pud).textContent =
-      'Zaznacz, co masz w domu. Reszta zostanie na liście zakupów.';
+      // NIENARYSOWANE brzmienie: pipeline treści (tryb ui). D-39.58 — poprzednie
+      // obiecywało zaznaczanie, którego już nie ma.
+      'Wszystko, czego potrzebujesz na wybraną liczbę porcji.';
 
     var lista = el('ul', 'mp-tryb__arkusz-lista', pud);
     lista.setAttribute('role', 'list');
@@ -2817,8 +2791,8 @@
      to ma się wkleić do notatek albo do wiadomości, a nie udawać dokumentu. */
   function tekstDoSchowka() {
     var skl = (stan.widok && stan.widok.skladniki) || [];
-    return skl.filter(function (s) { return !mamWDomu[s.key]; })
-              .map(function (s) { return s.etykieta || s.nazwa || s.key; })
+    /* D-39.58 — cała lista: nie ma już czym filtrować. */
+    return skl.map(function (s) { return s.etykieta || s.nazwa || s.key; })
               .join('\n');
   }
 
@@ -3231,8 +3205,7 @@
       el: function () { return arkusz ? arkusz.el : null; },
       otwarty: function () { return !!(stan.korzen && stan.korzen.hasAttribute('data-arkusz')); },
       kopiuj: function () { return kopiujSkladniki(arkusz ? arkusz.kopiuj : null); },
-      tekstDoSchowka: tekstDoSchowka,
-      mamWDomu: function () { return Object.keys(mamWDomu); }   // D-39.55
+      tekstDoSchowka: tekstDoSchowka
     },
     tooltip: {
       przelacz: przelaczTooltip,
