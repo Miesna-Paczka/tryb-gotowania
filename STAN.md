@@ -10247,3 +10247,68 @@ pozostaje NIESPRAWDZONA w tej sesji; poprzednie potwierdzenie jest z 2026-08-15.
 (Nazwy plików wróciły jako `[BLOCKED: JWT token]` — sanityzator `javascript_tool`
 zadziałał na adresie z `github.io`. Obejście zadziałało: czytany był ODDZIELNY
 atrybut strukturalny, nie tekst adresu. Katalog pułapek §4 potwierdzony po raz drugi.)
+
+### `D-39.30` · PRZYCZYNA ZNALEZIONA I NAZWANA — rezerwa pod pas dolny była DOPEŁNIENIEM
+
+Zgłoszenie „nie mogę przewinąć rozwiniętej listy do końca", wracające od kilkunastu
+przebiegów w trzech przebraniach, ma jedną przyczynę i **nie jest nią żadna z hipotez,
+które je poprzedzały.** Rozstrzygnęła sonda uruchomiona NA URZĄDZENIU OPERATORA
+(iPhone 17 Pro Max, Chrome/WebKit), bo tylko ona dosięgała warstwy, w której defekt
+mieszkał.
+
+**Odczyt rozstrzygający `[V]`, staging, lista rozwinięta, po kilkunastu przeciągnięciach:**
+
+```
+TOP  st=0 stMax=0 sh=766 ch=766 zapas=0
+touch s=11 m=112 e=11 dY=108  scrollEv=0
+reszta h[]=— h=158px mh=158px ovf=visible c/s=158/158 b=661
+ramka  h[]=— h=482px mh=auto  ovf=visible c/s=480/480 b=724
+blok   h[]=— h=506px mh=auto  ovf=visible c/s=506/506 b=724
+pas    t=686 h=80 safe=0 TOPpb=80px blok.b=724 ukryte=38
+```
+
+**Mechanizm.** Obszar przewijania to suma PADDING BOXA kontenera i tych fragmentów
+potomków, które poza niego wystają. Dzieci TOP-u kończyły się na 724, padding box
+TOP-u sięgał 766 — nic poza niego nie wystawało, więc nadmiar **nie powstawał**,
+`scrollHeight === clientHeight`, przewijać nie było czego. Treść wjeżdżała w
+`padding-bottom` i była zakrywana przez nieprzezroczysty pas dolny. **Rezerwa
+istniała, była co do piksela poprawna (`TOPpb=80` przy pasku `h=80`) i jednocześnie
+niczego nie zabraniała.**
+
+**Poprawka:** `padding-bottom` TOP-u schodzi do zera, jego rolę przejmuje `::after` —
+pudełko w układzie, które treść musi obejść. Pseudoelement, nie węzeł DOM: przeżywa
+przerysowanie TOP-u bez linijki JS, nie pojawia się w `children` ani
+`elementsFromPoint` (nie psuje istniejących asercji), nie da się go zgubić przy
+nowym ekranie. Wysokość `calc(var(--mp-bottom-h) - odstęp)` — odjęcie, bo `::after`
+jest kolejnym elementem flex i dostaje własny `gap`, którego dopełnienie nie miało.
+Bez `env()`, bo `przeliczBottom()` mierzy pas razem z jego safe-area, więc inset
+jest w zmiennej ZAWARTY; dołożenie liczyłoby go drugi raz.
+
+**PREDYKCJA, po której poznamy skuteczność bez ufania mi na słowo:** `zapas` ma wyjść
+**38**, a `ukryte` po dojechaniu na dół **0**. Jeśli `zapas` zostanie 0 — poprawka
+jest nieskuteczna i nie wolno jej uznać za zamkniętą.
+
+#### Trzy własne pomyłki tego dnia, zapisane, bo każda była pewna
+
+1. **„Nadmiar jest przycinany przed TOP-em".** Obalone: `c/s` równe w każdym pudełku.
+2. **„Wysokość zamrożona przez animację / `min-height:max-content`".** Obalone:
+   `h[]=—` wszędzie, `domknij()` oddaje wysokość poprawnie.
+3. **„To wina WebKita".** Obalone i to najważniejsze: zachowanie jest ZGODNE ZE
+   SPECYFIKACJĄ i Blink robi tak samo. Na desktopie przy oknie 616 px zapas wynosił
+   107 tylko dlatego, że tam treść wystawała POZA padding box o 11 px. Różnica jest
+   **geometryczna, nie silnikowa.** Luka „iOS/WebKit nigdy nie mierzony" zostaje
+   prawdziwa jako luka w pokryciu, ale **nie jest wyjaśnieniem tego defektu** —
+   i wpis z rozdziału wyżej należy czytać z tą korektą.
+
+#### Korekta o przyrządzie — terser
+
+Wcześniejszy wpis „`terser` wiesza się na `tryb-gotowania.js`" jest **nieprawdą
+o narzędziu**. Wiesza się **CLI**, i to niezależnie od wejścia: `terser -c -m` na
+pliku 60-bajtowym też kończy się timeoutem `[V]`. **API działa w sekundy.**
+Odtwarzalność builda POTWIERDZONA w tej sesji: `minify(źródło sprzed zmiany,
+{compress:true,mangle:true})` dało plik **identyczny co do znaku** z zacommitowanym
+`.min.js` (45 699 znaków) `[V]`. Budowa idzie odtąd przez API, nie przez CLI.
+
+**Artefakt po zmianie:** 45 798 znaków, **12 820 B gzip** — budżet WYMAGAŃ v1.9
+(≤ 20 kB gzip) zachowany z zapasem 7,2 kB. Składnia artefaktu zweryfikowana
+`new Function()`.

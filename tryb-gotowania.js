@@ -207,11 +207,54 @@
        daje `scrollTop: 24` z 24 możliwych i `window.scrollY: 0`.
        `contain` zatrzymuje gest w overlayu i nie rusza niczego innego — nie blokuje
        przewijania TOP-u, tylko odcina jego wyciek na zewnątrz. */
+    /* D-39.30 · REZERWA POD PAS DOLNY PRZESTAJE BYĆ DOPEŁNIENIEM, A STAJE SIĘ PUDEŁKIEM.
+       TO JEST PRZYCZYNA „NIE MOGĘ PRZEWINĄĆ LISTY DO KOŃCA", szukana od kilkunastu
+       przebiegów, i nie ma nic wspólnego z żadną z hipotez, które ją poprzedzały —
+       ani z `overflow` na liście, ani z animacją wysokości, ani z silnikiem.
+
+       Zmierzone sondą NA URZĄDZENIU OPERATORA (iPhone 17 Pro Max, Chrome/WebKit,
+       2026-08-17) `[V]`: `TOPpb=80px` przy pasku `h=80` — rezerwa była co do piksela
+       poprawna — a mimo to `zapas=0`, `ukryte=38`. Dzieci TOP-u kończyły się na 724,
+       padding box TOP-u sięgał 766.
+
+       Mechanizm jest ZGODNY ZE SPECYFIKACJĄ, nie jest błędem przeglądarki i dlatego
+       nie da się go obejść większą liczbą: obszar przewijania to suma PADDING BOXA
+       kontenera i tych fragmentów potomków, które poza niego wystają. Treść, która
+       wjeżdża w `padding-bottom`, nie wystaje poza padding box — więc nadmiar nie
+       powstaje, `scrollHeight === clientHeight`, przewijać nie ma czego, a pas dolny
+       (nieprzezroczysty, `position:absolute`) tę treść zakrywa. Rezerwa istniała
+       i jednocześnie niczego nie zabraniała.
+
+       Dlatego `padding-bottom` schodzi do zera, a jego rolę przejmuje `::after` —
+       PUDEŁKO w układzie, które treść musi obejść. Wtedy koniec treści ląduje nad
+       paskiem, a to, co dotąd chowało się pod nim, staje się prawdziwym nadmiarem
+       i zapas przewijania wraca.
+
+       `::after`, a nie węzeł DOM, z trzech powodów: przeżywa każde przerysowanie
+       TOP-u bez linijki JS, nie pojawia się w `children` ani w `elementsFromPoint`
+       (więc nie psuje żadnej istniejącej asercji ani sondy), i nie da się go zgubić
+       przy dopisywaniu nowego ekranu. Pseudoelement kontenera flex JEST elementem
+       flex — to jest warunek, na którym ta poprawka stoi.
+
+       `- W.odstep`: TOP ma `gap`, a `::after` jest kolejnym elementem flex, więc
+       przed rozpórką pojawia się jeszcze jedna przerwa. Bez odjęcia odstęp od dołu
+       urósłby z 80 na 96. Dopełnienie takiej przerwy nie miało.
+
+       `var(--mp-bottom-h)` bez `env()`: `przeliczBottom()` ustawia tę zmienną
+       z `getBoundingClientRect().height` pasa, a pas ma safe-area już w swoim
+       dopełnieniu — inset jest więc w niej ZAWARTY. Dołożenie `env()` tutaj
+       liczyłoby go drugi raz. Zmierzone `safe=0` przy widocznym pasku narzędzi
+       Chrome i 34 po jego schowaniu, więc pomyłka byłaby widoczna tylko czasem.
+
+       Cofnięcie: usuń regułę `::after` i przywróć `var(--mp-bottom-h,80px)` jako
+       trzecią wartość w `padding`. */
     '#' + ID + ' .mp-tryb__top{position:absolute;inset:0;overflow-y:auto;' +
       'overscroll-behavior-y:contain;' +
       '-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;' +
       'gap:' + W.odstep + 'px;' +
-      'padding:' + W.paddingTop + 'px ' + W.margines + 'px var(--mp-bottom-h,' + W.nawigacja + 'px)}' +
+      'padding:' + W.paddingTop + 'px ' + W.margines + 'px 0}' +
+    '#' + ID + ' .mp-tryb__top::after{content:"";display:block;flex:0 0 auto;' +
+      'height:calc(var(--mp-bottom-h,' + W.nawigacja + 'px) - ' + W.odstep + 'px)}' +
     /* D-39.12 WYCOFANE tego samego dnia, przed wysyłką — patrz STAN.md.
        Miała tu stanąć reguła `.mp-tryb__top > *{flex:0 0 auto}` jako naprawa
        obcięcia listy o 13 px. NIE STOI, bo hipoteza o ściskaniu flexem została
