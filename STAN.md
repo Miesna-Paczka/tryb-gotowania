@@ -11993,3 +11993,239 @@ Oba suche biegi bez regresji.
 Kontrakt dla redakcji przepisany trzeci raz w tej sesji — tym razem na „pogrubienie
 działa wszędzie", z zaleceniem używania go do **sygnału rozpoznawczego**
 („aż szczypta skrobi **od razu zasyczy**"), nie do ozdabiania.
+
+### `D-39.62` na Pages `[V]` 2026-08-17 18:3x
+
+Przebieg **#30**, `4a6d1dd` → success. Parser **42 427 znaków** z podstawieniem
+`<strong>$1</strong>`; runtime **50 500 znaków** z regułą `strong{font-weight:700}`.
+Obie liczby zgodne z przewidzianymi przed pomiarem.
+
+### PUŁAPKA NARZĘDZIOWA — wklejany blok gubi ostatnią linię `[V]`
+
+Trzy „poszło" w tej sesji były prawdziwe co do intencji i fałszywe co do skutku.
+Przyczyna zlokalizowana dopiero po trzecim trafieniu, i to nie po stronie gita:
+
+**Blok wklejany do PowerShella nie ma znaku nowej linii na końcu, więc ostatnia
+linia zostaje na prompcie niewykonana — a następne wklejenie DOKLEJA SIĘ do niej.**
+
+Dowód wprost, z terminala operatora:
+
+```
+PS …> git status --shortgit push origin main
+error: unknown option `shortgit'
+```
+
+Rozpoznanie po znacznikach czasu w `.git/` (bez uruchamiania gita):
+- gdy ostatnią linią był `push`: `COMMIT_EDITMSG` świeży, `main` na GitHubie stary;
+- gdy ostatnią linią był `commit`: `index` i `objects` świeże, `COMMIT_EDITMSG` stary.
+
+Za każdym razem brakowało dokładnie ostatniej komendy. **Mój pierwszy pomysł —
+„linia ofiarna" na końcu — był złym lekarstwem: ofiarą padła następna wklejona
+komenda**, bo to do niej dokleił się ogon.
+
+**Reguła: jedno polecenie na blok.** Nie „krótkie bloki", nie „ostatnia linia
+nieszkodliwa" — jedno polecenie.
+
+**Metodycznie warto zapamiętać, czego to jest przykładem:** trzy razy szukałem
+przyczyny w warstwie, o której mówił objaw (GitHub, Pages, uprawnienia), zamiast
+w warstwie, która była między mną a skutkiem — czyli w sposobie, w jaki podaję
+komendy. Warstwa transportu instrukcji jest częścią systemu i psuje się tak samo
+jak każda inna.
+
+### SPROSTOWANIE W LOT — nie dodawać `<script>`, tylko USUNĄĆ te linie `[V]` 2026-08-17
+
+W bloku footera szablonu przepisu stoi goły kod bez otwierającego `<script>`:
+wyświetla się jako tekst pod stopką. **Pierwsza diagnoza brzmiała „brakuje
+`<script>`, dodaj go" i była BŁĘDNA** — operator zauważył, że przycisk mimo to
+działa, co tej diagnozy nie tłumaczyło. Sprawdzenie zarejestrowanego skryptu:
+
+`mpGotowanieStart` **1.5.0** obsługuje CTA delegacją na `[data-mp-gotowanie-cta]`
+i **świadomie NIE podaje `ekran`** — komentarz w jego źródle: „jawne `ekran:'start'`
+(1.4.0) blokowało S1 na zawsze, patrz `D-39.18`".
+
+Goły kod w footerze to **starszy wariant tego samego handlera**: łapie po
+`.recipe-floating-cta` i podaje `ekran: 'start'`. Czyli dokładnie to, co 1.5.0
+usunęło.
+
+**Owinięcie go w `<script>` — czyli moja własna rekomendacja sprzed dwóch minut —
+przywróciłoby `D-39.18`:** dwa handlery na jeden przycisk, drugi wymusza ekran
+startowy, ekran wznowienia S1 przestaje się pojawiać. Objaw pojawiłby się dopiero
+u użytkownika z zapisaną sesją, czyli najpóźniej jak się da.
+
+**Poprawka: skasować trzy linie i osierocone `</script>`.** Footer ma zawierać
+wyłącznie dwa tagi `<script src>`.
+
+**Czego to jest przykład:** zobaczyłem uszkodzoną składnię i zaproponowałem
+naprawienie SKŁADNI, nie pytając, czy ten kod ma tam w ogóle być. „Zepsute" i
+„zbędne" wyglądają tak samo, dopóki nie sprawdzi się drugiego konsumenta —
+a tu drugi konsument był o jedno wywołanie `get_registered_script` dalej.
+Uratowała mnie obserwacja operatora „przycisk działa", która była **niezgodna
+z moją diagnozą** — i dlatego była cenna.
+
+### Pola do wiązań na itemie szyny (`recipe-rail__cmsitem`) `[V]`
+
+Kolekcja `produkty` (`69b199e8d5d69f5f09a345c4`):
+
+| atrybut | pole CMS | typ |
+|---|---|---|
+| `data-mp-produkt` | — (wartość stała, np. `1`) | — |
+| `data-slug` | `slug` | PlainText |
+| `data-nazwa` | `name` | PlainText |
+| `data-gramatura` | `gramatura-produktu` | PlainText |
+| `data-url` | pominąć — fallback `/produkty/{slug}` | — |
+
+`parsujGramature` oczekuje formatu **`n x N g`**. Gdy nie umie odczytać, zgłasza
+błąd o nieczytelnej gramaturze i wyłącza wielokrotność „n × …" — reszta działa.
+
+### Most produktowy zbudowany „na zapas" — pomiar `[V]` 2026-08-17
+
+Operator wybrał budowę mimo braku konsumenta. Zmierzone na `kurczak-teriyaki-przepis`:
+
+```
+[data-mp-produkt] : 1 wezel, na .recipe-rail--jeden
+data-mp-produkt   : "1"
+data-slug         : "filet-z-piersi-kurczaka"   ← ZWIAZANE
+data-nazwa        : null                        ← BRAK ATRYBUTU
+data-gramatura    : null                        ← BRAK ATRYBUTU
+```
+
+Złączenie działa: `skladnik #kurczak → ma_produkt: true`, `url` z fallbacku
+`/produkty/filet-z-piersi-kurczaka`. **Błąd „usterka SZABLONU" zniknął** — czyli
+`D-39.61` zachowuje się dokładnie tak, jak przewidywał CR-2 sesji treściowej.
+
+Został jeden błąd, i jest prawdziwy: `gramatura ""`. **Pole CMS NIE jest puste** —
+`gramatura-produktu = "2 x 330 g"`, czyli dokładnie format, którego parser oczekuje.
+Brakuje samego atrybutu na elemencie, nie danych.
+
+**Potwierdzone przy okazji: widoczność warunkowa NIE renderuje wariantu.**
+W DOM stoi wyłącznie `.recipe-rail--jeden`; `.recipe-rail__cmslist` nie ma wcale.
+Wariant „wiele" pozostaje więc **niesprawdzony** — trzeba go zmierzyć na przepisie
+z co najmniej dwoma produktami, bo na tym nigdy się nie wykona.
+
+**Stan faktyczny mostu:** przewód podłączony, po drugiej stronie nadal nic nie
+czyta. To była decyzja świadoma, nie przeoczenie.
+
+### `D-39.63` — demotacja komunikatów mostu produktowego `[V]` 2026-08-17
+
+CR sesji treściowej, decyzja operatora „demontujemy". Trzy `blad()` → `ostrzez()`
+w `podepnijProdukty`. Zero zmian logiki, kontraktu DOM i usuwania kodu.
+
+Warunek powrotu wpisany do komentarza przy kodzie, nie tylko do dokumentu —
+demotacja bez zapisanego warunku wyjścia staje się trwała przez zapomnienie.
+
+Suchy bieg mostu przerobiony: czyta `ostrzezeniaTeraz()`, a dodatkowo **wymaga, żeby
+`bledyTeraz()` było puste**. Gdyby któryś komunikat wrócił kiedyś do `blad()` przez
+nieuwagę, treść się nie zmienia i nikt by tego nie zauważył. Cztery przypadki
+przechodzą. `_wewnetrzne` dostaje `ostrzezeniaTeraz`; `wyczyscBledy` czyści obie listy.
+
+Artefakty: parser 42 478 znaków / 16 712 B gzip; runtime bez zmian (50 500).
+
+#### DWA SPROSTOWANIA DO CR-a — oba zmierzone na OPUBLIKOWANEJ stronie `[V]`
+
+CR opisuje stan szablonu inaczej, niż wygląda on w przeglądarce. Wniosek CR-a
+zostaje w mocy, ale jego przesłanka o Webflow jest błędna i **nie wolno jej przenieść
+do kontraktu**, bo wysłałaby następną sesję do roboty, która jest już zrobiona.
+
+**1. „`wezlow` = 2 zamiast 0".** W opublikowanym DOM stoi **JEDEN** węzeł. Atrybuty
+siedzą na obu szynach w Designerze, ale widoczność warunkowa jednej z nich **nie
+renderuje** — mierzone: `.recipe-rail--jeden` obecny, `.recipe-rail__cmslist` nieobecny.
+Liczba z CR-a to liczba elementów w projekcie, nie w wyjściu.
+
+**2. „`data-slug` wartość niewiązalna, `null`".** Na stronie `data-slug` ma wartość
+`"filet-z-piersi-kurczaka"` i złączenie DZIAŁA (`ma_produkt: true`, `url` z fallbacku).
+Odczyt `null` pochodzi najpewniej z `get_attributes` z `with_resolved_bindings: true`,
+którego dokumentacja mówi wprost: **`null`, gdy wiązania nie da się rozwiązać w czasie
+projektowania — np. pola CMS.** To odczyt narzędzia o sobie, nie o stronie.
+
+Konsekwencja merytoryczna: teza „poza Collection Itemem wiązanie nie ma z czego się
+rozwiązać" jest **obalona pomiarem** — szyna `--jeden` najwyraźniej stoi w zasięgu
+wiązania produktu. Wariant „wiele" pozostaje niesprawdzony, bo ten przepis go nie
+renderuje; to jedyna otwarta pozycja.
+
+**Wzorzec, trzeci raz dziś:** narzędzie projektowe odpowiada o czasie projektowania,
+a wniosek zapisuje się o produkcie. Tak samo powstał mój własny fałszywy alarm
+o gwiazdkach (czytałem `tekst` zamiast `tekstHtml`).
+
+#### KOREKTA MOJEGO SPROSTOWANIA — Webflow i strona przeczą sobie `[V]` 2026-08-17
+
+Operator kazał sprawdzić w Webflow zamiast w opublikowanym DOM. Słusznie: zdanie
+„atrybuty siedzą na obu szynach w Designerze" **wziąłem z CR-a, nie ze zmierzenia.**
+Pomiar mówi co innego niż obie wersje.
+
+`data_element_tool` na `przepisy Template` (`6a574b13929618407b161667`):
+
+```
+get_attributes  072abffc… (.recipe-rail)            → []
+get_attributes  a2f08223… (.recipe-rail--jeden)     → []
+get_attributes  c836de49…6f99 (recipe-rail__cmsitem)→ []
+query_elements  attribute_name=data-mp-produkt      → 0 trafień
+```
+
+A opublikowana strona niesie węzeł `data-mp-produkt="1"`, `data-slug` rozwiązany,
+na elemencie o klasie `recipe-rail recipe-rail--jeden`.
+
+**Zero po stronie API, jeden po stronie strony.** Gałęzi nie ma (`list_branches` → 404),
+więc to nie rozjazd branch/main. Stare atrybuty API pokazuje bez problemu
+(`data-mp-para="PL"` na plakietkach), czyli czyta ten sam element — tylko bez
+najnowszych zmian.
+
+**Czego NIE wiem:** czy to nieświeży odczyt API, czy zmiana żyje w otwartej sesji
+Designera i mimo publikacji nie weszła do stanu widzianego przez API. Rozstrzyga to
+jedno spojrzenie operatora: zaznaczyć szynę i sprawdzić Settings → Custom attributes.
+
+**Co zostaje w mocy:** liczba węzłów W WYJŚCIU wynosi 1 (zmierzone), a `data-slug`
+rozwiązuje się poprawnie i złączenie działa (zmierzone). Teza CR-a o `wezlow` = 2
+pozostaje **niezweryfikowana przez nikogo** — ani ja, ani CR jej nie zmierzyliśmy
+na wyjściu.
+
+**Do katalogu pułapek, jeśli się potwierdzi:** odczyt elementów przez API bywa
+nieświeży wobec Designera, także po publikacji — a różnica jest cicha, bo stare
+atrybuty zwraca poprawnie.
+
+### `D-39.64` — CTA „dodaj do Paczki", warstwa danych `[V]` 2026-08-17
+
+Łatka A z CR-a sesji treściowej wdrożona: `zbierzPaczke()` + `MP.przepis.paczka()`.
+Nowy przyrząd `narzedzia/suchy-bieg-paczki.js` — **siedem przypadków z CR-a, wszystkie
+zielone**, w tym `javascript:` odrzucone. Artefakt 43 622 znaki / 17 173 B gzip
+(budżet 20 kB, zapas 2,8 kB — schodzi).
+
+Jedna zmiana wobec CR-a: ostrzeżenie o bazie tylko gdy `idy.length && !baza`.
+W wersji z CR-a przepis bez ani jednego atrybutu dostawał **dwa** komunikaty o jednej
+przyczynie, a dwa sygnały o tym samym uczą ignorować oba.
+
+#### POMIAR, KTÓRY ZMIENIA ŁATKĘ B — CTA JUŻ DZIAŁA NATYWNIE `[V]`
+
+Na opublikowanej stronie, wariant jednoproduktowy:
+
+```
+.recipe-rail__ctaslot            → 1
+  └ <a class="button w-inline-block">   „dodaj do Paczki"
+     href = https://moja.miesnapaczka.pl/konfigurator?addToCart=f72a7bd1-…
+```
+
+**Webflow wiąże ten `href` sam, z pola produktu.** Skrypt nie jest do tego potrzebny
+i przy jednym produkcie nie ma czego poprawić — adres jest już dokładnie tym,
+który `zbierzPaczke()` by złożył.
+
+**Łatka B w brzmieniu z CR-a UKRYŁABY DZIAŁAJĄCY PRZYCISK.** Gałąź `else` robi
+`a.hidden = true`, a `paczka.url` jest dziś `null`, bo węzły nie niosą jeszcze
+`data-paczka-url`. Efekt: sprawny CTA znika ze strony. To ten sam kształt co przy
+gwiazdkach i przy `<script>` — poprawka pisana pod wyobrażony stan, nie pod zmierzony.
+
+**Reguła dla łatki B: skrypt WYŁĄCZNIE ULEPSZA, nigdy nie odbiera.** Ustawia `href`
+tylko wtedy, gdy złożył adres z **co najmniej dwóch** produktów; przy zerze i jedynce
+nie dotyka niczego. Wariant wieloproduktowy jest jedynym miejscem, gdzie natywne
+wiązanie nie wystarcza — bo trzeba skleić kilka UUID-ów w jeden adres.
+
+#### ROZSTRZYGNIĘCIE ZAGADKI ZNIKAJĄCYCH ATRYBUTÓW
+
+Sesja treściowa zmierzyła: ~18:50 dwa trafienia w Designerze, ~19:20 zero.
+Ja mierzyłem opublikowaną stronę (jeden węzeł, `data-slug` rozwiązany) i Designera
+(zero). **Nie ma tu nieświeżego API.** Opublikowana strona jest MIGAWKĄ z chwili
+publikacji, Designer pokazuje stan bieżący — atrybuty zostały usunięte PO publikacji.
+Rozjazd „opublikowane ma więcej niż projekt" tak właśnie wygląda.
+
+Moja hipoteza „API czyta nieświeżo" była błędna i nie wchodzi do katalogu pułapek.
+Prawdziwa nauka jest prostsza: **opublikowany DOM odpowiada na pytanie „co widzi
+czytelnik", a nie „co jest w szablonie". To dwa różne pytania** i dziś zadałem
+drugie, patrząc na odpowiedź na pierwsze.

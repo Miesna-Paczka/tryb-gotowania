@@ -843,7 +843,31 @@
         sztukWOpakowaniu: g ? g.sztuk : null
       };
     });
-    /* `D-39.61` (CR-2 sesji treściowej, 2026-08-17) — ODRÓŻNIENIE „brakuje jednej
+    /* `D-39.63` (CR sesji treściowej, 2026-08-17; decyzja operatora: „demontujemy") —
+       WSZYSTKIE TRZY KOMUNIKATY TEGO MOSTU SĄ OSTRZEŻENIAMI, NIE BŁĘDAMI.
+
+       Powód zmierzony `[V]`: **most nie ma odbiorcy.** `sk.produkt` czyta w całym
+       repo wyłącznie ten blok — i to po to, żeby o sobie ostrzegać. `tryb-gotowania.js`
+       nie odwołuje się do `produkt` ani razu, `generuj-html.mjs` nie zna tego pojęcia,
+       a formuła `n × gramatura g`, która była jedynym konsumentem gramatury opakowania,
+       została zdjęta przez `D-39.49`. Sprawdzenie przeżyło swojego konsumenta.
+
+       `bledy` jest bramką mechaniczną i ma zostać zero-tolerancyjne (§7 instrukcji).
+       Trzymanie w niej komunikatu, którego naprawienie **nie zmienia niczego na
+       ekranie**, psuje tę bramkę: przy 18 przepisach do migracji autor 18 razy
+       dostaje sygnał najwyższej rangi o rzeczy, której nie ma czym naprawić.
+       To ten sam koszt, dla którego powstało samo `D-39.61` — tylko o poziom wyżej.
+
+       WARUNEK POWROTU DO `blad`, żeby ta demotacja nie stała się trwała przez
+       zapomnienie:
+       - komunikat „nie ma w produkty-w-przepisie" wraca, gdy powstanie PIERWSZY
+         odbiorca `sk.produkt` (link do sklepu w szynie albo w trybie gotowania);
+       - komunikat o gramaturze wraca dopiero, gdy powstanie odbiorca WIELOKROTNOŚCI
+         `n × N g` — a takiego po `D-39.49` nikt nie planuje. Jeśli nie powstanie,
+         właściwym ruchem jest usunięcie `parsujGramature`, `gramatura`
+         i `sztukWOpakowaniu`, a nie utrzymywanie ostrzeżenia o martwym polu.
+
+       `D-39.61` (CR-2 sesji treściowej, 2026-08-17) — ODRÓŻNIENIE „brakuje jednej
        rzeczy" od „nie ma całego źródła".
        Zero węzłów przy niepustym wiązaniu `@` nie może być winą treści: gdyby ukryta
        Collection Lista renderowała, to przy wypełnionym `produkty-w-przepisie` stałby
@@ -858,16 +882,97 @@
     if (!wiazane.length) return;
     if (wezlow === 0) {
       wiazane.forEach(function (sk) { sk.produkt = null; });
-      blad('ukryta lista produktów nie renderuje ANI JEDNEGO elementu [data-mp-produkt], ' +
+      ostrzez('ukryta lista produktów nie renderuje ANI JEDNEGO elementu [data-mp-produkt], ' +
            'a wiązanie @ mają: #' + wiazane.map(function (sk) { return sk.key; }).join(', #') +
            '. To usterka SZABLONU, nie treści — NIE poprawiaj pola produkty-w-przepisie.');
       return;
     }
     wiazane.forEach(function (sk) {
       sk.produkt = mapa[sk.produktSlug] || null;
-      if (!sk.produkt) blad('składnik #' + sk.key + ' odsyła do produktu "' + sk.produktSlug + '", którego nie ma w produkty-w-przepisie');
-      else if (!sk.produkt.gramatura) blad('produkt "' + sk.produktSlug + '" ma gramaturę "' + sk.produkt.gramaturaRaw + '", której nie umiem odczytać (oczekuję "n x N g") — wielokrotność "n × …" niedostępna');
+      if (!sk.produkt) ostrzez('składnik #' + sk.key + ' odsyła do produktu "' + sk.produktSlug + '", którego nie ma w produkty-w-przepisie');
+      else if (!sk.produkt.gramatura) ostrzez('produkt "' + sk.produktSlug + '" ma gramaturę "' + sk.produkt.gramaturaRaw + '", której nie umiem odczytać (oczekuję "n x N g") — wielokrotność "n × …" niedostępna');
     });
+  }
+
+  /* ——— `D-39.64` · MOST PRODUKTOWY → CTA „dodaj do Paczki" ————————————————
+     CR sesji treściowej, decyzja operatora „opcja nr 1". **Pierwszy prawdziwy
+     odbiorca mostu** — do `D-39.63` był on przewodem podłączonym z jednej strony.
+
+     Źródło: atrybut `data-paczka-url` na węźle `[data-mp-produkt]`, związany
+     z polem `url-dodaj-do-paczki---backup` kolekcji `produkty`. Format zmierzony
+     `[V]` 2026-08-17: `https://moja.miesnapaczka.pl/konfigurator?addToCart=<UUID v4>`.
+     Identyfikator jest UUID-em BACKENDU, nie itemu Webflow — przepis nie ma jak go
+     wyliczyć, musi go przeczytać.
+
+     CZYTAMY WĘZŁY, NIE `skladniki`. Do Paczki idą wszystkie produkty przepisu,
+     a nie tylko te z wiązaniem `@` w składnikach — dzięki temu CTA działa też
+     w przepisie bez ani jednego `@`. To także powód, dla którego warunek powrotu
+     z `D-39.63` NIE jest tu spełniony: komunikat „składnik odsyła do produktu spoza
+     produkty-w-przepisie" dalej nie ma konsumenta i zostaje ostrzeżeniem.
+
+     BAZY URL-A NIE MA W KODZIE — bierze się z pierwszego czytelnego atrybutu.
+     Przeniesienie konfiguratora nie wymaga wtedy wydania parsera.
+
+     `zbierzPaczke()` nie potrzebuje modelu ani `zaladuj()`: czyta wyłącznie DOM,
+     więc CTA zadziała także tam, gdzie tryb gotowania nigdy nie wystartuje. */
+  var LIMIT_PACZKI = 5;
+  var RE_ADD_TO_CART = /[?&]addToCart=([^&#]+)/i;
+  var RE_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  function idZUrlaPaczki(url) {
+    if (!url) return null;
+    var m = String(url).match(RE_ADD_TO_CART);
+    if (!m) return null;
+    var id;
+    try { id = decodeURIComponent(m[1]).trim(); } catch (e) { id = m[1].trim(); }
+    return RE_UUID.test(id) ? id : null;
+  }
+
+  /* Tylko absolutny http(s). Wartość idzie z CMS-u prosto do `href`, więc nie
+     wpuszczamy `javascript:` ani niczego, czego nie umiemy nazwać. */
+  function bazaKonfiguratora(url) {
+    var s = String(url);
+    var i = s.indexOf('?');
+    var baza = i >= 0 ? s.slice(0, i) : s;
+    return /^https?:\/\/[^\s"'<>]+$/i.test(baza) ? baza : null;
+  }
+
+  function zbierzPaczke() {
+    var wezly = document.querySelectorAll('[data-mp-produkt]');
+    var idy = [], widziane = Object.create(null), baza = null, bezId = 0;
+    Array.prototype.forEach.call(wezly, function (el) {
+      var surowy = el.getAttribute('data-paczka-url');
+      var id = idZUrlaPaczki(surowy);
+      if (!id) { bezId++; return; }
+      if (!baza) baza = bazaKonfiguratora(surowy);
+      if (widziane[id]) return;           // ten sam produkt dwa razy = jeden wpis
+      widziane[id] = true;
+      idy.push(id);
+    });
+    var pominiete = idy.slice(LIMIT_PACZKI);
+    idy = idy.slice(0, LIMIT_PACZKI);
+
+    if (wezly.length && bezId) {
+      ostrzez('CTA Paczki: ' + bezId + ' z ' + wezly.length + ' węzłów produktu nie ma ' +
+              'czytelnego `data-paczka-url` — te produkty nie wejdą do linku');
+    }
+    /* Ostrzegamy o bazie TYLKO wtedy, gdy było z czego ją wziąć. Inaczej przepis
+       bez ani jednego atrybutu dostawał dwa komunikaty o jednej przyczynie —
+       a dwa sygnały o tym samym uczą ignorować oba. */
+    if (idy.length && !baza) {
+      ostrzez('CTA Paczki: żaden węzeł nie dał się odczytać jako absolutny adres http(s) — ' +
+              'linku nie składam');
+    }
+    if (pominiete.length) {
+      ostrzez('CTA Paczki: przepis ma ' + (idy.length + pominiete.length) + ' produktów, ' +
+              'limit to ' + LIMIT_PACZKI + ' — poza linkiem zostają: ' + pominiete.join(', '));
+    }
+    return {
+      idy: idy,
+      pominiete: pominiete,
+      wezlow: wezly.length,
+      url: (baza && idy.length) ? baza + '?addToCart=' + idy.join('&addToCart=') : null
+    };
   }
 
   function podepnijZdjecia(kroki) {
@@ -3784,6 +3889,7 @@
     kluczLS: KLUCZ_LS,
     kolizjeOdmian: function () { return FORMA_DO_BAZY.__kolizje.slice(); },   // D-39.53
     limitMarkerow: LIMIT_MARKEROW,
+    paczka: zbierzPaczke,
     _wewnetrzne: {
       parsujSkladniki: parsujSkladniki, parsujKroki: parsujKroki, rozbijTresc: rozbijTresc,
       parsujGramature: parsujGramature, zbudujZamienniki: zbudujZamienniki,
@@ -3793,8 +3899,10 @@
          Kolektor błędów wystawiony razem z nią: bez niego suchy bieg musiałby
          podmieniać `Array.prototype.push`, czyli testować przez pułapkę. */
       podepnijProdukty: podepnijProdukty,
+      zbierzPaczke: zbierzPaczke,
       bledyTeraz: function () { return bledy.slice(); },
-      wyczyscBledy: function () { bledy = []; }
+      ostrzezeniaTeraz: function () { return ostrzezenia.slice(); },
+      wyczyscBledy: function () { bledy = []; ostrzezenia = []; }
     }
   };
 })(typeof window !== 'undefined' ? window : this);
