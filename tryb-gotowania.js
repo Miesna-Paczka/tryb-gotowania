@@ -60,7 +60,8 @@
   var LIGATURY = ['hourglass', 'local_dining', 'leaderboard',
                 'arrow_back', 'arrow_forward',
                 'keyboard_arrow_down', 'keyboard_arrow_up',
-                'remove', 'add', 'close', 'refresh'];
+                'remove', 'add', 'close', 'refresh',
+                'check_box', 'check_box_outline_blank'];
 
   /* Font ikon — trzy wagi subsetu, hosting **Webflow** (D-15.1, rozstrzygnięte
      pomiarem w przeb. 31: `FontFace.load()` z obcego originu przechodzi, więc CORS
@@ -772,10 +773,39 @@
        i wagę odziedziczoną (400) — trzeci raz ten sam kształt co W23 i W17: rozjazd
        o jeden stopień w trzech własnościach naraz, więc żadna nie rzuca się w oczy
        osobno. Biel: pas dolny (W01) i ten ptaszek są jedynymi miejscami bieli PEŁNEJ. */
+    /* D-39.36 · CHECKBOX TO JEDEN GLIF, NIE PUDEŁKO CSS ZE ZNAKIEM W ŚRODKU.
+       Decyzja operatora 2026-08-17, wprost: „chcę ten mechanizm. Pusty stan =
+       blank, zaznaczony = check_box. Będzie to spójne z resztą projektu".
+       **To jest ODSTĘPSTWO OD FIGMY podjęte świadomie**, a nie odczyt — i jest
+       jedynym takim miejscem w tym produkcie. `7273:10878` rysuje pudełko 16×16
+       (promień 3, obrys 1 px `primary-text`), wypełniane atramentem po zaznaczeniu,
+       ze znakiem `✓` w DM Sans SemiBold 10 px BIELĄ w środku. Jednostka 2 z 2026-08-16
+       zbadała to i zaleciła zostawienie znaku tekstowego; operator wybrał spójność
+       mechanizmu ikon ponad wierność pojedynczemu komponentowi.
+
+       **RÓŻNICA, KTÓRA Z TEGO WYNIKA I KTÓRA JEST WIDOCZNA — zmierzona, nie
+       przewidziana:** subset to trzy STATYCZNE pliki woff2 (Light/Regular/Medium),
+       **bez osi `FILL`**. Sprawdzone zrzutem: `check_box` przy `FILL 0` i `FILL 1`
+       renderuje się IDENTYCZNIE `[V]` 2026-08-17. Stan zaznaczony jest więc
+       kwadratem OBRYSOWANYM z ptaszkiem w środku, a nie kwadratem WYPEŁNIONYM
+       z ptaszkiem wyciętym na biało, jak w Figmie. Para blank/check jest spójna
+       sama w sobie, ale to nie jest ten sam obraz co w pliku projektowym.
+       Odzyskanie wypełnienia wymaga subsetu z osią `FILL` albo dogranego wariantu
+       — a subset należy do sesji CMS i jest dla tego łańcucha TYLKO DO ODCZYTU
+       (pin w STAN.md). Pozycja decyzyjna operatora, nie zadanie na teraz.
+
+       Glif siedzi we WŁASNYM spanie, nie w `textContent` przycisku: przycisk niesie
+       też `.mp-tryb__cel` (niewidzialny cel dotyku 44 px), a `p.textContent = …`
+       przy przełączaniu skasowałoby to dziecko. Ten błąd popełniłby każdy, kto
+       pójdzie najkrótszą drogą — stąd osobny węzeł i ten komentarz.
+       Cofnięcie: przywróć obrys/promień/tło w tej regule, `font-size:10px`,
+       `color:transparent`, wróć do `textContent = '✓'` i przywróć regułę
+       wypełnienia dla `[data-odhaczony]` / `[data-stan="zuzyty"]`. */
     '#' + ID + ' .mp-tryb__ptaszek{position:relative;flex:0 0 auto;width:16px;height:16px;' +
-      'margin-right:8px;padding:0;border:1px solid var(--mp-atrament);border-radius:3px;' +
-      'background:transparent;cursor:pointer;font-size:10px;line-height:15px;font-weight:600;' +
-      'color:transparent;text-align:center}' +
+      'margin-right:8px;padding:0;border:0;background:transparent;cursor:pointer;' +
+      'color:var(--mp-atrament);text-align:center}' +
+    '#' + ID + ' .mp-tryb__ptaszek-glif{display:block;width:16px;height:16px;' +
+      'font-size:16px;line-height:16px}' +
     /* Odhaczony w bieżącym kroku = checkbox wypełniony + ✓, BEZ przekreślenia.
        (Dawne NIENARYSOWANE G2; przekreślenie niesie „składnik już zużyty".) */
     /* D-39.4 · ZUŻYTY DOSTAJE OBIE RZECZY NARAZ: wypełniony checkbox ORAZ przekreślenie.
@@ -787,9 +817,13 @@
        być „odhaczony" i „zużyty" jako STANY, a nie ich wykończenia. Wiersz `W42`
        („przekreślenie jest CAŁĄ deltą") jest przez to nieaktualny — patrz `W42b`.
        Cofnięcie: usuń selektor `[data-stan="zuzyty"]` z listy niżej. */
-    '#' + ID + ' .mp-tryb__wiersz[data-odhaczony] .mp-tryb__ptaszek,' +
-    '#' + ID + ' .mp-tryb__wiersz[data-stan="zuzyty"] .mp-tryb__ptaszek{' +
-      'background:var(--mp-atrament);border-color:var(--mp-atrament);color:var(--mp-bialy-pelny)}' +
+    /* D-39.36 — reguła wypełnienia USUNIĘTA. Stan niesie teraz GLIF
+       (`check_box` wobec `check_box_outline_blank`), ustawiany w JS, a nie
+       tło i kolor pudełka. Zostawienie jej pomalowałoby ciemny kwadrat POD
+       obrysowanym glifem — dwa kwadraty jeden na drugim.
+       Intencja `D-39.4` zachowana: zużyty nadal dostaje OBIE delty naraz —
+       zaznaczony glif ORAZ przekreślenie nazwy (reguła `line-through` niżej,
+       nietknięta). Zmieniło się wykończenie, nie reguła stanu. */
     '#' + ID + ' .mp-tryb__nazwa-skl{flex:0 1 auto;min-width:0;overflow:hidden;' +
       'white-space:nowrap;text-overflow:ellipsis}' +
     /* D1 — DWA stany wiersza, nie trzy: `dalej` nie dostaje delty wizualnej
@@ -1603,7 +1637,13 @@
 
     var ptaszek = el('button', 'mp-tryb__ptaszek', li);
     ptaszek.type = 'button';
-    ptaszek.textContent = '✓';
+    /* D-39.36 — glif we własnym spanie; `textContent` na przycisku skasowałby
+       `.mp-tryb__cel`. Zaznaczony wizualnie jest też składnik ZUŻYTY, nawet gdy
+       użytkownik nigdy go nie tknął — `D-39.4`: ten stan nadaje postęp przepisu. */
+    var ptaszekGlif = el('span', 'mp-tryb__ptaszek-glif mp-ikona', ptaszek);
+    ptaszekGlif.textContent =
+      (zaznaczone[s.key] || stanWiersza === 'zuzyty') ? 'check_box' : 'check_box_outline_blank';
+    ptaszekGlif.setAttribute('aria-hidden', 'true');
     ptaszek.setAttribute('role', 'checkbox');
     ptaszek.setAttribute('aria-checked', zaznaczone[s.key] ? 'true' : 'false');
     ptaszek.setAttribute('aria-label', s.etykieta);
@@ -1979,6 +2019,14 @@
           if (nowa) li.setAttribute('data-odhaczony', ''); else li.removeAttribute('data-odhaczony');
           var p = li.querySelector('.mp-tryb__ptaszek');
           if (p) p.setAttribute('aria-checked', nowa ? 'true' : 'false');
+          /* D-39.36 — glif niesie stan, więc trzeba go przestawić. Wiersz ZUŻYTY
+             zostaje zaznaczony niezależnie od `nowa`: jego stan nadaje postęp
+             przepisu, nie użytkownik (`D-39.26` odbiera mu nawet klikalność). */
+          var g = li.querySelector('.mp-tryb__ptaszek-glif');
+          if (g) {
+            var zuz = li.getAttribute('data-stan') === 'zuzyty';
+            g.textContent = (nowa || zuz) ? 'check_box' : 'check_box_outline_blank';
+          }
         });
     }
     /* D-39.27 — zapis PO każdej zmianie odhaczenia, nie tylko przy zmianie kroku.

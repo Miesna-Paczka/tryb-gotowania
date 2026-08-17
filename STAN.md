@@ -10455,3 +10455,45 @@ powiedzieć teraz niż po wdrożeniu:
 (wtedy jest co animować i jest sens kręcić glifem do czasu odpowiedzi), czy zostaje
 odczytem flagi — i wtedy trzeba dać choćby komunikat „nadal brak połączenia",
 bo dziś przycisk milczy.
+
+### `D-39.36` · CHECKBOX NA PARĘ LIGATUR — 2026-08-17, ODSTĘPSTWO OD FIGMY
+
+Decyzja operatora, wprost: „chcę ten mechanizm. Pusty stan = blank, zaznaczony =
+check_box. Będzie to spójne z resztą projektu". **Zapisuję to jako odstępstwo od
+Figmy, nie jako odczyt** — i jest to jedyne takie miejsce w produkcie.
+
+`7273:10878` rysuje pudełko 16×16 (promień 3, obrys 1 px `primary-text`),
+wypełniane atramentem po zaznaczeniu, ze znakiem `✓` DM Sans SemiBold 10 px BIELĄ
+w środku. Jednostka 2 (2026-08-16) zbadała to i zaleciła zostawienie znaku
+tekstowego. Operator wybrał spójność mechanizmu ikon ponad wierność pojedynczemu
+komponentowi. **Dawne zalecenie jednostki 2 jest przez to nieaktualne**, a nie
+„pominięte" — kto trafi na nie później, ma tu odpowiedź.
+
+**RÓŻNICA WIZUALNA, ZMIERZONA PRZED WPROWADZENIEM, NIE ODKRYTA PO.**
+Subset to trzy STATYCZNE pliki woff2 (Light/Regular/Medium), **bez osi `FILL`**.
+Zrzut porównawczy czterech próbek `[V]`: `check_box` przy `FILL 0` i `FILL 1`
+renderuje się **identycznie**. Stan zaznaczony jest więc kwadratem **obrysowanym**
+z ptaszkiem w środku, a nie kwadratem **wypełnionym** z ptaszkiem wyciętym na biało.
+Para blank/check jest spójna sama w sobie, ale to nie ten sam obraz co w Figmie.
+Sprawdzenie osi kosztowało jeden zrzut i uchroniło przed wdrożeniem „na pewno tak
+jak w projekcie", które byłoby nieprawdą.
+
+**POZYCJA DECYZYJNA:** odzyskanie wypełnienia wymaga subsetu z osią `FILL` albo
+dogranego wariantu wypełnionego. **Subset należy do sesji CMS i jest dla tego
+łańcucha TYLKO DO ODCZYTU** (pin w nagłówku tego pliku) — więc to zlecenie dla
+operatora, nie zadanie tego łańcucha.
+
+**Pułapka implementacyjna warta zapamiętania:** glif MUSI siedzieć we własnym
+spanie. Przycisk niesie także `.mp-tryb__cel` (niewidzialny cel dotyku 44 px),
+więc `ptaszek.textContent = …` przy przełączaniu skasowałoby to dziecko i cel
+dotyku zniknąłby po pierwszym kliknięciu — objaw pojawiłby się dopiero przy
+DRUGIM tapnięciu i wyglądał na losowy. Najkrótsza droga jest tu błędna.
+
+Reguła wypełnienia dla `[data-odhaczony]` / `[data-stan="zuzyty"]` **usunięta** —
+zostawiona malowałaby ciemny kwadrat pod obrysowanym glifem. Intencja `D-39.4`
+zachowana: zużyty dostaje obie delty (zaznaczony glif + przekreślenie nazwy).
+
+**W produkcie nie ma już ANI JEDNEGO substytutu Unicode.** `LIGATURY` = **13**;
+asercje `B16`/`I4` pytają o 5 i wymagają przebazowania na 13.
+
+**Artefakt:** 46 630 znaków, **12 951 B gzip** (budżet 20 kB).
