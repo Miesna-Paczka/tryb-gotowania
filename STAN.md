@@ -11220,3 +11220,103 @@ zmierzyć bez klikania przez interfejs.
 zmienia etykietę na „skopiowano" i wraca po ~1,6 s · schowek zawiera tylko pozycje
 NIEODHACZONE, po jednej w wierszu · odhaczenie pozycji i ponowne kopiowanie daje
 krótszą listę.
+
+### `D-39.47` · POLA KARTOWE W KONTRAKCIE + LIMIT MARKERÓW USUNIĘTY — 2026-08-17
+
+Trzy rozstrzygnięcia operatora po przeglądzie hand-offu przez sesję równoległą.
+**Wszystkie cztery rozjazdy zgłoszone przez tamtą sesję potwierdziłem odczytem
+kodu — żadnego nie odrzuciłem.**
+
+**1. `[data-mp-pole]` WCHODZI DO KONTRAKTU DOM. Czytanie pól kartowych domyślnie
+włączone.** Do tej pory `zaladuj()` czytał je tylko przy jawnym `opcje.pola`, więc
+`zbudujZamienniki` budowało mapę z pustego pola i **żaden marker zamiennika nie
+pojawiał się nigdy** — także przy bezbłędnie wypełnionym `co-mozesz-zmienic`.
+Cała mechanika (dopasowanie po kluczu, limit dwóch na krok, ostrzeżenia o wpisach,
+które nie siadają na wierszu) była gotowa i nieosiągalna. **Piąte wystąpienie
+wzorca „funkcja gotowa, wyzwalacza brak"** po `D-39.13/14/18/39`.
+
+**Zakres celowo wąski: włączone CZYTANIE pól do modelu. Wstrzykiwanie kart na
+stronę (`podzielKarty`) NIETKNIĘTE** — jego właściciela rozstrzyga tabela v2 sesji
+CMS, a WYMAGANIA §3 zabrania budować je bez tego rozstrzygnięcia. Te dwie rzeczy
+dotyczą tego samego pola i bywają mylone; rozdzielenie dopisane do nagłówka parsera.
+
+**WYMAGANIA.md NIE ZMIENIONE i hash NIE podbity** — i to jest świadome. §3 mówi
+o właścicielu wstrzykiwania, nie o czytaniu; „kontrakt DOM" to nagłówek
+`przepis-parser.js` i to on został zmieniony. Gdyby operator chciał, żeby §3
+wymieniało `[data-mp-pole]` z nazwy, to osobne polecenie i osobne podbicie hasha.
+
+**2. Limit „jeden `**marker**` na krok" USUNIĘTY.** Operator: „usunąć, skoro
+markera już nie ma, to i nie ma sensu go pilnować". Po `D-39.15` gwiazdki są
+zdejmowane i nie rysują niczego, a reguła podnosiła **błąd** — najostrzejszy sygnał
+parsera — pilnując składni bez konsekwencji. **Reguła bez skutku, egzekwowana jako
+błąd, jest pułapką:** zatrzymuje redakcję na czymś, czego naprawa niczego nie zmienia.
+
+**3. Panel walidacji ZOSTAJE za `?debug=1`.** Moja propozycja automatycznego pokazu
+na stagingu **odrzucona** przez operatora („tylko za parametrem"). Bez zmian w kodzie.
+
+**Zmierzone `[V]`** (stub DOM w Node, trzy warianty opcji): `zaladuj()` nie rzuca
+przy nowym domyślnym trybie · `model.pola` jest obiektem w każdym wariancie ·
+`opcje.pola` obiektem dalej podaje surowe teksty z pominięciem DOM-u (używa tego
+harness). **Ograniczenie tego testu, mówię wprost:** stub nie ma elementów
+`[data-mp-pole]`, więc **różnica między domyślnym trybem a `pola:false` nie jest
+w nim obserwowalna**. Rzeczywiste czytanie potwierdzi dopiero strona z markupem.
+
+**Artefakt parsera:** 40 230 znaków, **15 448 B gzip** (budżet 20 kB).
+
+**CZEKA NA OPERATORA — bez tego zamienniki dalej nie zadziałają:** szablon musi
+wystawiać sekcje `<section data-mp-pole="co-mozesz-zmienic">…<div data-mp-surowe>
+{{co-mozesz-zmienic}}</div></section>`. Parser jest gotowy; markupu w szablonie nie ma.
+
+Hand-off `HANDOFF--kontrakt-tresci-parsera--2026-08-17.md` poprawiony w czterech
+miejscach: bramka `?debug=1`, brak blokowania przez błędy, gwiazdki bez skutku,
+nowy rozdz. 5a o `co-mozesz-zmienic`.
+
+### `D-39.48` · OSTRZEŻENIE O NIEODMIENIALNEJ JEDNOSTCE — 2026-08-17
+
+Trzeci zestaw znalezisk sesji równoległej. **Wszystkie trzy potwierdziłem odczytem
+kodu; żadnego nie odrzuciłem.** Wdrożone jedno — pozostałe dwa opisane w hand-offie
+jako zachowania do znania, nie do zmiany.
+
+**Wdrożone: ostrzeżenie o jednostce spoza tabeli odmian.** `odmien()` przy słowie
+spoza `ODMIANY` zwraca je NIETKNIĘTE, więc „3 ząbki czosnku" renderuje się jako
+„3 ząbki" przy każdej liczbie porcji — **i nie było na to żadnego sygnału**.
+Objaw ujawnia się dopiero po ruszeniu selektora porcji, czyli po tym, jak redakcja
+uzna przepis za skończony.
+
+**Ostrzeżenie, nie błąd, i to jest rozstrzygnięcie, nie kompromis:** nieodmieniona
+jednostka nie psuje builda, psuje wygląd. Błąd zatrzymywałby redakcję na czymś,
+co przy porcjach bazowych wygląda dobrze.
+
+**Lista `MIARY_NIEODMIENNE` istnieje wyłącznie po to, żeby nie sypać szumem** na
+każdym „500 g" i „200 ml" — skróty są nieodmienne z definicji, to poprawna pisownia,
+nie niedopatrzenie. To było jedyne realne ryzyko tej zmiany i dlatego zostało
+zmierzone, a nie założone.
+
+**Zmierzone `[V]` — jedenaście przypadków, zero fałszywych alarmów:**
+
+| wejście | wynik |
+|---|---|
+| `3 ząbek czosnku` · `2 łyżka oliwy` · `3 jajko` | cisza (poprawne) |
+| `3 ząbki czosnku` · `2 łyżki oliwy` · `3 jajka` | **ostrzega** |
+| `500 g` · `200 ml` · `2 cm` | cisza (miary) |
+| `2 szalotka\|szalotki\|szalotek\|szalotki` | cisza (formy jawne) |
+| `sól do smaku` (bez liczby) | cisza |
+
+**Znalezisko uboczne, wstydliwe i warte zapisania:** własny przykład w hand-offie
+(`#oliwa 2 łyżki oliwy`) **był instancją tej samej pułapki**. Napisałem dokument
+ostrzegający przed błędem i popełniłem go w przykładzie trzy akapity wyżej.
+Poprawiony na `2 łyżka oliwy` z jawną adnotacją, że to wygląda źle w CMS i tak ma być.
+
+**NIE wdrożone, świadomie — dwie pozycje decyzyjne w hand-offie (rozdz. 3.2, 3.3):**
+
+- **`@produkt` kasuje pracę nad odmianą**, a `n` to liczba SZTUK, nie opakowań:
+  przy 8 porcjach „4 × 335 g" to dwa opakowania i etykieta tego nie mówi.
+  **Nie ruszam — liczenie w sztukach jest udokumentowaną decyzją projektową**
+  („design pokazuje sztuki"), więc zmiana byłaby cofnięciem czyjegoś rozstrzygnięcia,
+  nie naprawą. Pytanie dla operatora: lista zakupów ma mówić, ile zjesz, czy ile kupisz.
+- **Każdy składnik musi wystąpić w `skladniki:` jakiegoś kroku, inaczej BŁĄD.**
+  **Nie luzuję** — bez tego składnik wpadałby do sekcji „dalej" i nigdy z niej nie
+  wychodził, bo przynależność do sekcji liczy się po pierwszym użyciu. Błąd jest tu
+  właściwą ostrością.
+
+**Artefakt parsera:** 40 710 znaków, **15 690 B gzip** (budżet 20 kB).

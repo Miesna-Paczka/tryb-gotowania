@@ -28,13 +28,19 @@
  *        a nie dziura w układzie (R3). -->
  *   <img data-mp-foto-glowne src="{{zdjecie-glowne}}">
  *
- * POZA KONTRAKTEM, opt-in (rozszerzenie NIEZATWIERDZONE — pin, WYMAGANIA §3):
+ *   <!-- POLA KARTOWE — W KONTRAKCIE od 2026-08-17 (D-39.47, decyzja operatora).
+ *        Jedna sekcja na pole; nazwy: `wskazowka`, `co-mozesz-zmienic`,
+ *        `przechowywanie`. Bez nich ZAMIENNIKI NIE DZIAŁAJĄ — mapa buduje się
+ *        z pustego pola i żaden marker się nie pojawi. -->
+ *   <section data-mp-pole="co-mozesz-zmienic">…<div data-mp-surowe>{{co-mozesz-zmienic}}</div></section>
  *
- *   <section data-mp-pole="wskazowka">…<div data-mp-surowe>{{wskazowka}}</div></section>
+ * Pola kartowe są związane server-side z WIDOCZNYM tekstem (SEO/GEO). `zaladuj()`
+ * CZYTA je domyślnie do modelu; `opcje.pola === false` to wyłącza.
  *
- * Pola kartowe są związane server-side z WIDOCZNYM tekstem (SEO/GEO), więc
- * `zaladuj()` ich domyślnie NIE czyta, a `podzielKarty()` wywołuje się jawnie.
- * Do czasu decyzji operatora runtime nie wymaga tych atrybutów od szablonu.
+ * ROZDZIELENIE, KTÓRE ŁATWO POMYLIĆ: czytanie pól do modelu (powyżej, w kontrakcie)
+ * to co innego niż WSTRZYKIWANIE kart na stronę (`podzielKarty`, wołane jawnie).
+ * Właściciela wstrzykiwania rozstrzyga tabela v2 sesji CMS — WYMAGANIA §3 zabrania
+ * budować je bez tego rozstrzygnięcia i ten zakaz OBOWIĄZUJE BEZ ZMIAN.
  *
  * Użycie:
  *   const przepis = MP.przepis.zaladuj();          // model przy porcjach bazowych
@@ -87,6 +93,39 @@
     if (!baza) return true;
     if (DZIELNE[baza]) return true;
     return !ODMIANY[baza];      // g, ml, kg, cm, l — spoza tabeli, dzielne
+  }
+
+  /* `D-39.48` · JEDNOSTKI MIARY, KTÓRE SŁUSZNIE SIĘ NIE ODMIENIAJĄ.
+     Lista istnieje wyłącznie po to, żeby ostrzeżenie o nieodmienialnej jednostce
+     (`ostrzezJednostke`) nie sypało szumem na każdym „500 g" i „200 ml".
+     Skróty w polskim są nieodmienne z definicji — to nie jest niedopatrzenie
+     redakcji, tylko poprawna pisownia. */
+  var MIARY_NIEODMIENNE = {
+    'g': 1, 'kg': 1, 'mg': 1, 'dag': 1, 'dkg': 1,
+    'ml': 1, 'l': 1, 'cl': 1, 'dl': 1,
+    'mm': 1, 'cm': 1, 'm': 1,
+    'szt': 1, 'szt.': 1, 'op': 1, 'op.': 1, '%': 1
+  };
+
+  /* Ostrzeżenie, nie błąd, i to jest rozstrzygnięcie, nie kompromis: nieodmieniona
+     jednostka **nie psuje builda** — psuje wygląd dopiero po ruszeniu selektora
+     porcji. Błąd zatrzymywałby redakcję na czymś, co przy porcjach bazowych wygląda
+     dobrze; ostrzeżenie mówi „sprawdź to", nie „to się nie zbuduje".
+
+     Powód istnienia: `odmien()` przy słowie spoza tabeli zwraca je NIETKNIĘTE.
+     Zapis „3 ząbki czosnku" renderuje się jako „3 ząbki" przy każdej liczbie porcji
+     i **nie było na to żadnego sygnału** — pułapka zgłoszona przez sesję równoległą
+     2026-08-17, wdrożona na polecenie operatora. */
+  function ostrzezJednostke(key, jednostka) {
+    var baza = String(jednostka || '').split('|')[0].toLowerCase();
+    if (!baza) return;
+    if (String(jednostka).indexOf('|') >= 0) return;   // formy podane jawnie
+    if (MIARY_NIEODMIENNE[baza]) return;
+    if (ODMIANY[baza]) return;
+    ostrzez('składnik #' + key + ': jednostka „' + baza + '" nie jest w tabeli odmian, ' +
+            'więc NIE BĘDZIE odmieniana przy zmianie porcji. Użyj mianownika liczby ' +
+            'pojedynczej (np. „ząbek", nie „ząbki") albo podaj cztery formy przez ' +
+            'kreskę: „ząbek|ząbki|ząbków|ząbka".');
   }
 
   /* 1 → [0]; 2–4 (poza 12–14) → [1]; 5+ → [2]; ułamek → [3] (dopełniacz l.poj.). */
@@ -229,6 +268,10 @@
       widziane[key] = true;
 
       var czesci = rozbijTresc(reszta);
+      /* D-39.48 — sprawdzamy TYLKO wtedy, gdy w ogóle udało się rozebrać ilość.
+         Wiersz bez liczby („sól do smaku") nie ma jednostki do odmieniania i nie
+         ma o czym ostrzegać. */
+      if (czesci.ilosc != null) ostrzezJednostke(key, czesci.jednostka);
       czesci.key = key;
       czesci.produktSlug = produktSlug;
       czesci.produkt = null;   // wypełni podepnijProdukty()
@@ -258,7 +301,16 @@
       biezacy.tekst = biezacy._linie.join(' ').trim();
       biezacy.tekstHtml = bezZakreslen(biezacy.tekst);
       biezacy.kryteriumHtml = biezacy.kryterium ? bezZakreslen(biezacy.kryterium) : null;
-      if ((biezacy.tekst.match(/\*\*/g) || []).length > 2) blad('krok "' + biezacy.tytul + '" ma więcej niż jeden marker — limit to jeden na krok');
+      /* `D-39.47` · LIMIT „jeden `**marker**` na krok" USUNIĘTY. Decyzja operatora
+         2026-08-17: „usunąć, skoro markera już nie ma, to i nie ma sensu go pilnować".
+         Po `D-39.15` (2026-08-16) `bezZakreslen()` zdejmuje gwiazdki i zwraca sam
+         tekst, więc `**…**` nie rysuje NICZEGO. Reguła podnosiła BŁĄD — czyli
+         najostrzejszy sygnał, jaki ma parser — pilnując składni bez konsekwencji.
+         **Reguła bez skutku, egzekwowana jako błąd, jest pułapką:** zatrzymuje
+         redakcję na czymś, czego naprawa niczego nie zmienia w produkcie.
+         Zamienniki niesie pole `co-mozesz-zmienic` (`zbudujZamienniki`), z własnym
+         limitem dwóch na krok i własnymi ostrzeżeniami — i to jest jedyny limit,
+         który cokolwiek chroni. */
       delete biezacy._linie;
       if (biezacy.minutnik && biezacy.czas) blad('krok "' + biezacy.tytul + '" ma czas: i minutnik: naraz — wygrywa minutnik');
       if (!biezacy.minutnik && !biezacy.czas) biezacy.czas = 'bez minutnika';
@@ -726,10 +778,25 @@
     podepnijProdukty(model.skladniki);
     podepnijZdjecia(model.kroki);
 
-    /* Pola kartowe. Domyślnie WYŁĄCZONE, bo `[data-mp-pole]` nie jest jeszcze
-       w kontrakcie DOM (pin, WYMAGANIA §3) — `opcje.pola === true` czyta je
-       ze strony, obiekt podaje surowe teksty wprost. */
-    var zrodlaPol = opcje.pola;
+    /* `D-39.47` · POLA KARTOWE DOMYŚLNIE WŁĄCZONE — `[data-mp-pole]` WCHODZI DO
+       KONTRAKTU DOM. Decyzja operatora 2026-08-17, wprost: „wchodzi do kontraktu".
+
+       Przesłanka: dopóki czytanie było opt-in, `zbudujZamienniki` budowało mapę
+       z pustego pola i **żaden marker zamiennika nie pojawiał się nigdy** — także
+       przy bezbłędnie wypełnionym `co-mozesz-zmienic`. Cała mechanika zamienników
+       (dopasowanie po kluczu, limit dwóch na krok, ostrzeżenia o wpisach, które nie
+       siadają na wierszu) była gotowa i nieosiągalna. **Piąte wystąpienie wzorca
+       „funkcja gotowa, wyzwalacza brak"** po `D-39.13/14/18/39`.
+
+       Zakres zmiany jest wąski i celowo taki został: włączamy **CZYTANIE** pól do
+       modelu. **Wstrzykiwania kart na stronę (`podzielKarty`) NIE ruszamy** — jego
+       właściciela rozstrzyga tabela v2 sesji CMS, a WYMAGANIA §3 mówi wprost
+       „nie buduj wstrzykiwania bez tego rozstrzygnięcia". Te dwie rzeczy bywają
+       mylone, bo dotyczą tego samego pola.
+
+       `opcje.pola === false` wyłącza czytanie jawnie; obiekt nadal podaje surowe
+       teksty wprost, z pominięciem DOM-u (używa tego harness). */
+    var zrodlaPol = (opcje.pola === undefined || opcje.pola === true) ? true : opcje.pola;
     if (zrodlaPol === true) {
       zrodlaPol = {};
       Array.prototype.forEach.call(document.querySelectorAll('[data-mp-pole]'), function (el) {
