@@ -3293,6 +3293,57 @@
   var QR_ROZMIAR = 96;
   var QR_KOLOR = '#2b2118';
 
+  /* `D-39.43` · WŁASNY RENDERER SVG — ZAOKRĄGLONE DANE, OSTRE ZNACZNIKI.
+     Decyzja operatora 2026-08-17 po przedstawieniu trzech wariantów; wybrany
+     najbezpieczniejszy: zaokrąglamy moduły DANYCH, trzy znaczniki pozycjonujące
+     zostają ostre.
+
+     **Dlaczego znaczniki muszą zostać ostre:** to po nich dekoder NAJPIERW znajduje
+     kod i po nich liczy jego orientację oraz skalę. Rozmycie ich krawędzi kosztuje
+     najwięcej przy najmniejszym zysku wizualnym — trzy kwadraty na kilkaset modułów.
+     Moduły danych są odczytywane już po znalezieniu siatki, próbkowaniem ŚRODKA
+     komórki, więc zaokrąglenie rogu ich nie dotyka.
+
+     `createSvgTag` biblioteki tego nie potrafi (rysuje wszystko jedną ścieżką
+     prostokątów), stąd własny generator. Cena: kilkaset elementów `<rect>` zamiast
+     jednej ścieżki. To koszt DOM-u, nie transferu — SVG powstaje w przeglądarce.
+
+     `QR_PROMIEN` w jednostkach viewBoxa, gdzie komórka ma `QR_CELA` = 4. Przy 1,2
+     zaokrąglenie jest widoczne, a moduł zachowuje płaskie boki i dalej styka się
+     z sąsiadem — przy 2 zamieniłby się w koło i zniknęłyby styki, co przy module
+     rzędu 2 px na ekranie realnie utrudnia dekodowanie. Wartość jest nazwana
+     i jednoliniowa do zmiany, gdyby operator chciał mocniej albo słabiej. */
+  var QR_CELA = 4;
+  var QR_MARGINES = 8;      /* 2 moduły ciszy — mniej niż zalecane 4, zastane */
+  var QR_PROMIEN = 1.2;
+
+  /* Znaczniki pozycjonujące to trzy kwadraty 7×7 w rogach: lewy górny, prawy górny
+     i lewy dolny. Prawego dolnego NIE MA i to nie jest przeoczenie — jego brak jest
+     tym, co pozwala dekoderowi ustalić obrót kodu. */
+  function wZnaczniku(x, y, n) {
+    return (x < 7 && y < 7) || (x >= n - 7 && y < 7) || (x < 7 && y >= n - 7);
+  }
+
+  function svgKodu(kod) {
+    var n = kod.getModuleCount();
+    var bok = n * QR_CELA + 2 * QR_MARGINES;
+    var czesci = [];
+    for (var y = 0; y < n; y++) {
+      for (var x = 0; x < n; x++) {
+        if (!kod.isDark(y, x)) continue;
+        czesci.push('<rect x="' + (QR_MARGINES + x * QR_CELA) +
+                    '" y="' + (QR_MARGINES + y * QR_CELA) +
+                    '" width="' + QR_CELA + '" height="' + QR_CELA + '"' +
+                    (wZnaczniku(x, y, n) ? '' : ' rx="' + QR_PROMIEN + '"') + '/>');
+      }
+    }
+    /* `fill` na `<svg>`, nie na każdym prostokącie — prostokąty własnego nie mają,
+       więc dziedziczą. `shape-rendering:crispEdges` NIE dokładamy: wyłączyłoby
+       wygładzanie, czyli dokładnie to, po co są zaokrąglenia. */
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + bok + ' ' + bok +
+           '" fill="' + QR_KOLOR + '" role="img">' + czesci.join('') + '</svg>';
+  }
+
   function rysujQR(selektor) {
     var el = document.querySelector(selektor || '[data-mp-qr]');
     if (!el) return;
@@ -3301,17 +3352,40 @@
     var kod = QR(0, 'M');            /* 0 = wersja dobierana do długości adresu */
     kod.addData(adresQR());
     kod.make();
-    el.innerHTML = kod.createSvgTag({ cellSize: 4, margin: 8, scalable: true });
+    el.innerHTML = svgKodu(kod);
     var svg = el.querySelector('svg');
     if (svg) {
-      /* Biblioteka rysuje czarne moduły na przezroczystym tle i skaluje przez
-         viewBox. Rozmiar i barwę ustawiamy tu, bo `createSvgTag` ich nie przyjmuje,
-         a spec §8 podaje jedno i drugie. Kolor idzie na KAŻDĄ ścieżkę, nie na `svg`
-         — `fill` na rodzicu nie dziedziczy się do ścieżki z własnym `fill`. */
+      /* Kolor i `viewBox` ustawia już `svgKodu()`; tu zostaje rozmiar i zachowanie
+         w pudełku. Uwaga historyczna: dopóki SVG pochodził z `createSvgTag`, kolor
+         trzeba było wpisywać w KAŻDĄ ścieżkę osobno, bo `fill` na rodzicu nie
+         dziedziczy się do elementu z własnym `fill`. Nasze prostokąty własnego
+         `fill` nie mają, więc dziedziczą z `<svg>` i pętla po ścieżkach odpadła. */
       svg.setAttribute('width', QR_ROZMIAR);
       svg.setAttribute('height', QR_ROZMIAR);
-      var sciezki = svg.querySelectorAll('path');
-      for (var i = 0; i < sciezki.length; i++) sciezki[i].setAttribute('fill', QR_KOLOR);
+      /* `D-39.41` · TRZY DEKLARACJE, KTÓRE ROZSTRZYGAJĄ „KOD NIE JEST WYŚRODKOWANY".
+         Zgłoszenie operatora 2026-08-17. Przyczyny są DWIE i obie zmierzone `[V]`:
+
+         (1) Slot ma `border: 1px` przy `box-sizing: border-box`, więc jego
+             `offsetWidth` to 96, ale `clientWidth` **94**. SVG o boku 96 nie mieści
+             się w pudełku treści i przy `overflow:hidden` traci 2 px z PRAWEJ
+             i z DOŁU, zachowując pełne krawędzie z lewej i z góry. Z zewnątrz
+             wygląda to dokładnie jak przesunięcie w lewo i w górę.
+             `max-width:100%` + `height:auto` znoszą to bez dotykania szablonu:
+             kod zjeżdża do 94×94 i nic nie jest ucinane. Nominalne 96 zostaje
+             w stałej i dalej rządzi wszędzie tam, gdzie slot nie ma obramowania.
+
+         (2) `display:inline` (domyślne dla SVG) sadza kod na LINII BAZOWEJ tekstu,
+             więc pod nim zostaje miejsce na wydłużenia dolne — przy `line-height:20px`
+             slotu to kilka pikseli pustki u dołu i kolejne źródło asymetrii.
+             `display:block` je usuwa.
+
+         `margin:0 auto` dokłada wyśrodkowanie w poziomie, gdyby slot był kiedyś
+         szerszy od kodu — dziś nie zmienia nic, jutro nie pozwoli usiąść do lewej.
+         Cofnięcie: usuń te trzy przypisania do `style`. */
+      svg.style.display = 'block';
+      svg.style.maxWidth = '100%';
+      svg.style.height = 'auto';
+      svg.style.margin = '0 auto';
     }
     el.setAttribute('aria-label', 'Kod QR: otwórz tryb gotowania na telefonie');
   }

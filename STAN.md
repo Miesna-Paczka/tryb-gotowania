@@ -10979,3 +10979,244 @@ i audytowalną w jednym miejscu.
 Składnia źródła i artefaktu zweryfikowana `new Function()`.
 **Predykcja do sprawdzenia po publikacji:** slot 96×96, SVG 96×96, widoczne 100 %,
 trzy znaczniki pozycjonujące na swoich miejscach.
+
+### `D-39.41/42/43` · WYŚRODKOWANIE QR, ETYKIETA PORCJI, ZAOKRĄGLONE MODUŁY — 2026-08-17
+
+**`D-39.41` · „kod nie jest wyśrodkowany" — DWIE przyczyny, obie zmierzone `[V]`.**
+Slot ma `border:1px` przy `box-sizing:border-box`, więc `offsetWidth` = 96, ale
+**`clientWidth` = 94**. SVG o boku 96 nie mieścił się w pudełku treści i przy
+`overflow:hidden` tracił 2 px z PRAWEJ i DOŁU, zachowując pełne krawędzie z lewej
+i góry — z zewnątrz nieodróżnialne od przesunięcia. Druga przyczyna: `display:inline`
+sadzało SVG na linii bazowej, a slot ma `line-height:20px`, więc pod kodem zostawała
+pustka. Naprawa w parserze, bez dotykania szablonu: `display:block`, `max-width:100%`,
+`height:auto`, `margin:0 auto`.
+
+**`D-39.42` · „ile porcji?" wyśrodkowane i w wadze 500.** Zgłoszenie operatora,
+**zweryfikowane odczytem** `7195:10910`: `text-center`, `font-medium`, DM Sans Medium,
+`typo/caption` 14 px, interlinia 16. Runtime miał wyrównanie i wagę ODZIEDZICZONE,
+bo reguła nie ustawiała ani jednego, ani drugiego. **Operator zauważył wyrównanie;
+waga to znalezisko z tego samego odczytu** — styl `Caption` jest w Figmie
+zdefiniowany jako 500, nie 400. Lekcja przenośna: zgłoszenie o jednej właściwości
+warto zamknąć odczytem CAŁEGO węzła, bo brakująca deklaracja rzadko chodzi sama.
+
+**`D-39.43` · własny renderer SVG: dane zaokrąglone, znaczniki ostre.**
+`createSvgTag` biblioteki rysuje wszystko jedną ścieżką i tego nie potrafi.
+Znaczniki pozycjonujące zostają ostre, bo **to po nich dekoder najpierw znajduje kod
+i liczy jego orientację oraz skalę** — rozmycie ich krawędzi kosztuje najwięcej przy
+najmniejszym zysku wizualnym. Moduły danych są próbkowane w ŚRODKU komórki, więc
+zaokrąglenie rogu ich nie dotyka.
+
+**Zweryfikowane wykonaniem renderera poza przeglądarką `[V]`:** 41×41, 842 ciemne
+moduły, z tego **99 w znacznikach i 743 danych**; SVG ma 842 `<rect>`, z czego
+**743 z `rx` i 99 bez** — zgodność ostrych ze znacznikami potwierdzona programowo,
+nie na oko. `viewBox` niezmieniony (`0 0 180 180`), więc geometria kodu ta sama.
+`QR_PROMIEN` = 1,2 przy komórce 4: moduł zachowuje płaskie boki i styka się
+z sąsiadem. Przy 2 stałby się kołem i styki by zniknęły — przy module rzędu 2 px
+to realnie utrudnia dekodowanie.
+
+Koszt: 842 elementy zamiast jednej ścieżki, SVG 42 825 znaków wobec 18 306.
+**To koszt DOM-u, nie transferu** — SVG powstaje w przeglądarce.
+
+#### Gęstość kodu — odpowiedź na pytanie operatora, policzona biblioteką, którą wysyłamy
+
+| wariant adresu | znaków | EC | moduły | moduł @94 px |
+|---|---|---|---|---|
+| **OBECNY — długi slug** | 85 | **M** | **41×41** | **2,09 px** |
+| OBECNY — długi slug | 85 | L | 37×37 | 2,29 px |
+| OBECNY — krótki slug | 72 | M | 37×37 | 2,29 px |
+| bez `https://` | 77 | M | 37×37 | 2,29 px |
+| parametr `?g=1` | 74 | M | 37×37 | 2,29 px |
+| bez `https` + `?g=1` | 66 | M | 37×37 | 2,29 px |
+| bez `https` + `?g=1` | 66 | **L** | **33×33** | **2,54 px** |
+
+**Kluczowa liczba: przy poziomie M wersja 5 mieści 84 bajty, a nasz najdłuższy adres
+ma 85.** Jesteśmy JEDEN bajt nad progiem — stąd 41×41 zamiast 37×37. Dlatego gęstość
+**zmienia się między przepisami**: „kurczak-teriyaki-przepis" (72 znaki) daje 37×37,
+„wolowina-teriyaki-z-brokulami-przepis" (85) daje 41×41. Zmierzone na obu stronach.
+
+Najtańsze cięcie to `?tryb=gotowanie` → `?g=1` (−11 znaków): zdejmuje jedną wersję
+**bez ruszania korekcji błędów i bez skracania slugów**. Wymaga zmiany po stronie
+strony, która ten parametr czyta — **poza tym łańcuchem**, więc tylko odnotowuję.
+Zejście z M na L schodzi o kolejną wersję, ale obniża odporność na zabrudzenie
+z ~15 % do ~7 %; przy kodzie na ekranie, a nie na papierze, to obrona przed
+odbiciem światła i palcem na monitorze. **Nie rekomenduję bez potrzeby.**
+
+Osobno, zastane i nietknięte: margines ciszy wynosi **2 moduły**, a norma zaleca 4.
+Zwiększenie zjadłoby powierzchnię samego kodu przy stałym boku 94 px, więc zostawiam
+i zapisuję jako znany kompromis, nie jako przeoczenie.
+
+**Artefakty:** parser 40 315 znaków / **15 482 B gzip** · runtime 47 251 znaków /
+**13 225 B gzip**. Oba w budżecie.
+
+### `D-39.44` · ZDJĘCIE NA ASPEKCIE 16:9 — DOMYKA `D-31.1` — 2026-08-17
+
+Decyzja operatora: **16:9**, po przedstawieniu 3:2 / 16:9 / 4:3.
+
+**To domyka `D-31.1`**, który od przebiegu 31 stał na liście decyzji jako rozjazd
+między inwariantem `0aa` („żadnej miary zależnej od szerokości") a `D-26.2`
+(„aspekt"). **Wygrywa `D-26.2`.** Akapit w kodzie, który zapisywał WSTRZYMANIE,
+zastąpiony zapisem rozstrzygnięcia — inaczej zostałby jako uzasadnienie stanu,
+którego już nie ma.
+
+**Zgłoszenie operatora („zdjęcie zwyczajnie za szerokie") opisuje DRYF, nie projekt
+— i to czyni z tego usterkę, nie preferencję.** Figma rysuje 328×150 = 2,19:1, ale
+runtime miał `height:150px` na sztywno przy płynnej szerokości, więc kadr zgadzał
+się **wyłącznie przy 360 px**:
+
+| ekran | kolumna | aspekt PRZED | wysokość PO (16:9) |
+|---|---|---|---|
+| 360 | 328 | 2,19:1 (zgodny z Figmą) | 184 |
+| 390 | 358 | 2,39:1 | 201 |
+| 402 | 370 | 2,47:1 | 208 |
+| 430 | 398 | 2,65:1 | 224 |
+| **440** (iPhone 17 Pro Max) | 408 | **2,72:1** | 230 |
+
+Im lepszy telefon, tym płaskszy kadr — a operator patrzy na 440. `aspect-ratio`
+znosi dryf w całości: kadr jest ten sam na każdej szerokości.
+
+**Reguła BAZOWA, więc obejmuje też zdjęcie KROKU** — świadomie. Klatka kroku
+(`7195:10965`) ma te same 328×150, czyli ten sam dryf; zostawienie kroku na stałej
+wysokości dałoby **dwa różne kadry w jednym produkcie**, co jest gorsze niż jedna
+zmiana więcej. **Do zawetowania przez operatora, jeśli chciał tylko ekranu startowego.**
+
+Zapas zgodności: `aspect-ratio` od iOS 15 i Chrome 88 — poniżej każdego urządzenia,
+na którym ten tryb ma sens.
+
+**Skutek uboczny do obserwacji:** zdjęcie rośnie ze 150 na 184–230 px, więc wszystko
+pod nim zjeżdża o 34–80 px. Na ekranie startowym selektor porcji i CTA schodzą
+niżej; przy krótkich viewportach TOP zacznie się przewijać częściej niż dotąd.
+Po `D-39.30/31` przewijanie działa i ma prześwit nad pasem, więc to jest zmiana
+rytmu, nie regres — ale warto na to spojrzeć na urządzeniu.
+
+**Artefakt:** runtime 47 256 znaków, **13 236 B gzip** (budżet 20 kB).
+Stara `height:150px` nie występuje już w artefakcie — sprawdzone.
+
+**PREDYKCJA:** przy ramce 360 zdjęcie ma mieć **328×184**, a nie 328×150.
+
+### `S6` · MAKIETA MODALA SKŁADNIKÓW NARYSOWANA W FIGMIE — 2026-08-17
+
+**KOREKTA WŁASNEGO BŁĘDU: zapis do Figmy DZIAŁA.** Twierdziłem — dwa razy — że seat
+`View` na planie starter to uniemożliwia, i odmówiłem na tej podstawie. **To była
+inferencja z `whoami`, nie pomiar.** Próba (utworzenie ramki `__proba-uprawnien`
+i natychmiastowe usunięcie) przeszła bez błędu `[V]`. Ta sama klasa pomyłki co
+„terser się wiesza" i „13 px obcięcia": **orzeczenie o narzędziu bez uruchomienia
+narzędzia.** Trzeci raz tego samego dnia.
+
+Organizacji przełączyć nie umiem i nie ma czego przełączać — `whoami` widzi jeden
+plan („Łukasz Werecik's team", starter). Rysowane w `T0QnV1TrpngJhq2m1E9ZlI`,
+czyli tam, gdzie wskazują wszystkie pliki wiążące.
+
+**Klatka `7545:12442` — „S6 · składniki przed startem (propozycja Claude 2026-08-17)"**,
+w kontenerze `7195:10893`, pod istniejącymi rzędami.
+
+Decyzje projektowe, każda z przesłanką:
+
+- **Arkusz dolny, nie dialog wyśrodkowany.** S2/S4 są zaprojektowane pod dwa zdania
+  i dwa przyciski; lista składników bywa na kilkanaście pozycji. Arkusz 360×520,
+  promień 16 tylko u góry.
+- **Podkład to KLON ekranu startowego** (`7195:10894`), nie rysunek od nowa — modal
+  ma być oceniany w kontekście, a tło ma być dokładnie tym ekranem, który operator zna.
+- **Wiersze to INSTANCJE komponentu** `składnik — teraz` (`7273:10903`), nie moje
+  prostokąty. Makieta dziedziczy checkbox, typografię i rytm z systemu.
+- **Jeden CTA w arkuszu, nie dwa.** Ekran startowy ma już „zacznij gotować"
+  i „najpierw pokaż składniki"; modal jest odpowiedzią na ten drugi, więc
+  powtarzanie go w środku byłoby pętlą. Wyjście niesie iks w nagłówku —
+  klon `7283:10777`, nie imitacja.
+- **Lista bez podziału na „w tym kroku / dalej / zużyte"** — przed startem nie ma
+  kroku bieżącego ani zużytych, więc podział nie miałby desygnatu. Jedna płaska
+  lista z checkboxami, zgodnie z tym, co robi lista na stronie przepisu.
+
+**INGERENCJA W ISTNIEJĄCĄ PRACĘ — zgłaszam wprost:** kontener `7195:10893` został
+**powiększony z 3800 na 4817 px wysokości**, żeby nowa klatka mieściła się pod
+rzędami. Dokładanie pustego miejsca u dołu jest addytywne i odwracalne
+(`resize(4460, 3800)`), a przestawianie cudzych ekranów nie byłoby. **Nic innego
+w pliku nie zostało zmienione.** Dwie pierwsze próby postawiły klatkę w złym
+miejscu (najpierw na istniejącym ekranie, potem 37 tys. px pod kanwą) — obie
+poprawione, żadna nie zostawiła śladu poza przesunięciem tej jednej klatki.
+
+**Status: PROPOZYCJA do oceny operatora, nie ustalenie.** Nie wchodzi do
+`INTERAKCJE.md` ani do runtime'u, dopóki operator jej nie zatwierdzi. Zachowanie
+„najpierw pokaż składniki" w produkcie **nadal przechodzi do kroku 1** — zmiana
+runtime'u czeka na akceptację makiety.
+
+### `D-39.45` · ARKUSZ SKŁADNIKÓW WDROŻONY + kolor CTA w makiecie — 2026-08-17
+
+**Makieta `S6`:** przycisk przełączony z wariantu `wersja=primary` (atrament) na
+`wersja=cta` (pomarańcz). **Wariant, nie zamalowanie wypełnienia** — nadpisanie
+dałoby ten sam piksel i zerwało związek z komponentem, więc makieta przestałaby
+reagować na zmiany w systemie.
+`[!]` **Do sprawdzenia przez operatora:** wypełnienie wariantu `cta` odczytane jako
+**207,65,26** (#CF411A), a token runtime'u `--mp-cta` to **229,85,41** (#E55529).
+Nie zmieniam żadnego z nich — zgłaszam rozjazd, bo jeden z nich jest nieaktualny.
+
+**Wdrożenie w runtimie.** „Najpierw pokaż składniki" otwiera arkusz NA EKRANIE
+STARTOWYM zamiast przechodzić do kroku 1. **Poprzednie zachowanie było sprzeczne
+z własną etykietą:** przycisk mówi „NAJPIERW", a wrzucał użytkownika w krok 1 —
+czyli już po starcie. Wymóg D8/WYM §5 („pełna lista, nie skrócona") **zostaje
+spełniony**: arkusz pokazuje `widok.skladniki`, czyli komplet. Zmienia się miejsce,
+nie zakres.
+
+Rozstrzygnięcia implementacyjne:
+
+- **Wiersze budowane tą samą funkcją co na kroku** (`wierszSkladnika`), ze stanem
+  `dalej` — przed startem nie ma kroku bieżącego ani zużytych, a `dalej` jest
+  jedynym stanem, który nie twierdzi nic nieprawdziwego o przebiegu.
+- **Odhaczenia wspólne z listą kroku** (`zaznaczone`): ten sam składnik, ten sam
+  użytkownik, więc zaznaczenie tutaj przeżywa wejście w krok.
+- **`max-height:72%`, nie stała wysokość** — arkusz krótszy przy krótkiej liście.
+- **`min-height:0` na liście jest konieczne, nie ozdobne:** dziecko kolumny flex ma
+  domyślnie `min-height:auto` i rozpycha rodzica zamiast się przewijać. **Ta sama
+  pułapka, która dała `D-39.30`** — i pierwsze miejsce, gdzie nauka z niej weszła
+  do kodu profilaktycznie, a nie po zgłoszeniu.
+- **`overscroll-behavior-y:contain`** — dojechanie do końca listy nie przewija
+  ekranu pod spodem.
+- **Pas dolny arkusza z safe-area**, tak jak pas produktu.
+- **Zamknięcie trzema drogami:** iks, kliknięcie w scrim, CTA (który dodatkowo
+  startuje gotowanie). Arkusz domykany też w `zamknijWewn` — nie przeżywa wyjścia
+  z trybu.
+- Wystawiony w publicznym API (`MP.tryb.arkusz`), żeby dało się go zmierzyć
+  z zewnątrz zamiast klikać przez interfejs.
+
+**Artefakt:** 49 990 znaków, **13 763 B gzip** (budżet 20 kB, zapas 6,7 kB).
+Stare `przelaczListe(!0)` nie występuje już w artefakcie.
+
+**PREDYKCJE do sprawdzenia po publikacji:** tapnięcie „najpierw pokaż składniki"
+NIE zmienia ekranu na krok 1 · pojawia się arkusz z kompletem składników ·
+lista przewija się w środku arkusza, a nie przewija ekranu pod spodem ·
+CTA „zacznij gotować" zamyka arkusz i wchodzi w krok 1 · odhaczenie w arkuszu
+jest widoczne po wejściu w krok.
+
+### `D-39.46` · DRUGIE CTA „skopiuj składniki" — 2026-08-17
+
+Polecenie operatora, przez analogię do przycisku kopiowania na szablonie przepisu.
+Wprowadzone **równolegle w kodzie i w makiecie `S6`** (wariant `ghost`, rytm 12 px
+pod przyciskiem primary; lista skrócona o 60 px, żeby ustąpiła miejsca pasowi).
+
+**Kopiujemy WYŁĄCZNIE NIEODHACZONE i to nie jest wybór estetyczny:** podpowiedź
+arkusza mówi „zaznacz, co masz w domu, reszta zostanie na liście zakupów", więc
+skopiowanie kompletu przeczyłoby zdaniu stojącemu 8 px wyżej. Ta sama logika co
+na stronie przepisu.
+
+**Dwie drogi do schowka, bo jedna nie wystarcza.** `navigator.clipboard` wymaga
+kontekstu bezpiecznego i bywa odmawiane; `execCommand('copy')` jest wycofywany,
+ale działa tam, gdzie tamto pada. Pole zapasowe jest `readOnly` i poza ekranem —
+inaczej iOS podnosi klawiaturę i przewija stronę do pola, którego nie widać.
+
+**Potwierdzenie idzie na etykietę przycisku**, nie w osobny komunikat: użytkownik
+patrzy w to miejsce, w które właśnie tapnął. Powrót po 1,6 s, z budzikiem chroniącym
+przed nakładaniem się dwóch szybkich tapnięć.
+
+`[!]` **ROZJAZD NAZW DO ROZSTRZYGNIĘCIA:** szablon przepisu nazywa ten przycisk
+**„skopiuj listę zakupów"**, operator poprosił o **„skopiuj składniki"**. Zostawiam
+brzmienie operatora i zgłaszam — dwie nazwy tej samej czynności w jednym produkcie
+to pozycja dla pipeline'u treści (tryb `ui`), nie dla sesji technicznej.
+
+Wystawione w API (`MP.tryb.arkusz.kopiuj`, `.tekstDoSchowka`), żeby dało się to
+zmierzyć bez klikania przez interfejs.
+
+**Artefakt:** 51 236 znaków, **14 142 B gzip** (budżet 20 kB, zapas 6,3 kB).
+
+**PREDYKCJE:** w arkuszu są dwa przyciski w rytmie 12 · tapnięcie „skopiuj składniki"
+zmienia etykietę na „skopiowano" i wraca po ~1,6 s · schowek zawiera tylko pozycje
+NIEODHACZONE, po jednej w wierszu · odhaczenie pozycji i ponowne kopiowanie daje
+krótszą listę.

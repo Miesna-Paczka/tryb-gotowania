@@ -679,15 +679,40 @@
       "font-variant-ligatures:normal;font-feature-settings:'liga';" +
       'letter-spacing:normal;text-transform:none;white-space:nowrap;' +
       'direction:ltr;-webkit-font-smoothing:antialiased}' +
-    '#' + ID + ' .mp-tryb__foto{width:100%;height:150px;object-fit:cover;border-radius:8px;display:block}' +
+    /* `D-39.44` · ZDJĘCIE NA ASPEKCIE 16:9, NIE NA STAŁEJ WYSOKOŚCI.
+       **To domyka `D-31.1`** — rozjazd między inwariantem `0aa` („żadnej miary
+       zależnej od szerokości") a `D-26.2` („aspekt") stał na liście decyzji od
+       przebiegu 31. **Operator rozstrzygnął 2026-08-17 na rzecz aspektu, 16:9.**
+
+       Przesłanka jest zmierzona i to ona czyni z tego USTERKĘ, nie preferencję:
+       Figma rysuje 328×150, czyli 2,19:1, ale runtime miał `height:150px` na sztywno
+       przy PŁYNNEJ szerokości. Zdjęcie było więc zgodne z projektem **wyłącznie przy
+       360 px** i płaszczyło się na każdym szerszym telefonie — przy ekranie 440 px
+       kolumna ma 408 px, co daje **2,72:1**. Im lepszy telefon, tym gorszy kadr.
+       Zgłoszenie operatora („zwyczajnie za szerokie") opisuje więc dryf, a nie sam
+       projekt. `aspect-ratio` znosi go w całości: kadr jest ten sam na każdej
+       szerokości, a 16:9 daje 184 px przy kolumnie 328.
+
+       **Reguła BAZOWA, więc obejmuje też zdjęcie KROKU** — i to jest świadome:
+       klatka kroku (`7195:10965`) ma dokładnie te same 328×150, czyli ten sam dryf.
+       Zostawienie kroku na stałej wysokości dałoby dwa różne kadry w jednym
+       produkcie, co jest gorsze niż jedna zmiana więcej.
+
+       Zapas zgodności: `aspect-ratio` działa od iOS 15 i Chrome 88, czyli poniżej
+       każdego urządzenia, na którym ten tryb ma sens. Cofnięcie: `height:150px`
+       zamiast `aspect-ratio`. */
+    '#' + ID + ' .mp-tryb__foto{width:100%;aspect-ratio:16/9;object-fit:cover;' +
+      'border-radius:8px;display:block}' +
     /* Zdjęcie GŁÓWNE przepisu (D-23.1) — ekran startowy `7195:10901` i zakończenia
        `7195:11188`, obie ramki 328×150 z promieniem **12**. Modyfikator, a nie zmiana
        `.mp-tryb__foto`, bo zdjęcie KROKU nie ma dziś klatki w zestawie (inwentarz
        INTERAKCJE zna wyłącznie „krok BEZ zdjęcia", `7240:10936`) — przestawienie
        jego promienia byłoby zielenią z lektury kodu, nie z odczytu.
-       Wysokość zostaje STAŁA (150), nie stałoaspektowa: inwariant odległości 0aa
-       zabrania miary zależnej od szerokości, a D-26.2 każe aspekt. Rozjazd idzie
-       na listę decyzji (D-31.1), nie do kodu. */
+       **`D-31.1` ROZSTRZYGNIĘTE 2026-08-17** (operator): wygrywa `D-26.2`, czyli
+       aspekt — patrz `D-39.44` przy regule bazowej. Poprzednie brzmienie tego akapitu
+       („wysokość zostaje STAŁA, bo inwariant 0aa zabrania miary zależnej od
+       szerokości") było zapisem WSTRZYMANIA, nie rozstrzygnięcia, i przestało
+       obowiązywać. Modyfikator niesie odtąd wyłącznie promień 12. */
     '#' + ID + ' .mp-tryb__foto--glowne{border-radius:12px}' +
     /* Blok składników na ekranie kroku — W22/W26/W29, Figma `7477:12561` (zewnętrzne)
        i `7195:10935` (ramka). DWA pudełka, nie jedno: zewnętrzne niesie nagłówek
@@ -1164,7 +1189,57 @@
     '#' + ID + ' .mp-tryb__meta-wartosc{display:block;width:100%;height:17px;' +
       'font-size:14px;line-height:16.8px;font-weight:600;text-align:center;' +
       'overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
-    '#' + ID + ' .mp-tryb__porcje-etykieta{margin:0;font-size:14px;line-height:16px}' +
+    /* D-39.42 · „ile porcji?" jest WYŚRODKOWANE i w wadze 500. Zgłoszenie operatora
+       2026-08-17, potwierdzone odczytem `7195:10910`: `text-center`, `font-medium`,
+       `DM Sans Medium`, `typo/caption` 14 px, interlinia 16, `--primary-text`.
+       Runtime miał wyrównanie odziedziczone (`start`) i wagę odziedziczoną (400),
+       bo reguła nie ustawiała ani jednego, ani drugiego. Operator zauważył
+       wyrównanie; waga to znalezisko z tego samego odczytu — styl `Caption`
+       w Figmie jest zdefiniowany jako **500**, nie 400. */
+    '#' + ID + ' .mp-tryb__porcje-etykieta{margin:0;font-size:14px;line-height:16px;' +
+      'font-weight:500;text-align:center}' +
+
+    /* `D-39.45` · ARKUSZ SKŁADNIKÓW NA EKRANIE STARTOWYM (`S6`).
+       Zgłoszenie operatora 2026-08-17: „najpierw pokaż składniki" ma pokazywać listę
+       NA TYM SAMYM ekranie, a nie przechodzić do kroku 1. Makieta narysowana w Figmie
+       (`7545:12442`) i zatwierdzona; ta reguła jest jej wdrożeniem.
+
+       **Arkusz dolny, nie dialog wyśrodkowany** — S2/S4 są zaprojektowane pod dwa
+       zdania i dwa przyciski, a lista bywa na kilkanaście pozycji. `max-height:72%`
+       zamiast stałej wysokości: arkusz ma być krótszy przy krótkiej liście i nie
+       przykrywać całego ekranu przy długiej.
+
+       **Lista przewija się WEWNĄTRZ arkusza** (`flex:1 1 auto` + `min-height:0`
+       + `overflow-y:auto`). `min-height:0` jest tu konieczne, nie ozdobne: dziecko
+       kolumny flex ma domyślnie `min-height:auto`, więc bez tego rozpycha rodzica
+       zamiast się przewijać — ta sama pułapka, która dała `D-39.30`.
+       `overscroll-behavior-y:contain`, żeby dojechanie do końca listy nie przewijało
+       ekranu pod spodem.
+
+       **Pas dolny arkusza dostaje safe-area**, tak samo jak pas produktu — inaczej
+       CTA wchodziłoby pod wskaźnik gestu iPhone'a. */
+    '#' + ID + ' .mp-tryb__arkusz-scrim{position:absolute;inset:0;z-index:5;display:none;' +
+      'background:color-mix(in srgb,var(--mp-atrament) 45%,transparent)}' +
+    '#' + ID + '[data-arkusz] .mp-tryb__arkusz-scrim{display:block}' +
+    '#' + ID + ' .mp-tryb__arkusz{position:absolute;left:0;right:0;bottom:0;z-index:6;' +
+      'display:none;flex-direction:column;max-height:72%;background:var(--mp-bialy);' +
+      'border-radius:16px 16px 0 0;box-shadow:0 -2px 8px rgba(62,43,34,.08)}' +
+    '#' + ID + '[data-arkusz] .mp-tryb__arkusz{display:flex}' +
+    '#' + ID + ' .mp-tryb__arkusz-glowa{flex:0 0 auto;display:flex;align-items:flex-start;' +
+      'justify-content:space-between;gap:8px;padding:20px ' + W.margines + 'px 0}' +
+    '#' + ID + ' .mp-tryb__arkusz-tytul{margin:0;font-family:"DM Serif Display",Georgia,serif;' +
+      'font-size:22px;line-height:1.1;color:var(--mp-zielen)}' +
+    '#' + ID + ' .mp-tryb__arkusz-podpowiedz{flex:0 0 auto;margin:8px ' + W.margines + 'px 0;' +
+      'font-size:14px;line-height:19px}' +
+    '#' + ID + ' .mp-tryb__arkusz-lista{flex:1 1 auto;min-height:0;overflow-y:auto;' +
+      'overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;' +
+      'margin:' + W.margines + 'px;padding:' + W.wnetrze + 'px;' +
+      'border:1px solid var(--mp-beige-2);border-radius:12px;' +
+      'display:flex;flex-direction:column;gap:12px}' +
+    '#' + ID + ' .mp-tryb__arkusz-pas{flex:0 0 auto;display:flex;flex-direction:column;' +
+      'gap:' + W.lukaCta + 'px;padding:0 ' + W.margines + 'px ' + W.margines + 'px;' +
+      'padding-bottom:calc(' + W.margines + 'px + env(safe-area-inset-bottom,0px))}' +
+    /* D-39.46 — rytm 12 px między CTA, ten sam co na ekranach (W.lukaCta). */
     /* G01: blok 192 WYŚRODKOWANY w kolumnie treści (68+192+68 = 328 ✓) — środkowanie,
        nie współrzędna x=68, bo kolumna ma pięć szerokości. */
     '#' + ID + ' .mp-tryb__porcje{height:48px;display:flex;justify-content:center}' +
@@ -2635,14 +2710,152 @@
     return null;
   }
 
+  /* `D-39.45` · ARKUSZ SKŁADNIKÓW — budowa i przełączanie.
+     Wiersze budowane tą samą funkcją co na kroku (`wierszSkladnika`), ze stanem
+     `dalej`: przed startem nie ma kroku bieżącego ani zużytych, więc podział na
+     trzy sekcje nie miałby desygnatu — a `dalej` jest jedynym stanem, który nie
+     twierdzi nic nieprawdziwego o przebiegu gotowania.
+     Odhaczenia są WSPÓLNE z listą kroku (`zaznaczone`), bo to ten sam składnik
+     i ten sam użytkownik — zaznaczenie tutaj ma przetrwać wejście w krok. */
+  var arkusz = null;
+
+  function zbudujArkusz() {
+    if (arkusz) return arkusz;
+    zbuduj();
+    var scrim = el('div', 'mp-tryb__arkusz-scrim', stan.korzen);
+    var pud = el('div', 'mp-tryb__arkusz', stan.korzen);
+    pud.setAttribute('role', 'dialog');
+    pud.setAttribute('aria-modal', 'true');
+    pud.setAttribute('aria-label', 'składniki');
+
+    var glowa = el('div', 'mp-tryb__arkusz-glowa', pud);
+    el('p', 'mp-tryb__arkusz-tytul', glowa).textContent = 'składniki';
+    var x = el('button', 'mp-tryb__zamknij mp-ikona', glowa);
+    x.type = 'button';
+    x.textContent = 'close';
+    x.setAttribute('data-mp-ligatura', 'close');
+    x.setAttribute('aria-label', 'zamknij listę składników');
+
+    el('p', 'mp-tryb__arkusz-podpowiedz', pud).textContent =
+      'Zaznacz, co masz w domu. Reszta zostanie na liście zakupów.';
+
+    var lista = el('ul', 'mp-tryb__arkusz-lista', pud);
+    lista.setAttribute('role', 'list');
+
+    var pas = el('div', 'mp-tryb__arkusz-pas', pud);
+    var cta = el('button', 'mp-tryb__akcja-primary', pas);
+    cta.type = 'button';
+    cta.textContent = 'zacznij gotować';
+
+    /* `D-39.46` · DRUGIE CTA „skopiuj składniki" — polecenie operatora 2026-08-17,
+       przez analogię do przycisku kopiowania na szablonie przepisu (desktop).
+       **Kopiujemy WYŁĄCZNIE NIEODHACZONE** i to nie jest wybór estetyczny:
+       podpowiedź arkusza mówi „zaznacz, co masz w domu, reszta zostanie na liście
+       zakupów", więc skopiowanie wszystkiego przeczyłoby zdaniu stojącemu 8 px wyżej.
+       Ta sama logika co na stronie przepisu.
+       `[!]` Szablon nazywa ten przycisk „skopiuj listę zakupów"; operator poprosił
+       o „skopiuj składniki". Zostawiam brzmienie operatora i zgłaszam rozjazd —
+       dwie nazwy tej samej czynności w jednym produkcie to pozycja dla pipeline'u
+       treści, nie dla mnie. */
+    var kopiuj = el('button', 'mp-tryb__akcja-ghost mp-tryb__arkusz-kopiuj', pas);
+    kopiuj.type = 'button';
+    kopiuj.textContent = 'skopiuj składniki';
+
+    x.addEventListener('click', zamknijArkusz);
+    scrim.addEventListener('click', zamknijArkusz);
+    cta.addEventListener('click', function () { zamknijArkusz(); pokazKrok(1); });
+    kopiuj.addEventListener('click', function () { kopiujSkladniki(kopiuj); });
+
+    arkusz = { el: pud, scrim: scrim, lista: lista, cta: cta, kopiuj: kopiuj };
+    return arkusz;
+  }
+
+  /* Tekst do schowka: jedna pozycja w wierszu, bez numeracji i bez nagłówka —
+     to ma się wkleić do notatek albo do wiadomości, a nie udawać dokumentu. */
+  function tekstDoSchowka() {
+    var skl = (stan.widok && stan.widok.skladniki) || [];
+    return skl.filter(function (s) { return !zaznaczone[s.key]; })
+              .map(function (s) { return s.etykieta || s.nazwa || s.key; })
+              .join('\n');
+  }
+
+  /* Dwie drogi do schowka, bo jedna nie wystarcza. `navigator.clipboard` wymaga
+     kontekstu bezpiecznego i bywa odmawiane; `execCommand('copy')` jest wycofywany,
+     ale działa tam, gdzie tamto pada. Potwierdzenie idzie na etykietę przycisku,
+     nie w osobny komunikat — użytkownik patrzy w to miejsce, w które właśnie
+     tapnął. Etykieta wraca po 1,6 s; `_mpBudzik` chroni przed nakładaniem się
+     dwóch szybkich tapnięć. */
+  function kopiujSkladniki(przycisk) {
+    var tekst = tekstDoSchowka();
+    if (!tekst) return null;
+    var potwierdz = function (ok) {
+      if (!przycisk) return;
+      if (przycisk._mpBudzik) clearTimeout(przycisk._mpBudzik);
+      var bylo = przycisk._mpEtykieta || przycisk.textContent;
+      przycisk._mpEtykieta = bylo;
+      przycisk.textContent = ok ? 'skopiowano' : 'nie udało się skopiować';
+      przycisk._mpBudzik = setTimeout(function () {
+        przycisk.textContent = przycisk._mpEtykieta;
+        przycisk._mpBudzik = null;
+      }, 1600);
+    };
+    if (global.navigator && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(tekst).then(function () { potwierdz(true); },
+                                               function () { potwierdz(zapasowoDoSchowka(tekst)); });
+      return tekst;
+    }
+    potwierdz(zapasowoDoSchowka(tekst));
+    return tekst;
+  }
+
+  function zapasowoDoSchowka(tekst) {
+    try {
+      var pole = document.createElement('textarea');
+      pole.value = tekst;
+      /* `readOnly` i pozycja poza ekranem, żeby iOS nie podniósł klawiatury
+         ani nie przewinął strony do pola, którego użytkownik nie widzi. */
+      pole.readOnly = true;
+      pole.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+      document.body.appendChild(pole);
+      pole.select();
+      pole.setSelectionRange(0, tekst.length);
+      var ok = document.execCommand && document.execCommand('copy');
+      document.body.removeChild(pole);
+      return !!ok;
+    } catch (e) { return false; }
+  }
+
+  function otworzArkusz() {
+    var a = zbudujArkusz();
+    a.lista.textContent = '';
+    var skl = (stan.widok && stan.widok.skladniki) || [];
+    skl.forEach(function (s) { a.lista.appendChild(wierszSkladnika(s, 0, 'dalej')); });
+    stan.korzen.setAttribute('data-arkusz', '');
+    /* Ostrość wejścia klawiaturą: pierwszy element sterujący arkusza, nie cały
+       dokument. Bez tego czytnik zostaje na przycisku pod scrimem. */
+    if (a.cta && a.cta.focus) a.cta.focus();
+    return a.el;
+  }
+
+  function zamknijArkusz() {
+    if (stan.korzen) stan.korzen.removeAttribute('data-arkusz');
+    return null;
+  }
+
   function akcjaEkranu(ktory) {
     var e = stan.ekran;
     if (e === 'start') {
       if (ktory === 'primary') return pokazKrok(1);
-      /* NIENARYSOWANE (G6) / D8 / WYM §5: „najpierw pokaż składniki" otwiera PEŁNĄ listę (wszystkie
-         trzy sekcje), a nie listę skróconą pierwszego kroku. */
-      pokazKrok(1);
-      return przelaczListe(true);
+      /* `D-39.45` · „najpierw pokaż składniki" otwiera ARKUSZ NA EKRANIE STARTOWYM,
+         a nie przechodzi do kroku 1. Zgłoszenie operatora 2026-08-17, makieta `S6`
+         (`7545:12442`) zatwierdzona.
+         **Poprzednie zachowanie było sprzeczne z własną etykietą:** przycisk mówi
+         „NAJPIERW pokaż składniki", a wrzucał użytkownika w krok 1 z rozwiniętą
+         listą — czyli już po starcie. Dawny komentarz powoływał się na D8/WYM §5
+         („pełna lista, nie skrócona"), i ten wymóg zostaje spełniony: arkusz pokazuje
+         `widok.skladniki`, czyli KOMPLET, a nie wycinek kroku. Zmienia się miejsce,
+         nie zakres. */
+      return otworzArkusz();
     }
     if (e === 'wznowienie') {
       if (ktory === 'primary') return pokazKrok(stan.krok);   // I-30: wznowienie na kroku
@@ -2902,6 +3115,7 @@
     puscEkran();   // D-39.17 — blokada nie przeżywa trybu gotowania
     zamknijTooltip();
     zamknijDialog();
+    zamknijArkusz();   // D-39.45 — arkusz nie przeżywa zamknięcia trybu
     if (poprzedniOverflow !== null) {
       document.documentElement.style.overflow = poprzedniOverflow;
       /* D-39.23 — przywracamy OBA, w tej samej gałęzi. Rozdzielenie ich na dwa
@@ -2973,6 +3187,14 @@
       ukryj: ukryjBaner,
       sprawdz: sprawdzPolaczenie,
       el: function () { return baner; }
+    },
+    arkusz: {
+      otworz: otworzArkusz,
+      zamknij: zamknijArkusz,
+      el: function () { return arkusz ? arkusz.el : null; },
+      otwarty: function () { return !!(stan.korzen && stan.korzen.hasAttribute('data-arkusz')); },
+      kopiuj: function () { return kopiujSkladniki(arkusz ? arkusz.kopiuj : null); },
+      tekstDoSchowka: tekstDoSchowka
     },
     tooltip: {
       przelacz: przelaczTooltip,
