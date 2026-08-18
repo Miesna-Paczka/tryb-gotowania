@@ -130,6 +130,7 @@
     'ziemniak': ['ziemniak', 'ziemniaki', 'ziemniaków', 'ziemniaka'], 'bułka': ['bułka', 'bułki', 'bułek', 'bułki'],
     'por': ['por', 'pory', 'porów', 'pora'], 'łodyga': ['łodyga', 'łodygi', 'łodyg', 'łodygi'],
     'kolba': ['kolba', 'kolby', 'kolb', 'kolby'], 'batat': ['batat', 'bataty', 'batatów', 'batata'],
+    'brokuł': ['brokuł', 'brokuły', 'brokułów', 'brokuła'],
 
     /* `D-39.66` · PARTIA I (CR sesji treściowej 2026-08-18, zatwierdzona przez
        operatora tego samego dnia). Zebrane z 18 przepisów migracji — każde z tych
@@ -187,7 +188,8 @@
   var POŁÓWKOWE = {
     'cytryna': 1, 'limonka': 1, 'pomarańcza': 1, 'cebula': 1, 'dymka': 1,
     'papryka': 1, 'papryczka': 1, 'pomidor': 1, 'marchewka': 1, 'ziemniak': 1,
-    'batat': 1, 'por': 1, 'łodyga': 1, 'kolba': 1, 'bułka': 1,
+    'batat': 1,
+    'brokuł': 1, 'por': 1, 'łodyga': 1, 'kolba': 1, 'bułka': 1,
     'pęczek': 1, 'puszka': 1, 'kostka': 1, 'laska': 1
   };
 
