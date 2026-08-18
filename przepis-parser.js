@@ -94,7 +94,11 @@
      Ostrzeżenie z `D-39.57` doradzało „napisz to jako drugie zdanie", a generator
      szablonu (`generuj-html.mjs`, `KLUCZE`) **rozpoznawał ten znacznik od początku**
      i renderował go do czytelnego HTML-u. Rada była więc błędna, a nie tylko zbędna. */
-  var JEDNOSTKI_UŁAMKOWE = ['łyżka', 'łyżeczka', 'szklanka'];
+
+  /* `D-39.65` · `JEDNOSTKI_UŁAMKOWE` STAŁA TU JAKO TRZECIA RÓWNOLEGŁA LISTA
+     i przez to była niepełna — patrz jej nowe miejsce niżej, pod `DZIELNE`.
+     Deklaracja wisiała tutaj bez związku z komentarzami powyżej, które opisują
+     `KLUCZE_NIEOBSLUGIWANE`; sąsiedztwo było przypadkiem historii pliku. */
 
   /* Odmiana przez liczebnik. Polski ma cztery formy istotne dla przepisu, więc
      bez tej tabeli skalowanie porcji produkuje "6 łyżki", "2 ząbek", "1½ łyżek".
@@ -112,26 +116,192 @@
     'kostka': ['kostka', 'kostki', 'kostek', 'kostki'], 'szczypta': ['szczypta', 'szczypty', 'szczypt', 'szczypty'],
     'limonka': ['limonka', 'limonki', 'limonek', 'limonki'], 'cytryna': ['cytryna', 'cytryny', 'cytryn', 'cytryny'],
     'cebula': ['cebula', 'cebule', 'cebul', 'cebuli'], 'marchewka': ['marchewka', 'marchewki', 'marchewek', 'marchewki'],
-    'jajko': ['jajko', 'jajka', 'jajek', 'jajka'], 'filet': ['filet', 'filety', 'filetów', 'fileta'],
-    'pierś': ['pierś', 'piersi', 'piersi', 'piersi'], 'stek': ['stek', 'steki', 'steków', 'steka'],
+    'jajko': ['jajko', 'jajka', 'jajek', 'jajka'],
+    /* `D-39.71` (CR §3 „Furtka klamrowa", decyzja operatora 2026-08-18) ·
+       RODZINA MIĘSNA WYJĘTA W CAŁOŚCI: `polędwica`, `pierś`, `filet`, `stek`,
+       `udziec`, `podudzie`. Wpis w tej tabeli nie jest neutralny — jest cichym
+       oświadczeniem, że dana rzecz jest prawomocną jednostką liczenia, bo redakcja
+       widzi hasło i pisze „1 polędwica". Reguła MP brzmi „główne mięso zawsze
+       w gramach, z gramatury produktu", więc obecność tych słów **wyciszała
+       ostrzeżenie, które akurat tutaj jest pożądane**.
+       Zapłacona cena, świadomie: „6 podudzi" bywa naturalne i od dziś dostanie
+       ostrzeżenie. Odpowiedzią jest gramatura albo furtka klamrowa, nie wpis. */
     'papryka': ['papryka', 'papryki', 'papryk', 'papryki'], 'pomidor': ['pomidor', 'pomidory', 'pomidorów', 'pomidora'],
     'ziemniak': ['ziemniak', 'ziemniaki', 'ziemniaków', 'ziemniaka'], 'bułka': ['bułka', 'bułki', 'bułek', 'bułki'],
     'por': ['por', 'pory', 'porów', 'pora'], 'łodyga': ['łodyga', 'łodygi', 'łodyg', 'łodygi'],
-    'kolba': ['kolba', 'kolby', 'kolb', 'kolby'], 'batat': ['batat', 'bataty', 'batatów', 'batata']
+    'kolba': ['kolba', 'kolby', 'kolb', 'kolby'], 'batat': ['batat', 'bataty', 'batatów', 'batata'],
+
+    /* `D-39.66` · PARTIA I (CR sesji treściowej 2026-08-18, zatwierdzona przez
+       operatora tego samego dnia). Zebrane z 18 przepisów migracji — każde z tych
+       słów wychodziło wcześniej jako „0,3 polędwica wieprzowa", bo `jednostkaDzielna()`
+       zwraca `true` dla wszystkiego, czego `bazaJednostki()` nie zna.
+
+       **Tabela jest zasobem rosnącym, nie stałą konfiguracją.** Wyzwalacz wzrostu
+       jest maszynowy i już istnieje: `ostrzezJednostke()`. Obieg — ostrzeżenie →
+       redakcja proponuje cztery formy → operator zatwierdza → dopisujemy tutaj.
+       Alternatywa, którą redakcja stosowała przez całą migrację, to przepisanie
+       składnika na gramy; kupuje poprawne liczby za „53 g cytryny" i robi to
+       trwale w całej kolekcji, żeby ominąć wiersz, który pisze się raz.
+
+       Sufit kosztu jest policzalny i to jest argument za tą drogą: zbiór miar jest
+       ZAMKNIĘTY (skróty siedzą w `MIARY_NIEODMIENNE`, pięć jednostek dzielnych niżej),
+       rośnie wyłącznie zbiór przedmiotów jadalnych — szacunkowo 60–100 haseł na cały
+       repertuar MP. Zero kolizji form przy dopisaniu tej partii `[V]`. */
+    'goździk': ['goździk', 'goździki', 'goździków', 'goździka'],
+    'szczypiorek': ['szczypiorek', 'szczypiorki', 'szczypiorków', 'szczypiorku'],
+    'pęczek': ['pęczek', 'pęczki', 'pęczków', 'pęczka'],
+    'natka': ['natka', 'natki', 'natek', 'natki'],
+    'papryczka': ['papryczka', 'papryczki', 'papryczek', 'papryczki'],
+    'gwiazdka': ['gwiazdka', 'gwiazdki', 'gwiazdek', 'gwiazdki'],
+
+    /* `D-39.72` · PARTIA II (CR „Furtka klamrowa" §4, 2026-08-18). Dwa hasła
+       z dowodem, nie z listy: przy jednej porcji przepisu #4 wychodziło
+       „0,5 pomarańczy" i „0,5 dymki". Oba połówkują się sensownie, więc idą
+       też do `POŁÓWKOWE`. Reszty partii II celowo nie zgadujemy — ma wyjść
+       z ostrzeżeń, bo tabela rośnie z pomiaru, nie z burzy mózgów. */
+    'pomarańcza': ['pomarańcza', 'pomarańcze', 'pomarańczy', 'pomarańczy'],
+    'dymka': ['dymka', 'dymki', 'dymek', 'dymki']
   };
 
-  /* Jednostki miary — wolno je dzielić ("1½ łyżeczki"). Wszystko inne w ODMIANY
-     to policzalny przedmiot: "1,5 limonki" to nie jest przepis, tylko wynik
-     mnożenia, więc zaokrąglamy w górę do całości. */
+  /* Jednostki miary — wolno je dzielić ("1½ łyżeczki"). Granice wyznacza przyrząd,
+     nie przedmiot, więc każdy ułamek jest wykonalny. */
   var DZIELNE = { 'łyżka': 1, 'łyżeczka': 1, 'szklanka': 1, 'garść': 1, 'szczypta': 1 };
+
+  /* `D-39.67` (CR §5b sesji treściowej 2026-08-18) · TRZECI STAN: POŁÓWKI.
+     Dotąd przedmiot był albo niedzielny (zaokrąglanie w górę do całości), albo
+     dzielny bez ograniczeń. Kuchnia ma stan pośredni: „½ cytryny", „½ cebuli",
+     „½ papryki" to realne czynności — połowa zostaje w lodówce. „0,3 cytryny"
+     czynnością nie jest.
+
+     **Odrzucona wersja z CR: reguła globalna dla wszystkich przedmiotów policzalnych.**
+     Dałaby „½ jajka", „½ ząbka", „½ goździka". Połówkowość jest cechą HASŁA,
+     nie klasy — stąd zbiór, a nie warunek w kodzie.
+
+     Kryterium wpisu, sprawdzalne bez znajomości kodu: **po przekrojeniu na pół
+     zostaje reszta, która nadal jest tym samym przedmiotem i da się jej użyć.**
+     Cytryna tak, jajko nie. Rozszerzenie tej listy to jedna linia danych i nie
+     wymaga niczyjej zgody na architekturę — tylko zgody na to konkretne słowo.
+
+     ¼ dla dużych obiektów (rozważane w CR) NIE weszło: byłaby to czwarta klasa
+     bez zmierzonej potrzeby. Wracamy do tego, jeśli „½ arbuza" kiedyś zaboli. */
+  var POŁÓWKOWE = {
+    'cytryna': 1, 'limonka': 1, 'pomarańcza': 1, 'cebula': 1, 'dymka': 1,
+    'papryka': 1, 'papryczka': 1, 'pomidor': 1, 'marchewka': 1, 'ziemniak': 1,
+    'batat': 1, 'por': 1, 'łodyga': 1, 'kolba': 1, 'bułka': 1,
+    'pęczek': 1, 'puszka': 1, 'kostka': 1, 'laska': 1
+  };
+
+  /* `D-39.65` · WYPROWADZONE, NIE PRZEPISANE — a od `D-39.70` w ogóle nie jest listą.
+     Poprzednio `JEDNOSTKI_UŁAMKOWE` była trzecią ręcznie utrzymywaną listą obok
+     `DZIELNE` i `ODMIANY` i rozjechała się dokładnie tak, jak takie listy się
+     rozjeżdżają: `garść` i `szczypta` siedziały w `DZIELNE`, ale nie tutaj, więc
+     omijały `formatUlamek()` i renderowały się jako „0,5 garści" (CR §5a).
+     To była ta sama usterka co `D-39.52`, drugi raz. Dziś to funkcja pytająca
+     tabele klas, więc nie ma czego zapomnieć zaktualizować.
+
+     `D-39.70` (CR „Furtka klamrowa", 2026-08-18) · KLASA CZYTANA Z GŁOWY FRAZY.
+     Jednostka może teraz być frazą wielowyrazową z czterema formami podanymi
+     wprost. `bazaJednostki()` zwraca dla niej `null`, bo całej frazy nie ma
+     w tabeli — a `null` znaczyło dotąd „miara, dziel dowolnie".
+
+     **To był cichy błąd już przed klamrami**, w istniejącej furtce `|`: zapis
+     `3 goździk|goździki|goździków|goździka` wpadał w gałąź „spoza tabeli"
+     i przy ćwiartce porcji dawał `0,75 goździka`. Furtka miała naprawiać odmianę,
+     a przy okazji psuła zaokrąglanie — i nikt tego nie widział, bo obie usterki
+     dotyczą różnych liczb porcji.
+
+     Rozstrzygnięcie: przy formach podanych wprost klasy szukamy po KOLEJNYCH
+     SŁOWACH frazy, bo w polskiej grupie imiennej głową jest rzeczownik, a nie
+     przymiotnik („czerwona cebula" → `cebula`, „małe pory" → `por`). Gdy żadne
+     słowo nie trafia w tabelę, domyślną klasą jest **sztuka**, nie miara: autor,
+     który zadał sobie trud podania czterech form, opisuje przedmiot policzalny.
+     Miary (`g`, `ml`) furtki nie potrzebują i nigdy jej nie dostaną. */
+  function slowaFormy(jednostka) {
+    return String(jednostka || '').split('|')[0].toLowerCase().split(/\s+/).filter(Boolean);
+  }
+
+  /* 'miara' · 'polowkowa' · 'sztuka'. Jedyne miejsce, w którym zapada pytanie
+     „czym właściwie jest ta jednostka" — reszta kodu tylko z niego korzysta. */
+  function klasaJednostki(jednostka) {
+    var s = String(jednostka || '');
+    if (s.indexOf('|') < 0) {
+      var baza = bazaJednostki(s);
+      if (!baza) return 'miara';                       // g, ml, kg, cm, l
+      if (DZIELNE[baza]) return 'miara';
+      if (POŁÓWKOWE[baza]) return 'polowkowa';
+      return 'sztuka';
+    }
+    var slowa = slowaFormy(s);
+    for (var i = 0; i < slowa.length; i++) {
+      var b = FORMA_DO_BAZY[slowa[i]];
+      if (!b) continue;
+      if (DZIELNE[b]) return 'miara';
+      if (POŁÓWKOWE[b]) return 'polowkowa';
+      return 'sztuka';
+    }
+    return 'sztuka';
+  }
+
+  /* Czy tę jednostkę wolno pokazać znakiem ułamka („½ łyżki", „½ cytryny").
+     Gramy i mililitry — nie: „½ g" nie jest zapisem, którym ktokolwiek gotuje. */
+  function jednostkaUlamkowa(jednostka) {
+    var s = String(jednostka || '');
+    var slowa = s.indexOf('|') < 0 ? [s.toLowerCase()] : slowaFormy(s);
+    for (var i = 0; i < slowa.length; i++) {
+      var b = FORMA_DO_BAZY[slowa[i]];
+      if (b && (DZIELNE[b] || POŁÓWKOWE[b])) return true;
+    }
+    return false;
+  }
 
   function jednostkaDzielna(jednostka) {
     /* D-39.50 — przez indeks odwrotny, żeby „łyżki" było dzielne tak samo jak
        „łyżka". Wcześniej forma odmieniona trafiała do gałęzi „spoza tabeli"
-       i przypadkiem też wychodziła dzielna — ale z niewłaściwego powodu. */
+       i przypadkiem też wychodziła dzielna — ale z niewłaściwego powodu.
+       D-39.70 — pytanie oddane `klasaJednostki()`, żeby odpowiedź była jedna. */
+    return klasaJednostki(jednostka) === 'miara';
+  }
+
+  /* Jedno miejsce, w którym zapada „ile tego może być". Zwraca wartość
+     dopuszczalną dla tej jednostki, zawsze zaokrąglając W GÓRĘ — brakujący
+     kawałek składnika psuje danie, nadmiar nie. */
+  function kwantyzuj(v, jednostka) {
+    if (v == null) return v;
+    var k = klasaJednostki(jednostka);
+    if (k === 'miara') return v;                        // dowolny ułamek
+    if (k === 'polowkowa') return Math.ceil(v * 2 - 0.002) / 2;
+    return Math.ceil(v - 0.001);                        // sztuka — tylko całości
+  }
+
+  /* `D-39.68` (CR §5c) · DRABINA MIAR — WYŁĄCZNIE PRZELICZENIA BEZSTRATNE.
+     1 łyżka = 3 łyżeczki, więc „3 łyżeczki" i „1 łyżka" to ta sama ilość, a nie
+     przybliżenie. Awansujemy tylko wtedy, gdy druga strona równania wypada
+     dokładnie i renderuje się czytelnie.
+
+     **Czego tu nie ma i nie będzie bez osobnej decyzji: podmiany na szczyptę.**
+     CR proponował „⅓ łyżeczki → szczypta". Szczypta nie ma zdefiniowanej objętości,
+     więc to nie jest przeliczenie, tylko zamiana wartości na inną wartość o nieznanym
+     stosunku — czyli dokładnie ten rodzaj cichej pomyłki, którego zakazuje §3 CR
+     („nie prosimy, żeby parser zgadywał"). Ten sam argument, inna warstwa.
+
+     Sufit czytelności: `1⅓ łyżki` jest gorsze niż `4 łyżeczki`, więc w górę
+     przechodzą tylko wielokrotności ½ łyżki, a w dół tylko pełne łyżeczki. */
+  var DRABINA = [
+    { z: 'łyżeczka', na: 'łyżka',    dziel: 3, gdy: function (v, w) { return v >= 3 && Math.abs(w * 2 - Math.round(w * 2)) < 1e-6; } },
+    { z: 'łyżka',    na: 'łyżeczka', dziel: 1 / 3, gdy: function (v, w) { return v < 1 && Math.abs(w - Math.round(w)) < 1e-6; } }
+  ];
+
+  function awansMiary(v, jednostka) {
     var baza = bazaJednostki(jednostka);
-    if (!baza) return true;     // g, ml, kg, cm, l — spoza tabeli, dzielne
-    return !!DZIELNE[baza];
+    if (!baza) return null;
+    for (var i = 0; i < DRABINA.length; i++) {
+      var r = DRABINA[i];
+      if (r.z !== baza) continue;
+      var w = v / r.dziel;
+      if (!r.gdy(v, w)) return null;
+      return { ilosc: Math.round(w * 1e6) / 1e6, jednostka: r.na };
+    }
+    return null;
   }
 
   /* `D-39.48` · JEDNOSTKI MIARY, KTÓRE SŁUSZNIE SIĘ NIE ODMIENIAJĄ.
@@ -206,7 +376,19 @@
   function ostrzezJednostke(key, jednostka) {
     var baza = String(jednostka || '').split('|')[0].toLowerCase();
     if (!baza) return;
-    if (String(jednostka).indexOf('|') >= 0) return;   // formy podane jawnie
+    /* `D-39.70` · NIEPEŁNA FURTKA JEST GORSZA NIŻ JEJ BRAK. Zapis z jedną kreską
+       wygląda jak użycie furtki i przechodził dotąd tą samą gałęzią „formy podane
+       jawnie" co komplet — po czym `odmien()` odrzucał go (wymaga czterech form)
+       i zwracał pierwszy człon. Autor widział poprawny mianownik przy porcjach
+       bazowych i nie miał sygnału, że przy innych zobaczy ten sam mianownik. */
+    var czlony = String(jednostka).split('|');
+    if (czlony.length > 1 && czlony.length < 4) {
+      ostrzez('składnik #' + key + ': jednostka „' + String(jednostka) + '" ma ' +
+              czlony.length + ' formy zamiast czterech, więc furtka NIE ZADZIAŁA ' +
+              'i słowo zostanie nieodmienione. Kolejność: 1 · 2–4 · 5+ · dopełniacz l.poj.');
+      return;
+    }
+    if (czlony.length >= 4) return;                    // formy podane jawnie
     if (MIARY_NIEODMIENNE[baza]) return;
     if (bazaJednostki(baza)) return;                  // D-39.50 — także formy odmienione
     ostrzez('składnik #' + key + ': jednostka „' + baza + '" nie jest w tabeli odmian, ' +
@@ -326,15 +508,46 @@
        Zapada dopiero przy porcjach PONIŻEJ bazowych, więc typowy test na 4 porcjach
        tego nie pokazuje — stąd przeoczenie. Znalezione przez sesję równoległą
        suchym biegiem na wartościach skrajnych, nie przeglądem kodu. */
-    var baza = bazaJednostki(jednostka) || String(jednostka || '').split('|')[0].toLowerCase();
-    var ulamkowa = JEDNOSTKI_UŁAMKOWE.indexOf(baza) >= 0;
-    if (ulamkowa) {
+    /* `D-39.70` — pytanie oddane `jednostkaUlamkowa()`. Poprzednio porównywaliśmy
+       tu bazę z listą, co dla frazy wielowyrazowej z furtki zawsze wypadało
+       fałszywie: baza jest `null`, a `String(jednostka).split('|')[0]` to cała
+       fraza („czerwona cebula"), której w żadnej liście nie ma i być nie może. */
+    if (jednostkaUlamkowa(jednostka)) {
       var u = formatUlamek(v);
       if (u) return u;
     }
     if (v < 10) return String(Math.round(v * 10) / 10).replace('.', ',');
     if (v <= 100) return String(Math.round(v));
     return String(Math.round(v / 5) * 5);      // powyżej 100 g/ml zaokrąglamy do 5
+  }
+
+  /* `D-39.73` (zgłoszenie sesji treściowej, 2026-08-18) · SKŁADANIE ETYKIETY
+     WYJĘTE Z `naPorcje()`, ŻEBY GENERATOR HTML SZEDŁ TĄ SAMĄ ŚCIEŻKĄ.
+
+     Powód jest konkretny, nie porządkowy. `skladnikiHtml()` w `generuj-html.mjs`
+     renderuje listę PRZY PORCJACH BAZOWYCH i musiałby wybrać formę pasującą do
+     liczby na początku wiersza: dla `3 goździk|…` poprawne jest „3 goździki",
+     czyli forma druga. Reguła wyboru (1 · 2–4 · 5+ · ułamek, z wyjątkiem 12–14)
+     mieszkała wyłącznie tutaj i nie była eksportowana, więc jedyną drogą było
+     przepisanie jej po tamtej stronie — **czwarta kopia wiedzy dzielonej**,
+     dokładnie ta klasa błędu, którą `D-39.65` przed chwilą z tego pliku usunęło.
+     Sesja treściowa odmówiła i miała rację.
+
+     `D-39.69` · ODMIANA ZAKRESU O UŁAMKOWYM DOLNYM KOŃCU żyje tutaj.
+     Odmiana idzie po GÓRNYM końcu („2–3 łyżki", „4–6 łyżek") i to zostaje.
+     Ale gdy dolny koniec jest ułamkiem, górny koniec kłamie o całości frazy:
+     `½–1` dawało `odmien(…, 1)` → „½–1 łyżka", a poprawnie jest „½–1 łyżki".
+     Usterka jest STARSZA od klasy połówkowej — dotyczyła łyżek od zawsze —
+     tylko `POŁÓWKOWE` sprowadza ją na cytryny, czyli tam, gdzie ktoś ją
+     wreszcie zobaczy. Ułamek gdziekolwiek w zakresie ⇒ dopełniacz l. poj. */
+  function zlozEtykiete(ile, doIle, jednostka, nazwa) {
+    var txtOd = formatIlosc(ile, jednostka);
+    var txtDo = doIle != null ? formatIlosc(doIle, jednostka) : null;
+    var liczba = txtOd + (txtDo != null && txtDo !== txtOd ? '–' + txtDo : '');
+    var ulamkowy = (ile !== Math.floor(ile)) || (doIle != null && doIle !== Math.floor(doIle));
+    var nOdmiany = ulamkowy ? 0.5 : (doIle != null ? doIle : ile);
+    return (liczba + ' ' + odmien(jednostka, nOdmiany) + ' ' + (nazwa || ''))
+      .replace(/\s+/g, ' ').trim();
   }
 
   // ---------------------------------------------------------------- składniki
@@ -348,16 +561,32 @@
     tresc = tresc.trim();
     if (tresc.charAt(0) === '=') { pin = true; tresc = tresc.slice(1).trim(); }
 
-    var m = tresc.match(/^([\d.,½¼¾⅓⅔⅛]+)(?:\s*[–—-]\s*([\d.,½¼¾⅓⅔⅛]+))?\s+(\S+)?\s*([\s\S]*)$/);
+    /* `D-39.70` · FURTKA KLAMROWA — JEDNOSTKA MOŻE BYĆ FRAZĄ WIELOWYRAZOWĄ.
+       `1 {czerwona cebula|czerwone cebule|czerwonych cebul|czerwonej cebuli}`
+
+       Powód: jednostką jest PIERWSZY token po liczbie, więc przymiotnik z przodu
+       zostawał jednostką („0,3 czerwona cebula"), a przymiotnik z tyłu zostawał
+       w mianowniku przy odmienionym rzeczowniku („3 polędwice wieprzowa").
+       Odmieniała się jednostka, nie fraza — a rozdzielić ich nie da się bez
+       zgadywania deklinacji przymiotnika, czego kontrakt zakazuje.
+
+       Klamra jest wyłącznie ogranicznikiem: zdejmujemy ją tu i dalej płynie
+       zwykły ciąg form rozdzielonych `|`, który `odmien()` obsługuje od dawna.
+       **Stara furtka bez klamry działa bez zmian** — jest w treści migrowanych
+       przepisów i nie ma powodu jej wycofywać. */
+    var m = tresc.match(/^([\d.,½¼¾⅓⅔⅛]+)(?:\s*[–—-]\s*([\d.,½¼¾⅓⅔⅛]+))?\s+(\{[^}]*\}|\S+)?\s*([\s\S]*)$/);
     if (!m) return { ilosc: null, iloscDo: null, jednostka: '', nazwa: tresc, pin: true, tresc: tresc };
 
     var ilosc = naLiczbe(m[1]);
     if (ilosc == null) return { ilosc: null, iloscDo: null, jednostka: '', nazwa: tresc, pin: true, tresc: tresc };
 
+    var jedn = m[3] || '';
+    if (jedn.charAt(0) === '{') jedn = jedn.slice(1, -1).trim();
+
     return {
       ilosc: ilosc,
       iloscDo: naLiczbe(m[2]),
-      jednostka: m[3] || '',
+      jednostka: jedn,
       nazwa: (m[4] || '').trim(),
       pin: pin,
       tresc: tresc
@@ -1220,22 +1449,38 @@
       if (s.ilosc == null || s.pin) {
         kopia.etykieta = s.tresc;
       } else {
-        var dzielna = jednostkaDzielna(s.jednostka);
-        var ile = s.ilosc * mnoznik;
-        var doIle = s.iloscDo != null ? s.iloscDo * mnoznik : null;
-        if (!dzielna) { ile = Math.ceil(ile - 0.001); if (doIle != null) doIle = Math.ceil(doIle - 0.001); }
+        /* `D-39.67` — zaokrąglanie zeszło do `kwantyzuj()`. Trzy klasy zamiast
+           dwóch: miara dowolnie dzielna, przedmiot połówkowy, przedmiot całkowity.
+           Tutaj zostaje samo mnożenie, bo „ile tego może być" jest cechą jednostki,
+           a nie kroku przeliczania porcji. */
+        var jedn = s.jednostka;
+        var ile = kwantyzuj(s.ilosc * mnoznik, jedn);
+        var doIle = s.iloscDo != null ? kwantyzuj(s.iloscDo * mnoznik, jedn) : null;
+
+        /* `D-39.68` · DRABINA DZIAŁA WYŁĄCZNIE PRZY ZMIENIONEJ LICZBIE PORCJI.
+           Przy porcjach bazowych pokazujemy DOKŁADNIE to, co napisała redakcja —
+           autor, który wpisał „3 łyżeczki", ma prawo zobaczyć „3 łyżeczki", a nie
+           poprawkę parsera na wartość równoważną. Skarga z CR dotyczyła wielkości
+           POWSTAŁYCH ze skalowania i tylko tam wolno nam je składać. */
+        if (mnoznik !== 1) {
+          var aOd = awansMiary(ile, jedn);
+          var aDo = doIle != null ? awansMiary(doIle, jedn) : null;
+          /* Zakres awansuje w całości albo wcale. „3 łyżeczki – 1 łyżka" nie jest
+             zakresem, tylko dwoma pomiarami obok siebie. */
+          if (aOd && (doIle == null || (aDo && aDo.jednostka === aOd.jednostka))) {
+            ile = aOd.ilosc;
+            if (aDo) doIle = aDo.ilosc;
+            jedn = aOd.jednostka;
+          }
+        }
         /* `D-39.54` · ZAKRES O RÓWNYCH KOŃCACH ZWIJA SIĘ DO JEDNEJ LICZBY.
            Znalezione przez `narzedzia/suchy-bieg-porcji.js` na PIERWSZYM uruchomieniu:
            `2–3 gałązki` przy ćwiartce bazy dawało `1–1 gałązka`, bo oba końce
            zaokrąglają się w górę do 1 (jednostka niedzielna). „1–1" nie jest
            zakresem, tylko artefaktem zaokrąglenia. */
-        var txtOd = formatIlosc(ile, s.jednostka);
-        var txtDo = doIle != null ? formatIlosc(doIle, s.jednostka) : null;
-        var liczba = txtOd + (txtDo != null && txtDo !== txtOd ? '–' + txtDo : '');
         kopia.iloscPrzeliczona = ile;
-        // odmiana idzie po górnym końcu zakresu: "2–3 łyżki", "4–6 łyżek"
-        kopia.etykieta = (liczba + ' ' + odmien(s.jednostka, doIle != null ? doIle : ile) + ' ' + s.nazwa)
-          .replace(/\s+/g, ' ').trim();
+        kopia.jednostkaPrzeliczona = jedn;   // różna od `s.jednostka` tylko po awansie
+        kopia.etykieta = zlozEtykiete(ile, doIle, jedn, s.nazwa);
       }
       /* `D-39.49` · ETYKIETA PRODUKTOWA ZDJĘTA — ZOSTAJĄ GRAMY. Decyzja operatora
          2026-08-17: „design nie pokazuje sztuk, usunąłem to (…) wskazywanie liczby
@@ -3888,6 +4133,35 @@
     podzielWszystkieKarty: podzielWszystkieKarty,
     kluczLS: KLUCZ_LS,
     kolizjeOdmian: function () { return FORMA_DO_BAZY.__kolizje.slice(); },   // D-39.53
+
+    /* `D-39.73` · POWIERZCHNIA DLA DRUGIEGO KONSUMENTA (`generuj-html.mjs`).
+       Dwie funkcje, zero nowej wiedzy po tamtej stronie. Umowa o zbiorze
+       dzielonym — ta sama co dla `KLUCZE_KROKU`: zmiana idzie do drugiej strony
+       tego samego dnia. Od 2026-08-18 obejmuje też składnię furtki.
+
+       `formaDlaLiczby(fraza, n)` — wąski helper, o który proszono. Przyjmuje
+       hasło z tabeli („goździk"), formy podane wprost („a|b|c|d") ORAZ zapis
+       klamrowy („{a|b|c|d}"), bo generator dostaje tekst prosto z pola CMS
+       i nie ma powodu, żeby musiał wiedzieć, że klamra jest ogranicznikiem.
+
+       `etykietaBazowa(tresc)` — mocniejsza i **to jej należy używać**. Bierze
+       treść wiersza składnika (bez `#klucza` i bez `@sluga`) i zwraca gotowy
+       tekst przy porcjach bazowych. Załatwia naraz cztery znaczniki maszynowe,
+       z których `skladnikiHtml()` zdejmowało dotąd zero: klamrę, kreski, `=`
+       przypięcia i wybór formy. Zmierzone `[V]` 2026-08-18: „=1 łyżeczka cukru"
+       renderowało się z widocznym znakiem równości.
+
+       Wiersz bez liczby („sól do smaku") wraca nietknięty — nie ma czego odmieniać. */
+    formaDlaLiczby: function (fraza, n) {
+      var s = String(fraza == null ? '' : fraza).trim();
+      if (s.charAt(0) === '{' && s.charAt(s.length - 1) === '}') s = s.slice(1, -1).trim();
+      return odmien(s, n);
+    },
+    etykietaBazowa: function (tresc) {
+      var c = rozbijTresc(String(tresc == null ? '' : tresc));
+      if (c.ilosc == null) return c.tresc;
+      return zlozEtykiete(c.ilosc, c.iloscDo, c.jednostka, c.nazwa);
+    },
     limitMarkerow: LIMIT_MARKEROW,
     paczka: zbierzPaczke,
     _wewnetrzne: {
@@ -3900,6 +4174,12 @@
          podmieniać `Array.prototype.push`, czyli testować przez pułapkę. */
       podepnijProdukty: podepnijProdukty,
       zbierzPaczke: zbierzPaczke,
+      /* `D-39.67` — wystawione, żeby `narzedzia/suchy-bieg-jednostek.js` mógł
+         zaasertować NIEZMIENNIKI między tabelami, a nie tylko wyjście na przykładach.
+         Bez tego literówka w kluczu `POŁÓWKOWE` przechodzi bezszelestnie: słowo
+         spada do klasy „sztuka" i wygląda dokładnie tak, jak wyglądało przed
+         dopisaniem, czyli test na przykładzie mówi „zielono" o niczym. */
+      klasyJednostek: function () { return { DZIELNE: DZIELNE, POŁÓWKOWE: POŁÓWKOWE, ODMIANY: ODMIANY }; },
       bledyTeraz: function () { return bledy.slice(); },
       ostrzezeniaTeraz: function () { return ostrzezenia.slice(); },
       wyczyscBledy: function () { bledy = []; ostrzezenia = []; }
