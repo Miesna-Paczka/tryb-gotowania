@@ -5,6 +5,7 @@ porcje-bazowe: 4
 liczba-porcji: 4 porcje
 waga-porcji: 402
 czas-minuty: 35
+item: 6a5764168326a96c1e226c89
 
 [skladniki]
 #kurczak    660 g piersi z kurczaka   @filet-z-piersi-kurczaka

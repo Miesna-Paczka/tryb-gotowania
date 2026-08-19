@@ -10,14 +10,17 @@
  * Uruchomienie: node narzedzia/suchy-bieg-generatora.mjs
  * Kod wyjścia 0 = każdy uszkodzony przypadek został złapany.
  */
-import path from 'node:path';
-import { czytajZrodlo, zapiszZrodlo, wczytajPlik } from '../lancuch-html/zrodlo.mjs';
+import fs from 'node:fs';
+import { czytajZrodlo, zapiszZrodlo, parsujWartosci } from '../lancuch-html/zrodlo.mjs';
 import { zbuduj } from '../lancuch-html/generuj-html.mjs';
-import { KATALOG_ZRODEL, idZrodel } from '../lancuch-html/wspolne.mjs';
+import { kontrolujWynik } from '../lancuch-html/kontrole.mjs';
+import { zrodla, sprawdzNazwePliku } from '../lancuch-html/wspolne.mjs';
 
-const WZORZEC = idZrodel()[0];
-if (!WZORZEC) { console.error('brak plików w przepisy/ — nie ma na czym uszkadzać'); process.exit(2); }
-const CALY = wczytajPlik(path.join(KATALOG_ZRODEL, `${WZORZEC}.txt`));
+const PIERWSZY = zrodla()[0];
+if (!PIERWSZY) { console.error('brak plików w przepisy/ — nie ma na czym uszkadzać'); process.exit(2); }
+const WZORZEC = PIERWSZY.item;
+const PLIK = PIERWSZY.plik;
+const CALY = PIERWSZY.zrodlo;
 
 let zdane = 0, oblane = 0;
 
@@ -71,7 +74,7 @@ function przypadekFormatu(nazwa, tekst, oczekiwanyFragment) {
    9 kroków i 8 markerów wylądowało w środku, czyli wszystkie poza pierwszym. */
 const sklejAkapity = (s) => s.replace(/\n[ \t]*\n+/g, ' ');
 
-console.log(`wzorzec: ${WZORZEC} (${CALY.meta.slug})\n`);
+console.log(`wzorzec: ${CALY.meta.slug} (item ${WZORZEC})\n`);
 
 // --- 1–3: dokładnie to, co robi edytor Webflow ---------------------------
 przypadek('kroki bez pustych linii (chili, gulasz — 2026-08-19)',
@@ -150,6 +153,52 @@ przypadekFormatu('meta: liczba, która nie jest liczbą',
   caly.replace(/^porcje-bazowe: \d+$/m, 'porcje-bazowe: dwie'), 'ma być liczbą');
 przypadekFormatu('meta: nieznany klucz', caly.replace('[meta]', '[meta]\nkolor: zielony'), 'nieznany klucz');
 
+// --- 7b: klucz `item` i nazwa pliku --------------------------------------
+przypadekFormatu('item o złym kształcie',
+  caly.replace(/^item: [0-9a-f]{24}$/m, 'item: 6a5765'), 'identyfikatorem Webflow');
+
+/* KONTROLA POZYTYWNA, nie negatywna: brak `item` MA przechodzić. Gdyby zaczął
+   być błędem, przepis nie mógłby powstać przed itemem w Webflow — czyli wróciłoby
+   dokładnie to ograniczenie, które ta migracja usuwa. */
+{
+  const bezItemu = caly.replace(/^item: [0-9a-f]{24}\n/m, '');
+  let komunikat = null;
+  try { czytajZrodlo(bezItemu, 'próba.txt'); } catch (e) { komunikat = e.message; }
+  if (!komunikat) { zdane++; console.log('✓ źródło BEZ „item:" przechodzi walidację (przepis przed itemem w CMS)'); }
+  else { oblane++; console.log(`✗ brak „item:" zgłoszony jako błąd: ${komunikat}`); }
+}
+
+{
+  let komunikat = '(bez wyjątku)';
+  try { sprawdzNazwePliku('inny-slug.txt', 'wolowina-teriyaki'); } catch (e) { komunikat = e.message; }
+  if (komunikat.includes('nie zgadza się ze slugiem')) { zdane++; console.log('✓ nazwa pliku niezgodna ze slugiem w [meta]'); }
+  else { oblane++; console.log(`✗ niezgodna nazwa pliku przeszła: ${komunikat}`); }
+}
+
+/* --- 7c: pole, którego nie da się przeczytać po zdjęciu znaczników --------
+   Tego przypadku nie da się wywołać uszkodzeniem ŹRÓDŁA — usterka siedziała
+   w generatorze, nie w treści. Podstawiamy więc pod kontrolę dokładnie ten
+   HTML, który generator produkował do 2026-08-19 (tabelę), i sprawdzamy, że
+   kontrola go odrzuca. Bez tego poprawka byłaby zmianą bez dowodu, a powrót
+   do tabeli przeszedłby bramkę tak samo cicho jak za pierwszym razem. */
+{
+  const czysty = zbuduj(WZORZEC, CALY);
+  const tabela = '<table><thead><tr><th scope="col">wartość odżywcza</th>' +
+    '<th scope="col">w 100 g</th></tr></thead><tbody>' +
+    parsujWartosci(CALY.pola['wartosci-odzywcze'])
+      .map((w) => `<tr><th scope="row">${w.klucz}</th><td>${w.wartosc}</td></tr>`).join('') +
+    '</tbody></table>';
+  const udawany = { pola: { ...czysty.pola, 'wartosci-100-html': tabela } };
+  const r = kontrolujWynik(CALY, udawany);
+  if (r.bledy.some((b) => b.includes('skleja się z sąsiadem'))) {
+    zdane++; console.log('✓ wartości jako tabela — kontrola widzi, że pole jest nieczytelne');
+  } else {
+    oblane++;
+    console.log('✗ wartości jako tabela PRZESZŁY kontrolę');
+    console.log(r.bledy.length ? r.bledy.map((b) => `    dostałem: ${b}`).join('\n') : '    dostałem: ZERO BŁĘDÓW');
+  }
+}
+
 // --- 8: kontrola pozytywna — czysty plik NIE świeci -----------------------
 {
   const w = zbuduj(WZORZEC, CALY);
@@ -162,7 +211,7 @@ przypadekFormatu('meta: nieznany klucz', caly.replace('[meta]', '[meta]\nkolor: 
    kilkunastoma uszkodzeniami. Wszystkie robimy na KOPII obiektu — ale kopia
    płytka jest łatwa do zepsucia przy dopisywaniu przypadków. */
 {
-  const ponownie = wczytajPlik(path.join(KATALOG_ZRODEL, `${WZORZEC}.txt`));
+  const ponownie = czytajZrodlo(fs.readFileSync(PLIK, 'utf8'), PLIK);
   const nietkniety = JSON.stringify(ponownie.pola) === JSON.stringify(CALY.pola);
   if (nietkniety) { zdane++; console.log('✓ plik źródłowy nietknięty po suchym biegu'); }
   else { oblane++; console.log('✗ SUCHY BIEG ZMIENIŁ PLIK ŹRÓDŁOWY — przypadek mutuje wspólny obiekt'); }

@@ -428,9 +428,14 @@
          Cień zostaje: nav strony go nie ma, ale pas dolny overlaya oddziela treść
          przewijaną pod spodem, a nie stoi na tle strony. Gdyby miał zniknąć, jest
          to osobna decyzja i osobny wiersz. */
-      'background:color-mix(in srgb,var(--mp-bialy) 80%,transparent);' +
-      'backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);' +
-      'box-shadow:0 -1px 2px 0 rgba(62,43,34,.05),0 -4px 8px -2px rgba(62,43,34,.10)}' +
+      /* POWIERZCHNIA ZESZŁA STĄD NA PASKI (2026-08-19). Do dziś tło, rozmycie,
+         cień i zielona kreska siedziały na całym `BOTTOM`, czyli na sumie stosu
+         i paska. Skutek był taki, że kreska wędrowała: przy jednym minutniku
+         stała nad kaflem, przy dwóch wyżej — a pas dolny rósł i malał razem
+         z liczbą kafli. Operator nazwał to wprost: w krokach pasek ma STAŁĄ
+         wysokość, a minutniki mają nad nim PŁYWAĆ, nie dzielić z nim tła.
+         `BOTTOM` jest odtąd wyłącznie kontenerem układu — bez własnej skóry. */
+      'background:none;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}' +
     /* W02 (przeb. 21): kreska 1 px `secondary-text (h1)` #487622 nad pasem dolnym.
        PSEUDOELEMENT, nie `border-top` — i to nie jest ozdobnik implementacyjny.
        `BOTTOM` nie ma zadanej wysokości: wg reguły składania (INTERAKCJE §4.1)
@@ -440,10 +445,23 @@
        wysokości; `::before` jest jedynym odpowiednikiem, który tak samo nie
        uczestniczy w układzie. Ta sama logika, co `outline` zamiast `border`
        na pigułce alarmowej. Pomiar: `getComputedStyle(bottom,"::before")`. */
-    '#' + ID + ' .mp-tryb__bottom::before{content:"";position:absolute;top:0;' +
-      'left:0;right:0;height:1px;background:var(--mp-zielen)}' +
-    '#' + ID + ' .mp-tryb__nawigacja{height:' + W.nawigacja + 'px;display:flex;align-items:flex-start;' +
-      'padding:' + ((W.nawigacja - W.celDotyku) / 2) + 'px ' + W.margines + 'px;gap:' + W.lukaCta + 'px}' +
+    /* Skóra paska: tło, rozmycie, cień i kreska 1 px `secondary-text (h1)` #487622.
+       Ta sama dla nawigacji (kroki) i dla pasa akcji (start / S1 / zakończenie) —
+       bo w obu wypadkach to ONA jest krawędzią, nad którą przewija się treść.
+       Kreska dalej pseudoelementem, nie `border-top`: przy `box-sizing:border-box`
+       dołożyłaby 1 px do wysokości 80/132 i wywróciła wiersz B7. */
+    '#' + ID + ' .mp-tryb__nawigacja,#' + ID + ' .mp-tryb__akcje{position:relative;' +
+      'background:color-mix(in srgb,var(--mp-bialy) 80%,transparent);' +
+      'backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);' +
+      'box-shadow:0 -1px 2px 0 rgba(62,43,34,.05),0 -4px 8px -2px rgba(62,43,34,.10)}' +
+    '#' + ID + ' .mp-tryb__nawigacja::before,#' + ID + ' .mp-tryb__akcje::before{' +
+      'content:"";position:absolute;top:0;left:0;right:0;height:1px;background:var(--mp-zielen)}' +
+    /* `center`, nie `flex-start`: `←` ma 44 px, a CTA 48, więc jedno wyrównanie
+       od góry nie ustawi obu. Projekt (`7195:11065`) daje `←` na +18 i CTA na +16,
+       czyli OBA wyśrodkowane w pasie 80. Padding od góry 18 trzymał `←` poprawnie,
+       ale spychał CTA o 2 px za nisko — zmierzone 718 zamiast 716. */
+    '#' + ID + ' .mp-tryb__nawigacja{height:' + W.nawigacja + 'px;display:flex;align-items:center;' +
+      'padding:0 ' + W.margines + 'px;gap:' + W.lukaCta + 'px}' +
     /* W04 (przeb. 21): `←` jest KÓŁKIEM — obrys 1 px `primary-text` #3E2B22,
        promień 22 (połowa z 44, czyli koło dokładne, nie „zaokrąglony kwadrat").
        Border przy `box-sizing:border-box` nie rusza 44×44, więc B10 zostaje. */
@@ -530,13 +548,42 @@
     '#' + ID + ' [data-stan="koncowka"] .mp-tryb__kropka,' +
     '#' + ID + ' [data-stan="zero"] .mp-tryb__kropka{' +
       'width:' + W.kropkaDuza + 'px;height:' + W.kropkaDuza + 'px;background:var(--mp-alarm)}' +
-    /* NIENARYSOWANE (G3, G4) + I-19/I-20/I-21: eskalacja TEMPEM, nie barwą; przy 0:00 puls gaśnie.
-       Animacja skaluje kropkę, więc jej rozmiar mierzy się przez `getComputedStyle`
-       (układ), nie przez `getBoundingClientRect` (klatka animacji). */
+    /* JEDNO TEMPO NA CAŁE 60 s — decyzja operatora 2026-08-19.
+       Do dziś puls przyspieszał poniżej 10 s (stan `koncowka`, 0,5 s). Eskalacja
+       była w kodzie oznaczona `NIENARYSOWANE (G3, G4)`, czyli WYMYŚLONA: adnotacja
+       na klatce `7196:11087` opisuje jeden rytm — „pulsuje raz na sekundę" — dla
+       ostatnich 60 s i o drugim progu nie mówi. Zachowanie bez źródła zostało
+       zdjęte, zamiast dalej udawać, że coś je uzasadnia.
+
+       Stan `koncowka` ZOSTAJE w modelu: `stanCzasu()` dalej go zwraca, dalej
+       jest w atrybucie `data-stan` i dalej dokłada obrys alarmowy. Zniknęła tylko
+       różnica TEMPA. Usunięcie stanu byłoby większą zmianą, niż operator zamówił,
+       i skasowałoby próg I-20 z matrycy.
+
+       Przy 0:00 puls gaśnie (I-21). Animacja skaluje kropkę, więc jej rozmiar
+       mierzy się przez `getComputedStyle` (układ), nie przez
+       `getBoundingClientRect` (klatka animacji). */
     '@keyframes mp-tryb-puls{0%,100%{transform:scale(1)}50%{transform:scale(.6)}}' +
-    '#' + ID + ' [data-stan="ostatnia-minuta"] .mp-tryb__kropka{animation:mp-tryb-puls 1s steps(60) infinite}' +
-    '#' + ID + ' [data-stan="koncowka"] .mp-tryb__kropka{animation:mp-tryb-puls .5s steps(30) infinite}' +
+    '#' + ID + ' [data-stan="ostatnia-minuta"] .mp-tryb__kropka,' +
+    '#' + ID + ' [data-stan="koncowka"] .mp-tryb__kropka{animation:mp-tryb-puls 1s steps(60) infinite}' +
     '#' + ID + ' [data-stan="zero"] .mp-tryb__kropka{animation:none}' +
+
+    /* RAMKA PULSUJE RAZEM Z KROPKĄ. Adnotacja na klatce `7196:11087` mówi wprost:
+       „Ostatnie 60 s: kropka rośnie, robi się pomarańczowa i pulsuje raz na
+       sekundę — RAMKA MINUTNIKA TEŻ". Runtime animował samą kropkę; ramka miała
+       barwę alarmu, ale stała. Zgłoszone przez operatora 2026-08-19.
+
+       Pulsujemy BARWĄ obrysu, nie `transform`: skala na pigułce ruszyłaby całym
+       kaflem i rozjechała `stos`, a wszystkie liczby §2.2 są wymiarami pudełka.
+       To jest odczyt adnotacji, nie odczyt rysunku — plik nie mówi, CO w ramce
+       pulsuje, a barwa jest jedyną własnością, która nie dotyka układu. [I]
+
+       Tempo i wygaszenie przy 0:00 idą za kropką, żeby jedna rzecz nie pulsowała
+       w dwóch rytmach. */
+    '@keyframes mp-tryb-puls-ramki{0%,100%{outline-color:var(--mp-alarm)}50%{outline-color:transparent}}' +
+    '#' + ID + ' .mp-tryb__pigulka[data-stan="ostatnia-minuta"],' +
+    '#' + ID + ' .mp-tryb__pigulka[data-stan="koncowka"]{animation:mp-tryb-puls-ramki 1s steps(60) infinite}' +
+    '#' + ID + ' .mp-tryb__pigulka[data-stan="zero"]{animation:none}' +
 
     /* W17: styl `Caption` — DM Sans **Medium (500)**, 14/16, `primary-text`.
        Stopień i interlinia były zgodne; nieustawiona była grubość, czyli jedyna
@@ -579,9 +626,15 @@
        kapsuła, tak samo jak CTA „dalej" (W06). Ósemka była tu tym samym promieniem
        kart treści, co przy pigułce; jedna liczba rozlana po trzech miejscach.
        Tekst: styl `Button` — DM Sans SemiBold **600**, 16/20. */
-    '#' + ID + ' .mp-tryb__primary{height:' + W.przycisk + 'px;flex:0 0 auto;border:0;' +
+    /* NIEWYPEŁNIONY — decyzja operatora 2026-08-19 z odczytu Figmy: brzmienie
+       „zatrzymaj" jest kanoniczne, ale CTA kafla jest obrysowane, nie wypełnione.
+       Runtime malował je atramentem na biało, czyli jak CTA `dalej` w nawigacji —
+       i przez to kafel konkurował o uwagę z jedynym przyciskiem, który ma prowadzić
+       dalej. Obrys ten sam co `.mp-tryb__ghost`: 1,5 px `beige-3`. */
+    '#' + ID + ' .mp-tryb__primary{height:' + W.przycisk + 'px;flex:0 0 auto;' +
+      'border:1.5px solid var(--mp-beige-3);' +
       'border-radius:100px;font-weight:600;line-height:20px;' +
-      'background:var(--mp-atrament);color:var(--mp-bialy);' +
+      'background:transparent;color:var(--mp-atrament);' +
       'font-size:16px;cursor:pointer;width:100%}' +
     '#' + ID + ' .mp-tryb__ghosty{display:flex;gap:' + W.wnetrze + 'px;flex:0 0 auto;' +
       'height:' + W.przycisk + 'px}' +
@@ -1640,9 +1693,29 @@
     return p;
   }
 
-  function przelacz(m) {
-    m.rozwinieta = !m.rozwinieta;
+  /* AKORDEON: najwyżej JEDEN kafel rozwinięty naraz. Decyzja operatora 2026-08-19,
+     ze zrzutu projektu: przy dwóch biegnących minutnikach jeden jest rozwinięty,
+     drugi zwinięty do pigułki.
+
+     Bez tego `stos` rósł nieograniczenie: dwa kafle pełne to 236 + 8 + 236 + 12,
+     czyli BOTTOM na 572 px z 780 — pasek zjadał trzy czwarte ekranu i przestawał
+     być czymś, co UNOSI SIĘ nad treścią, a stawał się drugą treścią. Zmierzone
+     przed poprawką: dwa kafle dawały BOTTOM 462 px.
+
+     Reguła stoi w JEDNYM miejscu — `rozwin()` — bo rozwinięcie ma dwa wyzwalacze
+     (klik użytkownika i start nowego minutnika) i rozdzielenie ich dałoby dwie
+     kopie tej samej decyzji. */
+  function rozwin(m) {
+    minutniki.forEach(function (x) {
+      if (x !== m && x.rozwinieta) { x.rozwinieta = false; rysujKafel(x); }
+    });
+    m.rozwinieta = true;
     rysujKafel(m);
+  }
+
+  function przelacz(m) {
+    if (m.rozwinieta) { m.rozwinieta = false; rysujKafel(m); }
+    else rozwin(m);
     przeliczBottom();
     return m.rozwinieta;
   }
@@ -1687,7 +1760,11 @@
       nazwa: opcje.nazwa || '',
       sekundy: opcje.sekundy || 0,
       podpowiedz: opcje.podpowiedz || null,
-      rozwinieta: !!opcje.rozwinieta,
+      /* DOMYŚLNIE ROZWINIĘTY. Do 2026-08-19 było odwrotnie (`!!opcje.rozwinieta`),
+         więc minutnik odpalony z kroku pokazywał się jako pasek 40 px — a obie
+         klatki kroków w projekcie (`7195:11065`, `7211:10893`) rysują kafel
+         rozwinięty. `rozwinieta: false` nadal da się podać jawnie. */
+      rozwinieta: opcje.rozwinieta !== false,
       koniec: teraz() + (opcje.sekundy || 0) * 1000,
       zatrzymany: null,
       pozostalo: -1,
@@ -1696,6 +1773,7 @@
     };
     stan.czesci.stos.appendChild(zbudujKafel(m));
     minutniki.push(m);   // C14: drugi kafel dokłada się do `stos`, nie zastępuje pierwszego
+    if (m.rozwinieta) rozwin(m);   // zwija poprzedni — patrz `rozwin()`
     tyk();
     przeliczBottom();
     if (!interwal) interwal = setInterval(tyk, 200);
@@ -1718,7 +1796,11 @@
          Markdown dosłownie (zmierzone 2026-08-16: „Różyczki są **jaskrawozielone**"),
          podczas gdy akapit kroku obok renderował to samo poprawnie. */
       podpowiedz: opcje.podpowiedz || krok.kryteriumHtml || null,
-      rozwinieta: !!opcje.rozwinieta
+      /* PRZEKAZUJEMY DALEJ, NIE ROZSTRZYGAMY. `!!opcje.rozwinieta` (do 2026-08-19)
+         zamieniało brak wartości na twarde `false` i po cichu nadpisywało wartość
+         domyślną z `uruchomMinutnik`. Wyszło to dopiero na pomiarze: kafel odpalony
+         z kroku był zwinięty, choć domyślna zmieniła się na rozwiniętą. */
+      rozwinieta: opcje.rozwinieta
     });
   }
 

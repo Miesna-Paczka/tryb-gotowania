@@ -25,8 +25,8 @@
 ## Adres embedu: GitHub Pages, stały, bez podmiany przy commicie (od 2026-08-16)
 
 ```html
-<script src="https://miesna-paczka.github.io/tryb-gotowania/przepis-parser.min.js"></script>
-<script src="https://miesna-paczka.github.io/tryb-gotowania/tryb-gotowania.min.js"></script>
+<script src="https://lukaszwerecik.github.io/tryb-gotowania/przepis-parser.min.js"></script>
+<script src="https://lukaszwerecik.github.io/tryb-gotowania/tryb-gotowania.min.js"></script>
 ```
 
 **Po pushu NIE robi się nic** — Pages przebudowuje się samo, w praktyce poniżej minuty,

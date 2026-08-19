@@ -5,6 +5,7 @@ porcje-bazowe: 2
 liczba-porcji: 2 porcje
 waga-porcji: 225
 czas-minuty: 30
+item: 6a57649e2c911147dc2602d9
 
 [skladniki]
 #kurczak   300 g piersi z kurczaka   @filet-z-piersi-kurczaka
@@ -13,7 +14,7 @@ czas-minuty: 30
 #sojowy    120 ml jasnego sosu sojowego
 #woda      50 ml wody
 #miod      2 łyżki miodu
-#imbir     2 cm imbiru
+#imbir     6 g startego imbiru (łyżeczka to ok. 6 g)
 #czosnek   1 ząbek czosnku
 #chilli    1 łyżeczka sosu chilli (opcjonalnie)
 #limonka   1 limonka

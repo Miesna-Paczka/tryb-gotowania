@@ -5,6 +5,7 @@ porcje-bazowe: 4
 liczba-porcji: 3–4 porcje
 waga-porcji: 461
 czas-minuty: 80
+item: 6a5764168326a96c1e226c85
 
 [skladniki]
 #mieso        350 g mielonego mięsa wieprzowego @wieprzowina-mielona

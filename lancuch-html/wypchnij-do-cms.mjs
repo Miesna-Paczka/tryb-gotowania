@@ -33,9 +33,8 @@
  * inaczej nie działałby ani jsDelivr, ani Pages — więc token Webflow nie ma tu
  * gdzie mieszkać i most między Pages a CMS-em jest sesją Claude, nie skryptem
  * z sekretem (decyzja operatora 2026-08-19). Sesja nie widzi jednak Pages:
- * polityka egressu środowiska blokuje CAŁY ruch wychodzący HTTP — 403 na tunelu
- * CONNECT, jednakowo dla obu hostów Pages i dla `example.com`, i przez curl, i przez
- * WebFetch `[V 2026-08-19]`. Zmiana hosta tego nie zdejmuje. Dlatego kolejność sprawdza się
+ * `lukaszwerecik.github.io` jest zablokowane przez politykę egressu środowiska
+ * `[V 2026-08-19]`, i przez curl, i przez WebFetch. Dlatego kolejność sprawdza się
  * dwoma sposobami, zależnie od tego, kto uruchamia skrypt:
  *
  *   `--wykonaj` (maszyna operatora, jest sieć) — POBIERA każdy ładunek z Pages
@@ -57,7 +56,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { zbuduj } from './generuj-html.mjs';
 import { wczytajPlik } from './zrodlo.mjs';
-import { KATALOG_ZRODEL, KORZEN, KOLEKCJA, idZrodel } from './wspolne.mjs';
+import { KORZEN, KOLEKCJA, zrodla, BAZA_PAGES } from './wspolne.mjs';
 
 const API = 'https://api.webflow.com/v2';
 const argv = process.argv.slice(2);
@@ -85,8 +84,11 @@ async function api(sciezka, opcje = {}) {
 // ------------------------------------------------------------------ 1. budowa
 const budowy = [];
 let bledy = 0;
-for (const id of idZrodel()) {
-  const zrodlo = wczytajPlik(path.join(KATALOG_ZRODEL, `${id}.txt`));
+for (const { slug, item: id, zrodlo } of zrodla()) {
+  /* Bez `item` nie ma dokąd pisać. To nie jest usterka, tylko przepis jeszcze
+     nieprzypisany do kolekcji — ale wypchnięcie MUSI o tym powiedzieć, bo cicho
+     pominięty przepis wygląda jak wypchnięty. */
+  if (!id) { console.log(`· ${slug}  bez „item:" — pomijam, nie ma dokąd wypchnąć`); continue; }
   const w = zbuduj(id, zrodlo);
   if (w.bledy.length) {
     bledy += w.bledy.length;
@@ -110,12 +112,41 @@ console.log(`zbudowane bez błędu: ${budowy.length} przepisów`);
 const gitOut = (args, wejscie) => execFileSync('git', ['-C', KORZEN, ...args],
   { input: wejscie, encoding: 'utf8' }).trim();
 
-function bramkaGit(budowy) {
-  let commit;
-  try { commit = gitOut(['rev-parse', 'origin/main']); }
-  catch { console.error('nie umiem odczytać origin/main — zrób `git fetch origin main`'); process.exit(1); }
+/* KTÓRE `main` PILNUJEMY — to nie jest szczegół konfiguracji.
 
-  console.log(`\nbramka git — czy origin/main (${commit.slice(0, 7)}) niesie te same bajty:`);
+   Bramka ma odpowiadać na jedno pytanie: czy plik, na który za chwilę wskaże
+   `parser-url` w CMS, JEST JUŻ na hoście, który go serwuje. Do 2026-08-19 pytała
+   o `origin/main`, czyli o repozytorium osobiste — bo stamtąd wtedy szły Pages.
+   Po migracji hosta na organizację ten sam kod zaczął pilnować NIE TEGO REPO:
+   przechodziłby, gdy plik leży na osobistym, a na organizacyjnym go nie ma,
+   czyli dokładnie w sytuacji, dla której powstał.
+
+   Referencję wyprowadzamy więc z `BAZA_PAGES`, a nie z nazwy zdalnego — dzięki
+   temu adres w wygenerowanym `parser-url` i repozytorium sprawdzane przez bramkę
+   są z definicji tym samym miejscem. Zmiana hosta w jednej stałej przestawia oba. */
+function refPages() {
+  const m = /^https:\/\/([^.]+)\.github\.io\/([^/]+)/.exec(BAZA_PAGES);
+  if (!m) { console.error(`nie umiem wyprowadzić repozytorium z BAZA_PAGES (${BAZA_PAGES})`); process.exit(1); }
+  const [, wlasciciel, repo] = m;
+  const url = `https://github.com/${wlasciciel}/${repo}`;
+  /* Szukamy zdalnego, który wskazuje na TEN adres — nie zgadujemy nazwy. */
+  const zdalne = gitOut(['remote']).split('\n').filter(Boolean);
+  for (const r of zdalne) {
+    const u = gitOut(['remote', 'get-url', r]).replace(/\.git$/, '');
+    if (u.toLowerCase() === url.toLowerCase()) return { ref: `${r}/main`, url };
+  }
+  console.error(`\nżaden zdalny nie wskazuje na ${url} — a stamtąd Pages serwuje ładunki.`);
+  console.error(`Dodaj go: git remote add pages ${url}   (potem: git fetch pages main)`);
+  process.exit(1);
+}
+
+function bramkaGit(budowy) {
+  const { ref, url } = refPages();
+  let commit;
+  try { commit = gitOut(['rev-parse', ref]); }
+  catch { console.error(`nie umiem odczytać ${ref} — zrób \`git fetch ${ref.split('/')[0]} main\``); process.exit(1); }
+
+  console.log(`\nbramka git — czy ${ref} (${commit.slice(0, 7)}) — ${url} — niesie te same bajty:`);
   let brakuje = 0;
   for (const w of budowy) {
     const nasz = gitOut(['hash-object', '--stdin'], w.ladunek.tresc);
@@ -128,11 +159,11 @@ function bramkaGit(budowy) {
       brakuje++;
       console.log(`  ✗ ${w.zrodlo.meta.slug}: dane/${w.ladunek.plik} ` +
         (wDrzewie ? `ma w main hasz ${wDrzewie.slice(0, 8)}, a regeneracja daje ${nasz.slice(0, 8)}`
-                  : 'NIE MA GO w commicie wskazywanym przez origin/main'));
+                  : `NIE MA GO w commicie wskazywanym przez ${ref}`));
     }
   }
   if (brakuje) {
-    console.error(`\n${brakuje} ładunków nie ma na origin/main albo różnią się treścią. ` +
+    console.error(`\n${brakuje} ładunków nie ma na ${ref} albo różnią się treścią. ` +
       'Najpierw commit i push, potem zapis do CMS — odwrotna kolejność daje stronę ' +
       'wskazującą na nieistniejący plik.');
     process.exit(1);

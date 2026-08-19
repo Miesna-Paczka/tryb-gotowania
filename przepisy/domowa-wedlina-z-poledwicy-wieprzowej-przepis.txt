@@ -5,6 +5,7 @@ porcje-bazowe: 4
 liczba-porcji: 3–4 porcje
 waga-porcji: 80
 czas-minuty: 110
+item: 6a57652c742cc19ceca141ab
 
 [skladniki]
 #poledwica   350 g polędwicy wieprzowej   @poledwiczka-wieprzowa

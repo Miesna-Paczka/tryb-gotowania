@@ -1,4 +1,4 @@
-/* importuj-z-cms.mjs — zrzut kolekcji `przepisy` → pliki `przepisy/<itemId>.txt`.
+/* importuj-z-cms.mjs — zrzut kolekcji `przepisy` → pliki `przepisy/<slug>.txt`.
  *
  * Narzędzie JEDNORAZOWE z założenia, ale nie z konstrukcji: po migracji źródłem
  * jest repo i ten kierunek się odwraca (`wypchnij-do-cms.mjs`). Zostaje w drzewie,
@@ -51,7 +51,7 @@ for (const it of items) {
     continue;
   }
 
-  const plik = path.join(KATALOG_ZRODEL, `${it.id}.txt`);
+  const plik = path.join(KATALOG_ZRODEL, `${d.slug}.txt`);
   if (fs.existsSync(plik) && !nadpisz) { pominiete++; continue; }
 
   const meta = {
@@ -66,7 +66,7 @@ for (const it of items) {
 
   fs.writeFileSync(plik, zapiszZrodlo({ meta, pola }));
   zapisane++;
-  console.log(`✓ ${it.id}.txt  ${d.slug}`);
+  console.log(`✓ ${d.slug}.txt  ${it.id}`);
 }
 
 console.log(`\nzapisane: ${zapisane} · pominięte (już są, bez --nadpisz): ${pominiete} · poza zakresem: ${pozaZakresem}`);

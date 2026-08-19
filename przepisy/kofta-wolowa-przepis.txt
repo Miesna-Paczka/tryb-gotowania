@@ -5,12 +5,13 @@ porcje-bazowe: 2
 liczba-porcji: 2–3 porcje
 waga-porcji: 276
 czas-minuty: 60
+item: 6a57652c742cc19ceca141a9
 
 [skladniki]
 #wolowina  300 g wołowiny mielonej @wolowina-mielona
 #cebula  1 {mała cebula|małe cebule|małych cebul|małej cebuli}
 #czosnek  2 ząbki czosnku
-#imbir  2 cm świeżego imbiru
+#imbir  10 g startego świeżego imbiru (łyżeczka to ok. 6 g)
 #kolendra  1 garść kolendry
 #mieta  1 garść świeżej mięty
 #cynamon  szczypta cynamonu

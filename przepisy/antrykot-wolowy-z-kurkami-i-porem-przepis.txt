@@ -5,6 +5,7 @@ porcje-bazowe: 2
 liczba-porcji: 2 porcje
 waga-porcji: 610
 czas-minuty: 90
+item: 6a57649e2c911147dc2602db
 
 [skladniki]
 #antrykot   400 g antrykotu wołowego @antrykot-bez-kosci

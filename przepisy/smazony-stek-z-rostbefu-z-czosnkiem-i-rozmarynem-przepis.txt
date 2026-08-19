@@ -5,6 +5,7 @@ porcje-bazowe: 2
 liczba-porcji: 2 porcje
 waga-porcji: 270
 czas-minuty: 50
+item: 6a5764168326a96c1e226c81
 
 [skladniki]
 #rostbef  600 g rostbefu wołowego @rostbef

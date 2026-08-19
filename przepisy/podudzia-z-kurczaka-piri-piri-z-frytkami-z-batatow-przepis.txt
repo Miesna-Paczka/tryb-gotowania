@@ -5,6 +5,7 @@ porcje-bazowe: 6
 liczba-porcji: 6 porcji
 waga-porcji: 212
 czas-minuty: 80
+item: 6a5764168326a96c1e226c7f
 
 [skladniki]
 #podudzia   1020 g podudzi z kurczaka   @podudzia-z-kurczaka

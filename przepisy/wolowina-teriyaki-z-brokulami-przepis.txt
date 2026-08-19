@@ -5,6 +5,7 @@ porcje-bazowe: 2
 liczba-porcji: 2 porcje
 waga-porcji: 294
 czas-minuty: 120
+item: 6a57652c742cc19ceca141ad
 
 [skladniki]
 #wolowina    300 g wołowiny gulaszowej z udźca   @wolowina-gulaszowa
@@ -13,7 +14,7 @@ czas-minuty: 120
 #sojowy      200 ml jasnego sosu sojowego
 #brokuly     200 g brokułów
 #czosnek     3 ząbki czosnku
-#imbir       3 cm imbiru
+#imbir       12 g startego imbiru (łyżeczka to ok. 6 g)
 #pomarancza  1 pomarańcza
 #dymka       1 dymka
 #maka        1 łyżka mąki
@@ -80,9 +81,9 @@ Czym zastąpić cukier brązowy?
 Miodem gryczanym, w tej samej ilości co cukier. Sos wyjdzie mniej karmelowy, bo miód nie niesie melasy, i odrobinę słodszy – gęstnieje i tak od mąki, nie od cukru.
 
 #imbir
-krótko: ½ łyżeczki mielonego na 3 cm korzenia
+krótko: ½ łyżeczki mielonego na 12 g korzenia
 Mogę użyć imbiru mielonego zamiast świeżego?
-Tak – pół łyżeczki mielonego na każde trzy centymetry świeżego korzenia. Wsyp go do marynaty razem z cukrem, bo mielony potrzebuje płynu, żeby się rozejść; ostrej nuty świeżego i tak nie odda.
+Tak – pół łyżeczki mielonego na każde 12 g startego świeżego korzenia. Wsyp go do marynaty razem z cukrem, bo mielony potrzebuje płynu, żeby się rozejść; ostrej nuty świeżego i tak nie odda.
 
 [przechowywanie]
 Jak przechowywać i odgrzewać wołowinę teriyaki?

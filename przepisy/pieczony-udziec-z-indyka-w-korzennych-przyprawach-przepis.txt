@@ -5,6 +5,7 @@ porcje-bazowe: 3
 liczba-porcji: 2–3 porcje
 waga-porcji: 96
 czas-minuty: 120
+item: 6a57649e2c911147dc2602e3
 
 [skladniki]
 #udziec    500 g udźca z indyka   @podudzie-z-indyka

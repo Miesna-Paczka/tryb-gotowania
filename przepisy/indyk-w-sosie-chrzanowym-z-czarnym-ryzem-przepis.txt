@@ -5,6 +5,7 @@ porcje-bazowe: 1
 liczba-porcji: 1 porcja
 waga-porcji: 686
 czas-minuty: 40
+item: 6a5764168326a96c1e226c87
 
 [skladniki]
 #indyk       200 g piersi z indyka   @filet-z-piersi-indyka

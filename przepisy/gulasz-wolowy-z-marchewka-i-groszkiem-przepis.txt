@@ -5,6 +5,7 @@ porcje-bazowe: 2
 liczba-porcji: 2 porcje
 waga-porcji: 621
 czas-minuty: 120
+item: 6a57652c742cc19ceca141af
 
 [skladniki]
 #wolowina 300 g wołowiny gulaszowej @wolowina-gulaszowa

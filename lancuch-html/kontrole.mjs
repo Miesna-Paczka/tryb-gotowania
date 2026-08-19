@@ -1,3 +1,5 @@
+import { parsujWartosci } from './zrodlo.mjs';
+
 /* kontrole.mjs — kontrole ŹRÓDŁA, których parser nie robi, bo parser czyta
  * mikroskładnię, a te pytają o KSZTAŁT PLIKU.
  *
@@ -175,6 +177,31 @@ export function kontrolujWynik(zrodlo, wynik) {
     const bloki = zrodlo.pola[pole].split(/\n[ \t]*\n+/).filter((b) => b.trim()).length;
     if (h3 !== bloki) bledy.push(`${pole}: ${bloki} bloków w źródle, ${h3} <h3> w ${poleHtml}`);
   }
+  /* CZY POLE DA SIĘ PRZECZYTAĆ PO ZDJĘCIU ZNACZNIKÓW.
+
+     Webflow RichText zna wąski zestaw tagów i wszystko poza nim renderuje po ich
+     zdjęciu. Tabela znika wtedy bez śladu, a jej komórki nie mają między sobą
+     żadnego separatora — więc pole czytelne w HTML-u zamienia się w:
+
+         „wartość odżywczaw 100 genergia693 kJ / 165 kcaltłuszcz6,7 g…"
+
+     Usterka z 2026-08-19, zgłoszona z edytora CMS. Nie widać jej ani w liczbie
+     `<li>`, ani w wycieku metadanych — więc żadna z kontroli obok by jej nie
+     złapała. Ta sprawdza jedno, za to wprost: czy po BRUTALNYM zdjęciu tagów,
+     bez wstawiania spacji, każdy człon dalej stoi jako „klucz: wartość". */
+  for (const [pole, zrodloPola] of [['wartosci-100-html', 'wartosci-odzywcze'],
+    ['wartosci-porcja-html', 'wartosci-porcja']]) {
+    const goly = String(wynik.pola[pole] || '').replace(/<[^>]+>/g, '');
+    for (const czlon of parsujWartosci(zrodlo.pola[zrodloPola])) {
+      if (czlon.blad) continue;
+      if (!goly.includes(`${czlon.klucz}: ${czlon.wartosc}`)) {
+        bledy.push(`${pole}: po zdjęciu znaczników człon „${czlon.klucz}" skleja się z sąsiadem ` +
+          `— pole jest nieczytelne dla czytelnika i dla crawlera`);
+        break;
+      }
+    }
+  }
+
   /* Klucze i skróty są metadanymi trybu gotowania i NIE MAJĄ prawa pojawić się
      w HTML-u widzianym przez czytelnika. To jest ta kontrola, której brak
      kosztował „#kolendra" na stronie. */

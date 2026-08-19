@@ -13,10 +13,12 @@ name: lancuch-html
 on:
   push:
     paths: ['przepisy/**', 'dane/**', 'lancuch-html/**', 'narzedzia/suchy-bieg-generatora.mjs',
-            'przepis-parser.js', 'odmiana-node.mjs', '.github/workflows/lancuch-html.yml']
+            'przepis-parser.js', 'odmiana-node.mjs', 'narzedzia/suchy-bieg-listy-serwerowej.mjs',
+            '.github/workflows/lancuch-html.yml']
   pull_request:
     paths: ['przepisy/**', 'dane/**', 'lancuch-html/**', 'narzedzia/suchy-bieg-generatora.mjs',
-            'przepis-parser.js', 'odmiana-node.mjs', '.github/workflows/lancuch-html.yml']
+            'przepis-parser.js', 'odmiana-node.mjs', 'narzedzia/suchy-bieg-listy-serwerowej.mjs',
+            '.github/workflows/lancuch-html.yml']
 
 jobs:
   bramka:
@@ -42,6 +44,13 @@ jobs:
           node lancuch-html/generuj-html.mjs
           git diff --exit-code -- dane/ przepisy/ \
             || { echo '::error::dane/ rozjeżdża się z przepisy/ — uruchom generuj-html.mjs i zacommituj wynik'; exit 1; }
+
+      # Strona przepisu pokazuje listę składników DWA RAZY: raz wyrenderowaną przez
+      # Webflow z `skladniki-html` (to widzi crawler bez JS), raz zbudowaną
+      # w przeglądarce przez parser (to widzi człowiek). Przy porcjach bazowych
+      # muszą być identyczne — rozjazd to podmiana treści pod crawlerem.
+      - name: lista serwerowa zgodna z parserem
+        run: node narzedzia/suchy-bieg-listy-serwerowej.mjs
 
       - name: porównanie z odciskiem
         run: node lancuch-html/porownaj.mjs

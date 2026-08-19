@@ -21,7 +21,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { zbuduj, POLA_HTML, wczytajIndeks } from './generuj-html.mjs';
 import { wczytajPlik } from './zrodlo.mjs';
-import { KATALOG_ZRODEL, KATALOG_DANYCH, wczytajZrzut, idZrodel } from './wspolne.mjs';
+import { KATALOG_DANYCH, wczytajZrzut, zrodla } from './wspolne.mjs';
 
 const POLA = Object.values(POLA_HTML);
 const POCHODNE = ['kcal-porcja', 'bialko-porcja', 'weglowodany-porcja', 'tluszcz-porcja'];
@@ -38,8 +38,8 @@ const indeks = wczytajIndeks();
 let zgodne = 0, rozjazdy = 0, uwagi = 0;
 const raport = [];
 
-for (const id of idZrodel()) {
-  const zrodlo = wczytajPlik(path.join(KATALOG_ZRODEL, `${id}.txt`));
+for (const { slug, item: id, zrodlo } of zrodla()) {
+  if (!id) { raport.push(`  pomijam (bez „item:"): ${slug}`); continue; }
   const w = zbuduj(id, zrodlo);
 
   if (w.bledy.length) {
@@ -128,7 +128,7 @@ for (const id of idZrodel()) {
 
 // --- 2. pętla w drugą stronę --------------------------------------------
 if (items) {
-  const maPlik = new Set(idZrodel());
+  const maPlik = new Set(zrodla().map((z) => z.item).filter(Boolean));
   for (const [id, it] of items) {
     if (maPlik.has(id)) continue;
     const wZakresie = Object.keys(POLA_HTML).every((p) => it.fieldData[p]);
@@ -143,7 +143,7 @@ if (items) {
 
 // --- ładunki sieroce ----------------------------------------------------
 if (fs.existsSync(KATALOG_DANYCH)) {
-  const znane = new Set(idZrodel());
+  const znane = new Set(zrodla().map((z) => z.item).filter(Boolean));
   for (const f of fs.readdirSync(KATALOG_DANYCH)) {
     const m = /^([0-9a-f]{24})\.[0-9a-f]{8}\.json$/.exec(f);
     if (m && !znane.has(m[1])) {
