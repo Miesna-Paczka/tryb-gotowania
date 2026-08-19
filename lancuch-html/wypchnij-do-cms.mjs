@@ -33,8 +33,9 @@
  * inaczej nie działałby ani jsDelivr, ani Pages — więc token Webflow nie ma tu
  * gdzie mieszkać i most między Pages a CMS-em jest sesją Claude, nie skryptem
  * z sekretem (decyzja operatora 2026-08-19). Sesja nie widzi jednak Pages:
- * `lukaszwerecik.github.io` jest zablokowane przez politykę egressu środowiska
- * `[V 2026-08-19]`, i przez curl, i przez WebFetch. Dlatego kolejność sprawdza się
+ * polityka egressu środowiska blokuje CAŁY ruch wychodzący HTTP — 403 na tunelu
+ * CONNECT, jednakowo dla obu hostów Pages i dla `example.com`, i przez curl, i przez
+ * WebFetch `[V 2026-08-19]`. Zmiana hosta tego nie zdejmuje. Dlatego kolejność sprawdza się
  * dwoma sposobami, zależnie od tego, kto uruchamia skrypt:
  *
  *   `--wykonaj` (maszyna operatora, jest sieć) — POBIERA każdy ładunek z Pages

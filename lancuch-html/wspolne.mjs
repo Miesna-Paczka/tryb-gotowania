@@ -14,7 +14,7 @@ export const SITE = '6983617613052dc9fe624303';
 /* Baza adresów GitHub Pages tego repozytorium. Ta sama, z której idą oba
    artefakty embedu (DEPLOY.md) — nie zakładamy drugiego hostingu dla danych,
    bo drugi hosting to drugi tryb awarii i drugi cache do zrozumienia. */
-export const BAZA_PAGES = 'https://lukaszwerecik.github.io/tryb-gotowania';
+export const BAZA_PAGES = 'https://miesna-paczka.github.io/tryb-gotowania';
 
 /* Odpowiedź MCP bywa opakowana na kilka sposobów zależnie od tego, czym ją
    zapisano. Rozpakowujemy tolerancyjnie, bo to wejście operatorskie. */
