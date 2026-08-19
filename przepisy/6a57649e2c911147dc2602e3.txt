@@ -1,0 +1,77 @@
+[meta]
+nazwa: Pieczony udziec z indyka w korzennych przyprawach
+slug: pieczony-udziec-z-indyka-w-korzennych-przyprawach-przepis
+porcje-bazowe: 3
+liczba-porcji: 2–3 porcje
+waga-porcji: 96
+czas-minuty: 120
+
+[skladniki]
+#udziec    500 g udźca z indyka   @podudzie-z-indyka
+#gozdziki  3 goździki
+#anyz      ½ łyżeczki mielonego anyżu
+#ostra     ½ łyżeczki ostrej papryki
+#wedzona   ½ łyżeczki wędzonej papryki
+#cynamon   ½ łyżeczki cynamonu
+#sol       1 łyżeczka soli
+#oliwa     2 łyżki oliwy
+
+[kroki]
+== utrzyj przyprawy
+czas: ok. 5 min
+skladniki: gozdziki, anyz, ostra, wedzona, cynamon, sol
+Wrzuć goździki do moździerza i rozetrzyj je na proszek, a dopiero potem dosyp anyż, obie papryki, cynamon i sól. Goździki są najtwardsze z całej mieszanki – dosypane na końcu zostałyby w niej kawałkami.
+
+== natrzyj mięso
+czas: ok. 5 min
+skladniki: udziec, oliwa
+Osusz udziec ręcznikiem papierowym, wymieszaj przyprawy z oliwą i rozprowadź je po całej powierzchni, także pod skórą – tam, gdzie da się ją podważyć palcem.
+
+== zamarynuj w lodówce
+minutnik: 4:00:00 marynowanie
+kryterium: przyprawy nie są już sypkie, tylko tworzą na skórze ciemną, wilgotną warstwę, a mięso jest w dotyku jędrne, nie mokre
+Przełóż natarty udziec do naczynia żaroodpornego, przykryj je i wstaw do lodówki – cztery godziny wystarczą, żeby sól weszła pod skórę, a jeśli możesz, zostaw go wręcz na całą noc. Surowego mięsa nie marynuj jednak dłużej niż **dwie doby**.
+
+== nagrzej piekarnik
+czas: ok. 15 min
+Nastaw piekarnik na 180°C, grzanie góra-dół, i daj mu dojść do temperatury, zanim wyjmiesz mięso z lodówki. Udziec ma wejść do gorącego piekarnika – w letnim zacznie puszczać sok, zanim skórka zdąży się ściąć.
+
+== upiecz udziec
+minutnik: 1:30:00 udziec
+kryterium: termometr wbity w najgrubsze miejsce, tuż przy kości, ale jej niedotykający, pokazuje 74°C – to jest **jedyny rozstrzygający odczyt**, bo ani barwa soku z nakłucia, ani kolor skórki nie mówią o wnętrzu nic
+Wstaw naczynie na środkową półkę, bez przykrycia, i nie otwieraj piekarnika przez pierwszą godzinę. Minutnik odmierza czas dla pół kilograma mięsa – na każde dodatkowe 100 g **dolicz około 6 minut** i po sygnale nastaw go jeszcze raz, na same doliczone minuty.
+
+== odpocznij mięso
+minutnik: 15:00 odpoczynek
+kryterium: nakłute mięso puszcza już tylko kilka kropli soku zamiast strumienia, a skórka jest pod palcem ciepła, nie parząca
+Wyjmij udziec z piekarnika, przykryj go luźno folią aluminiową, zostaw na desce i pozwól mu odpocząć. Nie krój od razu, bo **straci soki**.
+
+== pokrój i podaj
+czas: ok. 5 min
+Odkrój mięso od kości, pokrój je w poprzek włókien i układaj plastry na ciepłym talerzu. Ten sam udziec podasz też na zimno, w cienkich plastrach zamiast wędliny – wystudź go wtedy w całości i kroj prosto z lodówki.
+
+[wskazowka]
+Skąd wiadomo, że udziec jest już upieczony?
+Z termometru wbitego w najgrubsze miejsce, tuż przy kości, ale tak, żeby jej nie dotykał – ma pokazać 74°C. To jedyny rozstrzygający odczyt, a w razie wątpliwości lepiej udziec przetrzymać niż nie dopiec.
+
+A jeśli nie mam termometru?
+Zamiennika nie ma: FoodSafety.gov każe mierzyć zawsze, a przy samej kości mięso bywa różowe także upieczone, więc ani barwa soku z nakłucia, ani kolor skórki niczego nie rozstrzygają. Termometr do mięsa to najtańszy sprzęt, który cokolwiek w tej kuchni zmienia – zanim go kupisz, piecz raczej dłużej niż krócej.
+
+Co zrobić, gdy skórka jest już ciemna, a środek surowy?
+Przykryj udziec folią aluminiową i piecz dalej w tej samej temperaturze. Folia zatrzymuje przypiekanie z góry, a wnętrze nagrzewa się tak samo – zdejmij ją na ostatnich kilka minut, jeśli chcesz odzyskać połysk skórki.
+
+[co-mozesz-zmienic]
+#anyz
+krótko: gwiazdka anyżu, utarta razem z resztą
+Czym zastąpić mielony anyż?
+Jedną gwiazdką anyżu, utartą w moździerzu razem z goździkami. Jeśli nie masz żadnego, wsyp pół łyżeczki nasion kopru włoskiego – zapach wyjdzie łagodniejszy, ale ta sama słodkawa nuta zostanie.
+
+[przechowywanie]
+Jak przechowywać i odgrzewać pieczony udziec z indyka?
+W lodówce: do 2 dni w szczelnym pojemniku i w kawałku – włóż go tam w ciągu 1–2 godzin od wyjęcia z piekarnika, a kroj dopiero przed podaniem. W zamrażarce: najlepsza jakość do 2–3 miesięcy, najwygodniej w plastrach. Odgrzewanie: na patelni albo w piekarniku, z łyżką wody i pod przykryciem – bez tego plastry wysychają w kilka minut.
+
+[wartosci-odzywcze]
+energia: 958 kJ / 230 kcal; tłuszcz: 14 g; kwasy tłuszczowe nasycone: 3,3 g; węglowodany: 0,4 g; cukry: 0,1 g; błonnik: 0,6 g; białko: 26 g; sól: 2,2 g
+
+[wartosci-porcja]
+energia: 920 kJ / 221 kcal; tłuszcz: 13 g; kwasy tłuszczowe nasycone: 3,2 g; węglowodany: 0,4 g; cukry: 0,1 g; błonnik: 0,6 g; białko: 25 g; sól: 2,1 g

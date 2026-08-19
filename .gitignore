@@ -56,3 +56,8 @@ DELTA--*.md
 # który stan opisuje.
 PROMPT-KOPIA-*.md
 PROPOZYCJA-*.md
+
+# Artefakt roboczy trybu --przez-mcp: payload do zapisu w CMS. Powstaje z plikow
+# zrodlowych przy kazdym uruchomieniu, wiec w repo bylby czwarta kopia tej samej
+# tresci — i jedyna, ktora moglaby sie zestarzec po cichu.
+payload-cms.json

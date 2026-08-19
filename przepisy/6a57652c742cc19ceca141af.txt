@@ -1,0 +1,97 @@
+[meta]
+nazwa: Gulasz wołowy z marchewką i groszkiem
+slug: gulasz-wolowy-z-marchewka-i-groszkiem-przepis
+porcje-bazowe: 2
+liczba-porcji: 2 porcje
+waga-porcji: 621
+czas-minuty: 120
+
+[skladniki]
+#wolowina 300 g wołowiny gulaszowej @wolowina-gulaszowa
+#maka 3 łyżki mąki
+#sol 1 łyżeczka soli
+#pieprz 1 łyżeczka pieprzu
+#cebula 1 cebula
+#czosnek 4 ząbki czosnku
+#marchewka 3 {mniejsza marchewka|mniejsze marchewki|mniejszych marchewek|mniejszej marchewki}
+#rozmaryn 2 gałązki świeżego rozmarynu
+#oliwa 3 łyżki oliwy z oliwek
+#groszek 60 g zielonego groszku
+#laur 2 {liść laurowy|liście laurowe|liści laurowych|liścia laurowego}
+#wino 150 ml czerwonego wina
+#woda 150 ml wody
+#passata 200 ml passaty pomidorowej
+#bulka 2 bułki
+#maslo 1 łyżka masła
+
+[kroki]
+== nastaw piekarnik
+Nastaw piekarnik na 180°C, bez termoobiegu. Rozgrzeje się w tle, kiedy będziesz zajmować się mięsem i warzywami.
+
+== oprósz mięso mąką
+czas: ok. 4 min
+skladniki: wolowina, maka, sol, pieprz
+Odsyp połowę mąki, soli i pieprzu do miseczki, zanim dotkniesz mięsa – ta połowa pójdzie później do sosu. Resztą mąki obtocz kostki wołowiny, a potem oprósz je solą i pieprzem.
+
+== pokrój warzywa
+czas: ok. 8 min
+skladniki: cebula, czosnek, marchewka, rozmaryn
+Umyj ręce i deskę po surowym mięsie. Cebulę pokrój w kostkę, marchewki w plastry grubości centymetra, czosnek zgnieć nożem, a rozmaryn posiekaj drobno.
+
+== zeszklij cebulę
+czas: 5–6 min
+skladniki: oliwa
+Rozgrzej oliwę na patelni na średnim ogniu, a potem wrzuć czosnek, cebulę i rozmaryn. Smaż, aż brzegi cebuli zrobią się złote, a czosnek **zacznie intensywnie pachnieć**.
+
+== zamknij mięso
+minutnik: 4:00 mięso
+kryterium: kostki są szare z każdej strony, a w środku wciąż surowe – zmiękną dopiero w piekarniku
+Dołóż oprószone kostki wołowiny i obracaj je co kilkadziesiąt sekund, aż nabiorą koloru. Rozłóż je luźno – stłoczone zaczną się dusić zamiast rumienić.
+
+== przełóż do naczynia
+Przelej zawartość patelni do naczynia żaroodpornego, razem z oliwą i przywartymi do dna sokami. Weź takie naczynie, żeby mięso leżało w jednej warstwie, a płyn miał min 5 cm zapasu od góry.
+
+== dołóż warzywa i liście
+skladniki: groszek, laur
+Wsyp do naczynia marchewkę i groszek, wrzuć liście laurowe. Dosyp pozostałą mąkę i dopraw resztą soli i pieprzu.
+
+== rozprowadź sos
+minutnik: 2:00 sos
+kryterium: mąka rozeszła się bez grudek, a płyn jest jednolicie czerwony i lekko mętny
+skladniki: woda, wino, passata
+Dolej wodę, wino i passatę, a potem mieszaj wolno, zgarniając mąkę z dna naczynia. Grudki, które zostaną teraz, będą w sosie do końca.
+
+== przykryj i piecz
+minutnik: 1:30:00 gulasz
+kryterium: włókna wołowiny rozchodzą się pod naciskiem widelca, bez oporu i sprężynowania
+Przykryj naczynie pokrywką albo szczelnie folią aluminiową i wstaw je do nagrzanego piekarnika. Przez ten czas nie musisz przy nim stać.
+
+== podaj z bułkami
+czas: ok. 2 min
+skladniki: bulka, maslo
+Wyłów liście laurowe i wyrzuć je, a bułki przekrój i posmaruj masłem. Gulasz nałóż do misek prosto z naczynia, razem z sosem.
+
+[wskazowka]
+Co zrobić, żeby wołowina zmiękła?
+Dać jej czas w niskiej temperaturze i nie podkręcać ognia. Jeśli po godzinie mięso wciąż jest twarde, to kolagen jeszcze się nie rozpuścił. Jeśli po półtorej godziny włókna wciąż stawiają opór, przykryj naczynie z powrotem i daj mu kolejne 20–30 minut, a w razie potrzeby powtórz.
+
+[co-mozesz-zmienic]
+#wino
+krótko: bulion wołowy w tej samej ilości
+Czym zastąpić czerwone wino?
+Bulionem wołowym w tej samej ilości. Sos wyjdzie łagodniejszy i mniej kwaśny, więc pod koniec pieczenia dodaj łyżeczkę octu winnego albo soku z cytryny.
+
+#rozmaryn
+krótko: suszony rozmaryn, trzy razy mniej niż świeżego
+Czym zastąpić świeży rozmaryn?
+Suszonym – potrzebujesz go mniej więcej trzy razy mniej niż świeżego. Wsypuj od razu do sosu, nie na patelnię: suszone igiełki na gorącej oliwie gorzknieją w kilkanaście sekund.
+
+[przechowywanie]
+Jak przechowywać i odgrzewać gulasz wołowy?
+W lodówce: do 2 dni w szczelnym pojemniku, włóż go tam w ciągu 1–2 godzin od wyjęcia z piekarnika; bułki trzymaj osobno. W zamrażarce: najlepsza jakość do 2–3 miesięcy, a po rozmrożeniu zjedz w ciągu 24 godzin. Odgrzewanie: w rondlu pod przykryciem, na małym ogniu i z łyżką wody – sos przez noc gęstnieje.
+
+[wartosci-odzywcze]
+energia: 402 kJ / 96 kcal; tłuszcz: 4,7 g; kwasy tłuszczowe nasycone: 1 g; węglowodany: 4,5 g; cukry: 2,4 g; błonnik: 1,6 g; białko: 5,9 g; sól: 0,56 g
+
+[wartosci-porcja]
+energia: 2498 kJ / 598 kcal; tłuszcz: 29 g; kwasy tłuszczowe nasycone: 6,2 g; węglowodany: 28 g; cukry: 15 g; błonnik: 9,8 g; białko: 37 g; sól: 3,5 g

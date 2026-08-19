@@ -1,0 +1,47 @@
+# Bramka repozytorium dla źródeł przepisów.
+#
+# Istnieje po to, żeby zdanie „w repozytorium każde takie uszkodzenie jest
+# jednolinijkowym diffem w PR-ze" było prawdziwe także wtedy, gdy nikt nie
+# pamiętał o uruchomieniu skryptu. Uszkodzenia z 2026-08-19 były CICHE — wyszły
+# przypadkiem, przy regeneracji — więc jedyną obroną jest kontrola, której nie
+# trzeba sobie przypomnieć.
+#
+# Czego tu NIE MA: porównania z żywym CMS-em. Wymaga sekretu z tokenem Webflow
+# i jest osobną decyzją operatora (handoff §7.4).
+name: lancuch-html
+
+on:
+  push:
+    paths: ['przepisy/**', 'dane/**', 'lancuch-html/**', 'narzedzia/suchy-bieg-generatora.mjs',
+            'przepis-parser.js', 'odmiana-node.mjs', '.github/workflows/lancuch-html.yml']
+  pull_request:
+    paths: ['przepisy/**', 'dane/**', 'lancuch-html/**', 'narzedzia/suchy-bieg-generatora.mjs',
+            'przepis-parser.js', 'odmiana-node.mjs', '.github/workflows/lancuch-html.yml']
+
+jobs:
+  bramka:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Najpierw dowód, że bramka umie zaświecić na czerwono. Bramka, która
+      # przechodzi na wszystkim, nie jest bramką, tylko dekoracją.
+      - name: suchy bieg — czy kontrole łapią uszkodzenia
+        run: node narzedzia/suchy-bieg-generatora.mjs
+
+      - name: walidacja źródeł
+        run: node lancuch-html/generuj-html.mjs --sucho
+
+      # Ładunki w dane/ mają być zcommitowane i zgodne z regeneracją — inaczej
+      # push zostawia na Pages plik, do którego CMS nie ma jak wskazać.
+      - name: regeneracja bez zmian w drzewie roboczym
+        run: |
+          node lancuch-html/generuj-html.mjs
+          git diff --exit-code -- dane/ przepisy/ \
+            || { echo '::error::dane/ rozjeżdża się z przepisy/ — uruchom generuj-html.mjs i zacommituj wynik'; exit 1; }
+
+      - name: porównanie z odciskiem
+        run: node lancuch-html/porownaj.mjs

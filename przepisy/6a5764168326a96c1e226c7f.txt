@@ -1,0 +1,127 @@
+[meta]
+nazwa: Podudzia z kurczaka piri piri z frytkami z batatów
+slug: podudzia-z-kurczaka-piri-piri-z-frytkami-z-batatow-przepis
+porcje-bazowe: 6
+liczba-porcji: 6 porcji
+waga-porcji: 212
+czas-minuty: 80
+
+[skladniki]
+#podudzia   1020 g podudzi z kurczaka   @podudzia-z-kurczaka
+#kukurydza  3 kolby kukurydzy
+#batat      2 bataty
+#limonka    2 limonki
+#czosnek    8 ząbków czosnku
+#oliwa      3 łyżki oliwy z oliwek
+#maslo      1 łyżka masła
+#natka      2 gałązki natki pietruszki
+#wedzona    2 łyżeczki wędzonej papryki
+#slodka     2 łyżeczki słodkiej papryki
+#oregano    1 łyżeczka suszonego oregano
+#cebulka    1 łyżeczka prażonej cebuli
+#chili      1 łyżeczka mielonego chili
+#sol        1 łyżeczka soli
+#pieprz     1 łyżeczka pieprzu
+#solwoda    sól do osolenia wody
+
+[kroki]
+== nagrzej piekarnik
+czas: 10–15 min
+Nastaw piekarnik na 200°C z grzaniem góra-dół i przygotuj sobie dwie blachy, praskę do czosnku i termometr do mięsa. Termometr wyłóż na wierzch – na końcu to on, a nie zegar, rozstrzyga, czy podudzia są gotowe.
+
+== ugotuj kukurydzę
+minutnik: 12:00 kukurydza
+kryterium: ziarna ustępują pod naciskiem widelca
+skladniki: kukurydza, solwoda
+Zagotuj w dużym garnku osoloną wodę, włóż do niej kolby kukurydzy tak, żeby woda je przykryła, i uruchom minutnik dopiero wtedy, gdy woda znów zawrze. Po sygnale wyjmij kolby łyżką cedzakową, przelej je zimną wodą i zostaw na desce – zimna woda zbija gorąco, więc za chwilę weźmiesz je do ręki.
+
+== odsyp zapas przypraw
+skladniki: sol, pieprz, slodka, czosnek
+Odsyp do małej miseczki jedną trzecią soli, jedną trzecią pieprzu i jedną trzecią słodkiej papryki, a obok odłóż ósmą część czosnku – przy sześciu porcjach wypada z tego jeden ząbek. To zapas na frytki i na masło do kukurydzy; cała reszta pójdzie do marynaty.
+
+== pokrój bataty na frytki
+skladniki: batat
+Obierz bataty i pokrój je wzdłuż na długie słupki grubości mniej więcej palca. Rozłóż je luźno, w jednej warstwie, na blasze wyłożonej papierem do pieczenia – solić i skrapiać będziesz dopiero tuż przed wstawieniem, bo sól wyciąga z batata wodę.
+
+== zmieszaj marynatę
+skladniki: limonka, oliwa, wedzona, oregano, cebulka, chili
+Przeciśnij pozostały czosnek przez praskę do miski, wlej dwie trzecie oliwy i dosyp wędzoną paprykę, resztę słodkiej, oregano, prażoną cebulę, chili oraz resztę soli i pieprzu. Zetrzyj do tego zieloną skórkę z połowy limonek, a potem wyciśnij sok ze wszystkich i wymieszaj marynatę na gładką, ciemnoczerwoną papkę.
+
+== posmaruj kukurydzę masłem
+skladniki: maslo
+Przetnij ostudzone kolby w poprzek na kawałki wielkości jednej porcji – z całej kolby wychodzą dwa. Rozetrzyj masło z odłożonym czosnkiem przeciśniętym przez praskę, szczyptą soli z zapasu i całą odsypaną słodką papryką, a potem rozsmaruj je po kukurydzy.
+
+== obtocz podudzia
+skladniki: podudzia
+Osusz podudzia ręcznikiem papierowym, włóż je do miski z marynatą i obtocz każde tak, żeby przyprawy weszły też pod skórę. Miskę zostaw przy blasze – marynata, która została na dnie, jedzie do piekarnika razem z mięsem.
+
+== wstaw kurczaka i kukurydzę
+minutnik: 15:00 kurczak
+kryterium: skórka jest sucha w dotyku i zaczyna się złocić na wypukłościach
+Rozłóż podudzia skórą do góry na blasze wyłożonej folią, wyskrob na nie resztę marynaty, ułóż obok kawałki kukurydzy i wstaw blachę na środkowy poziom – każde podudzie ma mieć dookoła wolne miejsce, bo stłoczone mięso **paruje zamiast się piec**. Dopiero teraz umyj ręce, miskę, deskę i nóż: od tego momentu nie dotykasz już surowego mięsa.
+
+== dopraw frytki i wsuń je pod kurczaka
+minutnik: 10:00 blachy
+kryterium: skórka podudzi jest równomiernie złota, a brzegi frytek marszczą się i ciemnieją
+Obróć podudzia i kukurydzę na drugą stronę, a frytki skrop resztą oliwy, dopraw większością odsypanej soli i pieprzu i wsuń ich blachę na poziom pod kurczakiem. Zamknij piekarnik od razu, bo przy otwartych drzwiczkach temperatura spada o kilkadziesiąt stopni.
+
+== przełącz na grill
+minutnik: 6:00 skórka
+kryterium: skórka jest napięta, bąbelkuje i ma ciemniejsze plamy
+Obróć podudzia i kukurydzę jeszcze raz, przewróć frytki na drugą stronę i przełącz piekarnik na grill, podnosząc temperaturę do 250°C. Od tej chwili nie odchodź daleko – pod grillem skórka **rumieni się w minuty, nie w kwadranse**, a jeśli kurczak stoi na dwóch blachach, grilluj je po kolei, każdą osobno.
+
+== zmierz temperaturę
+minutnik: 6:00 termometr
+kryterium: termometr wbity w najgrubsze miejsce podudzia, tuż przy kości, ale jej niedotykający, pokazuje co najmniej 74°C, a nacięte do kości mięso jest matowe i zwarte na całej grubości – to jedyne dwa dowody, bo skórka rumieni się na długo przed wnętrzem, a przy samej kości mięso bywa różowawe także wtedy, gdy jest już gotowe
+Obróć podudzia i kukurydzę ostatni raz, a po sygnale zmierz najgrubsze podudzie – a jeśli pieczesz ich więcej, zmierz też jedno z brzegu blachy – wbijając termometr tuż obok kości, ale jej nie dotykając. Każde ma pokazać **co najmniej 74°C**; jeśli któreś pokazuje mniej, przełącz piekarnik z powrotem na 200°C góra-dół, dopiekaj 5 minut i zmierz jeszcze raz przetartą sondą.
+
+== odstaw mięso i dopiecz frytki
+minutnik: 5:00 frytki
+kryterium: frytki mają przypieczone brzegi, a widelec wchodzi w najgrubszy słupek bez oporu
+Przełóż podudzia i kukurydzę na deskę, przykryj je luźno folią i zostaw – w tym czasie sok rozejdzie się z powrotem po włóknach. Blachę z frytkami wsuń w tę samą chwilę na najwyższy poziom, prosto pod grill: przez całe pieczenie zasłaniała im gorąco blacha z kurczakiem, więc dopiero teraz się przypieką.
+
+== rozłóż na talerze
+skladniki: natka
+Rozłóż podudzia, kukurydzę i frytki na talerzach i posyp wszystko posiekaną natką pietruszki. Podawaj od razu – frytki z batatów miękną szybciej niż ziemniaczane.
+
+[wskazowka]
+Skąd wiadomo, że podudzia są już upieczone?
+Z termometru wbitego w najgrubsze miejsce, tuż przy kości, ale tak, żeby jej nie dotykał – ma pokazać co najmniej 74°C. Amerykański FSIS pisze wprost, że wygląd, barwa mięsa i wyciek z nakłucia nie rozstrzygają niczego: przy kości drób bywa różowawy nawet wtedy, gdy jest już gotowy. Zmierz najgrubsze podudzie, a jeśli pieczesz ich więcej – jeszcze jedno z brzegu blachy, przecierając sondę między pomiarami.
+
+A jeśli nie mam termometru?
+Wtedy pieczenie drobiu na kości jest zgadywaniem i lepiej to sobie powiedzieć wprost – termometr do mięsa jest tu rozstrzygnięciem, a nie udogodnieniem. Zanim go kupisz, zostaje ci nacięcie podudzia do kości w najgrubszym miejscu: mięso ma być matowe i zwarte na całej grubości, a przy kości odchodzić od niej bez ciągnięcia. W razie wątpliwości dołóż kilka minut w 200°C – przesuszony drób jest gorszy w jedzeniu, niedopieczony jest ryzykiem.
+
+Dlaczego skórka jest ciemna, a mięso przy kości nadal różowawe?
+Bo to dwie różne rzeczy i dzieją się w różnym tempie: skórka rumieni się od gorącego powietrza z zewnątrz, a barwnik w mięsie tuż przy kości zmienia kolor wolno, zwłaszcza u młodego drobiu. Ciemna skórka nie mówi więc nic o środku, a różowawy odcień przy kości sam z siebie nie znaczy, że mięso jest surowe. Rozstrzyga wyłącznie temperatura wnętrza zmierzona przy kości.
+
+Mój piekarnik nie ma funkcji grilla – co wtedy?
+Zamiast przełączać na grill podnieś temperaturę do 230°C przy grzaniu góra-dół i przesuń blachę z kurczakiem na najwyższy poziom. Skórka zrumieni się wolniej, więc licz na tym etapie dwa razy po osiem minut zamiast dwóch razy po sześć – i tak samo zmierz temperaturę, zanim zdejmiesz mięso.
+
+Co zrobić, żeby frytki z batatów nie wyszły wiotkie?
+Rozłóż je na blasze w jednej warstwie, luźno – stłoczone puszczają parę i miękną zamiast się przypiekać. Nie przykrywaj blachy i nie przewracaj ich częściej niż raz; przez większość pieczenia stoją pod blachą z kurczakiem, więc chrupkość zbierają dopiero na końcu, na górnym poziomie. Batat ma mniej skrobi niż ziemniak i tak długo jej nie utrzyma – dlatego ostatni krok mówi, żeby podać od razu.
+
+[co-mozesz-zmienic]
+#limonka
+krótko: cytryna, ale zetrzyj mniej skórki
+Czym zastąpić limonkę?
+Cytryną, w tej samej liczbie sztuk. Skórka cytryny jest ostrzejsza w zapachu, więc zetrzyj jej mniej, a sok dodaj cały – to on rozrzedza marynatę na tyle, żeby dało się nią obtoczyć mięso.
+
+#cebulka
+krótko: pół łyżeczki czosnku granulowanego
+Nie mam prażonej cebuli – co zamiast niej?
+Pół łyżeczki czosnku granulowanego albo cebuli granulowanej. Prażona cebula wnosi tu głównie słodycz i przypieczoną nutę, więc możesz ją też po prostu pominąć – marynata bez niej wyjdzie ostrzejsza, ale nie gorsza.
+
+#kukurydza
+krótko: mrożone kolby, gotuj ok. 3 min dłużej
+Świeżej kukurydzy nie ma poza sezonem – co wtedy?
+Mrożone kolby, prosto z zamrażarki do wrzątku, gotowane o mniej więcej trzy minuty dłużej. Kolby z puszki są już ugotowane, więc te tylko osusz, posmaruj masłem i wstaw do piekarnika razem z kurczakiem.
+
+[przechowywanie]
+Jak przechowywać i odgrzewać podudzia piri piri?
+W lodówce: do 2 dni w szczelnym pojemniku i na kości – włóż je tam w ciągu 1–2 godzin od zdjęcia z blachy. W zamrażarce: podudzia i kukurydza – najlepsza jakość do 2–3 miesięcy, w porcjach i zjedzone w ciągu 24 godzin od rozmrożenia; frytki z batatów zostaw poza zamrażarką. Odgrzewanie: w piekarniku 180°C i bez przykrycia – skórka wraca wtedy do chrupkości, a pod folią zaparuje.
+
+[wartosci-odzywcze]
+energia: 790 kJ / 189 kcal; tłuszcz: 9,9 g; kwasy tłuszczowe nasycone: 2,2 g; węglowodany: 11 g; cukry: 2,9 g; błonnik: 2,7 g; białko: 12 g; sól: 0,64 g
+
+[wartosci-porcja]
+energia: 1677 kJ / 401 kcal; tłuszcz: 21 g; kwasy tłuszczowe nasycone: 4,6 g; węglowodany: 24 g; cukry: 6,2 g; błonnik: 5,7 g; białko: 26 g; sól: 1,4 g

@@ -1,0 +1,144 @@
+[meta]
+nazwa: Polędwica wieprzowa po meksykańsku w sosie piwnym
+slug: poledwica-wieprzowa-po-meksykansku-w-sosie-piwnym
+porcje-bazowe: 3
+liczba-porcji: 3 porcje
+waga-porcji: 264
+czas-minuty: 90
+
+[skladniki]
+#poledwica  350 g polędwiczki wieprzowej  @poledwiczka-wieprzowa
+#papryka    3 papryki
+#maslo      100 g masła
+#piwo       100 ml piwa
+#sos        4 łyżki sosu pomidorowego
+#rukola     50 g rukoli
+#cebula     2 łyżeczki suszonej cebuli
+#czosnek    2 łyżeczki suszonego czosnku
+#tymianek   1 łyżeczka tymianku
+#oregano    1 łyżeczka oregano
+#slodka     1 łyżeczka słodkiej papryki
+#cayenne    1 łyżeczka pieprzu cayenne
+#wedzona    =½ łyżeczki wędzonej papryki
+#sol        1 łyżeczka soli
+#pieprz     1 łyżeczka czarnego pieprzu
+#cukier     1 łyżeczka cukru muscovado
+
+[kroki]
+== nastaw grill
+czas: ok. 2 min
+Włącz w piekarniku funkcję grilla i ustaw 220°C. Blachę wyłóż folią aluminiową – papryki zostawią na niej czarny osad, a folię po prostu wyrzucisz.
+
+== przygotuj papryki
+czas: ok. 5 min
+skladniki: papryka
+Weź żółte albo czerwone papryki, nie zielone, przekrój je wzdłuż na pół i wyłam gniazda nasienne razem z białymi błonami. Połówki ułóż na blasze skórą do góry i przyciśnij dłonią, żeby leżały jak najbardziej płasko.
+
+== zgrilluj papryki
+minutnik: 15:00 papryki
+kryterium: skóra papryk jest czarna i spęcherzona na całej powierzchni, a nie tylko w kilku miejscach
+Wstaw blachę na najwyższy poziom, na jakim się mieści, tuż pod grzałkę. Skóra ma się **zwęglić na czarno** – bierze ogień na siebie, a miąższ pod nią w tym czasie tylko mięknie.
+
+== poparuj papryki
+minutnik: 10:00 parowanie
+kryterium: skóra odchodzi od miąższu na brzegach połówek i daje się podważyć paznokciem
+Gorące połówki przełóż do miski i szczelnie przykryj ją talerzem albo folią. Bez tej przerwy obieranie zamienia się w skrobanie.
+
+== obierz papryki
+czas: ok. 6 min
+Ściągnij skórę z połówek – po odpoczynku pod przykryciem schodzi dużymi płatami – i potnij miąższ w paski szerokości mniej więcej centymetra. Odstaw paski na bok; trafią na patelnię dopiero przy sosie.
+
+== wymieszaj przyprawy
+czas: ok. 3 min
+skladniki: cebula, czosnek, tymianek, oregano, slodka, cayenne, wedzona, sol, pieprz
+Wsyp do miski suszoną cebulę i czosnek, tymianek, oregano, słodką i wędzoną paprykę, cayenne, sól oraz pieprz, a potem rozetrzyj wszystko palcami. Cukier muscovado zostaje na boku – wejdzie dopiero do gotowego sosu.
+
+== rozpuść masło
+czas: ok. 3 min
+skladniki: maslo
+Rozpuść masło w małym rondelku na najmniejszym ogniu i zdejmij je z palnika, gdy tylko zrobi się płynne. Ma być letnie, nie gorące – z gorącego mięso wyjdzie ledwo zwilżone, a przyprawa nie będzie miała się czego złapać.
+
+== obtocz polędwiczkę
+czas: ok. 5 min
+skladniki: poledwica
+Polędwiczkę przekrój w poprzek na dwa krótsze kawałki, zanurz oba w rozpuszczonym maśle i obtocz w misce z przyprawami, dociskając mięso do dna. Sucha przyprawa trzyma się tylko tam, gdzie masło zdążyło zmoczyć mięso.
+
+== obsmaż polędwiczkę
+minutnik: 10:00 mięso
+kryterium: przyprawy na powierzchni są ciemne i suche w dotyku, a kawałki odchodzą od dna patelni bez szarpania
+Rozgrzej patelnię na średnim ogniu, wlej łyżkę rozpuszczonego masła i ułóż na niej oba kawałki. Obracaj je od czasu do czasu; **w środku mięso jest jeszcze daleko od gotowego** i tak ma być.
+
+== przetrzyj patelnię
+czas: ok. 2 min
+Zdejmij mięso na talerz, a patelnię przetrzyj zwiniętym ręcznikiem papierowym, trzymając go szczypcami. Przypalone przyprawy siedzą na dnie i w sosie dałyby gorycz.
+
+== zalej piwem
+czas: ok. 2 min
+skladniki: piwo, sos
+Połóż mięso z powrotem na patelnię, skrop je resztą rozpuszczonego masła, dołóż paski papryki i sos pomidorowy, a na końcu wlej piwo. Piwo idzie ostatnie, bo wlane wcześniej wygotowałoby się, zanim reszta trafi na patelnię.
+
+== duś w sosie piwnym
+minutnik: 20:00 sos
+kryterium: sos oblepia łyżkę i wolno się z niej zsuwa, a polędwiczka przekrojona w najgrubszym miejscu jest jednolicie biaława na wskroś, bez śladu różu, i pokazuje 70°C na termometrze
+Przykryj patelnię, zejdź z ogniem tak nisko, żeby sos ledwo mrugał, i zaglądaj co kilka minut, żeby zamieszać. Jeśli po odliczeniu sos wciąż rozlewa się po dnie, zdejmij pokrywkę i podgotuj go jeszcze kilka minut.
+
+== pokrój polędwiczkę
+czas: ok. 2 min
+Szczypcami przenieś oba kawałki mięsa na deskę i potnij je w poprzek na plastry grubości mniej więcej dwóch centymetrów. Sos zostaw na patelni, na najmniejszym ogniu.
+
+== dosłódź sos
+czas: ok. 2 min
+skladniki: cukier
+Wsyp do sosu cukier muscovado i mieszaj, aż się rozpuści. Muscovado niesie melasę, więc obok słodyczy wnosi gorycz – równoważy kwas pomidorów i spina sos, którego smaki do tej pory ciągnęły w różne strony.
+
+== podaj
+czas: ok. 2 min
+skladniki: rukola
+Plastry mięsa ułóż na talerzach i polej je gorącym sosem razem z paprykami. Rukolę posiekaj grubo i sypnij na talerze, nie na patelnię – w gorącym sosie zwiędłaby w kilkanaście sekund.
+
+[wskazowka]
+Czy alkohol z piwa wyparuje w czasie duszenia?
+Częściowo. Alkohol ulatnia się razem z parą, więc im dłużej i szerzej sos się gotuje, tym mniej go zostaje – ale dwadzieścia minut pod przykryciem nie usuwa go w całości. Jeśli nie chcesz go w daniu w ogóle, wlej bulion warzywny lub wybierz piwo bezalkoholowe (0,0%).
+
+Jak poznać, że polędwiczka jest gotowa?
+Po przekroju i po termometrze, nie po czasie i nie po skorupce z przypraw: wieprzowina – inaczej niż wołowina – musi dojść na wskroś, czyli do 70°C w najgrubszym miejscu i bez śladu różu w środku. Bez termometru rozstrzyga sam przekrój, a barwa soku nie rozstrzyga niczego. Ciemna przyprawa na powierzchni wygląda jak wysmażenie już po pięciu minutach i to jest tu główna pułapka.
+
+Jak ostre będzie to danie i jak z tego zejść?
+Ostrość niesie wyłącznie cayenne – słodka i wędzona papryka są łagodne, a łyżeczka cayenne na trzy porcje daje wyraźne szczypanie. Jeśli gotujesz dla kogoś, kto tego nie lubi, wsyp do mieszanki połowę, a resztę dosyp do sosu po zdjęciu pokrywki, kiedy będzie już czego spróbować. Za ostry talerz ratuje łyżka jogurtu, nie woda.
+
+Z czym to podać?
+Sos jest gęsty i słodko-gorzki, więc pod niego pasuje coś neutralnego i sypkiego: ryż, kasza jaglana albo pieczone ziemniaki. Kromka chleba też zda egzamin, bo sosu jest niewiele i szkoda go zostawiać na talerzu.
+
+Czy da się zrobić to danie bez piekarnika?
+Da się, na suchej patelni grillowej albo bezpośrednio nad palnikiem gazowym, po kolei. Papryki obracaj szczypcami, aż każda strona zrobi się czarna, a potem tak samo przełóż je do przykrytej miski. Zajmie to więcej Twojej uwagi niż blacha pod grzałką, bo od kuchenki nie odejdziesz.
+
+[co-mozesz-zmienic]
+#piwo
+krótko: piwo bezalkoholowe albo bulion warzywny
+Czym zastąpić piwo?
+Piwem bezalkoholowym w tej samej ilości – ten sos lubi jasne, bo ciemne dokłada palonej goryczy do i tak gorzkiego cayenne. Jeśli nie masz żadnego piwa, wlej bulion warzywny, ale wtedy sos straci gorzki spód i wyjdzie wyraźnie łagodniejszy.
+
+#wedzona
+krótko: szczypta wędzonej soli albo nic
+Nie mam wędzonej papryki, czym ją zastąpić?
+Szczyptą wędzonej soli dosypaną do sosu pod koniec duszenia – wtedy o tyle samo zmniejsz sól w mieszance przypraw. Jeśli i tej nie masz, pomiń dym; reszta przypraw zostaje na miejscu, a danie traci tylko posmak ogniska.
+
+#cukier
+krótko: ciemny cukier trzcinowy albo łyżeczka miodu
+Czym zastąpić cukier muscovado?
+Ciemnym cukrem trzcinowym w tej samej ilości albo łyżeczką miodu wmieszaną w sos zdjęty z ognia. Muscovado ma w sobie melasę, więc obok słodyczy wnosi gorycz – po zwykłym białym cukrze sos wyjdzie płasko słodki i warto wtedy dodać kilka kropli octu.
+
+#rukola
+krótko: natka pietruszki, tyle samo
+Nie mam rukoli, czym ją zastąpić?
+Natką pietruszki, w tej samej ilości. Zielone na wierzchu jest tu po to, żeby przeciąć maślany sos czymś świeżym – natka robi to bez goryczki rukoli, więc talerz wyjdzie łagodniejszy.
+
+[przechowywanie]
+Jak przechowywać i odgrzewać polędwiczkę w sosie piwnym?
+W lodówce: do 2 dni w szczelnym pojemniku, plastry razem z sosem – wstaw je tam w ciągu 1–2 godzin od zdjęcia patelni z ognia. W zamrażarce: najlepsza jakość do 2–3 miesięcy, w płaskich pojemnikach; rozmrażaj w lodówce, zjedz w ciągu 24 godzin i nie zamrażaj powtórnie. Odgrzewanie: na patelni pod przykryciem, na małym ogniu i z łyżką wody – sos przez noc mocno gęstnieje.
+
+[wartosci-odzywcze]
+energia: 705 kJ / 169 kcal; tłuszcz: 11 g; kwasy tłuszczowe nasycone: 6,4 g; węglowodany: 4,7 g; cukry: 4,2 g; błonnik: 2,3 g; białko: 11 g; sól: 0,81 g
+
+[wartosci-porcja]
+energia: 1861 kJ / 447 kcal; tłuszcz: 29 g; kwasy tłuszczowe nasycone: 17 g; węglowodany: 12 g; cukry: 11 g; błonnik: 5,9 g; białko: 30 g; sól: 2,1 g

@@ -1,0 +1,98 @@
+[meta]
+nazwa: Indyk w sosie chrzanowym z czarnym ryżem
+slug: indyk-w-sosie-chrzanowym-z-czarnym-ryzem-przepis
+porcje-bazowe: 1
+liczba-porcji: 1 porcja
+waga-porcji: 686
+czas-minuty: 40
+
+[skladniki]
+#indyk       200 g piersi z indyka   @filet-z-piersi-indyka
+#ryz         30 g czarnego ryżu
+#fasolka     1 garść fasolki szparagowej
+#marchewka   2 marchewki
+#cebula      ½ {mała cebula|małe cebule|małych cebul|małej cebuli}
+#pomidory    3 {suszony pomidor|suszone pomidory|suszonych pomidorów|suszonego pomidora} w oleju
+#oliwa       1 łyżeczka oliwy z oliwek
+#smietana    150 g śmietany 12%
+#chrzan      2 łyżeczki chrzanu ze słoika
+#musztarda   2 łyżeczki musztardy
+#ziola       zioła toskańskie, do smaku
+#przyprawy   sól i pieprz do smaku
+#posypka     natka pietruszki i czarnuszka do posypania
+
+[kroki]
+== nastaw czarny ryż
+czas: 30–40 min
+skladniki: ryz
+Przepłucz ryż i ugotuj go w osolonej wodzie zgodnie z opakowaniem – czarny potrzebuje wyraźnie więcej czasu niż biały, więc nastaw go pierwszy i przechodź do kolejnych kroków, zamiast czekać przy garnku. Gdy ziarna będą miękkie, ale w środku wciąż sprężyste, odcedź je i przykryj.
+
+== ugotuj fasolkę
+minutnik: 5:00 fasolka
+kryterium: strąki są jaskrawozielone, a czubek noża wchodzi w nie z lekkim oporem
+skladniki: fasolka
+Wrzuć fasolkę na wrzącą, osoloną wodę i gotuj bez przykrycia. Odcedź ją i odstaw pod przykryciem – wróci na talerz na końcu.
+
+== pokrój indyka
+skladniki: indyk
+Pierś z indyka pokrój w kawałki wielkości mniej więcej dwóch kęsów, po jakieś 3 cm. Im równiejsze, tym pewniej dojdą w tym samym czasie.
+
+== duś indyka
+minutnik: 10:00 indyk
+kryterium: przekrojony najgrubszy kawałek jest w środku biały, bez różowych smug, a termometr pokazuje w nim 74°C
+Ułóż kawałki luźno w jednej warstwie, wlej wody na grubość palca i przykryj; jeśli nie mieszczą się luźno, duś je w dwóch partiach i odpal minutnik od nowa. Po sygnale przekrój najgrubszy kawałek na pół – jeśli widzisz róż, **duś dalej po dwie minuty** i sprawdzaj ponownie.
+
+== pokrój warzywa
+skladniki: marchewka, cebula, pomidory
+Zanim dotkniesz warzyw, **umyj deskę, nóż i ręce** – leżał na nich surowy drób, a te warzywa lądują na patelni w kawałkach. Marchewki pokrój w plasterki, cebulę w drobną kostkę, a suszone pomidory w paski.
+
+== podsmaż warzywa
+czas: ok. 5 min
+skladniki: oliwa
+Przechyl patelnię i zlej spod indyka wodę, przytrzymując mięso pokrywką, a potem wlej oliwę i wrzuć pokrojone warzywa razem z pomidorami. Smaż, mieszając, aż cebula zrobi się szklista, a plasterki marchewki stracą surową twardość.
+
+== ścisz ogień i wlej sos
+minutnik: 5:00 sos
+kryterium: sos jest gładki, paruje i równo oblewa kawałki, ale ani razu nie przechodzi w bulgot
+skladniki: smietana, chrzan, musztarda, ziola, przyprawy
+**Zmniejsz ogień**, zanim wlejesz śmietanę – dwunastoprocentowa zwarzy się na ziarna, jeśli sos zawrze. Wmieszaj śmietanę, musztardę, chrzan, zioła, sól i pieprz, a potem trzymaj patelnię tuż pod progiem wrzenia.
+
+== podaj
+skladniki: posypka
+Nałóż indyka razem z sosem obok czarnego ryżu i fasolki. Posyp natką pietruszki i czarnuszką.
+
+[wskazowka]
+Skąd wiadomo, że indyk jest już gotowy?
+Po przekroju i po termometrze, nie po zegarze: najgrubszy kawałek ma być w środku biały, bez różowych smug, a termometr ma pokazać w nim 74°C. Barwa soku z nakłucia nie rozstrzyga tu niczego – zależy od pH i wieku ptaka, a sok klaruje się poniżej progu bezpieczeństwa.
+
+Dlaczego sos zrobił się ziarnisty?
+Bo zawrzał. Śmietana 12% ma za mało tłuszczu, żeby to znieść, a raz zwarzonego sosu nie da się rozmieszać z powrotem w gładki – wlewaj ją na ściszonym ogniu i nie pozwól, żeby sos przeszedł w bulgot.
+
+Sos wyszedł łagodniejszy, niż się spodziewałam – dlaczego?
+Chrzan traci ostrość, kiedy go podgrzewasz, a tu idzie na patelnię i dusi się razem z sosem. Jeśli lubisz wyraźniej, dołóż pół łyżeczki już po zdjęciu patelni z ognia – ta porcja ostrości nie zdąży zwietrzeć.
+
+[co-mozesz-zmienic]
+#ryz
+krótko: brązowy ryż, ok. 25 min
+Czym zastąpić czarny ryż?
+Brązowym – zostanie równie sprężysty, a znajdziesz go w każdym sklepie. Gotuje się krócej, więc sprawdzaj opakowanie zamiast przenosić czas z czarnego.
+
+#smietana
+krótko: 18% albo 30%, tyle samo
+Czy mogę wziąć tłustszą śmietanę?
+Tak, 18% albo 30% – im więcej tłuszczu, tym trudniej sos zwarzyć, więc to zamiana w bezpieczną stronę. Sos wyjdzie gęstszy, a chrzan odrobinę mniej wyrazisty.
+
+#ziola
+krótko: tymianek, oregano i bazylia
+Czym zastąpić zioła toskańskie?
+Szczyptą tymianku, oregano i suszonej bazylii – to trzon takiej mieszanki. Możesz je też po prostu pominąć, bo smak dania niesie chrzan z musztardą, nie zioła.
+
+[przechowywanie]
+Jak przechowywać i odgrzewać indyka w sosie chrzanowym z czarnym ryżem?
+W lodówce: do 24 godzin razem z ryżem (sam indyk z sosem, bez ryżu – do 2 dni), a porcję wstaw tam w ciągu 1 godziny od zdjęcia z ognia. W zamrażarce: najlepsza jakość do 2–3 miesięcy, a po rozmrożeniu zjedz danie w ciągu 24 godzin. Odgrzewanie: na małym ogniu i bez doprowadzania do wrzenia – śmietana 12% zwarzy się na ziarna; ryż osobno, skropiony wodą i pod przykryciem.
+
+[wartosci-odzywcze]
+energia: 436 kJ / 104 kcal; tłuszcz: 4 g; kwasy tłuszczowe nasycone: 1,4 g; węglowodany: 7,1 g; cukry: 3,7 g; błonnik: 1,5 g; białko: 8,9 g; sól: 0,44 g
+
+[wartosci-porcja]
+energia: 2993 kJ / 713 kcal; tłuszcz: 28 g; kwasy tłuszczowe nasycone: 9,9 g; węglowodany: 48 g; cukry: 25 g; błonnik: 11 g; białko: 61 g; sól: 3 g

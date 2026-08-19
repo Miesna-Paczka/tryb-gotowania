@@ -84,3 +84,12 @@ export const formaDlaLiczby = (fraza, n) => P.formaDlaLiczby(fraza, n);
 /* Wystawione, żeby druga strona mogła zaasertować, że most żyje i widzi tabelę,
    zamiast dowiadywać się o rozjeździe z wyglądu strony. */
 export const kolizjeOdmian = () => P.kolizjeOdmian();
+
+/* `generuj-html.mjs` potrzebuje nie tylko odmiany, ale i CAŁEGO parsowania
+   mikroskładni — składników, kroków i wpisów kartowych. Wystawiamy tu obiekt
+   parsera zamiast pisać drugi loader w łańcuchu HTML: loader jest dokładnie tą
+   wiedzą dzieloną, której ten plik pilnuje, a druga kopia atrapy DOM-u rozjechałaby
+   się przy pierwszej zmianie w starcie parsera — po cichu i po jednej stronie.
+   Ten eksport NIE poszerza kontraktu parsera: to, co wolno wołać, rozstrzyga
+   `MP.przepis` i jego `_wewnetrzne` (nazwa mówi, na co się piszesz). */
+export const parser = () => P;

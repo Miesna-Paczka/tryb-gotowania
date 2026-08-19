@@ -2221,26 +2221,34 @@
       foto.src = krok.fotoUrl;
       foto.alt = '';
     }
-    /* D-39.16 · BLOK SKŁADNIKÓW POWSTAJE, GDY JEST COKOLWIEK DO POKAZANIA —
-       nie tylko wtedy, gdy krok ma własne składniki „w tym kroku".
-       Zmierzony objaw: krok 1 tego przepisu ma `skladniki: []`, więc bramka
-       `skladnikiTeraz.length` wycinała CAŁY blok — razem z sekcjami „dalej"
-       i „zużyte". Skutek: ghost „najpierw pokaż składniki" prowadził na krok 1
-       z `listaOtwarta: true` i **zerem wierszy**; użytkownik prosił o składniki
-       i dostawał pustkę. Pomiar 2026-08-16: krok 1 `teraz=0 dalej=0 zużyty=0`,
-       krok 2 `teraz=3 dalej=9` — dziewięć pozycji istniało i było wycinane
-       bramką, która pytała o coś innego.
-       Po zmianie krok 1 pokazuje wszystkie składniki przepisu w sekcji „dalej",
-       czyli dokładnie to, czego oczekuje operator od pierwszego kroku
-       (rozstrzygnięcie 2026-08-16). Nie potrzeba do tego ani nowego pola CMS,
-       ani nowego ekranu — pełna lista jest w modelu (`m.skladniki`, 12 pozycji)
-       i już dziś zasila sekcje „dalej"/„zużyte".
+    /* `D-39.75` · BLOK SKŁADNIKÓW WYŁĄCZNIE NA KROKACH Z WŁASNYMI SKŁADNIKAMI.
+       Decyzja operatora 2026-08-19, po obejrzeniu kroku 1 wołowiny teriyaki na
+       stagingu: krok „nastaw piekarnik i wodę" nie używa niczego, a dostawał ramkę
+       z pełną dwunastką w sekcji „dalej" — czyli powtórzenie listy z ekranu startowego
+       w miejscu, w którym nie ma nic do odhaczenia.
+
+       ODWRACA `D-39.16` — i wolno to zrobić, bo PRZESŁANKA TAMTEJ DECYZJI ZNIKŁA.
+       D-39.16 broniło ścieżki „najpierw pokaż składniki", która wrzucała użytkownika
+       na krok 1 z rozwiniętą listą; przy wyciętym bloku dostawał pustkę (pomiar
+       2026-08-16: krok 1 `teraz=0 dalej=0 zużyty=0`). Dzień później `D-39.45`
+       przeniosło tę akcję na ARKUSZ NA EKRANIE STARTOWYM — `akcjaEkranu()` dla
+       ekranu `start` robi `return otworzArkusz()` i na krok 1 nikt już tą drogą
+       nie wchodzi. Blok pilnował od dwóch dni trasy, której nie ma.
+
+       **To jest wzorzec do zapamiętania, nie jednorazowa poprawka:** obrona
+       postawiona przeciw konkretnej ścieżce przeżywa jej usunięcie i wygląda potem
+       jak decyzja o wyglądzie. Przy cofaniu takiej obrony pytanie brzmi „czy trasa
+       jeszcze istnieje", a nie „czy tak ładniej".
+
+       CENA, NAZWANA: na kroku bez własnych składników pełna lista jest w trakcie
+       gotowania NIEOSIĄGALNA — nie ma z czego rozwinąć „pozostałych". W tym
+       przepisie dotyczy to 2 kroków z 9 („nastaw piekarnik i wodę", „połącz całość").
+       Kompletu użytkownik szuka wtedy na ekranie startowym, arkuszem z `D-39.45`.
+
        Etykieta „w tym kroku" i jej lista renderują się WYŁĄCZNIE przy niepustym
        `skladnikiTeraz`: pusty nagłówek nad niczym wyglądałby na usterkę. */
     var maTeraz = !!(krok.skladnikiTeraz && krok.skladnikiTeraz.length);
-    var maPozostale = !!((krok.skladnikiDalej || []).length ||
-                         (krok.skladnikiZuzyte || []).length);
-    if (maTeraz || maPozostale) {
+    if (maTeraz) {
       /* W26/W29 — DWA napisy, obydwa narysowane w Figmie i obydwa nieobecne
          w runtimie do przebiegu 22: nagłówek „składniki" (`7477:12562`) NAD ramką
          i etykieta „w tym kroku" (`7195:10936`) W ramce. To nie jest microcopy
@@ -2266,16 +2274,15 @@
       reszta.setAttribute('data-mp-lista-pelna', '');
       var maReszte = sekcjePozostale(krok, reszta);
       stan.czesci.reszta = maReszte ? reszta : null;
-      /* D-39.16 — gdy krok nie ma własnych składników, „pozostałe" NIE chowają się
-         za tapem: przycisk „zobacz pozostałe" ma sens wyłącznie jako zestawienie
-         „to teraz / reszta dalej". Bez „teraz" chowałby jedyną treść bloku przed
-         samym sobą — użytkownik dostałby ramkę z nagłówkiem i niczym w środku. */
-      if (!maTeraz && maReszte) reszta.setAttribute('data-otwarta', '');
+      /* `D-39.75` — wraz z wejściem do bloku wyłącznie przy `maTeraz` znika gałąź
+         z `D-39.16`, która rozwijała „pozostałe" na krokach bez własnych składników.
+         Była martwa od chwili zawężenia bramki: tutaj `maTeraz` jest już zawsze
+         prawdą. Zostawiona wyglądałaby na obsługiwany przypadek. */
 
       /* Przycisk istnieje tylko wtedy, gdy JEST co rozwijać. Wcześniej stał zawsze
          i prowadził na ekran listy nawet wtedy, gdy poza „w tym kroku" nie było
          ani jednej pozycji — czyli obiecywał treść, której nie ma. */
-      if (maTeraz && maReszte) {
+      if (maReszte) {
         var wiecej = el('button', 'mp-tryb__wiecej', ramka);
         wiecej.type = 'button';
         wiecej.setAttribute('aria-expanded', stan.listaOtwarta ? 'true' : 'false');

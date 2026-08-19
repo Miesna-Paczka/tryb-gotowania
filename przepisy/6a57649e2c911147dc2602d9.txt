@@ -1,0 +1,91 @@
+[meta]
+nazwa: Kurczak teriyaki
+slug: kurczak-teriyaki-przepis
+porcje-bazowe: 2
+liczba-porcji: 2 porcje
+waga-porcji: 225
+czas-minuty: 30
+
+[skladniki]
+#kurczak   300 g piersi z kurczaka   @filet-z-piersi-kurczaka
+#skrobia   3 łyżki skrobi ziemniaczanej
+#olej      olej do smażenia
+#sojowy    120 ml jasnego sosu sojowego
+#woda      50 ml wody
+#miod      2 łyżki miodu
+#imbir     2 cm imbiru
+#czosnek   1 ząbek czosnku
+#chilli    1 łyżeczka sosu chilli (opcjonalnie)
+#limonka   1 limonka
+#sezam     1 łyżeczka białego sezamu
+
+[kroki]
+== wymieszaj sos
+czas: ok. 5 min
+skladniki: sojowy, woda, miod, imbir, czosnek, chilli, limonka
+Zetrzyj imbir, przeciśnij czosnek i wyciśnij limonkę. W misce połącz sos sojowy, wodę, miód, imbir, czosnek, sos chilli i połowę soku z limonki – druga połowa czeka na koniec.
+
+== pokrój kurczaka
+czas: ok. 5 min
+skladniki: kurczak
+Pokrój pierś w kostkę o boku około 3 cm, a potem osusz kostki ręcznikiem papierowym. Suche mięso przyjmie skrobię, mokre zgubi ją na patelni.
+
+== obtocz w skrobi
+czas: ok. 3 min
+skladniki: skrobia
+Wsyp skrobię do miski i obtaczaj w niej kostki kurczaka po kilka naraz, strząsając nadmiar. Kostki mają wyjść matowe, a skrobia ma leżeć na nich równo, bez grudek.
+
+== rozgrzej olej
+skladniki: olej
+Wlej olej na wysokość mniej więcej półtora centymetra, czyli do połowy kostek, i grzej na dużym ogniu, aż szczypta skrobi **od razu zasyczy**. Zamiast smażyć, możesz skropić kostki olejem i upiec je w 220°C przez 20 minut, obracając w połowie.
+
+== usmaż kurczaka
+minutnik: 5:00 kurczak
+kryterium: termometr wbity w najgrubszą kostkę pokazuje 74°C, bo sama barwa panierki niczego nie rozstrzyga – przekrojona kostka ma być w środku matowo biała na wskroś, bez śladu różu
+Obtoczone kostki kurczaka rozłóż luźno w jednej warstwie i nie ruszaj ich przez pierwszą minutę, potem obracaj co jakiś czas. Jeśli nie mieszczą się luźno, usmaż je w dwóch partiach i odpal minutnik od nowa. Jeśli po odliczeniu przekrój jest jeszcze różowy, wróć kostkami na patelnię na kolejną minutę i przekrój następną.
+
+== odsącz mięso
+czas: ok. 1 min
+Przełóż usmażone kostki na sitko albo na ręcznik papierowy, żeby zszedł z nich nadmiar oleju.
+
+== zredukuj sos
+minutnik: 6:00 sos
+kryterium: sos oblepia łyżkę i spływa z niej wolno, zostawiając ślad
+Zlej olej z patelni i przetrzyj ją ręcznikiem – przypalone okruchy skrobi zgorzkniałyby w sosie. Wlej sos z miski i gotuj na średnim ogniu, cały czas mieszając; miód **zgorzknieje**, jeśli dasz mu kilkanaście sekund za dużo.
+
+== połącz z sosem
+czas: ok. 1 min
+Wrzuć odsączone kostki na patelnię i mieszaj, aż sos oblepi każdą z nich. Na patelni nie powinno zostać luźnego sosu – jeśli zostaje, daj mu jeszcze pół minuty.
+
+== podaj
+czas: ok. 1 min
+skladniki: sezam
+Przełóż kurczaka na talerze, skrop odłożonym sokiem z limonki i posyp sezamem.
+
+[wskazowka]
+Dlaczego panierka schodzi z mięsa?
+Skrobia trzyma się wyłącznie suchego mięsa – wilgotne kostki zgubią ją w oleju, a panierka zostanie na dnie patelni.
+
+Da się uratować sos, który zgęstniał za bardzo?
+Tak, o ile nie zdążył zgorzknieć: wlej łyżkę wody i rozmieszaj jeszcze na ogniu, aż glazura znów będzie spływać z łyżki wolno. Po przypalonym miodzie goryczki nie odkręcisz już niczym.
+
+[co-mozesz-zmienic]
+#skrobia
+krótko: skrobia kukurydziana, tyle samo
+Czym zastąpić skrobię ziemniaczaną?
+Kukurydzianą, tyle samo. Skorupka wyjdzie drobniejsza i jaśniejsza, poza tym nic się nie zmienia.
+
+#limonka
+krótko: cytryna, tyle samo soku
+Czym zastąpić limonkę?
+Cytryną – przetnie słodycz miodu tak samo. Zapach będzie mniej ostry, więc dodaj sok w dwóch ratach i spróbuj po pierwszej.
+
+[przechowywanie]
+Jak przechowywać i odgrzewać kurczaka teriyaki?
+W lodówce: do 2 dni w szczelnym pojemniku, włóż go tam w ciągu 1–2 godzin od zdjęcia z ognia, a ryż trzymaj osobno i zjedz do 24 godzin. W zamrażarce: najlepsza jakość do 1–3 mies. Odgrzewanie: na patelni na średnim ogniu, z łyżką wody – glazura zdąży się rozpuścić, zanim mięso wyschnie. Panierka i tak będzie już miękka.
+
+[wartosci-odzywcze]
+energia: 782 kJ / 186 kcal; tłuszcz: 7,2 g; kwasy tłuszczowe nasycone: 0,8 g; węglowodany: 12 g; cukry: 7,7 g; błonnik: 0,6 g; białko: 18 g; sól: 3,2 g
+
+[wartosci-porcja]
+energia: 1756 kJ / 417 kcal; tłuszcz: 16 g; kwasy tłuszczowe nasycone: 1,8 g; węglowodany: 26 g; cukry: 17 g; błonnik: 1,4 g; białko: 39 g; sól: 7,1 g

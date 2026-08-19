@@ -1,0 +1,100 @@
+[meta]
+nazwa: Kurczak z soczewicą i szpinakiem
+slug: kurczak-z-soczewica-i-szpinakiem-przepis
+porcje-bazowe: 4
+liczba-porcji: 4 porcje
+waga-porcji: 402
+czas-minuty: 35
+
+[skladniki]
+#kurczak    660 g piersi z kurczaka   @filet-z-piersi-kurczaka
+#cebula     1 cebula
+#czosnek    4 ząbki czosnku
+#cytryna    1 cytryna
+#soczewica  400 g ugotowanej soczewicy
+#szpinak    250 g świeżego szpinaku
+#przecier   200 ml przecieru pomidorowego
+#olej       1 łyżka oleju słonecznikowego
+#cynamon    1 laska cynamonu
+#sol        1 łyżeczka soli
+#kminek     1 łyżeczka mielonego kminku
+#kolendra   1 łyżeczka mielonej kolendry
+
+[kroki]
+== opłucz szpinak i cytrynę
+Szpinak opłucz w zimnej wodzie i osusz, a cytrynę wyszoruj pod ciepłą – jej skórka pójdzie do sosu. Mokrą robotę odhacz teraz, póki blat jest jeszcze czysty.
+
+== posiekaj i zetrzyj
+skladniki: cebula, czosnek, cytryna
+Cebulę i czosnek posiekaj w drobną kostkę, z cytryny zetrzyj skórkę i wyciśnij sok do małej miski, a cynamon przełam na pół. Robisz to **zanim dotkniesz mięsa** – potem ta sama deska będzie już po surowym drobiu.
+
+== pokrój kurczaka
+skladniki: kurczak
+Pokrój piersi w kostkę o boku około 1 cm i zsuń ją do miski. Deskę, nóż, ręce i tę miskę – gdy już się opróżni – umyj gorącą wodą z płynem: surowy drób zostawia na desce **to, czego nie widać**.
+
+== zeszklij cebulę
+minutnik: 5:00 cebula
+kryterium: cebula jest miękka i szklista, a czosnek najwyżej jasnozłoty
+skladniki: olej
+Rozgrzej olej na dużej patelni z pokrywką, na średnim ogniu, mniej więcej na połowie mocy, i wrzuć cebulę razem z czosnkiem. Przez ostatnie dwie minuty mieszaj częściej – drobno posiekany czosnek przypala się przed cebulą.
+
+== obsmaż kurczaka
+minutnik: 3:00 kurczak
+kryterium: kostki są białe z każdej strony, ale w środku wciąż są surowe
+Zwiększ ogień do jakichś trzech czwartych mocy i rozłóż pokrojonego kurczaka luźno, w jednej warstwie. Jeśli kostki się nie mieszczą, obsmaż je w dwóch turach i odpal minutnik od nowa – stłoczone zaczną się dusić zamiast rumienić.
+
+== wsyp przyprawy
+czas: 1 min
+skladniki: sol, kminek, kolendra, cynamon
+Wsyp sól, kminek i kolendrę, dorzuć startą skórkę z cytryny i połamany cynamon, a potem mieszaj bez przerwy. Przyprawy mają zapachnieć na gorącym tłuszczu, nie przywrzeć do dna.
+
+== duś pod przykryciem
+minutnik: 5:00 duszenie
+kryterium: sos zgęstniał i ledwo mruga pod pokrywką
+skladniki: soczewica, przecier
+Odsącz soczewicę, wsyp ją razem z przecierem pomidorowym i wymieszaj, a potem przykryj patelnię i zmniejsz ogień do średniego. To tutaj kurczak dochodzi do środka – jeśli sos zaczyna przywierać do dna, dolej kilka łyżek wody.
+
+== sprawdź kurczaka
+Wyłów największą kostkę i przekrój ją na pół: przekrój ma być **matowo biały do samego środka**, bez szklistego ani różowego oczka. Barwa z wierzchu i klarowność wycieku niczego tu nie rozstrzygają. Jeśli widzisz szkliste miejsce, przykryj patelnię na kolejne dwie minuty i sprawdź inną kostkę – szpinak wchodzi dopiero wtedy, gdy mięso jest gotowe.
+
+== wmieszaj szpinak
+minutnik: 2:00 szpinak
+kryterium: liście opadły do sosu, ale wciąż widać ich kształt
+skladniki: szpinak
+Dorzucaj szpinak garściami i mieszaj, dokładając kolejną dopiero wtedy, gdy poprzednia zwiędnie. Trzymany na ogniu za długo **rozpuści się w sosie** i zostanie po nim sam kolor.
+
+== skrop cytryną i podaj
+Wyjmij kawałki cynamonu, nałóż danie na talerze i skrop je sokiem z cytryny. Sok wchodzi poza ogniem – podgrzany traci zapach i zostaje z niego sama kwasowość.
+
+[wskazowka]
+Soczewica sucha czy ugotowana?
+Ugotowana i odsączona – 400 g to masa po ugotowaniu, nie przed. Pięć minut na patelni nie zmiękczy suchej, a soczewicę z puszki przepłucz pod bieżącą wodą: zalewa jest solona, a sól masz już w przyprawach.
+
+Skąd wiem, że kurczak jest już gotowy?
+Przekrój największą kostkę na pół: środek ma być matowo biały, taki sam jak brzeg, bez szklistego ani różowego oczka. Kolor z wierzchu i klarowność wycieku niczego tu nie rozstrzygają.
+
+[co-mozesz-zmienic]
+#soczewica
+krótko: zielona albo brązowa; czerwona się rozpadnie
+Jaka soczewica się tu nada?
+Zielona albo brązowa – po ugotowaniu trzymają kształt i nie rozejdą się w sosie. Czerwona ugotuje się na papkę i zamiast ziaren w sosie dostaniesz gęsty krem.
+
+#cynamon
+krótko: ¼ łyżeczki mielonego cynamonu
+Czym zastąpić laskę cynamonu?
+Mielonym cynamonem – ¼ łyżeczki na laskę, wsypanym razem z resztą przypraw. Nie wyłowisz go potem z sosu, więc ostatni krok z wyjmowaniem cynamonu pomiń.
+
+#szpinak
+krótko: mrożony liściasty, mocno odciśnięty
+Czy zamiast świeżego szpinaku może być mrożony?
+Tak, liściasty – rozmroź go i mocno odciśnij z wody, inaczej rozwodni sos. Wystarczy mu minuta zamiast dwóch, a gotowego dania z mrożonego szpinaku nie zamrażaj już drugi raz.
+
+[przechowywanie]
+Jak przechowywać i odgrzewać kurczaka z soczewicą i szpinakiem?
+W lodówce: do 2 dni w szczelnym pojemniku, włóż go tam w ciągu 1–2 godzin od zdjęcia z ognia. W zamrażarce: najlepsza jakość do 2–3 mies., a po rozmrożeniu zjedz w ciągu 24 godzin. Odgrzewanie: na patelni pod przykryciem, z łyżką wody – soczewica przez noc wciąga sos i gęstnieje.
+
+[wartosci-odzywcze]
+energia: 393 kJ / 93 kcal; tłuszcz: 1,9 g; kwasy tłuszczowe nasycone: 0,3 g; węglowodany: 5 g; cukry: 1,1 g; błonnik: 2,7 g; białko: 12 g; sól: 0,62 g
+
+[wartosci-porcja]
+energia: 1582 kJ / 375 kcal; tłuszcz: 7,7 g; kwasy tłuszczowe nasycone: 1,2 g; węglowodany: 20 g; cukry: 4,6 g; błonnik: 11 g; białko: 50 g; sól: 2,5 g

@@ -1,0 +1,66 @@
+[meta]
+nazwa: Domowa wędlina z polędwicy wieprzowej
+slug: domowa-wedlina-z-poledwicy-wieprzowej-przepis
+porcje-bazowe: 4
+liczba-porcji: 3–4 porcje
+waga-porcji: 80
+czas-minuty: 110
+
+[skladniki]
+#poledwica   350 g polędwicy wieprzowej   @poledwiczka-wieprzowa
+#olej        3 łyżki oleju
+#majeranek   2 łyżeczki majeranku
+#sol         1 łyżeczka soli
+#czosnek     1 łyżeczka granulowanego czosnku
+#zatar       ⅔ łyżeczki zataru
+
+[kroki]
+== wymieszaj marynatę
+czas: ok. 3 min
+skladniki: olej, majeranek, sol, czosnek, zatar
+W misce wymieszaj olej z majerankiem, solą, granulowanym czosnkiem i zatarem na gęstą, jednolitą pastę. Zatar nada jej rdzawy kolor i to po nim poznasz, że przyprawy rozeszły się równo.
+
+== natrzyj polędwicę
+czas: ok. 3 min
+skladniki: poledwica
+Osusz polędwiczkę ręcznikiem papierowym i natrzyj ją przygotowaną marynatą ze wszystkich stron, wcierając ją także w oba końce. Sucha powierzchnia przyjmie przyprawy, mokra zsunie je razem z wodą.
+
+== zawiń i wstaw do lodówki
+czas: 4–12 h
+Wyłóż formę papierem do pieczenia, ułóż na nim polędwiczkę i zawiń ją szczelnie, skręcając papier na obu końcach jak cukierek. Wstaw formę do lodówki na kilka godzin, najlepiej na całą noc; przez ten czas mięso ma stać w chłodzie, nie na blacie.
+
+== piecz od zimnego piekarnika
+minutnik: 45:00 polędwica
+kryterium: termometr w najgrubszym miejscu pokazuje 70°C i trzyma je przez dwie minuty, a w przekroju nie ma śladu różu
+Wstaw formę do zimnego piekarnika, nastaw 170°C i **licz 45 minut od włączenia**, nie od chwili, w której piekarnik dojdzie do temperatury – mięso zaczyna się piec już podczas nagrzewania. Jeśli termometr pokaże mniej niż 70°C albo w przekroju widać jeszcze róż, wsuń formę z powrotem na pięć minut i zmierz jeszcze raz.
+
+== schłodź i zawiń
+minutnik: 1:00:00 studzenie
+kryterium: papier jest już tylko letni w dotyku, a z formy nie unosi się para
+Zawiń polędwiczkę z powrotem w papier do pieczenia, uważając, żeby nie wylać soków, które zebrały się w formie – dzięki nim pozostanie soczysta. Do lodówki wstaw ją najpóźniej dwie godziny po wyjęciu z piekarnika, bo **dłużej nie może stać w cieple**.
+
+== pokrój na zimno
+Zacznij kroić dopiero wtedy, gdy wędlina jest zimna na wskroś; ciepła rozpada się pod nożem na nierówne kawałki. Ostry nóż i cienkie plastry robią z niej wędlinę, grube kawałki to już pieczeń.
+
+[wskazowka]
+Kiedy wędlina jest gotowa?
+Po termometrze, nie po zegarze. Food Standards Agency podaje dla wieprzowiny próg 70°C w środku, utrzymany przez dwie minuty, a wieprzowinę – inaczej niż wołowinę – trzeba upiec na wskroś. Bez termometru zostaje przekrój: róż w najgrubszym miejscu znaczy „dopiekaj", a barwa soku nie rozstrzyga niczego.
+
+Czemu wędlina wychodzi sucha?
+Wilgoci pilnują trzy rzeczy: szczelny papier, termometr zdjęty przy 70°C i studzenie w tym samym papierze. Polędwiczka jest chuda, więc każde dodatkowe dziesięć minut w piekarniku odbiera jej sok, którego już nie odzyska. Sok zebrany na dnie formy zostaw przy mięsie, wsiąknie w nie podczas stygnięcia.
+
+[co-mozesz-zmienic]
+#zatar
+krótko: papryka słodka i wędzona, po równej części
+Czym zastąpić zatar?
+Papryką słodką i wędzoną, po równej części każdej. Zniknie wtedy kwaskowy sumak, a zostanie łagodniejsza, dymna nuta.
+
+[przechowywanie]
+Jak przechowywać i odgrzewać domową wędlinę?
+W lodówce: do 2 dni w szczelnie zamkniętym pojemniku, włóż ją tam w ciągu 1–2 godzin od wyjęcia z piekarnika. W zamrażarce: najlepsza jakość do 2–3 miesięcy, w kawałku, a nie w plastrach; rozmrażaj ją w lodówce, zjedz w ciągu 24 godzin i nie zamrażaj jej powtórnie. Odgrzewanie: tej wędliny się nie odgrzewa, smakuje na zimno i podgrzana traci zwartość plastra.
+
+[wartosci-odzywcze]
+energia: 974 kJ / 234 kcal; tłuszcz: 14 g; kwasy tłuszczowe nasycone: 1,8 g; węglowodany: 0,3 g; cukry: 0,1 g; błonnik: 1 g; białko: 25 g; sól: 1,9 g
+
+[wartosci-porcja]
+energia: 780 kJ / 187 kcal; tłuszcz: 12 g; kwasy tłuszczowe nasycone: 1,5 g; węglowodany: 0,2 g; cukry: 0,1 g; błonnik: 0,8 g; białko: 20 g; sól: 1,5 g

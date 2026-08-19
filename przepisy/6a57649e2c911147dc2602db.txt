@@ -1,0 +1,121 @@
+[meta]
+nazwa: Antrykot wołowy z kurkami i porem
+slug: antrykot-wolowy-z-kurkami-i-porem-przepis
+porcje-bazowe: 2
+liczba-porcji: 2 porcje
+waga-porcji: 610
+czas-minuty: 90
+
+[skladniki]
+#antrykot   400 g antrykotu wołowego @antrykot-bez-kosci
+#kurki      100 g kurek
+#por        2 {mały por|małe pory|małych porów|małego pora}
+#pomidory   15 {pomidor koktajlowy|pomidory koktajlowe|pomidorów koktajlowych|pomidora koktajlowego}
+#cytryna    1 cytryna
+#salata     100 g mieszanki sałat
+#czosnek    4 ząbki czosnku
+#rozmaryn   2 gałązki rozmarynu
+#maslo      60 g masła
+#oliwa      120 ml oliwy
+#sojowy     90 ml sosu sojowego
+#miod       90 ml miodu
+#musztarda  3 łyżeczki musztardy
+#sol        1 łyżeczka soli
+#pieprz     1 łyżeczka czarnego pieprzu
+#tymianek   ½ łyżeczki tymianku
+#chili      ½ łyżeczki chili (pieprzu cayenne)
+
+[kroki]
+== zamarynuj mięso
+minutnik: 1:00:00 marynata
+kryterium: mięso jest zanurzone na całej wysokości i ściemniało od sosu sojowego
+skladniki: antrykot, oliwa, sojowy, miod, musztarda, pieprz
+Antrykot podziel na steki grubości około dwóch centymetrów, jeśli nie jest już pokrojony, a potem zanurz go w marynacie rozmieszanej z 90 ml oliwy, sosu sojowego, miodu, musztardy i pół łyżeczki pieprzu. Wstaw naczynie do lodówki – mięso ma leżeć całe pod płynem, więc weź raczej wąski pojemnik albo strunową torebkę niż szeroką michę.
+
+== nastaw piekarnik
+Nastaw piekarnik na 180°C, bez termoobiegu, i wyłóż blachę papierem do pieczenia. Będzie się grzał w tle, kiedy zajmiesz się warzywami.
+
+== pokrój warzywa
+czas: ok. 8 min
+skladniki: por, czosnek, pomidory, cytryna
+Pory pokrój w plastry grubości pół centymetra, czosnek w cienkie plasterki, a pomidory przekrój na połówki. Z połowy cytryny wyciśnij sok – do sałatki pójdzie z niego jedna łyżka, reszta zostaje zapasem.
+
+== obsmaż steki
+minutnik: 0:30 stek
+kryterium: skorupka jest ciemnobrązowa i sucha, a w środku mięso wciąż surowe – dojdzie w piekarniku
+Rozgrzej suchą patelnię na pełnym ogniu, aż **zacznie dymić**, osusz steki z marynaty ręcznikiem papierowym i połóż je na patelni. Po sygnale obróć mięso i włącz minutnik drugi raz, a na koniec przypiecz jeszcze brzegi, stawiając każdy stek na bok.
+
+== przełóż na blachę
+skladniki: maslo, rozmaryn
+Przełóż steki na wyłożoną blachę i polej je pięcioma łyżkami marynaty. Na wierzchu rozłóż całe masło pokrojone w plastry i gałązki rozmarynu.
+
+== wstaw do piekarnika
+minutnik: 10:00 antrykot
+kryterium: w najgrubszym miejscu mięso ma około 63°C, a naciśnięte palcem stawia opór i wraca do kształtu
+Wstaw blachę do nagrzanego piekarnika. Patelnię po stekach zdejmij z ognia i przelej na nią resztę marynaty – gorące dno zbierze to, co przywarło.
+
+== zrób sałatkę
+czas: ok. 3 min
+skladniki: salata, sol
+Umyj ręce po surowym mięsie, a potem włóż do miski mieszankę sałat i połówki pomidorów. Skrop je łyżką oliwy i łyżką soku z cytryny, dopraw pół łyżeczki soli i wymieszaj.
+
+== zrumień czosnek
+czas: ok. 2 min
+Na drugiej patelni rozgrzej łyżkę oliwy i wrzuć na nią plasterki czosnku. Smaż je, aż brzegi zrobią się złote – przypalony czosnek zgorzknieje całą patelnię.
+
+== usmaż kurki z porem
+minutnik: 5:00 kurki
+kryterium: kurki są matowe i sprężyste, a na patelni nie stoi wolny płyn – dopiero taki grzyb jest ugotowany
+skladniki: kurki, tymianek, chili
+Wsyp do czosnku pory i oczyszczone, całe kurki, a potem dopraw po pół łyżeczki soli, pieprzu, tymianku i chili. Smaż na średnim ogniu; jeśli po sygnale płyn wciąż stoi na patelni, podkręć ogień i odparuj go.
+
+== odpocznij mięso
+minutnik: 5:00 odpoczynek
+kryterium: na blasze zebrał się sok, a mięso przestało syczeć
+Wyjmij blachę z piekarnika, zostaw na niej steki bez przykrywania, a patelnię z kurkami przykryj, żeby nie wystygły. Sok, który przez ten czas zbierze się na blasze, wchodzi do sosu – nie wylewaj go.
+
+== zagotuj sos
+minutnik: 3:00 sos
+kryterium: sos bulgocze na całej powierzchni, nie tylko przy brzegach patelni
+Soki z blachy zlej na patelnię z resztą marynaty i doprowadź ją do wrzenia na dużym ogniu. Ta marynata leżała pod surową wołowiną, więc na stół trafia dopiero zagotowana.
+
+== pokrój antrykot
+czas: ok. 2 min
+Przełóż steki na deskę i pokrój je w poprzek włókien na plastry grubości centymetra. Plastry odkładaj z powrotem na ciepłą blachę – na zimnej desce stygną w oczach.
+
+== nałóż na talerze
+Na talerze nałóż kurki z porem, na nich ułóż plastry antrykotu, a obok sałatkę. Zagotowany sos podaj w osobnym naczyniu i wymieszaj go tuż przed polaniem, bo oliwa z marynaty wypływa na wierzch.
+
+[wskazowka]
+Ile piec antrykot, żeby wyszedł różowy w środku?
+Dziesięć minut w 180°C jest policzone na stek grubości około dwóch centymetrów, prosto z lodówki, obsmażony wcześniej ze wszystkich stron – w najgrubszym miejscu wychodzi wtedy około 63°C, czyli mięso różowe, ale nie czerwone. Grubszy stek potrzebuje dwóch–trzech minut więcej, a w czasie odpoczynku temperatura w środku podnosi się jeszcze o kilka stopni. Ta swoboda dotyczy wyłącznie wołowiny w kawałku, obsmażonej z każdej strony – mięso mielone i drób muszą być wypieczone na wskroś, a kobiety w ciąży, małe dzieci, seniorzy i osoby z obniżoną odpornością powinny jeść tę wołowinę dopiero od 63°C w środku, nigdy poniżej.
+
+Czy sos z marynaty jest bezpieczny?
+Tak, ale dopiero po zagotowaniu. Leżała pod surowym mięsem, więc doprowadź ją do pełnego wrzenia i utrzymaj je co najmniej minutę – samo podgrzanie nie wystarczy, choćby sos parował.
+
+Mam tylko duże pory – ile ich wziąć?
+Jeden duży por odpowiada mniej więcej dwóm małym. Weź go w całości, ale odetnij ciemne, twarde liście – w pięć minut smażenia nie zmiękną.
+
+Czy kurki trzeba wcześniej gotować?
+Nie, pięć minut na patelni wystarczy, ale najpierw je oczyść: zamiast moczyć, wytrzep piasek i przetrzyj kapelusze pędzelkiem albo wilgotną ściereczką. Surowych ani ledwo podsmażonych kurek nie jedz – grzyb ma być matowy i sprężysty, a na patelni nie może stać wolny płyn.
+
+[co-mozesz-zmienic]
+#kurki
+krótko: boczniaki, tak samo 100 g
+Czym zastąpić kurki poza sezonem?
+Boczniakami w tej samej wadze – większe kapelusze potnij na pół, żeby smażyły się równo z porem. Smak wyjdzie łagodniejszy i mniej pieprzny niż na kurkach, więc dosyp do patelni szczyptę chili.
+
+#rozmaryn
+krótko: ¼ łyżeczki suszonego, do marynaty
+Nie mam świeżego rozmarynu – co zamiast niego?
+Ćwierć łyżeczki suszonego, ale wsyp go do marynaty, a nie na mięso. Suszone igiełki leżące na maśle w piekarniku przypalą się w kilka minut i zgorzknieją.
+
+[przechowywanie]
+Jak przechowywać i odgrzewać antrykot z kurkami i porem?
+W lodówce: do 2 dni w szczelnym pojemniku, włóż go tam w ciągu 1–2 godzin od zdjęcia z ognia, a sałatkę trzymaj osobno. W zamrażarce: najlepsza jakość do 2–3 miesięcy, w porcjach, po rozmrożeniu zjedz w ciągu 24 godzin i nie zamrażaj powtórnie; sałatki nie mrozimy w żadnej wersji. Odgrzewanie: na patelni pod przykryciem, z łyżką sosu albo wody, żeby plastry nie wyschły.
+
+[wartosci-odzywcze]
+energia: 886 kJ / 213 kcal; tłuszcz: 15 g; kwasy tłuszczowe nasycone: 4,6 g; węglowodany: 9,5 g; cukry: 8,8 g; błonnik: 1,4 g; białko: 8,3 g; sól: 1,4 g
+
+[wartosci-porcja]
+energia: 5405 kJ / 1302 kcal; tłuszcz: 93 g; kwasy tłuszczowe nasycone: 28 g; węglowodany: 58 g; cukry: 54 g; błonnik: 8,6 g; białko: 51 g; sól: 8,7 g

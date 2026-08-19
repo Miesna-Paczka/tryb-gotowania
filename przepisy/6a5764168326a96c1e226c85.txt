@@ -1,0 +1,123 @@
+[meta]
+nazwa: Pulpety z makaronem w kremowym sosie z soczewicy
+slug: pulpety-z-makaronem-w-kremowym-sosie-z-soczewicy-przepis
+porcje-bazowe: 4
+liczba-porcji: 3–4 porcje
+waga-porcji: 461
+czas-minuty: 80
+
+[skladniki]
+#mieso        350 g mielonego mięsa wieprzowego @wieprzowina-mielona
+#jajko        1 jajko
+#bulka        2 łyżki bułki tartej
+#przyprawy    2 łyżeczki przypraw do pulpetów: suszony czosnek, kolendra w liściach, papryka i pieprz w równych częściach
+#soczewica    100 g czerwonej soczewicy
+#marchew      1 {duża marchewka|duże marchewki|dużych marchewek|dużej marchewki}
+#cebula       ½ cebuli
+#czosnek      2 ząbki czosnku
+#olej         1 łyżka oleju
+#woda         500 ml wody
+#masloorz     1 łyżka masła orzechowego
+#mascarpone   1 łyżeczka mascarpone
+#papryka      1 łyżeczka mielonej papryki słodkiej
+#pieprz       ½ łyżeczki mielonego pieprzu
+#drozdzowe    1 łyżka nieaktywnych płatków drożdżowych
+#makaron      300 g makaronu
+#sol          sól do smaku
+#natka        natka pietruszki – posiekana, do masy i na wierzch
+
+[kroki]
+== opłucz soczewicę
+skladniki: soczewica
+Przesyp soczewicę na sitko i płucz ją pod zimną wodą, aż woda przestanie się mętnić. Czerwona soczewica pyli skrobią i to ona zrobiłaby z sosu klej zamiast kremu.
+
+== posiekaj i zetrzyj
+skladniki: cebula, czosnek, marchew, natka
+Cebulę i czosnek posiekaj drobno, marchewkę zetrzyj na tarce o dużych oczkach, a natkę posiekaj i odłóż na bok. Całą tę robotę odhacz teraz, póki deska jest czysta – po mięso sięgasz dopiero w ósmym kroku.
+
+== zeszklij cebulę
+czas: 2 min
+skladniki: olej
+Rozgrzej olej w szerokim garnku na średnim ogniu, wrzuć cebulę z czosnkiem i mieszaj bez przerwy. Idź dalej, gdy cebula zrobi się przezroczysta, a czosnek zapachnie – **złoty czosnek jest już o pół minuty za daleko** i zgorzknieje w całym sosie.
+
+== wsyp soczewicę i marchewkę
+skladniki: woda
+Wsyp odsączoną soczewicę i startą marchewkę, przemieszaj je z cebulą i dolej wodę. Doprowadź do wrzenia bez pokrywki, a potem przykryj garnek i zmniejsz ogień tak, żeby sos ledwo mrugał.
+
+== gotuj sos
+minutnik: 20:00 sos
+kryterium: soczewica rozciera się o ściankę garnka, a marchewka jest miękka jak na zupę
+Odpal minutnik dopiero od tej chwili i zaglądaj pod pokrywkę co kilka minut, mieszając dnem, nie powierzchnią. Czerwona soczewica osiada i **przywiera do dna**, a przypalony spód przejdzie potem przez cały sos.
+
+== zblenduj sos na gładko
+czas: 1–2 min
+skladniki: masloorz
+Zdejmij garnek z ognia, dodaj masło orzechowe i blenduj, aż z soczewicy i marchewki zrobi się gładki, pomarańczowy krem. Trzymaj nóż blendera przy samym dnie i nie unoś go przy pracującym silniku – gorący sos chlapie, a przy jednej czy dwóch porcjach garnek trzeba przechylić.
+
+== dopraw sos
+skladniki: mascarpone, papryka, pieprz, drozdzowe, sol
+Wmieszaj mascarpone, słodką paprykę i pieprz, a płatki drożdżowe wsyp na końcu i tylko zamieszaj. Spróbuj sosu i dosól po trochu – płatki drożdżowe niosą już sporo słoności i łatwo tu przesolić.
+
+== wyrób masę na pulpety
+skladniki: mieso, jajko, przyprawy
+Przełóż mięso do miski, wsyp przyprawy z posiekaną natką, **posól masę osobno** – sól z sosu do środka kulki nie wejdzie – i wbij jajko. Przy jednej lub dwóch porcjach roztrzep jajko i daj połowę; potem wyrabiaj ręką, aż masa zrobi się jednolita i lekko kleista.
+
+== wmieszaj bułkę tartą
+czas: 3 min
+skladniki: bulka
+Wsyp bułkę tartą, wymieszaj jeszcze raz i odstaw miskę na te trzy minuty. Bułka wypija wilgoć z mięsa i masa przestaje kleić się do dłoni – bez tego kulki rozjeżdżają się przy toczeniu.
+
+== uformuj pulpety
+Zwilż dłonie zimną wodą i tocz kulki po mniej więcej 25 g, czyli cztery z każdych 100 g mięsa – wychodzą wielkości orzecha włoskiego, koło 3,5 cm w poprzek. Odkładaj je na talerz i nie ugniataj mocno: zbita kulka wychodzi gumowata.
+
+== włóż pulpety do sosu
+minutnik: 20:00 pulpety
+kryterium: przekrojony pulpet jest szarobrązowy do samego środka, bez różowego rdzenia – ale przy mielonym rozstrzyga dopiero termometr
+Wstaw garnek na mały ogień i wkładaj pulpety pojedynczo, tak żeby leżały luźno w jednej warstwie – przy większej liczbie porcji weź do tego szeroki rondel zamiast wysokiego garnka. Umyj ręce, przykryj garnek i odpal minutnik dopiero wtedy, gdy sos **znów zacznie mrugać**: z zimnymi kulkami wraca do tego stanu nawet kilka minut.
+
+== posprzątaj po mięsie
+Umyj talerz po pulpetach, miskę, deskę i blat gorącą wodą z płynem – wszystko to jest po surowej wieprzowinie. Minutnik już bieży, więc masz na to czas; wodę na makaron nastawisz zaraz potem.
+
+== nastaw wodę i obróć pulpety
+czas: 10 min
+Nastaw duży garnek osolonej wody na największym ogniu i przykryj go pokrywką – bez niej zagotuje się dwa razy dłużej. Zajrzyj przy okazji do pulpetów i obróć je łyżką: leżą w sosie tylko do połowy, a górę mają na samej parze.
+
+== ugotuj makaron
+czas: 8–11 min
+skladniki: makaron
+Wrzuć makaron do wrzątku i gotuj go minutę krócej, niż mówi opakowanie – zejdzie z ognia razem z pulpetami. Odcedź go i zostaw kubek wody z gotowania: sos z soczewicy gęstnieje, gdy stygnie, i wtedy ta woda go rozluźni.
+
+== sprawdź największy pulpet
+Wyłów największy pulpet, przekrój go na pół i wbij termometr w sam środek: ma pokazać **71 °C**, bo przy mielonym mięsie barwa niczego nie dowodzi. Przekrój ma być przy tym jednolicie szarobrązowy, bez różowego oczka; jeśli termometr pokazuje mniej albo widzisz róż, wrzuć przekrojony z powrotem, trzymaj garnek pod przykryciem jeszcze pięć minut i przykryj na ten czas makaron w durszlaku.
+
+== połącz i podaj
+Zdejmij garnek z ognia, rozłóż makaron na talerzach, nałóż na niego pulpety z sosem i posyp wszystko resztą natki. Jeśli sos zgęstniał, wmieszaj do niego dwie–trzy łyżki wody z makaronu, zanim nałożysz.
+
+[wskazowka]
+Jaki makaron się tu nada?
+Krótki i z zagłębieniami – świderki, penne albo kokardki, bo gęsty krem z soczewicy zostaje w nich zamiast spływać na dno talerza.
+
+Sos wyszedł za gęsty albo za rzadki – co z tym zrobić?
+Za gęsty rozluźnij wrzątkiem albo wodą z makaronu, po 50 ml naraz; za rzadki pogotuj kilka minut bez pokrywki, ale zrób to, zanim włożysz pulpety.
+
+Skąd wiem, że pulpety są gotowe w środku?
+Termometr wbity w środek największego pulpeta ma pokazać 71 °C – przy mielonym mięsie to jedyny dowód, bo zanieczyszczenie siedzi w całej masie, a barwa nie mówi o temperaturze niczego. Na przekroju środek ma być przy tym jednolicie szarobrązowy, bez różowego oczka.
+
+Ten sos nie jest pomidorowy – jak smakuje?
+Orzechowo i lekko słodko, od marchewki i masła orzechowego, z wytrawnym tłem od płatków drożdżowych. Jest gęsty jak przecier, więc oblepia makaron zamiast zbierać się pod nim na dnie.
+
+[co-mozesz-zmienic]
+#drozdzowe
+krótko: łyżka drobno startego parmezanu albo pomiń
+Czym zastąpić nieaktywne płatki drożdżowe?
+Łyżką drobno startego parmezanu, wsypaną tak samo na końcu – dają ten sam słony, serowy ton, którego soczewica sama z siebie nie ma. Możesz je też pominąć, ale wtedy dosól sos mocniej, bo to one trzymały jego głębię.
+
+[przechowywanie]
+Jak przechowywać i odgrzewać pulpety z makaronem?
+W lodówce: do 2 dni w szczelnym pojemniku, makaron osobno od sosu, i włóż je tam w ciągu 1–2 godzin od zdjęcia z ognia. W zamrażarce: same pulpety w sosie, najlepsza jakość do 2–3 mies. – ugotowanego makaronu nie mroź. Odgrzewanie: w rondlu pod przykryciem, z paroma łyżkami wody – sos z soczewicy gęstnieje przez noc najmocniej ze wszystkiego, co tu jest.
+
+[wartosci-odzywcze]
+energia: 625 kJ / 149 kcal; tłuszcz: 6 g; kwasy tłuszczowe nasycone: 1,8 g; węglowodany: 15 g; cukry: 1,4 g; błonnik: 1,7 g; białko: 7,8 g; sól: 0,27 g
+
+[wartosci-porcja]
+energia: 2880 kJ / 686 kcal; tłuszcz: 28 g; kwasy tłuszczowe nasycone: 8,3 g; węglowodany: 69 g; cukry: 6,2 g; błonnik: 8 g; białko: 36 g; sól: 1,3 g

@@ -12229,3 +12229,161 @@ Moja hipoteza „API czyta nieświeżo" była błędna i nie wchodzi do katalogu
 Prawdziwa nauka jest prostsza: **opublikowany DOM odpowiada na pytanie „co widzi
 czytelnik", a nie „co jest w szablonie". To dwa różne pytania** i dziś zadałem
 drugie, patrząc na odpowiedź na pierwsze.
+
+---
+
+## ŹRÓDŁA PRZEPISÓW W REPOZYTORIUM (2026-08-19, sesja Claude Code)
+
+Wejście: handoff „przeniesienie źródeł przepisów do GH" z sesji CMS-owej, która nie ma
+prawa pushu. Zakres: postawić architekturę, nie publikować.
+
+### Powód jest zmierzony, nie estetyczny
+
+Mikroskładnia używa pustej linii jako separatora bloków, pola źródłowe są typu PlainText,
+a **edytor Webflow puste linie kasuje** `[V 2026-08-19, sesja CMS]`. Zastane uszkodzenia:
+`kroki` w 2 przepisach (8 i 9 markerów `== tytuł` w środku linii), `co-mozesz-zmienic`
+w 5 (sklejone kafelki, `#kolendra` widoczny na stronie), `wskazowka` w 4 (pytanie
+kolejnego kafelka na końcu poprzedniego akapitu). **Żadnego nikt nie zgłosił** — wyszły
+przypadkiem, przy regeneracji.
+
+### Co stoi w repo
+
+`przepisy/<itemId>.txt` (16 plików, format `[nazwa-pola]` opisany w `lancuch-html/zrodlo.mjs`)
+→ `lancuch-html/generuj-html.mjs` → trzy wyjścia z jednego uruchomienia: 7 pól `*-html`,
+`dane/<itemId>.<sha8>.json` na Pages, `parser-url`. Spójność jest konstrukcyjna: powstają
+w jednym przebiegu z jednego odczytu pliku.
+
+**Generator nie parsuje mikroskładni.** Rozbiera ją `przepis-parser.js` przez most
+`odmiana-node.mjs` (dopisany eksport `parser()`); w generatorze został wyłącznie render.
+To jest to samo rozstrzygnięcie co `D-39.65` i `D-39.73` — jedna implementacja gramatyki,
+nie druga kopia wiedzy dzielonej.
+
+### Pomiar
+
+| kontrola | wynik |
+|---|---|
+| pliki źródłowe ↔ pola CMS, znak w znak (7 × 16) | **112 / 112** |
+| regeneracja → pola `*-html`, znak w znak | **112 / 112** |
+| pola pochodne `kcal/bialko/weglowodany/tluszcz-porcja` | **64 / 64** |
+| pętla plik↔item, sieroty | **0** |
+| błędy i uwagi walidatora na 16 plikach | **0 / 0** |
+| `narzedzia/suchy-bieg-generatora.mjs` — uszkodzenia złapane | **22 / 22** |
+
+### Cztery rzeczy, które wyszły przy okazji i są `[V]`
+
+1. **`liczba-porcji` NIE jest polem pochodnym**, wbrew handoffowi §4. Przy `porcje-bazowe: 3`
+   CMS ma raz „3 porcje" (chili), raz „2–3 porcje" (udziec); przy `4` — „4 porcje" i
+   „3–4 porcje". Widełki niosą informację redakcyjną, której w liczbie bazowej nie ma;
+   5 z 16 przepisów. Zostaje źródłem, w `[meta]`.
+2. **Generator strony nie escapował `"`**, a parser escapuje. Wskazówka wędliny niesie
+   w CMS `znaczy „dopiekaj"` z gołym cudzysłowem, nie `&quot;`. W treści elementu obie
+   formy wyglądają identycznie — **rozjazd bez objawu**, widoczny wyłącznie przy
+   porównaniu znak w znak. Generator ma teraz dwie ucieczki: `escTekst` i `escAtrybut`.
+3. **Uszkodzenie Webflow SKLEJA wiersze, nie zamienia pustej linii na zwykłą.** Gdyby
+   zamieniał, markery `==` zostałyby na początku wierszy i objaw „8 i 9 markerów w środku
+   linii" nie mógłby powstać. Liczby się zgadzają: chili ma 9 kroków, w środku wylądowało
+   8 markerów — wszystkie poza pierwszym. Suchy bieg odtwarza to uszkodzenie dosłownie.
+4. **Pierwsza wersja kontroli pozycji znaczników dała 63 fałszywe alarmy na 16 poprawnych
+   plikach**, bo `\s` w regexie łapało koniec poprzedniego wiersza. Złapał to dopiero suchy
+   bieg z kontrolą pozytywną „nieuszkodzony wzorzec przechodzi bez błędu". Sam suchy bieg
+   miał zresztą własną dziurę tej samej klasy: przypadek „przechowywanie bez pustych linii"
+   świecił na zielono, bo wzorzec ma tam JEDEN kafelek i nie było czego skleić — zielone
+   bez informacji. Stąd twarda gwarancja: uszkodzenie, które nic nie zmieniło we wzorcu,
+   jest teraz porażką przypadku, a nie jego sukcesem.
+
+### Czego świadomie nie zrobiłem
+
+Nic nie zapisane do CMS-u, nic nie opublikowane, pole `parser-url` nie założone, żadne pole
+nie usunięte, `przepis-parser.js` i szablon nietknięte. `wypchnij-do-cms.mjs` stoi gotowy
+i **wymusza kolejność** `push → Pages → CMS`: przed jakimkolwiek zapisem pobiera każdy
+`parser-url` z Pages i wymaga 200 o treści identycznej co do bajtu. Przypomnienie da się
+przeoczyć; 404 nie da się. Publikacji nie robi w żadnym trybie.
+
+Ładunek na Pages jest dziś **artefaktem bez konsumenta** — celowo. Ścieżka „parser pobiera
+JSON zamiast czytać wyspy `text/plain`" to zmiana runtime'u w pliku produkcyjnym i osobna
+decyzja; do tego czasu kolejność publikacji da się przećwiczyć bez ryzyka.
+
+Otwarte pozycje (czas kroku z `minutnik:`, pogrubienie w polach kartowych, zadanie
+harmonogramowe, ścieżka edycji dla redakcji): `lancuch-html/README.md` §„Otwarte pozycje".
+
+### Most Pages↔CMS: sesja Claude zamiast skryptu z tokenem `[U]` 2026-08-19
+
+Decyzja operatora, powód konstrukcyjny: **repozytorium musi być publiczne**, bo
+inaczej nie działa ani jsDelivr, ani Pages — a to znaczy, że token Webflow nie ma
+tu gdzie mieszkać. Mostem jest sesja Claude przez Webflow MCP, nie skrypt z sekretem.
+
+Konsekwencja, której nie da się obejść uprzejmością: **sesja nie widzi Pages.**
+`lukaszwerecik.github.io` jest zablokowane przez politykę egressu środowiska `[V]`,
+i przez `curl`, i przez `WebFetch`. Bramka kolejności, która pobierała każdy ładunek
+spod jego adresu, nie ma jak zadziałać z tej strony.
+
+**Zastąpiona parą, którą da się sprawdzić stąd** (`wypchnij-do-cms.mjs --przez-mcp`):
+
+1. czy `origin/main` niesie ładunek o identycznym haszu obiektu gita, liczonym
+   ZE ŚWIEŻO WYGENEROWANEJ TREŚCI, a nie z pliku na dysku — plik mógł się zmienić
+   po commicie i wtedy porównanie „dysk vs drzewo" przechodzi, mówiąc o czym innym;
+2. czy przebieg `pages build and deployment` dla TEGO SAMEGO SHA dał `success`.
+
+Bramka jest słabsza o jedno założenie: ufa, że Pages serwuje korzeń repo z `main`.
+To jest zmierzone osobno (DEPLOY.md) i nie zmienia się przy publikacji treści.
+
+**Zakres zapisu zawężony do jednego pola i to był ruch obniżający ryzyko.** Pola
+`*-html` i cztery makro były już w CMS poprawne (112/112 i 64/64 tego samego dnia),
+więc ponowny zapis nie dawał nic poza ryzykiem literówki — a ono jest zmierzone,
+nie teoretyczne: 6 przekręceń w jednej sesji, dwa o identycznej długości ciągu.
+Zapisane zostało wyłącznie `parser-url`, 16 krótkich adresów. `fieldData` jest
+scalane, nie zastępowane, więc reszta pól została nietknięta.
+
+**Wynik `[V]`:** pole `parser-url` (Link) założone, 16 itemów zaktualizowanych,
+odczyt zwrotny przez `porownaj.mjs` na świeżym zrzucie kolekcji: **176 zgodnych,
+0 rozjazdów, 0 uwag**. Itemy zostają wersjami roboczymi — publikacji nie zrobiono.
+
+Merge migracji: `main` przeszedł fast-forwardem `6b0a898 → d6389d1`, oba przebiegi
+CI (`lancuch-html`, `pages build and deployment`) na zielono na tym SHA.
+
+**Sprostowanie do wcześniejszego zapisu tej sesji:** twierdziłem kilkakrotnie, że
+sesja bierze poświadczenia GitHuba na starcie i instalacja aplikacji jej nie pomoże.
+Nieprawda — po instalacji `github.com/apps/claude` zapis zadziałał natychmiast, i przez
+API, i przez `git push`, bez restartu sesji. Wniosek pochodził z tego, że odświeżenie
+konektora nic nie dało; ale konektor odnawiał AUTORYZACJĘ, a brakowało INSTALACJI.
+Kasowanie referencji pozostaje odmawiane (403) przy działającym tworzeniu.
+
+### `D-39.75` — blok składników tylko na krokach z własnymi składnikami `[U]` 2026-08-19
+
+Zgłoszenie operatora po obejrzeniu kroku 1 wołowiny teriyaki na stagingu: krok
+„nastaw piekarnik i wodę" nie używa niczego, a dostawał ramkę z pełną dwunastką
+w sekcji „dalej". Doprecyzowanie operatora: **start nie jest krokiem** — arkusz
+z „pokaż składniki" na ekranie startowym zostaje bez zmian, zmiana dotyczy kroków.
+
+**ODWRACA `D-39.16`, bo przesłanka tamtej decyzji zniknęła.** D-39.16 broniło
+ścieżki „najpierw pokaż składniki", która wrzucała użytkownika na krok 1 z rozwiniętą
+listą; przy wyciętym bloku dostawał pustkę. **Dzień później `D-39.45` przeniosło tę
+akcję na arkusz ekranu startowego** (`akcjaEkranu()` dla `start` → `otworzArkusz()`),
+więc na krok 1 nikt już tą drogą nie wchodzi. Obrona pilnowała od dwóch dni trasy,
+której nie ma.
+
+**Wzorzec do zapamiętania:** obrona postawiona przeciw konkretnej ścieżce przeżywa
+jej usunięcie i wygląda potem jak decyzja o wyglądzie. Pytanie przy cofaniu takiej
+obrony brzmi „czy trasa jeszcze istnieje", nie „czy tak ładniej".
+
+**Cena, nazwana:** na kroku bez własnych składników pełna lista jest w trakcie
+gotowania nieosiągalna. W tym przepisie 2 kroki z 9.
+
+**Pomiar `[V]`** — Chromium headless, `playwright-core`, strona próbna z pól
+źródłowych wołowiny teriyaki, **kontrola ujemna na wersji sprzed zmiany z gita**:
+
+| krok | teraz | PRZED | PO |
+|---|---|---|---|
+| 1 „nastaw piekarnik i wodę" | 0 | blok, 12 wierszy | **brak** |
+| 8 „połącz całość" | 0 | blok, 12 wierszy | **brak** |
+| pozostałe 7 | 1–4 | blok | blok |
+
+Zero błędów strony w obu wariantach. Bez kontroli ujemnej ten pomiar nic by nie
+znaczył — pierwsza wersja przyrządu dawała `blok: false` na WSZYSTKICH krokach,
+bo `MP.tryb.otworz()` wołane bez argumentu zostawia `stan.widok` puste, a `pokazKrok()`
+wychodzi wtedy natychmiast. Przyrząd mierzył ekran startowy i wyglądał na wynik.
+
+**Minifikat przebudowany** (`terser -c -m`, 50 597 → 50 481 B) z kontrolą: przebudowa
+`przepis-parser.min.js`, którego nie tknięto, wyszła **bajt w bajt identyczna** z plikiem
+na dysku — czyli recepta i wersja narzędzia się zgadzają, a różnica w drugim artefakcie
+pochodzi wyłącznie z tej zmiany.

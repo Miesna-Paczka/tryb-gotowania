@@ -1,0 +1,96 @@
+[meta]
+nazwa: Chili con carne
+slug: chili-con-carne-przepis
+porcje-bazowe: 3
+liczba-porcji: 3 porcje
+waga-porcji: 726
+czas-minuty: 80
+
+[skladniki]
+#wolowina  450 g wołowiny mielonej  @wolowina-mielona
+#pomidory  800 ml pomidorów całych z puszki
+#fasola    200 g czarnej fasoli z puszki
+#cebula    2 cebule
+#czosnek   4 ząbki czosnku
+#marchew   2 marchewki
+#seler     2 łodygi selera naciowego
+#kolendra  3 gałązki świeżej kolendry
+#ryz       200 g ryżu
+#oliwa     2 łyżki oliwy z oliwek
+#smietana  3 łyżeczki śmietany
+#ocet      2 łyżeczki octu balsamicznego
+#papryka   2 łyżeczki słodkiej wędzonej papryki
+#cynamon   1 łyżka cynamonu mielonego
+#chili     1 łyżeczka chili (pieprzu cayenne)
+#sol       1 łyżeczka soli
+#pieprz    =½ łyżeczki pieprzu
+
+[kroki]
+== pokrój warzywa
+skladniki: cebula, czosnek, marchew, seler
+Cebulę i czosnek posiekaj drobno w kostkę, a marchew i seler naciowy potnij w plastry grubości pół centymetra. Grubsze plastry przetrwają godzinę duszenia i nie rozpadną się w sosie.
+
+== odcedź fasolę
+skladniki: fasola
+Przelej fasolę przez sitko i opłucz ją zimną wodą, aż przestanie się pienić. Zalewa z puszki jest kleista i zmąciłaby sos.
+
+== zeszklij cebulę
+minutnik: 5:00 cebula
+kryterium: cebula jest szklista i miękka, a czosnek pachnie, ale nie zbrązowiał
+skladniki: oliwa
+Rozgrzej oliwę w szerokim garnku na średnim ogniu, wrzuć cebulę z czosnkiem i mieszaj co pół minuty. Pilnuj, by czosnek nie nabrał brązowego koloru, bo wówczas **zgorzknieje**.
+
+== zrumień mięso
+minutnik: 7:00 mięso
+kryterium: w mięsie nie ma już różowych grudek, a przekrojona bryłka jest szara na wskroś
+skladniki: wolowina, sol, pieprz
+Dodaj mieloną wołowinę, połowę soli i cały pieprz, po czym rozgniataj mięso, aż rozpadnie się na drobne grudki – zbite kęsy zostają w środku surowe.
+
+== dodaj pomidory i przyprawy
+skladniki: pomidory, ocet, papryka, cynamon, chili
+Wrzuć pomidory razem z marchewką i selerem, dosyp wędzoną paprykę, cynamon i chili, wlej ocet balsamiczny i wymieszaj. Rozgnieć pomidory łyżką o ścianę garnka – z całych nie zrobi się sos.
+
+== duś sos
+minutnik: 40:00 sos
+kryterium: marchewka jest miękka, a sos jest gęsty jak gulasz
+Zmniejsz ogień tak, żeby sos ledwie bulgotał, przykryj garnek i zaglądaj co kilkanaście minut, żeby zamieszać. Jeśli sos przywiera do dna, dolej pół szklanki wody i zejdź z ogniem jeszcze niżej.
+
+== ugotuj ryż
+czas: 15 min
+skladniki: ryz
+Zagotuj wodę, posól ją resztą soli i wsyp ryż. Trzymaj się czasu z opakowania – 15 minut to jedynie sugestia.
+
+== dodaj fasolę
+minutnik: 15:00 fasola
+kryterium: przeciągnięcie łyżką odsłania dno, a sos wypełnia je dopiero po chwili
+Wsyp odcedzoną fasolę do sosu, wymieszaj i przykryj garnek ponownie. Ten kwadrans biegnie równolegle z ryżem, więc nie doliczaj go osobno.
+
+== podaj
+czas: ok. 2 min
+skladniki: smietana, kolendra
+Nałóż ryż na talerze, polej go sosem i dołóż do każdego talerza łyżeczkę śmietany. Oberwij listki kolendry z gałązek i rozrzuć je na wierzchu – w gorącym sosie zwiędną w kilkanaście sekund.
+
+[wskazowka]
+Po co w chili cynamon i ocet balsamiczny?
+To dodatki nie od parady. Cynamon podbija słodycz pomidorów i daje pomidorom głębię, którą normalnie musielibyśmy wypracować kilkoma godzinami duszenia. Ocet robi rzecz odwrotną – przecina tę słodycz, żeby sos nie wyszedł mdły.
+
+[co-mozesz-zmienic]
+#ocet
+krótko: ocet winny czerwony, tyle samo
+Czym zastąpić ocet balsamiczny?
+Octem winnym czerwonym, w tej samej ilości. Balsamiczny jest słodszy, więc bez niego sos wyjdzie ostrzejszy w kwasie – dorzuć wtedy szczyptę cukru na sam koniec.
+
+#kolendra
+krótko: natka pietruszki, tyle samo
+Nie mam świeżej kolendry albo jej nie lubię – czym ją zastąpić?
+Natką pietruszki, w tej samej ilości. Świeża zielenina na wierzchu ma kontrastować z tłustym sosem, a natka robi to równie dobrze.
+
+[przechowywanie]
+Jak przechowywać i odgrzewać chili con carne?
+W lodówce: sam sos do 2 dni w szczelnym pojemniku; ryż trzymaj osobno – schłodź go w ciągu godziny i zjedz do 24 godzin. W zamrażarce: sam sos, najlepsza jakość do 2–3 miesięcy, zamrożony w porcjach. Odgrzewanie: w rondelku na małym ogniu albo w mikrofalówce, z łyżką wody, jeśli sos zgęstniał; ryż osobno, skropiony wodą i pod przykryciem.
+
+[wartosci-odzywcze]
+energia: 487 kJ / 117 kcal; tłuszcz: 5,1 g; kwasy tłuszczowe nasycone: 1,8 g; węglowodany: 11 g; cukry: 2,4 g; błonnik: 2,1 g; białko: 6 g; sól: 0,32 g
+
+[wartosci-porcja]
+energia: 3534 kJ / 846 kcal; tłuszcz: 37 g; kwasy tłuszczowe nasycone: 13 g; węglowodany: 76 g; cukry: 18 g; błonnik: 15 g; białko: 44 g; sól: 2,4 g

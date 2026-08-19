@@ -1,0 +1,83 @@
+[meta]
+nazwa: Smażony stek z rostbefu z czosnkiem i rozmarynem
+slug: smazony-stek-z-rostbefu-z-czosnkiem-i-rozmarynem-przepis
+porcje-bazowe: 2
+liczba-porcji: 2 porcje
+waga-porcji: 270
+czas-minuty: 50
+
+[skladniki]
+#rostbef  600 g rostbefu wołowego @rostbef
+#olej     1 łyżka oleju roślinnego
+#maslo    1 łyżka masła
+#czosnek  2 ząbki czosnku
+#rozmaryn 4 gałązki rozmarynu
+#sol      1 łyżeczka soli
+#pieprz   1 łyżeczka mielonego pieprzu
+
+[kroki]
+== utemperuj mięso
+minutnik: 30:00 mięso
+kryterium: stek w dotyku jest chłodny, ale nie lodowaty – zimno nie ciągnie już do dłoni
+skladniki: rostbef
+Wyjmij rostbef z lodówki co najmniej pół godziny przed smażeniem, a jeśli nie jest jeszcze pokrojony, potnij go w poprzek włókien na steki po mniej więcej 300 g, grubości około 2,5 cm. Grubość rozstrzyga o wszystkich czasach niżej, a stek prosto z lodówki przypali się z wierzchu, zanim środek zdąży dojść.
+
+== osusz steki
+Wytrzyj każdy stek do sucha papierowym ręcznikiem, z obu stron i po bokach. Mokra powierzchnia najpierw odparowuje wodę, a dopiero potem zaczyna się rumienić – wilgotny stek wychodzi szary zamiast brązowego.
+
+== dopraw solą i pieprzem
+skladniki: sol, pieprz
+Oprósz steki solą i pieprzem z obu stron, dociskając przyprawy dłonią, żeby przywarły. Zrób to tuż przed patelnią, a nie w połowie temperowania – w środku tego okna sól zdąży wyciągnąć wodę na wierzch, ale nie zdąży jej wciągnąć z powrotem; potem umyj ręce, bo dalej mięso ruszasz już wyłącznie szczypcami.
+
+== rozgrzej patelnię
+czas: 3–5 min
+skladniki: olej
+Wlej olej na ciężką patelnię i rozgrzej ją na 80–100% mocy palnika – weź rzepakowy albo inny o wysokim punkcie dymienia, bo oliwa extra virgin zacznie się palić, zanim dno będzie gotowe. Patelnia jest gotowa wtedy, kiedy powierzchnia oleju **faluje i puszcza pierwsze pasemko dymu**.
+
+== usmaż pierwszą stronę
+minutnik: 2:00 strona pierwsza
+kryterium: spód steku jest równo ciemnobrązowy i odchodzi od patelni bez szarpania
+Ułóż steki szczypcami tak, żeby leżały luźno i nie dotykały się bokami, a potem nie przesuwaj ich ani razu – skorupka tworzy się tylko tam, gdzie mięso nieruchomo dotyka dna. Jeśli nie mieszczą się w jednej warstwie, smaż je partiami: każda partia przechodzi przez ten i dwa następne kroki osobno, z minutnikiem uruchomionym od nowa.
+
+== obróć na drugą stronę
+minutnik: 2:00 strona druga
+kryterium: mięso naciśnięte palcem ugina się i sprężyście wraca, jak mięsień u nasady kciuka przy kciuku złączonym ze wskazującym; na termometrze to około 50°C
+Obróć steki szczypcami i znów ich nie ruszaj. Dwie minuty na stronę prowadzą przy grubości 2,5 cm do medium rare; kobiety w ciąży, małe dzieci i osoby z obniżoną odpornością powinny dostać stek smażony po cztery minuty na stronę i sprawdzony termometrem na **co najmniej 63°C** w środku.
+
+== polej masłem z czosnkiem
+minutnik: 1:00 masło
+kryterium: środek steku ma 52–57°C, czyli medium rare, a masło na patelni jest orzechowo brązowe, nie czarne
+skladniki: maslo, czosnek, rozmaryn
+Zmniejsz moc palnika do połowy, dodaj masło, rozgnieciony czosnek w łupinie i gałązki rozmarynu, a potem przechylaj patelnię i zgarniaj łyżką zbierające się na dnie masło na wierzch steków. W tej samej minucie postaw każdy stek szczypcami na bok i przypiecz brzegi razem z rantem tłuszczu – różowy środek wolno podać tylko wtedy, gdy każda powierzchnia mięsa dotknęła patelni.
+
+== odpocznij steki
+minutnik: 5:00 odpoczynek
+kryterium: powierzchnia steku jest matowa i przestała parować, a mięso pod palcem jest twardsze niż zaraz po zdjęciu z patelni
+Przełóż steki na wygrzany talerz, polej je masłem z patelni i przykryj luźno folią aluminiową – szczelne przykrycie zaparuje skorupkę. Przez te pięć minut nie tnij mięsa: temperatura w środku podniesie się jeszcze o dwa–trzy stopnie, a sok, który teraz wypłynąłby na deskę, w większości zostaje w steku.
+
+== pokrój w poprzek włókien
+czas: ok. 2 min
+Połóż stek na desce i potnij go **w poprzek** widocznych na powierzchni pasm, na plastry grubości mniej więcej centymetra. Ten jeden ruch nożem robi dla miękkości więcej niż wszystko wcześniej – pokrojony wzdłuż włókien ten sam stek żuje się znacznie dłużej.
+
+[wskazowka]
+Na jakiej patelni usmażyć stek z rostbefu?
+Na ciężkiej – żeliwnej albo ze stali z grubym dnem. Cienka patelnia i teflon tracą temperaturę zaraz po położeniu zimnego mięsa, więc zamiast skorupki dostajesz duszenie we własnym soku, a powłoka nieprzywierająca nie jest na takie rozgrzanie przewidziana. Włącz wyciąg, zanim zaczniesz – olej doprowadzony do dymienia zadymi kuchnię.
+
+Jak sprawdzić wysmażenie steku bez termometru?
+Naciśnij mięso opuszkiem palca i porównaj z mięśniem u nasady kciuka: przy rozluźnionej dłoni jest miękko jak stek krwisty, przy kciuku złączonym ze wskazującym – jak medium rare, ze środkowym – jak medium, z serdecznym – jak medium well, z małym – jak dobrze wysmażony. Nie krój steku na próbę i nie oceniaj po kolorze soku – kolor zależy od pH mięsa i od tego, czy było mrożone, a nie od wysmażenia. W wariancie dla kobiet w ciąży, małych dzieci i osób z obniżoną odpornością test palcem nie wystarcza: tam termometr jest obowiązkowy.
+
+[co-mozesz-zmienic]
+#rozmaryn
+krótko: tymianek, tyle samo gałązek
+Czym zastąpić świeży rozmaryn?
+Świeżym tymiankiem w tej samej liczbie gałązek – trafia na patelnię w tym samym momencie i pachnie łagodniej. Suszonego rozmarynu tu nie używaj: igiełki w gorącym maśle przypalają się szybciej, niż stek dochodzi, i zgorzknieje całe masło.
+
+[przechowywanie]
+Jak przechowywać i odgrzewać usmażony stek?
+W lodówce: do 2 dni w szczelnym pojemniku, w kawałku, a nie w plastrach – włóż go tam w ciągu 1–2 godzin od zdjęcia z patelni. W zamrażarce: najlepsza jakość do 2–3 mies., szczelnie owinięty; rozmrażaj w lodówce i zjedz w ciągu 24 godzin. Odgrzewanie: krótko, na patelni z łyżką masła – każda minuta w cieple przesuwa stek o stopień wysmażenia w górę.
+
+[wartosci-odzywcze]
+energia: 769 kJ / 184 kcal; tłuszcz: 9,1 g; kwasy tłuszczowe nasycone: 3,6 g; węglowodany: 0,2 g; cukry: 0 g; błonnik: 0,2 g; białko: 25 g; sól: 1,2 g
+
+[wartosci-porcja]
+energia: 2076 kJ / 496 kcal; tłuszcz: 25 g; kwasy tłuszczowe nasycone: 9,6 g; węglowodany: 0,7 g; cukry: 0,1 g; błonnik: 0,5 g; białko: 68 g; sól: 3,3 g

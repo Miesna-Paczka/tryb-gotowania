@@ -1,0 +1,95 @@
+[meta]
+nazwa: Kofta wołowa
+slug: kofta-wolowa-przepis
+porcje-bazowe: 2
+liczba-porcji: 2–3 porcje
+waga-porcji: 276
+czas-minuty: 60
+
+[skladniki]
+#wolowina  300 g wołowiny mielonej @wolowina-mielona
+#cebula  1 {mała cebula|małe cebule|małych cebul|małej cebuli}
+#czosnek  2 ząbki czosnku
+#imbir  2 cm świeżego imbiru
+#kolendra  1 garść kolendry
+#mieta  1 garść świeżej mięty
+#cynamon  szczypta cynamonu
+#papryka  1 {płaska łyżeczka|płaskie łyżeczki|płaskich łyżeczek|płaskiej łyżeczki} mielonej papryki
+#kumin  ½ łyżeczki kuminu
+#pieprz  ½ łyżeczki pieprzu
+#sol  ½ łyżeczki soli
+#skyr  200 g skyru naturalnego
+#mieta-sos  kilka liści mięty
+#szczypiorek  1 garść szczypiorku
+#czosnek-suszony  szczypta suszonego czosnku
+#sol-sos  szczypta soli
+#pieprz-sos  szczypta pieprzu
+#limonka  ½ limonki
+
+[kroki]
+== nagrzej piekarnik
+Nastaw piekarnik na 200°C, grzanie góra-dół, bez termoobiegu, i wyjmij patyki do szaszłyków. Piekarnik dojdzie do temperatury, zanim posiekasz dodatki i uformujesz kofty, więc nie czekaj na niego – rób dalej.
+
+== posiekaj dodatki
+czas: ok. 10 min
+skladniki: cebula, czosnek, imbir, kolendra, mieta
+Cebulę i czosnek pokrój w bardzo drobną kostkę, imbir zetrzyj na tarce, a kolendrę i miętę posiekaj razem z łodyżkami. Kostka ma być drobna – większy kawałek cebuli zostanie w kofcie twardy i rozsadzi ją od środka.
+
+== wyrób masę
+czas: ok. 3 min
+skladniki: wolowina, cynamon, papryka, kumin, pieprz, sol
+Wrzuć posiekaną cebulę, czosnek, imbir i zioła do mielonej wołowiny razem z przyprawami, a potem wyrabiaj masę ręką. Rób to, aż przestanie się rozpadać i **zacznie się kleić do dłoni** – dopiero taka trzyma się w całości.
+
+== uformuj kofty
+czas: ok. 10 min
+Z mięsnej masy nabieraj porcje wielkości garści, po jednej na patyk, i ugniataj każdą w podłużny wałek mniej więcej na środku patyka. Mokra dłoń nie klei się do mięsa, więc trzymaj obok miskę z wodą.
+
+== piecz pierwszą stronę
+minutnik: 7:30 kofty
+kryterium: wierzch koft stracił surowy, czerwony odcień i zaczyna się rumienić – to połowa pieczenia, nie koniec
+Rozłóż kofty na blasze wyłożonej papierem tak, żeby między nimi mieściły się dwa palce, i wstaw je na środkową półkę. Stłoczone zaczną się dusić we własnym soku zamiast piec.
+
+== obróć i dopiecz
+minutnik: 7:30 kofty
+kryterium: termometr w najgrubszym miejscu kofty pokazuje 71°C, a przekrojone mięso jest w środku jednolicie szarobrązowe, bez różowych smug
+Obróć każdą koftę na drugą stronę i wstaw blachę z powrotem. Zanim je wyjmiesz, przekrój najgrubszą na pół – mielone musi dojść na wskroś, inaczej niż stek z jednego kawałka, bo przy mieleniu bakterie z powierzchni trafiają do środka.
+
+== wymieszaj sos
+czas: ok. 5 min
+skladniki: skyr, mieta-sos, szczypiorek, czosnek-suszony, sol-sos, pieprz-sos, limonka
+Posiekaj miętę i szczypiorek, a potem wymieszaj je ze skyrem, suszonym czosnkiem, solą, pieprzem i sokiem z limonki. Sos ma spływać z łyżki – jeśli skyr jest gęsty jak twaróg, rozrób go łyżką wody.
+
+== podaj
+czas: ok. 2 min
+Przełóż kofty na talerze i postaw sos obok, w osobnej miseczce. Patyki zostaw – kofta zjedzona prosto z patyka jest tym, czym miała być.
+
+[wskazowka]
+Czy da się zrobić kofty bez patyków do szaszłyków?
+Da się, choć mielone na patyku trzyma kształt pewniej. Uformuj z masy podłużne wałki i ułóż je wprost na blasze; piecz tak samo długo, ale obracaj je łopatką i ostrożnie, bo bez patyka w środku wałek łatwiej pęka.
+
+Dlaczego kofty nie mogą zostać różowe w środku?
+Przy mieleniu bakterie z powierzchni trafiają do wnętrza mięsa, więc mielone musi dojść na wskroś. Sam kolor to za mało – FSIS i NIZP-PZH ostrzegają, że barwa bywa myląca, a pewność daje termometr pokazujący 71°C w najgrubszym miejscu.
+
+Dlaczego masa zsuwa się z patyka?
+Bo za krótko ją wyrabiasz. Rób to dłużej – dopiero gdy masa zaczyna się kleić do dłoni, obejmie patyk i zostanie na nim w piekarniku; taka, która wciąż się rozpada, spadnie przy pierwszym obrocie.
+
+[co-mozesz-zmienic]
+#kolendra
+krótko: sama mięta, podwójna porcja
+Czym zastąpić kolendrę?
+Podwójną porcją mięty albo natką pietruszki. Kofta straci cytrusowy ton kolendry, ale reszta przypraw zostaje na miejscu i danie nadal się broni.
+
+#limonka
+krótko: cytryna, tyle samo soku
+Czym zastąpić limonkę?
+Cytryną – kwas przetnie tłustość skyru tak samo. Zapach będzie mniej ostry, więc wyciśnij trochę więcej i spróbuj, zanim dolejesz resztę.
+
+[przechowywanie]
+Jak przechowywać i odgrzewać kofty?
+W lodówce: do 2 dni w szczelnym pojemniku, włóż je tam w ciągu 1–2 godzin od wyjęcia z piekarnika; sos trzymaj osobno i kieruj się datą przydatności skyru z opakowania. W zamrażarce: same kofty, bez sosu – najlepsza jakość do 2–3 miesięcy, a po rozmrożeniu zjedz je w ciągu 24 godzin. Odgrzewanie: w piekarniku 180°C pod folią – na patelni kofty się rozpadają, bo nie ma w nich ani jajka, ani bułki tartej.
+
+[wartosci-odzywcze]
+energia: 659 kJ / 158 kcal; tłuszcz: 9,2 g; kwasy tłuszczowe nasycone: 4,1 g; węglowodany: 2,6 g; cukry: 2,3 g; błonnik: 1,1 g; białko: 15 g; sól: 0,69 g
+
+[wartosci-porcja]
+energia: 1817 kJ / 435 kcal; tłuszcz: 25 g; kwasy tłuszczowe nasycone: 11 g; węglowodany: 7,3 g; cukry: 6,3 g; błonnik: 3 g; białko: 42 g; sól: 1,9 g
