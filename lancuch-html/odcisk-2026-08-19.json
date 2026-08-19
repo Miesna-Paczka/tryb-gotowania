@@ -1,9 +1,9 @@
 {
- "data": "2026-08-19 (drugi)",
+ "data": "2026-08-19 (trzeci)",
  "co": "Zamrożony pomiar pól *-html w kolekcji przepisy (6a574b13929618407b161661) z dnia migracji źródeł do repozytorium. Stan wyjściowy: regeneracja ze źródeł dawała wtedy 112/112 pól identycznych znak w znak.",
  "jak": "sha256 wartości pola z odpowiedzi data_cms_tool > list_collection_items; pola pochodne zapisane wprost, bo są liczbami.",
  "poCo": "Detektor zmiany zachowania generatora — nie druga kopia treści. Gdy zaświeci, prawdę pokazuje CMS; odcisk zastępuje się wtedy nowym, z nową datą i z powodem zapisanym w STAN.md. Podciąganie odcisku pod nowy wynik, żeby bramka przeszła, kasuje jedyny sygnał, jaki ta bramka daje.",
- "powodWymiany": "wartosci-100-html i wartosci-porcja-html przestaly byc tabelami, a staly sie listami: Webflow RichText nie zna <table>, wiec pole bylo renderowane po zdjeciu znacznikow i sklejalo sie w jeden ciag (\"wartosc odzywczaw 100 genergia693 kJ...\"). Zgloszenie operatora ze zrzutu edytora CMS, 2026-08-19. Odcisk wymieniony DOPIERO po wypchnieciu do CMS i po potwierdzeniu porownaniem z zywym CMS-em (16/16 we wszystkich warstwach) — nie po to, zeby bramka przeszla.",
+ "powodWymiany": "imbir przeszedł z centymetrów na gramy z przelicznikiem łyżeczki w trzech przepisach (kofta wołowa, kurczak teriyaki, wołowina teriyaki), co zmieniło skladniki-html w tych trzech i zamienniki-html w wołowinie — razem 4 pola. Zmiana pochodzi ze źródeł w repo, nie z generatora: zachowanie generatora jest to samo, przesunęła się treść wejściowa. Odcisk wymieniony DOPIERO po zapisie do CMS przez MCP, po odczycie zwrotnym (porownaj.mjs wobec żywego zrzutu: 176 pól zgodnych, 0 rozjazdów) i po publikacji trzech itemów potwierdzonej na stagingu (renderowane gramy, parser-url wskazuje na ładunek zwracający 200) — nie po to, żeby bramka przeszła. Hasze policzone ze zrzutu CMS po publikacji, nie z regeneracji.",
  "przepisow": 16,
  "przepisy": {
   "6a57649e2c911147dc2602e3": {
@@ -36,7 +36,7 @@
   },
   "6a57652c742cc19ceca141a9": {
    "slug": "kofta-wolowa-przepis",
-   "skladniki-html": "8207a4c0c13acdf480ca35b3ec73144106cfd906728f80e16bc1a378069cc98b",
+   "skladniki-html": "33ee0e1d3fad32d921598758a83b1b568a198d1084deb490a2a02231d805e93c",
    "kroki-html": "016f9ca9a55f0f4512dbccd92812bee99c7392c7d8cb5dbbb9cfe1af6593be56",
    "wskazowki-html": "0bb30feaf93558e3e78dfa8059538418cf662745d974aaf235abd10ffea2cea5",
    "zamienniki-html": "f7cd6d095394f325f52e2ee50cec5514336c9db1f597d46b5421d11bf2c2dd64",
@@ -50,7 +50,7 @@
   },
   "6a57649e2c911147dc2602d9": {
    "slug": "kurczak-teriyaki-przepis",
-   "skladniki-html": "a870f25c1864045cef3e5879bb5f383de966ff666e7f3f249087b59b941d1680",
+   "skladniki-html": "5d64dd0c7850b7f4d951fd84bac525e39a6a6bbdde51c1dba1e075682c8f4469",
    "kroki-html": "1bbb049780f1a68db20f0d22196feffc1952d5704bf9123f0021b02eeb7b8500",
    "wskazowki-html": "fe77d64997979c30f0c5fa205112e1ddb1eafd0043487ce7371f856540104a8b",
    "zamienniki-html": "7203533aee55452aaae61054d9f9f44ce2ac210ba4bb44a3d8776d61e9dcb0f5",
@@ -218,10 +218,10 @@
   },
   "6a57652c742cc19ceca141ad": {
    "slug": "wolowina-teriyaki-z-brokulami-przepis",
-   "skladniki-html": "b354ab7e142cede0fe084748d9f27e912a782ec78950c66c35a639a69d3a37e6",
+   "skladniki-html": "53098a332d0fdb11b7bfaaae4ab56a764bb56114477889ace661b6a49961d78c",
    "kroki-html": "3746523e4e9097fdacd60e30e9e622ced2848010cf87939d28e71a3f84724074",
    "wskazowki-html": "a95edae1ede3c26c730dc44b2a12387d2a78d0dcf63d1a8c8c097fc96fdf5007",
-   "zamienniki-html": "1e94c96a32dc99580df5dfd57388729f64967cc0645a059a3a00c1ebe73efbdd",
+   "zamienniki-html": "afb71b7f181ba8346abf09ad70a057f42f41cd0ecde7c4e3f2faf3461b253b31",
    "przechowywanie-html": "93834525801f10da16fedc080bb7463056124b007634e38ee35202139019d272",
    "wartosci-100-html": "281df97cef9c326752723303fcb95eacb887f6bd65843ac4cc30bf5f135343a8",
    "wartosci-porcja-html": "ffa322dd69a1ec5221097862192609768d82343e1e6c9bc7d62cc73db220b364",

@@ -343,6 +343,41 @@ design--2026-08-12.md` §2+§4 (wymiary tooltipa, markery, decyzje operatora) ·
 11. **Zamknięcie łańcucha**: raport decyzji z propozycją taga `v1.0.0`; push, tag
     i zaplanowanie fazy integracyjnej = operator.
 
+## SYNCHRONIZACJA REPO → CMS (2026-08-19) — odcisk wymieniony na trzeci
+
+**Co się wydarzyło.** Stan gałęzi roboczej z 19.08 przeniesiony na `main` repozytorium
+organizacji jednym commitem (`7e34400`), potem sprzątanie ładunków po poprzedniej
+generacji (`7124f16`), zapis pól pochodnych do CMS przez MCP i publikacja trzech itemów.
+
+**Odcisk wymieniony: „2026-08-19 (drugi)" → „2026-08-19 (trzeci)".** Powód pełny jest
+w polu `powodWymiany`. Skrótowo: imbir przeszedł z centymetrów na gramy w trzech
+przepisach, co ruszyło `skladniki-html` ×3 i `zamienniki-html` ×1 — cztery pola.
+Zachowanie generatora się NIE zmieniło; przesunęła się treść wejściowa. Hasze policzone
+ze zrzutu CMS PO publikacji, nie z regeneracji. Kolejność, w tej i tylko tej postaci:
+zapis do CMS → odczyt zwrotny (`porownaj.mjs` wobec żywego zrzutu: 176 zgodnych,
+0 rozjazdów) → publikacja → weryfikacja na stagingu → dopiero potem nowy odcisk.
+
+**Pułapka złapana na sobie: retencja i bramka wykluczają się nawzajem.** Sprzątanie
+w `generuj-html.mjs` liczy zbiór do zachowania z `indeks.json` LEŻĄCEGO NA DYSKU
+(`wczytajIndeks()` przed nadpisaniem), więc zostawia bieżącą i poprzednią generację.
+Gdy nowy indeks trafi do repo obok obu generacji, każdy kolejny bieg czyta NOWY indeks
+jako „poprzedni", zbiór kurczy się do bieżących plików i poprzednia generacja leci.
+Generator nie jest więc idempotentny: bieg 1 kasuje 3 pliki, bieg 2 nic. `[V]` zmierzone
+w osobnym worktree. Bramka `lancuch-html` wymaga dokładnie idempotencji („regeneracja
+bez zmian w drzewie roboczym"), **więc nie może być zielona, dopóki retencja czegokolwiek
+pilnuje.** Na `1f1e0b3` przechodziła tylko dlatego, że drugiej generacji jeszcze nie było.
+
+**Cena zapłacona, nazwana.** Trzy poprzednie ładunki skasowano przy założeniu, że CMS
+ma już nowe adresy. NIE MIAŁ — `parser-url` wskazywał na wszystkie trzy skasowane pliki.
+Staging przez ok. 40 minut serwował strony, w których `mpladunek` dostawał 404 i nie
+budował `MP.model` (brak trybu gotowania i skalowania porcji na tych trzech przepisach).
+Produkcja nietknięta: stoi na publikacji z 12.08, starszy szablon, zero odwołań
+do ładunku `[V]` — sprawdzone z kontrolą pozytywną. Naprawione publikacją itemów.
+
+**Wniosek do zapamiętania:** okno retencji chroni przed tym oknem, ale tylko jeśli
+kasowanie następuje PO zapisie adresów do CMS, nie przed. Kolejność jest ta sama co
+w `wypchnij-do-cms.mjs`, o jeden krok dłuższa: Pages → CMS → publikacja → **sprzątanie**.
+
 ## SESJA `tryb-gotowania-domkniecie` (2026-08-16) — jednorazowa, przejmująca po sesji z 08-15
 
 **Wejście:** `LOCK` przeterminowany (`1970-…`), `STOP` brak, drzewo robocze czyste,
