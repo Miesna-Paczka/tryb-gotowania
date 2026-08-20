@@ -54,12 +54,21 @@
      kropkę i wyglądała jak ikona, której nie ma. Teraz nieznana nazwa idzie
      do `ostrzezenie()` i renderuje się PUSTO — bo słowo w miejscu ikony widać
      natychmiast, a kropka udaje sukces. */
-  /* D-39.32 — lista rośnie z 5 na 7. Asercje `B16`/`I4` w harnessie pytają
-     `szerLig.length === 5` i po tej zmianie MUSZĄ zostać przebazowane na 7;
-     to jest zamierzone przebazowanie zbioru, nie regres. */
+  /* ZBIÓR JEST LISTĄ GLIFÓW, KTÓRYCH RUNTIME FAKTYCZNIE UŻYWA — nie katalogiem
+     glifów dostępnych w subsecie. Każdy wpis musi mieć miejsce wykonania w kodzie.
+
+     D-40.3 (2026-08-20) — `keyboard_arrow_up` USUNIĘTY: po przejściu wywoływacza
+     listy na obrót (jak pigułka, I-36) runtime nie rysuje już tego glifu nigdzie.
+     Zostawienie go czyniłoby ze zbioru katalog, a `I4` pytałby o obecność glifu
+     w subsecie zamiast o zgodność zbioru z użyciem. 13 → 12.
+
+     Historia wpisu, bo wprowadza w błąd: adnotacja D-39.32 mówiła „lista rośnie
+     z 5 na 7" i zapowiadała przebazowanie asercji `B16`/`I4` z `szerLig.length === 5`.
+     PRZEBAZOWANIA NIGDY NIE WYKONANO, a lista urosła dalej — do 13. Oba harnessy
+     (`fixture.html`, `fixture-min.html`) nadal pytają o 5 i o zbiór pięcioelementowy. */
   var LIGATURY = ['hourglass', 'local_dining', 'leaderboard',
                 'arrow_back', 'arrow_forward',
-                'keyboard_arrow_down', 'keyboard_arrow_up',
+                'keyboard_arrow_down',
                 'remove', 'add', 'close', 'refresh',
                 'check_box', 'check_box_outline_blank'];
 
@@ -1032,8 +1041,18 @@
       'margin-top:12px;padding:12px 0 0;border:0;border-top:1px solid var(--mp-atrament);' +
       'box-sizing:content-box;background:transparent;cursor:pointer;color:inherit;' +
       'font-size:14px;line-height:19px;text-align:left}' +
+    /* D-40.3 — wywolywacz listy dostaje TEN SAM mechanizm co szewron pigulki
+       (I-36): jeden glif `keyboard_arrow_down` i obrot, zamiast podmiany dwoch
+       glifow. Wartosci sa te same, bo zrodlem jest ten sam wzorzec — akordeon
+       `.mp-faq-item` z produktowki: `transform 280ms`, `-180deg`, origin w srodku.
+       Stanem steruje `aria-expanded`, ktory przycisk JUZ nosi i ktory `przelaczListe`
+       JUZ aktualizuje — wiec nie powstaje drugi kanal tej samej prawdy. */
     '#' + ID + ' .mp-tryb__wiecej-glif{width:16px;height:22px;' +
-      'font-size:16px;line-height:22px;text-align:center}' +
+      'font-size:16px;line-height:22px;text-align:center;transition:transform 280ms}' +
+    '#' + ID + ' .mp-tryb__wiecej[aria-expanded="true"] .mp-tryb__wiecej-glif{' +
+      'transform:rotate(-180deg)}' +
+    '@media (prefers-reduced-motion:reduce){' +
+      '#' + ID + ' .mp-tryb__wiecej-glif{transition:none}}' +
 
     /* Pełna lista (§3.8): JEDEN rytm 8 px między wszystkimi blokami — nagłówek,
        wiersze, linia. Skok wiersza 27 = 19 + 8, wobec 31 = 19 + 12 na ekranie
@@ -1695,9 +1714,12 @@
   function tyk() {
     var t = teraz();
     minutniki.forEach(function (m) {
-      var pozostalo = m.zatrzymany != null
-        ? m.zatrzymany
-        : Math.max(0, Math.round((m.koniec - t) / 1000));
+      /* D-40.4 — JEDNO źródło pozostałego czasu: `koniec` minus teraz. Stała tu
+         gałąź `m.zatrzymany != null ? …`, nieosiągalna od usunięcia pauzy
+         (I-33/I-34/I-35, 2026-08-20). Zmierzone przed usunięciem: 27 próbek
+         obiektu minutnika na 16 operacjach — pole zawsze `null`, przy kontroli
+         dodatniej, która wstrzyknięte 42 widziała. PAUZY NIE MA W PROJEKCIE. */
+      var pozostalo = Math.max(0, Math.round((m.koniec - t) / 1000));
       if (pozostalo === m.pozostalo && stanCzasu(pozostalo) === m.stan) return;
       m.pozostalo = pozostalo;
       m.stan = stanCzasu(pozostalo);
@@ -1773,24 +1795,23 @@
     return m.rozwinieta;
   }
 
-  function uruchomPonownie(m) {
-    m.koniec = teraz() + m.sekundy * 1000;
-    m.zatrzymany = null;
+  /* D-40.4 — jedyny sposób przestawienia minutnika: ile sekund ma biec OD TERAZ.
+     Po zdjęciu `zatrzymany` obie ścieżki różniły się już WYŁĄCZNIE tą liczbą,
+     więc zostaje jedna. Nazwy `uruchomPonownie` nie zwijam do `nastaw`, bo jest
+     w API publicznym (`MP.tryb.minutniki.uruchomPonownie`). */
+  function nastaw(m, sekundy) {
+    m.koniec = teraz() + sekundy * 1000;
     tyk();
     przeliczBottom();
     return m;
   }
 
+  function uruchomPonownie(m) { return nastaw(m, m.sekundy); }
+
   /* `+5 min` z `7240:10918`. Liczy od TERAZ, nie od `pozostalo`: przycisk pokazuje
      sie wylacznie na `0:00`, wiec `pozostalo` jest zerem i „dolozenie" nie ma do
      czego dolozyc. Piec minut, nie jedna — brzmienie klatki jest jednoznaczne. */
-  function dolozMinuty(m, minut) {
-    m.koniec = teraz() + minut * 60 * 1000;
-    m.zatrzymany = null;
-    tyk();
-    przeliczBottom();
-    return m;
-  }
+  function dolozMinuty(m, minut) { return nastaw(m, minut * 60); }
 
   function usun(m) {
     var i = minutniki.indexOf(m);
@@ -1825,7 +1846,6 @@
          rozwinięty. `rozwinieta: false` nadal da się podać jawnie. */
       rozwinieta: opcje.rozwinieta !== false,
       koniec: teraz() + (opcje.sekundy || 0) * 1000,
-      zatrzymany: null,
       pozostalo: -1,
       stan: 'w-toku',
       el: null
@@ -2192,8 +2212,9 @@
          Zerujemy własny uchwyt, żeby stan modułu nie twierdził, że trzymamy coś,
          czego już nie mamy; o samo `release()` nie prosimy, bo jest po fakcie. */
       blokadaEkranu = null;
+      /* D-40.4 — warunek `m.zatrzymany == null &&` zdjęty: był tautologią. */
       bieglyPrzyUkryciu = minutniki.filter(function (m) {
-        return m.zatrzymany == null && m.pozostalo > 0;
+        return m.pozostalo > 0;
       });
       return null;
     }
@@ -2455,8 +2476,8 @@
            sprawdzenia brak glifu w subsetcie wypisałby użytkownikowi SŁOWO. */
         glif.className += ' mp-ikona';
         // NIENARYSOWANE (G5) / I-15 `down` = rozwiń · I-16 `up` = zwiń — dwa glify, nie obrót
-        glif.textContent = stan.listaOtwarta ? 'keyboard_arrow_up' : 'keyboard_arrow_down';
-        glif.setAttribute('data-mp-ligatura', stan.listaOtwarta ? 'keyboard_arrow_up' : 'keyboard_arrow_down');
+        glif.textContent = 'keyboard_arrow_down';
+        glif.setAttribute('data-mp-ligatura', 'keyboard_arrow_down');
         glif.setAttribute('aria-hidden', 'true');
         stan.czesci.wiecej = wiecej;
         wiecej.addEventListener('click', function () { przelaczListe(); });
@@ -2532,12 +2553,11 @@
     if (stan.czesci.wiecej) {
       stan.czesci.wiecej.setAttribute('aria-expanded', nowa ? 'true' : 'false');
       var tekst = stan.czesci.wiecej.querySelector('.mp-tryb__wiecej-tekst');
-      var gl = stan.czesci.wiecej.querySelector('.mp-tryb__wiecej-glif');
       if (tekst) tekst.textContent = nowa ? 'zwiń' : 'zobacz pozostałe';
-      if (gl) {                                     // D-39.32 — ligatura, nie substytut
-        gl.textContent = nowa ? 'keyboard_arrow_up' : 'keyboard_arrow_down';
-        gl.setAttribute('data-mp-ligatura', nowa ? 'keyboard_arrow_up' : 'keyboard_arrow_down');
-      }
+      /* D-40.3 — glifu NIE dotykamy: kierunek robi obrot z CSS, zawieszony na
+         `aria-expanded` ustawionym linijke wyzej. Do 2026-08-20 stala tu podmiana
+         `up`/`down` i to bylo jedyne miejsce w nakladce robiace to inaczej niz
+         pigulka minutnika. */
     }
 
     /* Animujemy PIKSELE, nie `auto`. Kolejność jest wiążąca: najpierw zapisujemy

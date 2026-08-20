@@ -4669,14 +4669,14 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
                  substytutami Unicode i weszły do zbioru. Liczba jest tu ASERCJĄ, a nie
                  wygodą — gdyby stało `szerLig.length > 0`, dopisanie ligatury bez subsetu
                  przeszłoby bez słowa. */
-              szerLig.length === 5 && szerLig.every(function (w) { return w >= 8 && w <= 24; }) &&
+              szerLig.length === 12 && szerLig.every(function (w) { return w >= 8 && w <= 24; }) &&
               szerNieistniejacej > 100,
               'glify ' + szerLig.join('/') + ' px · nieistniejąca ' + szerNieistniejacej + ' px');
     };
     sprawdz('B16: brak glifu = zgłoszenie, NIE własny zastępnik (`|| \'·\'` zdjęte)',
             typeof MP.tryb.ostrzezenia === 'function' &&
             trescArkusza.indexOf('·') < 0 &&
-            MP.tryb.zbiorLigatur().join(',') === 'hourglass,local_dining,leaderboard,arrow_back,arrow_forward',
+            MP.tryb.zbiorLigatur().join(',') === 'hourglass,local_dining,leaderboard,arrow_back,arrow_forward,keyboard_arrow_down,remove,add,close,refresh,check_box,check_box_outline_blank',
             'zbiór ' + MP.tryb.zbiorLigatur().join(',') +
             ' · ostrzeżeń ' + (MP.tryb.ostrzezenia ? MP.tryb.ostrzezenia().length : 'brak API'));
 
