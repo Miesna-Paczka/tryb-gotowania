@@ -156,7 +156,28 @@ nie „domyślne".
 | I-19 | licznik przekracza 60 s od końca | `stan=w toku` → `stan=ostatnia minuta` | **kropka 8→12 px, `#3E2B22`→`#CF411A`, puls 1×/s; ramka pigułki 1,5 px `#CF411A`** | [V] LEGENDA `7221:10893` + różnica wariantów | Aneks 4 |
 | I-20 | licznik wchodzi w ostatnie 10 s | `ostatnia minuta` → **stan bez wariantu** | **ten sam kolor, puls przyspiesza do 2×/s — „eskalacja tempem, nie barwą"** | [V] LEGENDA; brak wariantu komponentu | §4/G3 |
 | I-21 | licznik osiąga `0:00` | → `stan=czas minął` | **puls gaśnie, kropka pomarańczowa statyczna** | [V] LEGENDA | Aneks 4 |
-| I-22 | restart po `0:00` („uruchom ponownie") | — | — | [U] D10, WYM §2. **Etykiety „uruchom ponownie" nie ma w żadnej klatce** | §4/G10 |
+| I-22 | restart po `0:00` | — | — | **SKORYGOWANE 2026-08-20 odczytem Figmy.** [U] D10, WYM §2. Adnotacja „etykiety »uruchom ponownie« nie ma w żadnej klatce" była **prawdziwa i miała powód**: restart nazywa się **„od nowa"** i jest DRUGIM GHOSTEM, nie primary (`7240:10918`). Zachowanie → I-35 | §4/G10 |
+| I-33 | tap primary pigułki — **„✓ ‹nazwa› gotowy"** | minutnik ZNIKA ze stosu | — | [V] `7211:10925` (biegnący) i `7240:10918` (`0:00`) — **ta sama etykieta w obu stanach**; primary NIE steruje czasem, potwierdza kryterium. [U] „tylko zamyka, nie przechodzi do następnego kroku" — decyzja operatora 2026-08-20; nawigacja stoi w BOTTOM, osobno | Figma · §4 |
+| I-34 | tap ghost1 | w biegu **„wyłącz minutnik"** → minutnik znika · na `0:00` **„+5 min"** → 5 minut od teraz, minutnik biegnie | — | [V] `7211:10925`: JEDEN ghost pełnej szerokości 296×48 · `7240:10918`: dwa ghosty 140×48. **Pięć minut, nie jedna** — brzmienie klatki jednoznaczne | Figma · §4 |
+| I-35 | tap ghost2 — **„od nowa"** | restart pełnego czasu | — | [V] `7240:10918`, widoczny **wyłącznie** na `0:00` (w biegu rząd ma jeden ghost) | Figma · §4 · D10 |
+
+
+### Nota 2026-08-20 — trzy etykiety, których nie było w żadnej klatce
+
+Do 2026-08-20 runtime renderował na pigułce **„zatrzymaj"**, **„dodaj minutę"**
+i **„uruchom ponownie"**. Żadna z tych trzech nie występuje w pliku Figmy; rejestr
+I-14…I-23 nie ma dla nich wiersza, bo nigdy nie zostały zaprojektowane.
+
+Do tego pauza była zaimplementowana w połowie: funkcja ustawiała `zatrzymany`
+i nie robiła nic więcej — bez przerysowania, bez wznowienia, bez wyjścia. Efekt
+na produkcji był **gorszy niż brak funkcji**: jedno tapnięcie zamrażało pigułkę
+na zawsze, bo zapauzowany minutnik nie może dojść do `zero`, a zamykanie było
+schowane właśnie do `zero`. Zmierzone na produkcji 2026-08-20 przez przewinięcie
+zegara: **13 z 15 kombinacji (stan × przycisk) martwych.**
+
+**Pauzy nie ma w projekcie i to nie jest luka do uzupełnienia** — primary biegnącej
+pigułki potwierdza kryterium („✓ ‹nazwa› gotowy"), a nie steruje czasem. Wiersze
+I-33/I-34/I-35 są ekstrakcją z klatek, nie projektem.
 | I-23 | powrót do karty po wygaszeniu ekranu | → `7240:10900` (S5), `BOTTOM` 347 | — | [V] geometria i copy · [U] wake lock, Aneks 6 | Aneks 6 |
 | I-24 | tap markera zamiennika (`info` 20×20) | `7468:103095` → tooltip `7468:103138` **296×89**, `x=32` (lico kolumny składników), 8 px pod wierszem, radius 12, fill `beige 1` (`VariableID:173:3194`), cień surowy `DROP_SHADOW` | — | [V] pełna geometria | Aneks 5 · HANDBACK §2 |
 | I-25 | tap „zamknij" (`7473:103100`) | tooltip → zamknięty | — | [V] glif **16×19**, nie 44×44 · [U] decyzja 7 wymaga hit-area 44 px | §4/G9 |

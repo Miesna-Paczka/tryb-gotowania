@@ -135,7 +135,8 @@ a nie embed w stronie gospodarza.
 | C13 | oś kropki nie przesuwa się przy zmianie rozmiaru — rośnie promień | R11 | 5× | DOM | 🟢 | 6 |
 | C14 | drugi minutnik układa się w `stos`, nie zastępuje pierwszego | I-17 | 5× | DOM | 🟢 | 6 |
 | C15 | tap pigułki rozwija; tap nagłówka zwija; stan przeżywa zmianę kroku | I-15/I-16 | 5× | DOM | 🟢 | 6 |
-| C16 | „uruchom ponownie" po `0:00` restartuje minutnik | I-22 · G10 | 5× | DOM | 🟢 | 6 |
+| C16 | restart po `0:00` — **„od nowa"**, drugi ghost | I-22 · I-35 · G10 | 5× | DOM | 🟢 **BRZMIENIE SKORYGOWANE 2026-08-20**: wiersz pytał o „uruchom ponownie", etykietę, której nie ma w żadnej klatce. Zachowanie (restart pełnego czasu) było i jest poprawne — zmieniło się PYTANIE, nie produkt | 6 · **41** |
+| C18 | **skład i role przycisków pigułki** — biegnący: primary „✓ ‹nazwa› gotowy" + JEDEN ghost „wyłącz minutnik"; `0:00`: primary + „+5 min" + „od nowa". Każdy przycisk robi to, co obiecuje: primary i „wyłącz" ZAMYKAJĄ, „+5 min" nastawia 300 s, „od nowa" restartuje pełny czas | I-33 · I-34 · I-35 | 1× | DOM | 🟢 **ZAŁOŻONE I ZMIERZONE 2026-08-20**, przyrząd `narzedzia/suchy-bieg-pigulki.mjs`, zegar przez `MP.zegar`. **19/19 zdanych** na artefakcie po naprawie. **KONTROLA NEGATYWNA na artefakcie SPRZED naprawy: 17/19 PADA** — dwie przechodzące (`ghost2` ukryty w biegu, stan `zero` na 0:00) to zachowania, które faktycznie były poprawne, więc wiersz nie jest tautologią. Powód założenia zmierzony, nie przewidziany: do 2026-08-20 runtime renderował trzy brzmienia spoza klatek, a pauza była kikutem bez wyjścia — **13 z 15 kombinacji (stan × przycisk) martwych na produkcji**, i przez cały ten czas żaden wiersz matrycy o to nie pytał | **41** |
 | C17 | minutnik biegnie dalej, gdy użytkownik przechodzi do kolejnego kroku | §3.16 (07) | 1× | DOM | 🟢 | 6 |
 ## D · Lista składników
 

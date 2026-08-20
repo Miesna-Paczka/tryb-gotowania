@@ -1625,9 +1625,23 @@
     // §3.6 vs §3.9: przy 0:00 rząd ma DWA ghosty po 140, przy biegnącym — jeden pełnej szerokości
     m.el.ghost2.hidden = m.stan !== 'zero';
 
-    // NIENARYSOWANE (G10): brzmienia dostarcza pipeline treści (tryb ui); wiersz
-    // matrycy pyta o obecność i zachowanie, nie o brzmienie.
-    m.el.primary.textContent = m.stan === 'zero' ? 'uruchom ponownie' : 'zatrzymaj';
+    /* ETYKIETY I ROLE — ODCZYTANE Z FIGMY 2026-08-20, nie z pipeline'u tresci.
+       `7211:10925` (biegnacy): primary „✓ <nazwa> gotowy" + JEDEN ghost „wylacz minutnik".
+       `7240:10918` (0:00):     primary „✓ <nazwa> gotowy" + DWA ghosty „+5 min" i „od nowa".
+
+       Co to zastapilo i dlaczego. Do 2026-08-20 stalo tu „zatrzymaj" / „uruchom
+       ponownie" / „dodaj minute" — TRZY etykiety, ktorych nie ma w ZADNEJ klatce,
+       z polzaimplementowana pauza: funkcja pauzy ustawiala `zatrzymany` i nie robila
+       nic wiecej — bez przerysowania, bez wznowienia, bez wyjscia. Efekt na produkcji
+       byl gorszy niz brak funkcji: jedno tapniecie zamrazalo pigulke na zawsze, bo
+       zapauzowany minutnik nie moze dojsc do `zero`, a zamykanie bylo schowane do `zero`.
+       Zmierzone na produkcji 2026-08-20: 13 z 15 kombinacji (stan × przycisk) martwych.
+
+       PAUZY NIE MA W PROJEKCIE — to nie luka do uzupelnienia, tylko funkcja, ktorej
+       nigdy nie zamowiono. Primary NIE steruje czasem: potwierdza kryterium. */
+    m.el.primary.textContent = '✓ ' + m.nazwa + ' gotowy';
+    m.el.ghost1.textContent = m.stan === 'zero' ? '+5 min' : 'wyłącz minutnik';
+    m.el.ghost2.textContent = 'od nowa';
     m.el.odliczanie.textContent = formatOdliczania(m.pozostalo);
     m.el.nazwa.textContent = m.nazwa;
     /* D-39.15 — `innerHTML`, nie `textContent`, i to NIE jest rozluźnienie granicy.
@@ -1679,17 +1693,22 @@
     m.el.ghost1 = el('button', 'mp-tryb__ghost', m.el.ghosty);
     m.el.ghost2 = el('button', 'mp-tryb__ghost', m.el.ghosty);
     m.el.ghost1.type = m.el.ghost2.type = 'button';
-    m.el.ghost1.textContent = 'dodaj minutę';    // NIENARYSOWANE: brzmienie z pipeline'u treści
-    m.el.ghost2.textContent = 'zamknij minutnik';
+    /* Etykiety ghostow NIE sa statyczne: `ghost1` zmienia brzmienie ze stanem
+       (patrz `rysujKafel`). Ustawia je wylacznie `rysujKafel`, zeby nie bylo
+       dwoch zrodel tej samej prawdy. */
 
     // I-15 / I-16: tap wiersza rozwija i zwija ten sam kafel
     wiersz.addEventListener('click', function () { przelacz(m); });
-    // I-22 / G10: po 0:00 primary restartuje odliczanie
-    m.el.primary.addEventListener('click', function () {
-      if (m.stan === 'zero') uruchomPonownie(m);
-      else zatrzymaj(m);
+    // I-33: primary „✓ <nazwa> gotowy" WYLACZNIE zamyka minutnik (decyzja operatora
+    // 2026-08-20). Nie przechodzi do nastepnego kroku: nawigacja stoi w BOTTOM, osobno.
+    m.el.primary.addEventListener('click', function () { usun(m); });
+    // I-34: ghost1 — w biegu „wylacz minutnik" (zamyka), na 0:00 „+5 min" (doklada 5 min)
+    m.el.ghost1.addEventListener('click', function () {
+      if (m.stan === 'zero') dolozMinuty(m, 5);
+      else usun(m);
     });
-    m.el.ghost2.addEventListener('click', function () { usun(m); });
+    // I-35: ghost2 „od nowa" — widoczny wylacznie na 0:00, restart pelnego czasu
+    m.el.ghost2.addEventListener('click', function () { uruchomPonownie(m); });
     return p;
   }
 
@@ -1728,8 +1747,14 @@
     return m;
   }
 
-  function zatrzymaj(m) {
-    m.zatrzymany = m.pozostalo;
+  /* `+5 min` z `7240:10918`. Liczy od TERAZ, nie od `pozostalo`: przycisk pokazuje
+     sie wylacznie na `0:00`, wiec `pozostalo` jest zerem i „dolozenie" nie ma do
+     czego dolozyc. Piec minut, nie jedna — brzmienie klatki jest jednoznaczne. */
+  function dolozMinuty(m, minut) {
+    m.koniec = teraz() + minut * 60 * 1000;
+    m.zatrzymany = null;
+    tyk();
+    przeliczBottom();
     return m;
   }
 
