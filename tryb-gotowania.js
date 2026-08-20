@@ -614,8 +614,27 @@
     '#' + ID + ' [data-forma="krotka"][data-stan="zero"] .mp-tryb__odliczanie,' +
     '#' + ID + ' [data-forma="pelna"][data-stan="zero"] .mp-tryb__odliczanie{' +
       'color:var(--mp-cta)}' +
+    /* D-40.1 · SZEWRON PIGULKI OBRACA SIE — schemat akordeonu z produktowki,
+       nie wlasny wynalazek. Zmierzone na zywej stronie 2026-08-20,
+       `.mp-faq-item__heading .icon-text.is-faq`:
+         zwiniety   `keyboard_arrow_down`, rotate(0deg)      -> strzalka w DOL
+         rozwiniety ten sam glif,          rotate(-180deg)   -> strzalka w GORE
+         przejscie  `transform 280ms` (easing domyslny `ease`), origin srodek
+         `prefers-reduced-motion: reduce` -> `transition:none`
+       JEDEN glif i obrot, nie dwa glify. Znak `-180`, nie `180`: produktowka
+       obraca PRZECIWNIE do wskazowek (`mp-mnav__group-chevron` robi `+180deg`
+       przez 240 ms i jest w witrynie odosobniony — kanonem jest FAQ).
+       Rotacja wisi na `[data-forma]`, nie na osobnej klasie stanu: forma JEST
+       stanem rozwiniecia pigulki i drugi kanal tej samej prawdy byloby trzeba
+       synchronizowac. `zwinieta` to jedyna forma zwinieta, wiec negacja jednej
+       wartosci pokrywa `krotka` i `pelna` bez wyliczania ich z osobna. */
     '#' + ID + ' .mp-tryb__szewron{flex:0 0 auto;width:' + W.szewron + 'px;height:22px;' +
-      'margin-left:' + W.szewronLuka + 'px;font-size:16px;line-height:22px;text-align:center}' +
+      'margin-left:' + W.szewronLuka + 'px;font-size:16px;line-height:22px;text-align:center;' +
+      'transition:transform 280ms}' +
+    '#' + ID + ' .mp-tryb__pigulka:not([data-forma="zwinieta"]) .mp-tryb__szewron{' +
+      'transform:rotate(-180deg)}' +
+    '@media (prefers-reduced-motion:reduce){' +
+      '#' + ID + ' .mp-tryb__szewron{transition:none}}' +
 
     /* W63 (przeb. 25) — podpowiedź w pigułce pełnej (`7240:10923`) jest zwykłą treścią
        `Body small` w `primary-text`, nie tekstem przygaszonym. Runtime dawał `beige-3`.
@@ -1616,8 +1635,16 @@
     p.setAttribute('data-forma', f);
     p.setAttribute('data-stan', m.stan);
 
-    // R10: szewron towarzyszy WYŁĄCZNIE pigułce rozwiniętej pełnej — nie liczbie minutników
-    m.el.szewron.hidden = f !== 'pelna';
+    /* R10 ZDJETE decyzja operatora 2026-08-20. Regula („szewron wylacznie przy
+       pigulce rozwinietej pelnej") byla odczytana z klatek i jest w nich prawdziwa
+       — ale opisuje projekt BEZ obrotu. Szewron, ktory znika przy zwinieciu, nie ma
+       jak pokazac pozycji `w dol`: uzytkownik ogladalby wylacznie polowe animacji,
+       a pigulka zwinieta nie mialaby zadnej oznaki, ze da sie ja rozwinac —
+       czyli traciloby sie sam afordans akordeonu. Skutek uboczny jest zmierzalny
+       i zamierzony: R9 (czas oddaje szewronowi 28 px) obowiazuje teraz takze
+       w pigulce zwinietej, wiec odliczanie w formie `zwinieta` przesuwa sie
+       o 28 px w lewo. To jest ta zmiana, nie przypadek. */
+    m.el.szewron.hidden = false;
     m.el.podpowiedz.hidden = f !== 'pelna';
     m.el.primary.hidden = f === 'zwinieta';
     m.el.ghosty.hidden = f !== 'pelna';
@@ -1650,12 +1677,19 @@
        dosłownie. Zmiana idzie w parze z przejściem na `kryteriumHtml` przy
        `uruchomZKroku` — poprzednio szło tu pole SUROWE i stąd gwiazdki na ekranie. */
     m.el.podpowiedz.innerHTML = m.podpowiedz || '';
-    /* D-39.32 — szewron pigułki minutnika też jest ligaturą. Odczyt `7240:10921`
-       (wiersz `row` z „duś ragù" i „0:00"): tekst `keyboard_arrow_up`, Outlined
-       Regular 16 px, pudełko 16×22 `[V]`. `.mp-tryb__szewron` ma już te wymiary.
-       I-16 zostaje: `up` = zwiń; klatki z `down` to dryf Figmy. */
-    m.el.szewron.textContent = 'keyboard_arrow_up';
-    m.el.szewron.setAttribute('data-mp-ligatura', 'keyboard_arrow_up');
+    /* D-39.32 — szewron pigułki jest LIGATURĄ, nie znakiem Unicode. Odczyt
+       `7240:10921` (wiersz `row` z „duś ragù" i „0:00"): Outlined Regular 16 px,
+       pudełko 16×22 `[V]`. `.mp-tryb__szewron` ma te wymiary. Ta część stoi.
+       Zdjęte z tego wpisu 2026-08-20: zdanie „I-16 zostaje: `up` = zwiń; klatki
+       z `down` to dryf Figmy" — patrz D-40.1 niżej. */
+    /* D-40.1 — glif jest BAZOWY i staly: `keyboard_arrow_down`. Kierunek robi
+       obrot z CSS, nie podmiana tresci. To rownoczesnie godzi odczyt Figmy
+       z komentarzem, ktory tu stal: klatki z `up` (`7240:10921`) rysuja pigulke
+       ROZWINIETA, klatki z `down` — zwinieta. Poprzednie ogniwo uznalo te drugie
+       za „dryf Figmy", bo zakladalo glif statyczny; przy obrocie oba odczyty sa
+       tym samym elementem w dwoch koncach przejscia i zaden nie jest dryfem. */
+    m.el.szewron.textContent = 'keyboard_arrow_down';
+    m.el.szewron.setAttribute('data-mp-ligatura', 'keyboard_arrow_down');
   }
 
   function tyk() {

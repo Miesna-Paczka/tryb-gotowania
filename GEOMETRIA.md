@@ -729,8 +729,8 @@ Klatki pominięte zgodnie z ustaleniem: `7266:10720` (duplikat), `7448:128443` (
 | R6 | `BOTTOM` = 80 + [Σ kafli + 8×(n−1) + 12] · albo 132 dla ekranów dwu-CTA | `[V]` 8 wartości |
 | R7 | kafel `stos` ∈ { pigułka zwinięta 40 · rozwinięta krótka 126 · rozwinięta pełna 198+H · baner offline 121 } | `[V]` |
 | R8 | wnętrze pigułki i banera: padding 16, odstęp między blokami 12 | `[V]` |
-| R9 | czas w pigułce prawo-przypięty do 296; szewron odbiera 28 → 268 | `[V]` 5 klatek |
-| R10 | szewron w pigułce ↔ pigułka rozwinięta **pełna**; nie zależy od liczby minutników | `[V]` obalona hipoteza |
+| R9 | czas w pigułce prawo-przypięty do 296; szewron odbiera 28 → 268 | `[V]` 5 klatek · **od D-40.1 obowiązuje też w formie `zwinieta`** — zmierzony skutek: prawa krawędź odliczania 358 → 330 px przy pigułce 358×40, wysokość bez zmian |
+| R10 | ~~szewron w pigułce ↔ pigułka rozwinięta **pełna**~~ — **ZDJĘTE 2026-08-20 (D-40.1)**: szewron jest w **każdej** formie, kierunek robi obrót (I-36). Pomiar klatek stoi i nie jest podważony — opisywał projekt bez obrotu. Zależność od liczby minutników pozostaje **obalona** | `[V]` → `[U]` operator |
 | R11 | kropka minutnika: 8×8 (> 60 s) → 12×12 (≤ 60 s i 0:00), oś bez zmian | `[V]` |
 | R12 | tooltip 296×(zależne), x=32, padding 14/12, odstęp 8, kotwica 8 px pod wierszem | `[V]` |
 | R13 | cel dotyku „wstecz" 44×44 spełniony; kółko `i` 20 i `×` tooltipa 16 — **nie** | `[V]` → G-luka |
