@@ -2062,8 +2062,12 @@
       ? 'Zakończ jeden z odliczających, żeby zrobić miejsce na kolejny.'
       /* D-39.56 — brzmienie poprawione: „zaznaczone składniki" obiecywały stan,
          którego użytkownik już nie tworzy. Mówimy o tym, co naprawdę przepada. */
+      /* D-40.2 — zgodność liczby. Podmiotem drugiego zdania składowego jest
+         „postęp" (l. poj.), a orzeczenie stało w mnogiej: „zostaną zapamiętane".
+         Pozostałość po D-39.56, gdzie zdanie miało dwa podmioty. Zmierzone na
+         produkcji 2026-08-20 przez odczyt dialogu S2 z żywej strony. */
       : 'Minutniki przestaną odliczać, a postęp przepisu ' +
-        'zostaną zapamiętane do następnego razu.';
+        'zostanie zapamiętany do następnego razu.';
     /* Wiersze minutników wchodzą MIĘDZY treść a CTA (§3b.1 skład S4), czyli w tym
        samym rytmie 12 px co reszta bloków — dlatego to ten sam szkielet, nie nowy. */
     var wiersze = s4 ? minutniki.map(function (m) {
