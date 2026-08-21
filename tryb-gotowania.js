@@ -1452,6 +1452,235 @@
   var stan = { widok: null, krok: 1, korzen: null, czesci: null, listaOtwarta: false,
                ekran: null, porcje: 2, model: null };
 
+  /* ====================================================================
+     POMIAR — instrumentacja PostHog (jednostka „instrumentacja", 2026-08-21)
+
+     Runtime nie zna PostHoga i nie może go zakładać. Snippet PostHoga na
+     miesnapaczka.pl stoi w `<head>` jako `<script type="text/plain"
+     data-cookieconsent="statistics">`, a Cookiebot z `data-blockingmode="auto"`
+     odblokowuje go DOPIERO po zgodzie na kategorię „statistics".
+
+     ZMIERZONE 2026-08-21 na produkcji, nie odczytane z dokumentacji:
+       przed zgodą  →  `window.posthog` === undefined · 0 żądań sieciowych
+       po zgodzie   →  `window.posthog` obiekt, `__loaded` true · 9 żądań
+     a `window.MP.tryb` i `window.mpGotowanie` istnieją JUŻ PRZED zgodą.
+
+     Stąd KOLEJKA, a nie strażnik. Gdyby tu stało zwykłe
+     `if (posthog) posthog.capture(...)`, użytkownik, który otwiera tryb przed
+     kliknięciem banera, zgubiłby `cooking_mode_opened`, a jego późniejsze
+     `cooking_step_advanced` weszłyby normalnie — czyli instrumentacja
+     produkowałaby SYSTEMATYCZNIE tę samą awarię, którą zapytanie kontrolne
+     („otwarcia == 1 dla każdej sesji") ma wykrywać. Kolejka jest ograniczona
+     do LIMIT_KOLEJKI i pilnowana zegarem o skończonej liczbie prób: dla
+     użytkownika bez zgody moment odblokowania nie nadejdzie NIGDY i pamięć
+     nie może rosnąć w nieskończoność.
+
+     DZIENNIK jest tym samym obiektem, który idzie do `capture` — nie
+     równoległą rekonstrukcją. Gdyby był budowany osobno, wiersze matrycy
+     mierzyłyby dziennik, a nie produkt.
+     ==================================================================== */
+  var POMIAR = (function () {
+    var LIMIT_KOLEJKI = 40;      // ~6 sesji trybu; wyżej i tak nie ma czego ratować
+    var LIMIT_PROB = 30;         // 30 × 1 s — tyle czekamy na zgodę, potem odpuszczamy
+    var LIMIT_DZIENNIKA = 200;
+
+    var kolejka = [];
+    var dziennik = [];
+    var sesja = null;            // { id, t0, wznowiona, minutnikow, ostatniKrok, zakonczona }
+    var zegar = null, prob = 0, zgloszono = false;
+
+    function silnik() {
+      var p = global.posthog;
+      /* Nie wymagamy `__loaded`: między odblokowaniem snippetu a wczytaniem
+         `array.js` `window.posthog` jest namiastką, która KOLEJKUJE `capture`
+         i sama się opróżnia. Odrzucanie jej zgubiłoby zdarzenia z tego okna. */
+      return (p && typeof p.capture === 'function') ? p : null;
+    }
+
+    function klucz() {
+      try {
+        if (global.crypto && global.crypto.randomUUID) return global.crypto.randomUUID();
+      } catch (e) { /* `crypto` bywa nieobecne w kontekście niezabezpieczonym */ }
+      /* Zapas: Safari < 15.4 nie ma `randomUUID`. To nie jest UUID v4 w sensie
+         normy i nie musi być — klucz ma być unikalny w obrębie projektu, a nie
+         rozstrzygalny globalnie. */
+      return 'mp-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+    }
+
+    function slug() {
+      var p = String((global.location && global.location.pathname) || '');
+      return p.replace(/\/+$/, '').split('/').pop() || '';
+    }
+
+    function tytul() {
+      if (stan.widok && stan.widok.tytul) return stan.widok.tytul;
+      if (global.MP && global.MP.model && global.MP.model.tytul) return global.MP.model.tytul;
+      return null;
+    }
+
+    function zglos(tekst) {
+      if (zgloszono) return;
+      zgloszono = true;
+      /* WYMÓG Z PRZEKAZANIA: cichy brak pomiaru jest gorszy niż wyjątek.
+         Raz, nie przy każdym zdarzeniu — inaczej konsola staje się bezużyteczna. */
+      try { console.warn('[mp-tryb] pomiar: ' + tekst); } catch (e) {}
+    }
+
+    function spusc(p) {
+      if (!kolejka.length) return;
+      var partia = kolejka;
+      kolejka = [];
+      for (var i = 0; i < partia.length; i++) {
+        try { p.capture(partia[i][0], partia[i][1]); } catch (e) {}
+      }
+    }
+
+    function pilnuj() {
+      if (zegar) return;
+      zegar = setInterval(function () {
+        prob++;
+        var p = silnik();
+        if (p) { spusc(p); clearInterval(zegar); zegar = null; return; }
+        if (prob >= LIMIT_PROB) {
+          clearInterval(zegar); zegar = null;
+          zglos('PostHog nie wstał w ' + LIMIT_PROB + ' s (brak zgody na „statistics"?) — ' +
+                kolejka.length + ' zdarzeń nie pojedzie');
+        }
+      }, 1000);
+    }
+
+    function wyslij(nazwa, wlasciwosci) {
+      /* Właściwości zamrażamy TERAZ, nie przy spuszczaniu kolejki: między
+         zakolejkowaniem a zgodą użytkownik zdąży zmienić krok i porcje. */
+      var w = {
+        cooking_session_id: sesja ? sesja.id : null,
+        recipe_slug: slug(),
+        recipe_title: tytul()
+      };
+      for (var k in wlasciwosci) {
+        if (Object.prototype.hasOwnProperty.call(wlasciwosci, k)) w[k] = wlasciwosci[k];
+      }
+      if (dziennik.length < LIMIT_DZIENNIKA) dziennik.push({ event: nazwa, properties: w });
+      var p = silnik();
+      if (p) { spusc(p); try { p.capture(nazwa, w); } catch (e) {} return w; }
+      if (kolejka.length < LIMIT_KOLEJKI) { kolejka.push([nazwa, w]); pilnuj(); return w; }
+      zglos('kolejka pełna (' + LIMIT_KOLEJKI + ') — zdarzenia od tej chwili przepadają');
+      return w;
+    }
+
+    /* Powiązanie z konwersją. `cta_click` zostaje JEDYNĄ miarą kliknięcia
+       (zakaz z przekazania §6/§10) — dokładamy do niego kontekst przez super
+       properties, nie przez drugie zdarzenie.
+
+       ZMIERZONE 2026-08-21: w overlayu NIE MA przycisku „dodaj do Paczki" —
+       ekran zakończenia to okrojony wariant `7195:11178` (WYMAGANIA §2, D9 poza
+       zakresem v1.0), a klikalne są tylko `close`, „zrób zdjęcie" i „wróć do
+       przepisu". Konwersja pada więc PO wyjściu z trybu, na stronie przepisu.
+       Dlatego `cooking_session_id` rejestrujemy na całą sesję PostHoga: jedzie
+       odtąd na każdym `cta_click`, także tym poza overlayem — i to jest właśnie
+       miara „sesja z trybem gotowania kontra sesja bez".
+       `in_cooking_mode` zostaje osobno i mówi węższą prawdę: czy overlay był
+       otwarty W CHWILI kliknięcia. */
+    function oznacz(wlasciwosci) {
+      var p = silnik();
+      if (!p || typeof p.register !== 'function') return false;
+      try { p.register(wlasciwosci); return true; } catch (e) { return false; }
+    }
+
+    return {
+      otwarto: function (dane) {
+        sesja = { id: klucz(), t0: teraz(), wznowiona: !!dane.is_resumed,
+                  minutnikow: 0, ostatniKrok: null, zakonczona: false };
+        oznacz({ cooking_session_id: sesja.id, in_cooking_mode: true });
+        return wyslij('cooking_mode_opened', {
+          steps_total: dane.steps_total,
+          servings: dane.servings,
+          servings_base: dane.servings_base,
+          source: dane.source,
+          is_resumed: !!dane.is_resumed,
+          viewport_width: (global.innerWidth || 0)
+        });
+      },
+
+      krok: function (n, N, maMinutnik) {
+        if (!sesja) return null;
+        if (n === sesja.ostatniKrok) return null;   // przerysowanie to nie przejście
+        var wstecz = sesja.ostatniKrok !== null && n < sesja.ostatniKrok;
+        sesja.ostatniKrok = n;
+        return wyslij('cooking_step_advanced', {
+          /* `step_index` LICZONY OD ZERA — spec przekazania mówi to wprost,
+             a runtime numeruje kroki od jedynki, więc konwersja jest tutaj
+             i tylko tutaj. */
+          step_index: n - 1,
+          steps_total: N,
+          step_has_timer: !!maMinutnik,
+          direction: wstecz ? 'back' : 'forward'
+        });
+      },
+
+      minutnik: function (sekundy, ileChodzi) {
+        if (!sesja) return null;
+        sesja.minutnikow++;
+        return wyslij('cooking_timer_started', {
+          step_index: sesja.ostatniKrok === null ? null : sesja.ostatniKrok - 1,
+          timer_seconds: sekundy,
+          timers_active: ileChodzi
+        });
+      },
+
+      zakonczono: function (N, porcje) {
+        if (!sesja) return null;
+        /* Bez tej bramki zmiana porcji NA EKRANIE ZAKOŃCZENIA odpalałaby
+           zdarzenie ponownie: `ustawPorcje` woła `pokazEkran(stan.ekran)`,
+           a `stan.ekran` jest wtedy `'koniec'`. */
+        if (sesja.zakonczona) return null;
+        sesja.zakonczona = true;
+        return wyslij('cooking_mode_completed', {
+          steps_total: N,
+          duration_seconds: Math.round((teraz() - sesja.t0) / 1000),
+          servings: porcje,
+          timers_used: sesja.minutnikow
+        });
+      },
+
+      zamknieto: function (powod, N, porcje) {
+        if (!sesja) return null;
+        var w = wyslij('cooking_mode_closed', {
+          exit_step_index: sesja.ostatniKrok === null ? null : sesja.ostatniKrok - 1,
+          steps_total: N,
+          duration_seconds: Math.round((teraz() - sesja.t0) / 1000),
+          reason: powod
+        });
+        oznacz({ in_cooking_mode: false });
+        /* Sesja gaśnie TUTAJ i to jest bramka przeciw duplikatom: `zamknijWewn`
+           nie zeruje `stan.korzen`, więc drugie `zamknij()` przeszłoby przez jego
+           własny strażnik. */
+        sesja = null;
+        return w;
+      },
+
+      porcje: function (z, na) {
+        if (!sesja) return null;
+        return wyslij('cooking_servings_changed', {
+          servings_from: z,
+          servings_to: na,
+          step_index: sesja.ostatniKrok === null ? null : sesja.ostatniKrok - 1
+        });
+      },
+
+      /* Powierzchnia POMIAROWA — matryca ma czym mierzyć bez sieci i bez zgody. */
+      dziennik: function () { return dziennik.slice(); },
+      wyczysc: function () { dziennik = []; kolejka = []; },
+      sesja: function () { return sesja ? { id: sesja.id, wznowiona: sesja.wznowiona,
+                                            minutnikow: sesja.minutnikow,
+                                            ostatniKrok: sesja.ostatniKrok,
+                                            zakonczona: sesja.zakonczona } : null; },
+      wKolejce: function () { return kolejka.length; },
+      silnikJest: function () { return !!silnik(); }
+    };
+  })();
+
+
   function zbuduj() {
     if (stan.korzen) return stan.korzen;
     wstawStyl();
@@ -1862,6 +2091,11 @@
     tyk();
     przeliczBottom();
     if (!interwal) interwal = setInterval(tyk, 200);
+    /* PO `push`, nie przed: `timers_active` ma nieść liczbę minutników
+       chodzących W TEJ CHWILI, razem z właśnie uruchomionym. Odmowa przy
+       limicie wraca wcześniej przez `return null` i zdarzenia nie wystawia —
+       minutnik, którego nie ma, nie wystartował. */
+    POMIAR.minutnik(m.sekundy, minutniki.length);
     return m;
   }
 
@@ -3107,6 +3341,11 @@
 
   function ustawPorcje(n) {
     n = Math.max(PORCJE_MIN, Math.min(PORCJE_MAX, n | 0));
+    /* Wartość SPRZED zmiany bierzemy przed strażnikiem równości, żeby zdarzenie
+       niosło prawdziwy `servings_from`. Strażnik zostaje na miejscu i to on
+       sprawia, że „kliknięcie bez zmiany" (np. `+` na maksimum) nie generuje
+       zdarzenia o przejściu z 7 na 7. */
+    var porcjeSprzed = stan.porcje;
     if (n === stan.porcje) return stan.porcje;
     stan.porcje = n;
     /* Przeliczenie widoku wymaga MODELU, nie widoku — `naPorcje` jest funkcją
@@ -3116,6 +3355,7 @@
       stan.widok = global.MP.przepis.naPorcje(stan.model, n);
     }
     if (stan.ekran) pokazEkran(stan.ekran);
+    POMIAR.porcje(porcjeSprzed, stan.porcje);
     return stan.porcje;
   }
 
@@ -3129,6 +3369,7 @@
     var cz = stan.czesci;
     var N = stan.widok ? stan.widok.kroki.length : 9;
     if (rodzaj === 'koniec') {
+      POMIAR.zakonczono(N, stan.porcje);
       cz.etykieta.textContent = 'ugotowane';
       ustawPostep(N, N);                       // R5: pasek pełny na zakończeniu
       ekranKoniec(top);
@@ -3197,6 +3438,7 @@
        zamknięciem karty albo wygaszeniem telefonu, czyli dokładnie wtedy, gdy
        żaden handler zamknięcia nie zdąży się wykonać. */
     zapiszSesje();
+    POMIAR.krok(n, N, !!krok.minutnik);
     return krok;
   }
 
@@ -3311,10 +3553,37 @@
        ZNACZY WIĘC „był na kroku"; samo obejrzenie ekranu startowego nie zapisuje nic.
        Jawne `{ekran:…}` i `{krok:…}` mają pierwszeństwo — wywołujący, który wie,
        czego chce, nie może dostać ekranu, o który nie prosił. */
+    var wznowiono = false;
     if (opcje.ekran) { stan.krok = opcje.krok || stan.krok; pokazEkran(opcje.ekran); }
     else if (opcje.krok) pokazKrok(opcje.krok);
-    else if (czytajSesje() && wznow()) { /* S1 — ekran ustawiony przez `wznow()` */ }
+    else if (czytajSesje() && wznow()) { wznowiono = true; /* S1 — ekran ustawiony przez `wznow()` */ }
     else pokazEkran('start');
+    /* POMIAR stoi PO rozstrzygnięciu ekranu, bo `is_resumed` znane jest dopiero
+       tutaj — i PRZED `wejdzDoHistorii()`, żeby otwarcie było zapisane nawet gdy
+       wpis historii rzuci.
+
+       `source` NIE bierze się z `mpGotowanie.zrodloWidocznosci`, choć przekazanie
+       tak instruowało. ZMIERZONE 2026-08-21 na dwóch różnych drogach wejścia:
+       zwykłej i przez QR (`?tryb=gotowanie`) — oba razy `"css"`. To pole mówi,
+       DLACZEGO przycisk startu jest widoczny (media query), a nie JAK użytkownik
+       wszedł; jako `source` byłoby stałą, czyli właściwością, która nigdy nie
+       rozróżni dwóch sesji. Wyprowadzamy je więc z rzeczy, które faktycznie się
+       różnią, i wszystkie są tutaj pod ręką. */
+    POMIAR.otwarto({
+      steps_total: stan.widok && stan.widok.kroki ? stan.widok.kroki.length : null,
+      /* `MP.tryb.porcje()`, nie `mpGotowanie.porcje` — ZMIERZONE 2026-08-21:
+         strona pokazywała 4, tryb 2. Selektor strony i selektor trybu to dwie
+         różne liczby i tylko druga opisuje to, co użytkownik widzi w overlayu. */
+      servings: stan.porcje,
+      servings_base: (stan.model && stan.model.porcjeBazowe) ||
+                     (global.MP && global.MP.model && global.MP.model.porcjeBazowe) || null,
+      source: wznowiono ? 'wznowienie'
+            : opcje.ekran ? 'ekran'
+            : opcje.krok ? 'krok'
+            : /[?&]tryb=gotowanie(?:&|$)/.test(String(global.location && global.location.search || '')) ? 'qr'
+            : 'cta',
+      is_resumed: wznowiono
+    });
     /* NIENARYSOWANE (G11) / F4 / I-09: wpis historii dokładamy PO zbudowaniu widoku. Gdyby szedł przed,
        a budowa rzuciła, w historii zostałby wpis bez overlaya do zamknięcia. */
     wejdzDoHistorii();
@@ -3350,6 +3619,14 @@
       poprzedniOverflowBody = null;
     }
     if (zHistorii) wpisHistorii = false; else zdejmijZHistorii();
+    /* `reason` rozróżnia dokładnie tyle, ile runtime NAPRAWDĘ wie: gest wstecz
+       (`nawigacja`) od krzyżyka i „wróć do przepisu" (`user`). Trzeciej wartości
+       z przekazania — `uspienie` — nie wystawiamy, bo `zamknijWewn` nie jest
+       wołane przy wygaszeniu ekranu; udawanie, że umiemy je rozpoznać, dałoby
+       właściwość, która nigdy nie przyjmuje tej wartości. */
+    POMIAR.zamknieto(zHistorii ? 'nawigacja' : 'user',
+                     stan.widok && stan.widok.kroki ? stan.widok.kroki.length : null,
+                     stan.porcje);
   }
 
   function zamknij() { return zamknijWewn(false); }
@@ -3361,6 +3638,10 @@
   global.MP = global.MP || {};
   global.MP.tryb = {
     otworz: otworz, zamknij: zamknij, pokazKrok: pokazKrok,
+    /* Powierzchnia POMIAROWA instrumentacji — wystawiona po to, żeby wiersze
+       matrycy dało się zmierzyć bez sieci, bez PostHoga i bez klikania w baner
+       zgody. `dziennik()` zwraca TE SAME obiekty, które poszły do `capture`. */
+    pomiar: POMIAR,
     korzen: function () { return stan.korzen; },
     czesci: function () { return stan.czesci; },
     wymiary: W,

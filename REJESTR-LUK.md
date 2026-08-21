@@ -144,3 +144,19 @@ Komentarz przepisany. **Koszt w artefakcie zerowy, zmierzony:**
 (Przy okazji zmierzone: artefakt w repo różni się od świeżego wyjścia tersera
 **wyłącznie brakiem końcowego `\n`** — 51 330 vs 51 331 bajtów, `cmp` zgłasza EOF,
 nie różnicę treści. Build jest odtwarzalny.)
+
+---
+
+## POMIAR — pozycje otwarte po instrumentacji (2026-08-21)
+
+Nie luki `G` z INTERAKCJE, tylko rzeczy świadomie niedomknięte w instrumentacji.
+Zapisane tutaj, a nie w komentarzu w kodzie, zgodnie z §3 dokumentu przekazania.
+
+| # | pozycja | dlaczego otwarta |
+|---|---|---|
+| PM-1 | **weryfikacja na fizycznym telefonie** (`P15`) | środowisko sesji nie ma urządzenia. Emulacja na żywym adresie produkcyjnym przeszła, ale nie zastępuje Safari na iOS ani wake locka. Wymaga operatora. |
+| PM-2 | **zapytanie kontrolne §8.3 na żywych danych** (`P16`) | offline sprawdzone w harnessie (`otwarcia == 1` dla każdej sesji w dzienniku), na produkcji dopiero po publikacji. |
+| PM-3 | **lejek w PostHogu** (`P17`) | zdarzenia jeszcze nie istnieją w projekcie 183307. Do założenia po pierwszych wpadnięciach. |
+| PM-4 | `reason: 'uspienie'` w `cooking_mode_closed` | przekazanie wymienia trzy wartości; runtime rozróżnia dwie (`user` / `nawigacja`), bo `zamknijWewn` NIE jest wołane przy wygaszeniu ekranu. Trzecia wartość nie jest wystawiana — właściwość, która nigdy nie przyjmuje danej wartości, byłaby gorsza niż jej brak. Domknięcie wymaga osobnego haka na `visibilitychange`, czyli zmiany zachowania — a to jest poza zakresem zadania (§10). |
+| PM-5 | restart minutnika („uruchom ponownie") nie liczy się jako `cooking_timer_started` | hak siedzi w `uruchomMinutnik`, czyli na TWORZENIU minutnika; `uruchomPonownie` idzie przez `nastaw()` i zdarzenia nie wystawia. Konsekwencja: `timers_used` znaczy „ile minutników POWSTAŁO", nie „ile razy odliczano". Świadome, do rozstrzygnięcia przy pierwszym odczycie danych. |
+| PM-6 | odcięcie ruchu zespołu | flaga w localStorage odrzucona (przewraca `H6`). Robi się po stronie PostHoga, poza repo. Do czasu ustawienia — liczby z adnotacją. |

@@ -343,6 +343,88 @@ design--2026-08-12.md` §2+§4 (wymiary tooltipa, markery, decyzje operatora) ·
 11. **Zamknięcie łańcucha**: raport decyzji z propozycją taga `v1.0.0`; push, tag
     i zaplanowanie fazy integracyjnej = operator.
 
+## INSTRUMENTACJA POMIARU (2026-08-21) — tryb gotowania zaczyna się mierzyć
+
+Zadanie z dokumentu przekazania: wpiąć PostHoga tak, żeby po dwóch tygodniach dało
+się odpowiedzieć na cztery pytania, z których właściwe jest czwarte — czy sesja
+z trybem gotowania konwertuje lepiej niż samo obejrzenie przepisu.
+
+### Co zostało zmierzone, zanim cokolwiek napisano
+
+**Zgoda jest bramą — i to nie jest przypis, tylko wymóg konstrukcyjny.**
+Snippet PostHoga to `<script type="text/plain" data-cookieconsent="statistics">`,
+Cookiebot ma `data-blockingmode="auto"`. Pomiar w przeglądarce na produkcji:
+
+| | `window.posthog` | żądań |
+|---|---|---|
+| przed zgodą | `undefined` | **0** |
+| po „zezwól na wszystkie" | obiekt, `__loaded: true` | 9 |
+
+a `window.MP.tryb` i `window.mpGotowanie` istnieją **już przed zgodą**. Naiwny
+strażnik `if (posthog) capture(...)` gubiłby więc `cooking_mode_opened` i wpuszczał
+późniejsze kroki — czyli sam produkowałby awarię, którą zapytanie kontrolne ma
+wykrywać. Stąd ograniczona kolejka (40 zdarzeń, 30 prób co 1 s).
+
+**Trzy rzeczy z przekazania okazały się nieprawdą o produkcie:**
+
+1. `mpGotowanie.zrodloWidocznosci` jako `source` byłoby **stałą**. Zmierzone na
+   dwóch drogach wejścia — zwykłej i przez QR (`?tryb=gotowanie`) — oba razy
+   `"css"`. Pole mówi, DLACZEGO przycisk jest widoczny, nie JAK użytkownik wszedł.
+   `source` wyprowadzany jest teraz wewnątrz `otworz()` z `opcje.ekran` /
+   `opcje.krok` / gałęzi wznowienia / `location.search`.
+2. `mpGotowanie.porcje` to **inna liczba** niż ta, którą widzi użytkownik:
+   zmierzone 4 przy `MP.tryb.porcje() === 2`. Bierzemy drugą.
+3. W overlayu **nie ma przycisku „dodaj do Paczki"**. Przeszedłem całą ścieżkę:
+   start (`close · − · + · zacznij gotować · najpierw pokaż składniki`), kroki
+   (`close · ← · dalej`), zakończenie (`close · zrób zdjęcie · wróć do przepisu`).
+   Jedyne „paczk" w overlayu to `@miesnapaczka` w treści o Instagramie. Zgadza się
+   z `WYMAGANIA.md` §2 — ekran zakończenia to okrojony wariant `7195:11178`.
+   Konwersja pada więc PO wyjściu z trybu, na stronie przepisu, i dlatego
+   `cooking_session_id` idzie jako **super property** na całą sesję PostHoga,
+   a nie jako doklejka do jednego kliknięcia. Zakaz „żadnego drugiego zdarzenia"
+   z przekazania §6 zostaje utrzymany — `cta_click` pozostaje jedyną miarą.
+
+**Podejrzenie duplikatu sprawdzone zawczasu i oddalone.** `mpGotowanie.otwarty`
+pokazywał `2` po jednym kliknięciu CTA, co wyglądało na podwójne otwarcie.
+Owinięcie `MP.tryb.otworz` licznikiem dało **1 wywołanie na 1 kliknięcie** —
+`otwarty` należy do skryptu strony i liczy co innego.
+
+### Co zbudowano
+
+Moduł `POMIAR` w `tryb-gotowania.js` (za deklaracją `stan`), siedem haków:
+`otworz` · `pokazKrok` · `uruchomMinutnik` · `ustawPorcje` · `pokazEkran('koniec')`
+· `zamknijWewn`, plus eksport `MP.tryb.pomiar` jako powierzchnia pomiarowa.
+`dziennik()` zwraca **te same obiekty**, które idą do `capture` — nie równoległą
+rekonstrukcję, bo wtedy matryca mierzyłaby dziennik zamiast produktu.
+
+### Przebiegi
+
+```
+suchy-bieg-pomiaru.mjs                zdane 55 · oblane 0
+  --stary (artefakt sprzed zmiany)    zdane  0 · oblane 1   ← kontrola ujemna
+sześć harnessów runtime'u             17/7/16/16/19/20, zero oblanych
+transfer                              13,8 → 15,2 kB gzip   (limit 20,0)
+otworz() mediana, n=12, lokalnie      20,2 → 23,8 ms        (limit 50)
+```
+
+Trzy najostrzejsze kontrole ujemne, bo bez nich ta zieleń byłaby o niczym:
+przerysowanie kroku nie jest przejściem · **zmiana porcji na ekranie zakończenia
+nie powtarza `cooking_mode_completed`** (realna pułapka: `ustawPorcje` woła
+`pokazEkran(stan.ekran)`, a ten jest wtedy `'koniec'`) · odmowa trzeciego
+minutnika nie odpala `cooking_timer_started`.
+
+### Czego ta sesja NIE zrobiła
+
+`P15`–`P17` w matrycy, czerwone i tak zapisane: przejście na **fizycznym
+telefonie**, zapytanie kontrolne na żywych danych, lejek w PostHogu. Pierwsze jest
+poza zasięgiem środowiska — emulacja mobilna na żywym adresie produkcyjnym łapie
+logikę i DOM, ale nie Safari na iOS ani wake locka. Pozostałe dwa wymagają danych,
+których jeszcze nie ma, bo artefakt nie jest opublikowany.
+
+**Flaga ruchu wewnętrznego w localStorage odrzucona** (decyzja operatora
+2026-08-21): przewróciłaby wiersz `H6` i `WYMAGANIA` §6. Odcięcie zespołu robi się
+po stronie PostHoga.
+
 ## SYNCHRONIZACJA REPO → CMS (2026-08-19) — odcisk wymieniony na trzeci
 
 **Co się wydarzyło.** Stan gałęzi roboczej z 19.08 przeniesiony na `main` repozytorium

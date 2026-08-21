@@ -219,6 +219,7 @@ baza #3E2B22, rzucany DO GÓRY); belka 72;
 #c8461d). Glify: wyłącznie ligatury obecne w subsecie (STAN: pin fontu); brakujący
 glif = pozycja decyzyjna, nie własny fallback.
 
+
 ## 5. Stany nienarysowane — reguła postępowania
 
 Figma nie rysuje wszystkiego (HANDBACK §6). Obowiązuje: zbuduj zachowanie
@@ -242,3 +243,47 @@ tu „480" — ta sama literówka C9). Nie wpuszcza
 `czas:` i `minutnik:` naraz bez ostrzeżenia (spec §4.2). Nie czyta kwoty zniżki
 z Site Settings i nie renderuje mechaniki zdjęciowej na ekranie zakończenia
 (cięcie zakresu v1.0, §2) — ekran kończy się na „pochwal się swoim daniem".
+
+## 7. Pomiar (instrumentacja PostHog) — dopisane 2026-08-21
+
+Runtime **emituje zdarzenia produktowe do PostHoga i nie zakłada, że PostHog
+istnieje**. Sześć zdarzeń, nazwy `lowercase_snake_case` po angielsku (taksonomia
+projektu: `cta_click`, `afi_form_submit_success`):
+`cooking_mode_opened` · `cooking_step_advanced` · `cooking_timer_started` ·
+`cooking_mode_completed` · `cooking_mode_closed` · `cooking_servings_changed`.
+
+**Zgoda jest bramą i to jest zmierzone, nie założone.** Snippet PostHoga stoi na
+miesnapaczka.pl jako `<script type="text/plain" data-cookieconsent="statistics">`,
+a Cookiebot z `data-blockingmode="auto"` odblokowuje go dopiero po zgodzie na
+kategorię „statistics". Pomiar 2026-08-21 na produkcji: przed zgodą
+`window.posthog === undefined` i **zero żądań sieciowych**; po zgodzie obiekt
+i 9 żądań. `window.MP.tryb` istnieje **przed** zgodą — użytkownik może więc
+przejść pół przepisu, zanim PostHog powstanie.
+
+**Stąd wymóg konstrukcyjny: KOLEJKA, nie strażnik.** Zwykłe
+`if (posthog) capture(...)` gubiłoby `cooking_mode_opened` i wpuszczało późniejsze
+`cooking_step_advanced`, czyli produkowałoby systematycznie tę samą awarię, którą
+zapytanie kontrolne („otwarcia == 1 na sesję") ma wykrywać. Kolejka jest
+ograniczona (40 zdarzeń, 30 prób co 1 s), bo dla użytkownika bez zgody moment
+odblokowania nie nadejdzie nigdy.
+
+**Instrumentacja nie zmienia zachowania trybu gotowania.** Warunek sprawdzalny:
+sześć harnessów runtime'u przechodzi bez zmian (17/7/16/16/19/20, zmierzone
+2026-08-21 po wdrożeniu).
+
+**Budżety z §4 obowiązują dalej i zostały przemierzone**: transfer
+13,8 → **15,2 kB gzip** (limit 20,0); `otworz()` mediana 20,2 → **23,8 ms**
+lokalnie, n=12 (limit 50). Pomiar `otworz()` **na żywej stronie** — czyli ten,
+o którym mówi §4 — należy powtórzyć po publikacji.
+
+**Powiązanie z konwersją nie tworzy drugiego zdarzenia.** `cta_click` zostaje
+jedyną miarą kliknięcia; kontekst dokładamy przez super properties
+(`cooking_session_id` na całą sesję, `in_cooking_mode` tylko na czas otwarcia).
+Podstawa: w overlayu **nie ma** przycisku „dodaj do Paczki" — zmierzone
+2026-08-21, ekran zakończenia to okrojony wariant `7195:11178` (§2, D9 poza
+zakresem v1.0), więc konwersja pada po wyjściu z trybu, na stronie przepisu.
+
+**Zakaz:** instrumentacja **nie zapisuje niczego w localStorage.** Wynika to
+z §6 i wiersza matrycy `H6`; propozycja flagi „ruch wewnętrzny" w localStorage
+została z tego powodu odrzucona (decyzja operatora 2026-08-21) — odcięcie ruchu
+zespołu robi się po stronie PostHoga.

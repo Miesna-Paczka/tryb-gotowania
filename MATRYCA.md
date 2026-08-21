@@ -247,6 +247,48 @@ a nie embed w stronie gospodarza.
 | I13 | **blok pomiarowy PRZEŻYWA brak węzła**: usunięcie pojedynczego elementu z drzewa daje PADNIĘCIA asercji, nie urwanie ramki | sito dereferencji + mutacja (przeb. 37) · **inw. 0b** | 1× | DOM | 🟢 **ZAŁOŻONE NA CZERWONO w przeb. 37 (jednostka 3), z pomiaru.** `narzedzia/sito-dereferencji.py` wskazywał **41 miejsc**, w których asercja dereferencjonuje wynik `querySelector` bez guardu — ale sito daje WZORZEC, nie dowód. Batch 6 zamienił podejrzenie w pomiar: cztery mutacje `M41`–`M44` odbierają po JEDNYM węźle (`.mp-tryb__tooltip-zamknij`, `.mp-tryb__dialog-link`, `.mp-tryb__baner-akcja`, `.mp-tryb__meta-wartosc`) przez opakowanie `Element.prototype.querySelector` zwracające `null` dla dokładnie tego selektora — **najwierniejsza symulacja „element nie został wyrenderowany”; `display:none` tego NIE symuluje, bo węzeł dalej istnieje.** **Wynik: 4 URWANIA na 4, na obu powierzchniach** [V]. Brak jednego węzła kosztuje **160 / 143 / 121 / 28 asercji** (pełna, baza 427) i **162 / 145 / 123 / 28** (zminifikowana, baza 432) — czyli w najgorszym przypadku **37 % matrycy przestaje zabierać głos**, a strona meldowałaby wynik na podstawie tego, czego nie zmierzyła. **To defekt PRZYRZĄDU, nie produktu** — ta sama rodzina co `F8` i blok S4 w przeb. 36, tylko szersza. **Naprawa nie należy do tego wiersza i nie wolno jej robić hurtem:** każde miejsce wymaga wykazania, że przy zastępniku (odczepiony `div`) KAŻDA dotknięta asercja wychodzi FAŁSZ — zastępnik, który mógłby dać PRAWDĘ, jest gorszy od wyjątku. Cztery zmierzone miejsca: `fixture.html` linie **2661** (`.mp-tryb__tooltip-zamknij.click()`, 160 asercji), **2826** (`.mp-tryb__dialog-link.click()`, 143), **3112** (`.mp-tryb__baner-akcja.click()`, 121), **4325** (`.mp-tryb__meta-wartosc.textContent`, 28). **PIERWSZE MIEJSCE NAPRAWIONE I ZMIERZONE w tym samym przebiegu (jednostka 4): `M44` = ZABITA przy PEŁNEJ długości ramki na obu powierzchniach (427/427 i 432/432), urwania 4 → 3, uboczne pierwszych czterdziestu mutacji niezmienione co do sztuki** [V]. **Naprawa wymagała DWÓCH różnych zastępników i to jest wniosek do przeniesienia**: wartownika napisowego (`\u0000brak-wezla`) tam, gdzie pomiar czyta treść lub atrybut, i odczepionego `div`-a tam, gdzie pomiar potrzebuje ELEMENTU do `getComputedStyle`. **Pierwszy przemiar dał werdykt ZABITA przy ramce krótszej o 18 asercji** — trzecia dereferencja siedziała 190 linii dalej (`W33`/`W34`). **Miarą naprawy jest długość ramki równa bazie, nie werdykt**; gdyby pomiar patrzył tylko na werdykt, naprawa zostałaby uznana za zamkniętą. Zostają trzy miejsca; sito zeszło z 41 na **39** **ZAMKNIĘTE NA ZIELONO W PRZEB. 38.** Trzy pozostałe miejsca z sita (`.mp-tryb__tooltip-zamknij`, `.mp-tryb__dialog-link`, `.mp-tryb__baner-akcja`) dostały wspólny zastępnik `wezelLub(rodzic, sel)` — odczepiony `div` zamiast `null` — z wykazem przy KAŻDYM z trzech miejsc, dlaczego zastępnik gwarantuje FAŁSZ, a nie przypadkową PRAWDĘ. **Zmierzone na obu powierzchniach: 44/44 ZABITYCH, `urwania: []`, `ok: true`, wszystkie 44 ramki po 427 asercji (pełna) i po 432 (zminifikowana) — JEDNA wartość długości, czyli zero urwań** [V]. Uboczne `M41`–`M44` identyczne co do sztuki na obu powierzchniach (2/1/3/1). **Wykryte przy okazji, że jedno miejsce z sita to nie jedna dereferencja**: `M41` miał trzy (`zamknijX`, cel dotyku `.mp-tryb__cel` ×6 użyć, `.click()`), więc naprawa objęła też nową zmienną `zamknijCel`. Sito statyczne zeszło z 39 na **30** miejsc | **38** |
 ---
 
+## P · Pomiar (instrumentacja PostHog, sekcja założona 2026-08-21)
+
+Litera wolna: A–I, M, S, W, Z były zajęte. Wiersze mierzy
+`narzedzia/suchy-bieg-pomiaru.mjs` — czyta `MP.tryb.pomiar.dziennik()`, czyli
+**te same obiekty, które runtime podaje do `posthog.capture`**, nie równoległą
+rekonstrukcję. Bez sieci, bez PostHoga i bez klikania w baner zgody.
+
+**Kontrola ujemna całej sekcji:** ta sama próba puszczona na artefakcie sprzed
+instrumentacji (`--stary`) pada na pierwszej asercji i przerywa. Zmierzone
+2026-08-21: `zdane 55 · oblane 0` na nowym, `zdane 0 · oblane 1` na starym.
+
+| poz. | pozycja | źródło | szer. | metoda | status | przeb. |
+|---|---|---|---|---|---|---|
+| P1 | `cooking_mode_opened` odpala się **dokładnie raz** na otwarcie; `otwarcia == 1` dla każdej sesji w dzienniku | przek. §5.1 · §8.3 | 1× | DOM | 🟢 | 41 |
+| P2 | każde zdarzenie niesie komplet wspólnych: `cooking_session_id`, `recipe_slug` (bez `/przepisy/`), `recipe_title` | przek. §5 | 1× | DOM | 🟢 | 41 |
+| P3 | `step_index` **liczony od zera** — krok 1 runtime'u daje `0` | przek. §5.2 | 1× | DOM | 🟢 | 41 |
+| P4 | **przerysowanie tego samego kroku NIE jest przejściem** — drugie `pokazKrok(2)` nie dokłada zdarzenia | przek. §8.3 | 1× | DOM | 🟢 | 41 |
+| P5 | powrót do niższego kroku daje `direction: back`, nie `forward` | przek. §5.2 | 1× | DOM | 🟢 | 41 |
+| P6 | `timers_active` liczy razem z właśnie odpalonym; **odmowa trzeciego minutnika (D11) NIE odpala zdarzenia** | przek. §5.3 · D11 | 1× | DOM | 🟢 | 41 |
+| P7 | `duration_seconds` liczone szwem `MP.zegar` — 754 s po przesunięciu zegara o 754 000 ms | przek. §5.4 | 1× | DOM | 🟢 | 41 |
+| P8 | **zmiana porcji NA EKRANIE ZAKOŃCZENIA nie powtarza `cooking_mode_completed`** — `ustawPorcje` woła `pokazEkran(stan.ekran)`, a ten jest wtedy `'koniec'` | przek. §8.3 | 1× | DOM | 🟢 | 41 |
+| P9 | drugie `zamknij()` nie dokłada `cooking_mode_closed` — `zamknijWewn` nie zeruje `stan.korzen`, więc jego własny strażnik by przepuścił | przek. §5.5 | 1× | DOM | 🟢 | 41 |
+| P10 | `source` **rozróżnia drogi wejścia**: `cta` / `qr` (`?tryb=gotowanie`) / `krok` / `wznowienie` — nie jest stałą | przek. §5.1 ¶ | 1× | DOM | 🟢 | 41 |
+| P11 | zdarzenia sprzed zgody Cookiebota **czekają w kolejce i spuszczają się W KOLEJNOŚCI**, gdy `window.posthog` się pojawi | przek. §4 · §7 | 1× | DOM | 🟢 | 41 |
+| P12 | `cooking_session_id` rejestrowany jako super property i **zostaje po zamknięciu**; `in_cooking_mode` zdejmowane | przek. §6 | 1× | DOM | 🟢 | 41 |
+| P13 | `servings` bierze się z `MP.tryb.porcje()`, nie z `mpGotowanie.porcje` — zmierzone 2026-08-21: strona 4, tryb 2 | przek. §5.1 ¶ | 1× | DOM | 🟢 | 41 |
+| P14 | `cooking_mode_completed` niesie **końcową** liczbę porcji, nie startową | przek. §5.4 | 1× | DOM | 🟢 | 41 |
+| P15 | **[Z]** komplet sześciu typów w PostHog → Activity, z tym samym `cooking_session_id`, po przejściu na **fizycznym telefonie** | przek. §8.1–8.2 | 1× | oko | 🔴 | — |
+| P16 | **[Z]** zapytanie kontrolne z §8.3 na ŻYWYCH danych zwraca `otwarcia = 1` dla każdej sesji | przek. §8.3 | 1× | oko | 🔴 | — |
+| P17 | **[Z]** lejek `opened → step_advanced → completed` założony w PostHogu | przek. §9 | 1× | oko | 🔴 | — |
+
+**P15–P17 są poza pętlą lokalną (jak sekcja `Z`) i nie liczą się do zieleni.**
+Wymagają fizycznego urządzenia i żywych danych — sesja nie ma ani jednego, ani
+drugiego. Zapisane jako czerwone, a nie pominięte, bo definicja ukończenia
+z przekazania §9 ich wymaga.
+
+¶ `P10`/`P13` mają w źródle dopisek, bo **poprawiają przekazanie**, a nie tylko je
+realizują: dokument instruował, żeby `source` brać z `mpGotowanie.zrodloWidocznosci`,
+a `servings` z `mpGotowanie.porcje`. Oba zmierzone 2026-08-21 jako nienadające się —
+pierwsze jest stałą (`"css"` i przy wejściu zwykłym, i przez QR), drugie to inna
+liczba niż ta, którą widzi użytkownik w overlayu.
+
 ## W · Wykończenie powierzchni (klasa założona 2026-08-15, polecenie operatora)
 
 **Dlaczego ta sekcja istnieje.** Sekcje A–I mierzą **położenia, wymiary, zachowania
