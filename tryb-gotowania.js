@@ -1531,7 +1531,9 @@
       var partia = kolejka;
       kolejka = [];
       for (var i = 0; i < partia.length; i++) {
-        try { p.capture(partia[i][0], partia[i][1]); } catch (e) {}
+        try { p.capture(partia[i][0], partia[i][1]); } catch (e) {
+          zglos('`posthog.capture` rzucił przy spuszczaniu kolejki: ' + (e && e.message));
+        }
       }
     }
 
@@ -1562,7 +1564,17 @@
       }
       if (dziennik.length < LIMIT_DZIENNIKA) dziennik.push({ event: nazwa, properties: w });
       var p = silnik();
-      if (p) { spusc(p); try { p.capture(nazwa, w); } catch (e) {} return w; }
+      if (p) {
+        spusc(p);
+        /* Nie połykamy wyjątku po cichu. Wymóg z przekazania §4 brzmi wprost:
+           cichy brak pomiaru jest gorszy niż wyjątek. `try` zostaje, bo rzucający
+           `capture` nie ma prawa przewrócić trybu gotowania — ale rzut jest
+           ZGŁASZANY, raz, zamiast znikać. */
+        try { p.capture(nazwa, w); } catch (e) {
+          zglos('`posthog.capture` rzucił na „' + nazwa + '": ' + (e && e.message));
+        }
+        return w;
+      }
       if (kolejka.length < LIMIT_KOLEJKI) { kolejka.push([nazwa, w]); pilnuj(); return w; }
       zglos('kolejka pełna (' + LIMIT_KOLEJKI + ') — zdarzenia od tej chwili przepadają');
       return w;
