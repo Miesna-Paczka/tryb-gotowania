@@ -2500,7 +2500,12 @@
            po 20,0 px przy kontroli ujemnej 505,6 px `[V]` 2026-08-17. Bez tego
            sprawdzenia brak glifu w subsetcie wypisałby użytkownikowi SŁOWO. */
         glif.className += ' mp-ikona';
-        // NIENARYSOWANE (G5) / I-15 `down` = rozwiń · I-16 `up` = zwiń — dwa glify, nie obrót
+        /* NIENARYSOWANE (G5) / I-15 `down` = rozwiń · I-16 `up` = zwiń.
+           D-40.3 (2026-08-21): rozstrzygnięcie ZMIENIONE — jeden glif
+           `keyboard_arrow_down` obracany o −180° przez CSS na
+           `[aria-expanded="true"]`, tak samo jak szewron pigułki (D-40.1)
+           i jak akordeony stron produktowych. Podmiana `textContent`
+           w `przelaczListe` zdjęta; `keyboard_arrow_up` wypadł z subsetu. */
         glif.textContent = 'keyboard_arrow_down';
         glif.setAttribute('data-mp-ligatura', 'keyboard_arrow_down');
         glif.setAttribute('aria-hidden', 'true');
