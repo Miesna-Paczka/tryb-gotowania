@@ -1832,7 +1832,13 @@
     opcje = opcje || {};
     if (minutniki.length >= W.limitMinutnikow) {
       zbuduj();
-      otworzDialog('S4');
+      /* D-40.5 — odmowa NIE zabiera już ze sobą intencji. Do 2026-08-20 przepadała
+         razem z kaflem: użytkownik prosił o minutnik, dostawał okno, zwalniał
+         miejsce — i musiał poprosić DRUGI RAZ, choć treść okna obiecywała wprost
+         „żeby zrobić miejsce na kolejny". Przekazujemy KOPIĘ żądania, nie `opcje`,
+         żeby dialog nie trzymał obiektu, który wołający może jeszcze zmienić. */
+      otworzDialog('S4', { nazwa: opcje.nazwa, sekundy: opcje.sekundy,
+                           podpowiedz: opcje.podpowiedz, rozwinieta: opcje.rozwinieta });
       return null;
     }
     zbuduj();
@@ -2049,7 +2055,7 @@
   /* S4: wiersz minutnika 280×44 (§3b.1). „zakończ" zdejmuje TEN minutnik i zamyka
      dialog — zwolnienie miejsca, nie start trzeciego. Automatyczny start po zwolnieniu
      slotu byłby zachowaniem ZGADYWANYM: I-18 opisuje wyłącznie odmowę i dialog. */
-  function wierszDialoguMinutnika(m) {
+  function wierszDialoguMinutnika(m, intencja) {
     var w = el('div', 'mp-tryb__dialog-min');
     w.setAttribute('data-mp-min', '');
     var nazwa = el('span', 'mp-tryb__dialog-min-nazwa', w);
@@ -2059,13 +2065,28 @@
     var koniec = el('button', 'mp-tryb__dialog-min-koniec', w);
     koniec.type = 'button';
     // NIENARYSOWANE: brzmienie „zakończ" jest placeholderem (pipeline treści, tryb ui)
-    koniec.textContent = 'zakończ';
+    /* D-40.5 — etykieta NIESIE KONSEKWENCJĘ. Gdy dialog powstał z odmowy, tapnięcie
+       zrobi DWIE rzeczy: zamknie ten minutnik i włączy ten, o który użytkownik
+       właśnie prosił. Gołe „zakończ" ukrywałoby drugą połowę i zamieniało pomyłkę
+       w podwójną stratę — a to był jedyny poważny zarzut wobec łączenia skutków.
+       Bez intencji (dialog otwarty inaczej) brzmienie zostaje bez zmian. */
+    koniec.textContent = (intencja && intencja.nazwa)
+      ? 'zakończ i włącz „' + intencja.nazwa + '"'
+      : 'zakończ';
     el('span', 'mp-tryb__cel', koniec).setAttribute('aria-hidden', 'true');
-    koniec.addEventListener('click', function () { usun(m); zamknijDialog(); });
+    koniec.addEventListener('click', function () {
+      usun(m);
+      zamknijDialog();
+      /* Intencja żyje TYLKO tą jedną drogą wyjścia. `zamknijDialog()` niszczy obiekt
+         dialogu, więc każde inne wyjście — „wróć do gotowania", scrim, zmiana kroku —
+         zabiera ją ze sobą i nic się samo nie uruchomi. Kolejność jest wiążąca:
+         najpierw `usun`, potem start, inaczej limit odmówiłby po raz drugi. */
+      if (intencja) uruchomMinutnik(intencja);
+    });
     return w;
   }
 
-  function otworzDialog(rodzaj) {
+  function otworzDialog(rodzaj, intencja) {
     zamknijDialog();
     zamknijTooltip();
     var s4 = rodzaj === 'S4';
@@ -2091,7 +2112,7 @@
     /* Wiersze minutników wchodzą MIĘDZY treść a CTA (§3b.1 skład S4), czyli w tym
        samym rytmie 12 px co reszta bloków — dlatego to ten sam szkielet, nie nowy. */
     var wiersze = s4 ? minutniki.map(function (m) {
-      var w = wierszDialoguMinutnika(m);
+      var w = wierszDialoguMinutnika(m, intencja);
       d.appendChild(w);
       return w;
     }) : [];
@@ -2109,7 +2130,11 @@
       link.addEventListener('click', function () { zamknijDialog(); zamknij(); });  // I-08
     }
     scrimEl.setAttribute('data-otwarty', '');
-    dialog = { el: d, rodzaj: rodzaj, cta: cta, link: link, wiersze: wiersze };
+    /* Intencja mieszka W OBIEKCIE DIALOGU, nie w stanie modułu. `zamknijDialog()`
+       zeruje `dialog`, więc pamięć ginie razem z oknem i nie ma stanu, który mógłby
+       zwietrzeć — nikt nie dostanie minutnika zamówionego trzy kroki wcześniej. */
+    dialog = { el: d, rodzaj: rodzaj, cta: cta, link: link, wiersze: wiersze,
+               intencja: intencja || null };
     return d;
   }
 

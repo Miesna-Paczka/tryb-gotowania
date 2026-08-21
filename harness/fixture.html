@@ -1589,8 +1589,16 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
        i na życzenie. Kolejność jest częścią pomiaru, nie wygodą. */
     var korzen = MP.tryb.otworz(w2, { krok: 3 });
     var cz = MP.tryb.czesci();
-    var pxN = function (e, w) { return parseFloat(getComputedStyle(e)[w]); };
-    var pr = function (e) { return e.getBoundingClientRect(); };
+    /* NAPRAWA 2026-08-20 — te dwa pomocniki były jedynym miejscem, gdzie doktryna
+       WĘZŁA ZASTĘPCZEGO (niżej) nie obowiązywała: brały węzeł na wiarę i przy
+       `null` rzucały, urywając blok. Ponieważ przechodzi przez nie KAŻDY pomiar
+       wymiaru i stylu, jeden brakujący węzeł kosztował całą resztę ramki — łącznie
+       z sondą ligatur `I4`/`B16`, która stoi na samym końcu i przez to nie wykonała
+       się ani razu. Zastępnik daje zera i puste style, więc brak węzła kończy się
+       PADNIĘCIEM tej asercji, a nie ciszą trzydziestu następnych. */
+    var ZASTEPNIK = document.createElement('div');
+    var pxN = function (e, w) { return parseFloat(getComputedStyle(e || ZASTEPNIK)[w]); };
+    var pr = function (e) { return (e || ZASTEPNIK).getBoundingClientRect(); };
     /* WĘZEŁ ZASTĘPCZY (przeb. 38, wiersz `I13`) — jeden zastępnik dla TRZECH ostatnich
        miejsc z sita dereferencji (`M41`, `M42`, `M43`). Wzór wzięty z bloku S4
        (przeb. 36) i z naprawy `M44` (przeb. 37): zamiast `null` idzie ODCZEPIONY `div`,
@@ -1888,12 +1896,22 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     MP.tryb.pokazKrok(4);   // „rozgrzej olej" — jedyny krok teriyaki z markerem
     var marki = cz.top.querySelectorAll('mark');
     sprawdz('B14: marker to <mark>, nie prostokąt', marki.length === 1, marki.length);
+    /* NAPRAWA 2026-08-20 — te trzy asercje czytały `marki[0]` bez sprawdzenia,
+       czy marker w ogóle powstał. Gdy dryf danych fixture'a zabrał markery,
+       `getComputedStyle(undefined)` rzucał, jedyny `try` bloku łapał wyjątek —
+       i WSZYSTKIE ~30 asercji poniżej, z sondą ligatur (I4/B16) włącznie, nie
+       wykonywały się nigdy. Matryca meldowała wtedy 12 padnięć zamiast 12 padnięć
+       PLUS 30 niewykonanych, czyli myliła „zmierzone i złe" z „niezmierzone".
+       Styl czytamy z markera ALBO — gdy go nie ma — z węzła zastępczego, żeby
+       padła TA asercja, a nie cały blok. */
+    var stylMarkera = marki[0] ? getComputedStyle(marki[0]) : null;
     sprawdz('B14: <mark> ma box-decoration-break: clone',
-            /clone/.test(getComputedStyle(marki[0]).boxDecorationBreak ||
-                         getComputedStyle(marki[0]).webkitBoxDecorationBreak || ''),
-            getComputedStyle(marki[0]).webkitBoxDecorationBreak);
+            !!stylMarkera && /clone/.test(stylMarkera.boxDecorationBreak ||
+                                          stylMarkera.webkitBoxDecorationBreak || ''),
+            stylMarkera ? stylMarkera.webkitBoxDecorationBreak : '(brak markera)');
     sprawdz('B14: marker łamie się z wierszem (inline, nie blok)',
-            getComputedStyle(marki[0]).display === 'inline', getComputedStyle(marki[0]).display);
+            !!stylMarkera && stylMarkera.display === 'inline',
+            stylMarkera ? stylMarkera.display : '(brak markera)');
 
     /* C01 — trzy stany czasu na trzech REALNYCH krokach teriyaki, nie na
        spreparowanych: krok 1 „ok. 5 min" (czas), krok 4 „bez minutnika",
@@ -2605,45 +2623,112 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             korzen.querySelectorAll('[class*="scroll-rail"],[class*="thumb"]').length === 0,
             'TOP ' + getComputedStyle(cz.top).overflowY + ' · reszta ' +
             (reszta ? reszta.scrollHeight + '/' + reszta.clientHeight : '?'));
+    /* NAPRAWA 2026-08-20 — `MP.tryb.zaznaczone()` NIE ISTNIEJE: `odhacz()` i zbiór
+       `zaznaczone` usunięto w całości decyzją **D-39.56**, a ta asercja wołała je
+       dalej i rzucała `TypeError`, ucinając blok przed sondą ligatur. Wołanie
+       przez `typeof`, żeby padła TA asercja — i żeby jej detal mówił, co się stało,
+       zamiast udawać pomiar nieistniejącego stanu. */
+    var maZaznaczone = typeof MP.tryb.zaznaczone === 'function';
     sprawdz('D12: zaznaczenie przeżyło ROZWINIĘCIE listy (stan wiersza, nie DOM-u)',
+            maZaznaczone &&
             cz.top.querySelectorAll('.mp-tryb__wiersz[data-odhaczony]').length === 1 &&
-            MP.tryb.zaznaczone().length === 1, MP.tryb.zaznaczone().join(','));
+            MP.tryb.zaznaczone().length === 1,
+            maZaznaczone ? MP.tryb.zaznaczone().join(',')
+                         : 'API `MP.tryb.zaznaczone` nie istnieje — zdjęte przez D-39.56');
     var wiecej2 = cz.top.querySelector('.mp-tryb__ramka-skladnikow .mp-tryb__wiecej');
     /* C08 — obrót szewronu NA LIŚCIE SKŁADNIKÓW (I-15 `down` = rozwiń, I-16 `up` = zwiń).
        Wiersz C08 stał zielony od przeb. 15 bez własnej asercji: mierzyły go te dwie
        linijki pod etykietą D9, więc żaden przegląd pokrycia nie mógł go zobaczyć.
        Nie jest to ten sam szewron co C07 — tamten należy do PIGUŁKI minutnika. */
-    var glifPrzed = wiecej2 && wiecej2.querySelector('.mp-tryb__wiecej-glif').textContent;
-    sprawdz('D9 · C08: lista ROZWINIĘTA — szewron pokazuje `⌃` (I-16: `up` = zwiń)',
-            !!wiecej2 && glifPrzed === '⌃', glifPrzed);
+    /* PRZEBAZOWANE 2026-08-20 (D-40.3) — wiersz mierzył PODMIANĘ ZNAKU `⌃`/`⌄`,
+       a nazywa się „obrót szewronu". Od D-39.32 znaki Unicode zastąpiły ligatury,
+       od D-40.3 glif jest STAŁY (`keyboard_arrow_down`), a kierunek robi `transform`.
+       Wiersz pyta więc teraz o to, co jest w jego nazwie: o KĄT. */
+    var glifSzewronu = function (e) {
+      return e ? e.querySelector('.mp-tryb__wiecej-glif').textContent.trim() : '(brak)';
+    };
+    var katSzewronu = function (e) {
+      if (!e) return null;
+      var m = getComputedStyle(e.querySelector('.mp-tryb__wiecej-glif')).transform
+                .match(/matrix\(([^)]+)\)/);
+      if (!m) return 0;
+      var t = m[1].split(',');
+      return Math.abs(Math.round(Math.atan2(parseFloat(t[1]), parseFloat(t[0])) * 180 / Math.PI));
+    };
+    /* Stan WYMUSZONY, nie odziedziczony: do 2026-08-20 wiersz mierzył cokolwiek
+       zostawiły po sobie czterysta linijek wcześniejszych asercji, więc jego wynik
+       zależał od kolejności bloku, a nie od produktu. `lista(true)` + ponowne
+       pobranie węzła (render kroku odbudowuje przycisk) czyni go samodzielnym. */
+    /* `cz` pobrano czterysta linijek wyżej i po drodze overlay zdążył się przerysować,
+       więc `cz.top` wskazuje ODCZEPIONE poddrzewo: `textContent` z niego jeszcze
+       czytamy, ale `getComputedStyle` nie ma z czego brać wartości i każdy pomiar
+       stylu wychodzi pusty — czyli dokładnie zachowanie WĘZŁA ZASTĘPCZEGO opisane
+       wyżej, tyle że przypadkiem i bez padnięcia. Stąd świeży odczyt z dokumentu. */
+    MP.tryb.pokazKrok(1);   // krok z RESZTĄ składników — bez niej wywoływacza nie ma
+    /* DWA wywołania, nie jedno — i to nie jest ostrożnościowa magia. `przelaczListe`
+       sprawdza, czy uchwyt `stan.czesci.reszta` jest ŻYWY; zaraz po `pokazKrok`
+       bywa sierotą, więc pierwsze wywołanie tylko przerysowuje krok i wychodzi,
+       NIE zmieniając stanu. Zachowanie zmierzone na artefakcie sprzed dzisiejszych
+       zmian tak samo, więc nie jest regresją — ale jest powodem, dla którego jedno
+       `lista(true)` tutaj nic nie otwierało i wiersz C08 mierzył listę ZAMKNIĘTĄ. */
+    MP.tryb.lista(true);
+    if (MP.tryb.listaOtwarta() !== true) { MP.tryb.lista(true); }
+    wiecej2 = document.querySelector('.mp-tryb__ramka-skladnikow .mp-tryb__wiecej');
+    var glifPrzed = glifSzewronu(wiecej2), katPrzed = katSzewronu(wiecej2);
+    sprawdz('D9 · C08: lista ROZWINIĘTA — szewron obrócony w GÓRĘ (I-16: `up` = zwiń)',
+            !!wiecej2 && glifPrzed === 'keyboard_arrow_down' && katPrzed === 180,
+            glifPrzed + ' @ ' + katPrzed + '°');
     wiecej2.click();
-    var glifPo = cz.top.querySelector('.mp-tryb__wiecej-glif').textContent;
+    var wiecejPo = document.querySelector('.mp-tryb__ramka-skladnikow .mp-tryb__wiecej');
+    var glifPo = glifSzewronu(wiecejPo), katPo = katSzewronu(wiecejPo);
     /* PRZEBAZOWANE: po zwinięciu nagłówki sekcji ZOSTAJĄ w drzewie — kontener jest
        tylko schowany wysokością zero. Pytamy więc o to, czego naprawdę chcemy:
        że nie są widoczne. `offsetParent === null` nie zadziała (kontener nie jest
        `display:none`), więc mierzymy wysokość kontenera. */
-    sprawdz('D9 · C08: po tapnięciu lista jest ZWINIĘTA, szewron na `⌄`',
+    sprawdz('D9 · C08: po tapnięciu lista jest ZWINIĘTA, szewron w DÓŁ',
             MP.tryb.listaOtwarta() === false &&
             Math.round(pr(cz.top.querySelector('.mp-tryb__reszta')).height) === 0 &&
-            glifPo === '⌄', glifPo);
+            katPo === 0, glifPo + ' @ ' + katPo + '°');
     /* Falsyfikowalność wiersza siedzi w tej jednej asercji, nie w dwóch wyżej.
        Dwie asercje na stałe wartości przeszłyby także wtedy, gdyby glif był
        przypisany na sztywno w dwóch różnych miejscach kodu i wcale się nie OBRACAŁ
        — a „obraca się" jest dosłowną treścią wiersza C08. Pytamy więc o RÓŻNICĘ. */
-    sprawdz('C08: szewron faktycznie się OBRACA — wartość po tapnięciu ≠ wartość przed',
-            glifPrzed !== glifPo && glifPrzed === '⌃' && glifPo === '⌄',
+    /* Falsyfikowalność wiersza siedzi w tej jednej asercji, nie w dwóch wyżej.
+       Dwie asercje na stałe wartości przeszłyby także wtedy, gdyby kąt był
+       przypisany na sztywno w dwóch miejscach i wcale się nie ZMIENIAŁ — a
+       „obraca się" jest dosłowną treścią wiersza C08. Pytamy więc o RÓŻNICĘ,
+       i to o różnicę KĄTA. Do tego wprost o to, że glif się NIE zmienia:
+       podmiana dwóch glifów jest tym, co D-40.3 zdjęło, i wróciłaby tu jako
+       zieleń, gdyby pytać wyłącznie o „coś się zmieniło". */
+    sprawdz('C08: szewron faktycznie się OBRACA — kąt po tapnięciu ≠ kąt przed',
+            katPrzed !== katPo && katPrzed === 180 && katPo === 0,
+            katPrzed + '° → ' + katPo + '°');
+    sprawdz('C08: obrót, NIE podmiana — glif jest ten sam po obu stronach tapnięcia',
+            glifPrzed === glifPo && glifPo === 'keyboard_arrow_down',
             glifPrzed + ' → ' + glifPo);
 
     /* D12 — zaznaczenia przeżywają przejście krok → krok i powrót */
     MP.tryb.pokazKrok(2);
     MP.tryb.pokazKrok(1);
-    sprawdz('D12: zaznaczenie przeżywa przejście krok → krok i powrót',
-            cz.top.querySelectorAll('.mp-tryb__wiersz[data-odhaczony]').length === 1 &&
-            MP.tryb.zaznaczone().length === 1, MP.tryb.zaznaczone().join(','));
-    MP.tryb.odhacz(MP.tryb.zaznaczone()[0], false);
-    sprawdz('D12: odznaczenie zdejmuje stan z modelu i z wiersza',
-            MP.tryb.zaznaczone().length === 0 &&
-            cz.top.querySelectorAll('.mp-tryb__wiersz[data-odhaczony]').length === 0);
+    /* PRZEBAZOWANE 2026-08-20 — wiersz D12 STRACIŁ PRZEDMIOT. `odhacz()` i zbiór
+       `zaznaczone` usunięto w całości decyzją **D-39.56**: ptaszek nie jest już
+       afordancją, tylko wyświetlaczem stanu liczonego przez parser z pierwszego
+       użycia składnika. Asercje wołały nieistniejące API i rzucały `TypeError`,
+       ucinając blok. Zamiast je skasować, odwracamy je w KONTROLĘ NEGATYWNĄ:
+       pytamy wprost, że API nie ma i że ręcznego odhaczania nie da się wywołać.
+       Skasowanie zostawiłoby ciszę tam, gdzie stoi decyzja. */
+    sprawdz('D12 (kontrola negatywna, D-39.56): API ręcznego odhaczania NIE ISTNIEJE',
+            typeof MP.tryb.zaznaczone !== 'function' && typeof MP.tryb.odhacz !== 'function',
+            'zaznaczone=' + typeof MP.tryb.zaznaczone + ' odhacz=' + typeof MP.tryb.odhacz);
+    sprawdz('D12 (kontrola negatywna, D-39.56): tap w wiersz nie zmienia stanu ptaszka',
+            (function () {
+              var w = cz.top.querySelector('.mp-tryb__wiersz');
+              if (!w) return false;
+              var g = w.querySelector('.mp-tryb__ptaszek-glif');
+              var przed = g ? g.textContent : null;
+              w.click();
+              return !!g && g.textContent === przed;
+            })(), 'ptaszek jest wyświetlaczem, nie przełącznikiem');
 
     /* ---- jednostka W4: tooltip zamiennika (E7–E13) + domiar E4 -----------------
        Krok 1 teriyaki ma DWA markeryW4 (#sojowy, #limonka), więc jeden ekran pokrywa
@@ -2854,8 +2939,12 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     for (var im = 0; im < w2.kroki.length; im++)
       if (/<mark>/.test(w2.kroki[im].tekstHtml)) { krokZMark = im + 1; break; }
     MP.tryb.pokazKrok(krokZMark);
-    var znak = cz.top.querySelector('.mp-tryb__opis mark');
-    var stylZnak = getComputedStyle(znak);
+    /* NAPRAWA 2026-08-20 — ta sama klasa co B14 wyżej: `<mark>` bywa nieobecny
+       (dryf danych fixture'a zabrał markery), a `getComputedStyle(null)` rzuca
+       i urywa blok przed sondą ligatur. Odczyt z dokumentu, nie ze stałego `cz`,
+       i węzeł zastępczy zamiast `null`. */
+    var znak = document.querySelector('.mp-tryb__opis mark');
+    var stylZnak = getComputedStyle(elLubZ(znak));
     /* Klauzula o BARWIE wyjęta stąd w przeb. 25 i przeniesiona do W53/W54. E4 niesie
        zachowanie (`<mark>` inline + `box-decoration-break: clone`), wykończenie jest
        osobnym oraclem i osobnym wierszem — trzymanie obu w jednej asercji znaczyło,
