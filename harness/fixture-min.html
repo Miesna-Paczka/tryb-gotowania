@@ -28,23 +28,35 @@
      ekranowe z Figmą tonęło w szumie typograficznym (etap 0a, inwentarz STAN).
      Adres harnessu po zmianie korzenia:
      http://localhost:8123/git/tech/tryb-gotowania/harness/matrix.html            */
+  /* ŹRÓDŁO FONTÓW: CDN WEBFLOW, nie katalog lokalny (2026-08-20).
+     Do tego dnia stało tu siedem adresów `/local/tech/fonts/…` — ścieżek
+     bezwzględnych z maszyny operatora, których nie ma w repozytorium. Skutek był
+     poważniejszy niż brak wygody: u kogokolwiek innego wszystkie siedem żądań
+     kończyło się `ERR_FILE_NOT_FOUND`, przeglądarka mierzyła krój ZASTĘPCZY,
+     a każda asercja dotykająca typografii mierzyła nie ten produkt — `I4` widział
+     ligatury jako słowa (76–206 px zamiast 8–24), `W37` dostawał 82 px zamiast ≤72,
+     `D11` skok wiersza 31 zamiast 27. Matryca była niemierzalna poza jedną maszyną.
+     Adresy są TE SAME, których używa produkcja: subset ikon bierze je `MP.tryb.fontIkon()`
+     (asercja `B16/D-15.1` pyta o nie wprost), DM Sans — arkusz witryny.
+     Cena: pomiar zależy teraz od sieci. `font-display:block` zostaje, bo bez niego
+     pierwsza klatka mierzyłaby krój zastępczy mimo poprawnego adresu. */
   @font-face{font-family:"DM Sans";font-style:normal;font-weight:400;font-display:block;
-    src:url("/local/tech/fonts/dm-sans/DMSans-Regular.woff2") format("woff2")}
+    src:url("https://cdn.prod.website-files.com/6983617613052dc9fe624303/69e1f74739f63171bd862675_DMSans-Regular.woff2") format("woff2")}
   @font-face{font-family:"DM Sans";font-style:normal;font-weight:500;font-display:block;
-    src:url("/local/tech/fonts/dm-sans/DMSans-Medium.woff2") format("woff2")}
+    src:url("https://cdn.prod.website-files.com/6983617613052dc9fe624303/69e1f747ce96d4c53fd48400_DMSans-Medium.woff2") format("woff2")}
   @font-face{font-family:"DM Sans";font-style:normal;font-weight:600;font-display:block;
-    src:url("/local/tech/fonts/dm-sans/DMSans-SemiBold.woff2") format("woff2")}
+    src:url("https://cdn.prod.website-files.com/6983617613052dc9fe624303/69e1f74972ef94660945696c_DMSans-SemiBold.woff2") format("woff2")}
   @font-face{font-family:"DM Sans";font-style:normal;font-weight:700;font-display:block;
-    src:url("/local/tech/fonts/dm-sans/DMSans-Bold.woff2") format("woff2")}
+    src:url("https://cdn.prod.website-files.com/6983617613052dc9fe624303/69e1f7472f5c6273aad61998_DMSans-Bold.woff2") format("woff2")}
   /* Subset v4 (2026-08-15): 87 ligatur, w tym `keyboard_arrow_up`, `refresh`,
      `restart_alt`, `add_shopping_cart`. Trzy wagi = trzy pliki, bo to subsety
      statyczne, nie oś zmienna — `font-weight` syntetyczny dałby cichy fałsz. */
   @font-face{font-family:"Material Symbols Outlined";font-style:normal;font-weight:300;font-display:block;
-    src:url("/local/tech/fonts/subset-2026-08-15-v4/MaterialSymbolsOutlined-Light.woff2") format("woff2")}
+    src:url("https://cdn.prod.website-files.com/6983617613052dc9fe624303/6a802bb795ffed595d0d4157_MaterialSymbolsOutlined-Light.woff2") format("woff2")}
   @font-face{font-family:"Material Symbols Outlined";font-style:normal;font-weight:400;font-display:block;
-    src:url("/local/tech/fonts/subset-2026-08-15-v4/MaterialSymbolsOutlined-Regular.woff2") format("woff2")}
+    src:url("https://cdn.prod.website-files.com/6983617613052dc9fe624303/6a802bb76772924b821ab866_MaterialSymbolsOutlined-Regular.woff2") format("woff2")}
   @font-face{font-family:"Material Symbols Outlined";font-style:normal;font-weight:500;font-display:block;
-    src:url("/local/tech/fonts/subset-2026-08-15-v4/MaterialSymbolsOutlined-Medium.woff2") format("woff2")}
+    src:url("https://cdn.prod.website-files.com/6983617613052dc9fe624303/6a802bb7e5ca52af75b2f846_MaterialSymbolsOutlined-Medium.woff2") format("woff2")}
   /* Klasa pomocnicza do migracji substytutów Unicode na ligatury (B16/I4).
      `font-feature-settings:'liga'` jest tu jawne, bo bez ligatur nazwa ikony
      wyrenderuje się jako SŁOWO i wygląda to jak brak glifu, a nie jak brak cechy. */
