@@ -1,4 +1,4 @@
-# REJESTR LUK G1–G12 — wsad do rozstrzygnięcia wiersza I6
+# REJESTR LUK — G1–G12, od 2026-08-21 DZIEWIĘĆ (G2/G6/G10 zdjęte, zob. „Przebieg 41")
 
 Powstał w przebiegu 11. **Nie rozstrzyga wiersza I6** — dostarcza rejestr, którego
 rekomendacja (a) z listy decyzji wymaga, i mierzy, jak wygląda pokrycie dzisiaj.
@@ -106,3 +106,41 @@ nim nie stoi: pokrycie jest 12/12, mierzalne jednym `grepem`
 (`grep -c 'NIENARYSOWANE (G'` → 16 wystąpień na 12 luk; G5 i G11 mają po trzy
 miejsca, G7 dwa). Gdy brzmienie zostanie przyjęte, I6 zmienia się na 🟢 jedną
 edycją matrycy — bez dotykania runtime'u i bez przemiaru.
+
+---
+
+## PRZEBIEG 41 (2026-08-21) — lista schodzi z dwunastu do DZIEWIĘCIU
+
+Operator rozstrzygnął trzy luki **produktowo**, a nie implementacyjnie: ich
+przesłanka przestała obowiązywać, więc nie ma czego oznaczać w kodzie. To nie
+jest „luka zamknięta implementacją" — to **luka wycofana**. Rozróżnienie ma
+znaczenie dla wiersza I6: zamknięta luka zostawia znacznik, wycofana go zabiera.
+
+| # | luka (skrót) | co ją zdjęło |
+|---|---|---|
+| G2 | odhaczony = checkbox + `✓`, **bez przekreślenia** | decyzja operatora: wykorzystane składniki mają być odhaczane **oraz przekreślane**. Przesłanka luki („bez przekreślenia") została odwrócona — nie ma otwartego pytania. |
+| G6 | „najpierw pokaż składniki" — cel `7196:10982` | zmiana D8: cel otwiera **tooltip**, a nie pełną listę. Zachowanie jest narysowane, więc luka nie istnieje. |
+| G10 | etykieta „uruchom ponownie" | D-40.4/D-40.5: pole `zatrzymany` usunięte, a etykiety wyjść z dialogu przepisane na intencję (`zakończ i włącz „…"`). Etykieta, o którą pytała luka, nie występuje już w produkcie. |
+
+**Pokrycie po zdjęciu: 9/9**, zmierzone `grepem`, nie z pamięci:
+`grep -c 'NIENARYSOWANE (G' tryb-gotowania.js` → **11 wystąpień na 9 luk**
+(G11 ma trzy miejsca, G7 dwa; G5 zeszło z trzech miejsc do jednego wraz z D-40.3).
+Zero znaczników po G2/G6/G10 zostało w kodzie — sprawdzone tym samym `grepem`.
+
+Wiersz I6 w obu matrycach czyta dziś listę dziewięciu
+(`var LUKI = ['G1','G3','G4','G5','G7','G8','G9','G11','G12']`) i trzyma osobną
+listę `ZDJETE = ['G2','G6','G10']`. Ta druga jest celowo redundantna wobec stanu
+kodu: gdyby ktoś kiedyś zostawił znacznik po zdjętej luce, wiersz „lista
+ZAMKNIĘTA" ma go **nie** zgłosić jako lukę nową — to ślad po starej.
+
+### Poprawka znacznika G5 przy okazji (D-40.3)
+
+Znacznik G5 mówił `dwa glify, nie obrót`. Po D-40.3 to nieprawda: przełącznik
+pełnej listy trzyma jeden statyczny `keyboard_arrow_down` i obraca go CSS-em
+o −180° na `[aria-expanded="true"]`, dokładnie jak szewron pigułki (D-40.1).
+Komentarz przepisany. **Koszt w artefakcie zerowy, zmierzony:**
+`terser -c -m` na źródle sprzed i po edycji daje ten sam skrót
+`cbe3ef8dabdf90f9…`, czyli `tryb-gotowania.min.js` nie wymaga przebudowy.
+(Przy okazji zmierzone: artefakt w repo różni się od świeżego wyjścia tersera
+**wyłącznie brakiem końcowego `\n`** — 51 330 vs 51 331 bajtów, `cmp` zgłasza EOF,
+nie różnicę treści. Build jest odtwarzalny.)

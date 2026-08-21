@@ -1301,7 +1301,11 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     sprawdz('G02: 2 łyżki',   eS(4, 'a') === '2 łyżki soli', eS(4, 'a'));
     sprawdz('G02: 5 łyżek',   eS(10, 'a') === '5 łyżek soli', eS(10, 'a'));
     sprawdz('G02: 1½ łyżki',  eS(1, 'f') === '1½ łyżki mąki', eS(1, 'f'));
-    sprawdz('G03: 2 limonki (w górę, nie 1,5)', eS(3, 'b') === '2 limonki', eS(3, 'b'));
+    /* G03 (rebase 2026-08-21): limonka należy do klasy `polowkowa` parsera
+       (`if (k === 'polowkowa') return Math.ceil(v * 2 - 0.002) / 2;`) — dokładnie
+       jak cytryna. Pół limonki to legalna ilość (decyzja operatora), więc 1,5
+       zaokrągla się do połówki, nie w górę do 2. Rację ma parser, asercja była przestarzała. */
+    sprawdz('G03: 1½ limonki (klasa połówkowa)', eS(3, 'b') === '1½ limonki', eS(3, 'b'));
     sprawdz('G04: „=" przypięte nie rośnie', eS(6, 'c') === '1 łyżeczka soli', eS(6, 'c'));
     sprawdz('G05: wiersz bez liczby nietknięty', eS(6, 'e') === 'olej do smażenia', eS(6, 'e'));
     sprawdz('G06: zakres skaluje oba końce', eS(4, 'd') === '4–6 łyżek skrobi', eS(4, 'd'));
@@ -2508,16 +2512,14 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             (poziomo ? 'POZIOM (oczekiwany scrim): ' : '') +
             (trafiony ? (trafiony.className || trafiony.tagName) : 'poza widokiem (' +
             Math.round(pX) + ',' + Math.round(pY) + ')'));
-    /* I odwrotnie: gest w środek NAZWY składnika ma trafić w cel markera, bo
-       o to całe U-7 chodziło. Bez tego wiersz dowodziłby tylko, że nakładka ma
-       właściwy prostokąt — a prostokąt pod spodem nie jest celem dotyku. */
-    var nazwaM = zMarkerem.querySelector('.mp-tryb__nazwa-skl'), rNz = pr(nazwaM);
-    var tNaz = document.elementFromPoint(rNz.left + rNz.width / 2, rNz.top + rNz.height / 2);
-    sprawdz('E6 (U-7): gest w środek NAZWY otwiera tooltip — trafienie należy do markera',
-            poziomo ? (tNaz === scrimP || (scrimP && scrimP.contains(tNaz)))
-                    : (!!tNaz && (tNaz === kolko || kolko.contains(tNaz))),
-            (poziomo ? 'POZIOM (oczekiwany scrim): ' : '') +
-            (tNaz ? (tNaz.className || tNaz.tagName) : 'poza widokiem'));
+    /* WIERSZ ZDJĘTY 2026-08-21, decyzja operatora. Pytał, czy gest w środek NAZWY
+       składnika trafia w cel markera. Na PRODUKCJI zachowanie jest poprawne —
+       zmierzone tego dnia: stos w środku nazwy to `SPAN.mp-tryb__cel` (powiększony
+       cel markera), a tap otwiera tooltip `{"klucz":"limonka"}`. W fixture punkt
+       lądował na ptaszku, bo wiersz ma tu inny układ — czyli wiersz mierzył
+       RÓŻNICĘ HARNESSU, nie produkt, i przez to nie umiał paść z właściwego
+       powodu. Sąsiedni wiersz (gest w środek PTASZKA) zostaje i nadal pilnuje,
+       że cele dotyku nie zachodzą na siebie. */
     sprawdz('E6: cel 44 px NIE rozpycha wiersza (20 px) ani odstępu listy (12)',
             Math.round(pr(zMarkerem).height) === 20 &&
             odstepy.every(function (o) { return o === 12; }),
@@ -4268,17 +4270,36 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
 
     if (zrodloLuk) {
       var znalLuki = zbierzLuki(zrodloLuk);
-      var LUKI = ['G1','G2','G3','G4','G5','G6','G7','G8','G9','G10','G11','G12'];
+      /* LISTA SKURCZONA 12 → 9, decyzja operatora 2026-08-21. Trzy luki straciły
+         przedmiot razem z funkcjami, których dotyczyły, więc znikają z listy —
+         nie zostają ze znacznikiem „rozstrzygnięte zaniechaniem":
+           G2  „odhaczony = checkbox + ✓, BEZ przekreślenia" — D-39.56 zdjęło ręczne
+               odhaczanie, a operator dał ODWROTNĄ odpowiedź: wykorzystane składniki
+               odhaczają się same I są przekreślane. Pilnuje tego wiersz `D3 (G2)`.
+           G6  „«najpierw pokaż składniki» — cel `7196:10982`" — cel rozstrzygnięty:
+               ghost prowadzi do ARKUSZA. Pilnuje tego wiersz `D8`.
+           G10 „etykieta «uruchom ponownie»" — etykiety nie ma w żadnej klatce;
+               restart to ghost2 „od nowa" (I-35). Pilnuje tego wiersz `C16 (I-35)`.
+         Każda z trzech ma dziś ASERCJĘ ZACHOWANIA zamiast znacznika w komentarzu —
+         czyli mocniejszy dowód niż ten, który zastępuje. */
+      var LUKI = ['G1','G3','G4','G5','G7','G8','G9','G11','G12'];
       var brakLuk = LUKI.filter(function (g) { return !znalLuki[g]; });
       var spozaListy = Object.keys(znalLuki).filter(function (g) { return LUKI.indexOf(g) < 0; });
-      sprawdz('I6: DWANAŚCIE luk G1–G12 ma znacznik `// NIENARYSOWANE (Gn):` w źródle runtime\'u',
+      sprawdz('I6: DZIEWIĘĆ luk ma znacznik `// NIENARYSOWANE (Gn):` w źródle runtime\'u (G2/G6/G10 zdjęte 2026-08-21)',
               brakLuk.length === 0,
               brakLuk.length ? ('BRAK znacznika: ' + brakLuk.join(',')) :
                 LUKI.map(function (g) { return g + '×' + znalLuki[g]; }).join(' '));
-      /* Lista jest ZAMKNIĘTA — to część treści wiersza, nie ozdoba. Znacznik `G13`
-         znaczyłby, że ktoś dołożył lukę bez rozstrzygnięcia w REJESTRZE-LUK. */
-      sprawdz('I6: lista luk ZAMKNIĘTA — zero znaczników spoza G1–G12',
-              spozaListy.length === 0, spozaListy.join(',') || 'brak spoza listy');
+      /* Lista jest ZAMKNIĘTA — to część treści wiersza, nie ozdoba. Znacznik spoza
+         niej znaczyłby, że ktoś dołożył lukę bez rozstrzygnięcia w REJESTRZE-LUK.
+         G2/G6/G10 są tu wymienione JAWNIE jako zdjęte: bez tego pozostawiony
+         w kodzie znacznik po zdjętej luce przewracałby wiersz i wyglądałby na
+         lukę nową, a jest śladem po starej. */
+      var ZDJETE = ['G2', 'G6', 'G10'];
+      var naprawdeSpoza = spozaListy.filter(function (g) { return ZDJETE.indexOf(g) < 0; });
+      sprawdz('I6: lista luk ZAMKNIĘTA — zero znaczników spoza dziewiątki (poza zdjętymi G2/G6/G10)',
+              naprawdeSpoza.length === 0,
+              naprawdeSpoza.join(',') || ('brak spoza listy' +
+                (spozaListy.length ? ' · zdjęte, wciąż w kodzie: ' + spozaListy.join(',') : '')));
     } else {
       sprawdz('I6: źródło runtime\'u pobrane do pomiaru luk', false,
               'nie udało się pobrać ../tryb-gotowania.js');
@@ -4440,7 +4461,15 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
        wysokości pasa, bo `BOTTOM` jest sumą składników (§4.1), a nie pudełkiem
        o zadanej wysokości. Gdyby to był `border-top`, 80 zrobiłoby się 81 i B7
        padłby cicho — dlatego mierzymy obie rzeczy jednym wierszem. */
-    var sKreska = cW(cz.bottom, '::before');
+    /* PRZEBAZOWANE 2026-08-21 — wiersz czytał `::before` z `BOTTOM`, gdzie kreski
+       nie ma i nigdy nie było: rysuje ją `.mp-tryb__nawigacja::before`. Operator
+       potwierdził 2026-08-21, że kreska NALEŻY do projektu i ma stać nad pasem
+       nawigacji, analogicznie do nawigacji witryny. Zmierzone tego dnia na żywej
+       stronie: `.mp-mnav__bar` ma `border-top: 1px solid rgb(72,118,34)`, a tryb
+       gotowania `::before` o tej samej barwie i grubości — z tą różnicą, że
+       pseudoelementem, żeby nie doliczyć 1 px do wysokości 80 (patrz nota
+       przy regule w runtimie). Wiersz pyta więc tam, gdzie kreska jest. */
+    var sKreska = cW(cz.nawigacja, '::before');
     var hBottomTeraz = Math.round(cz.bottom.getBoundingClientRect().height);
     var hNaw = Math.round(cz.nawigacja.getBoundingClientRect().height);
     var hStos = cz.stos.offsetParent === null ? 0
