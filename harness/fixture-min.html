@@ -1219,9 +1219,19 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     var bez = model.kroki.filter(function (k) { return k.czas === 'bez minutnika'; });
     sprawdz('1 krok „bez minutnika"', bez.length === 1, bez.length);
 
-    /* marker `**...**` → <mark> (krok „rozgrzej olej") */
-    var zMarkerem = model.kroki.filter(function (k) { return /<mark>/.test(k.tekstHtml); });
-    sprawdz('1 krok z markerem <mark>', zMarkerem.length === 1, zMarkerem.length);
+    /* PRZEBAZOWANE 2026-08-20 — `**...**` NIE daje już `<mark>`. Dwie decyzje
+       operatora, obie zapisane w parserze przy `wyroznienia()`:
+         **D-39.15** (2026-08-16) — „usuńmy efekt highlightu zupełnie, jest
+         nieutrzymywalny": funkcja przestała zwracać `<mark>`;
+         **D-39.62** (2026-08-17) — `**tekst**` znów coś rysuje: POGRUBIENIE.
+       Wiersz pyta więc o `<strong>`, a osobno — o NIEOBECNOŚĆ `<mark>`. Sama
+       zmiana znacznika przeszłaby także wtedy, gdyby oba wychodziły naraz,
+       a wtedy zakreślenie wróciłoby tylnymi drzwiami razem z jego wykończeniem. */
+    var zWyroznieniem = model.kroki.filter(function (k) { return /<strong>/.test(k.tekstHtml); });
+    sprawdz('1 krok z wyróżnieniem <strong> (D-39.62)', zWyroznieniem.length === 1, zWyroznieniem.length);
+    sprawdz('D-39.15: zakreślenia <mark> NIE MA w żadnym kroku',
+            model.kroki.every(function (k) { return !/<mark>/.test(k.tekstHtml || ''); }),
+            model.kroki.filter(function (k) { return /<mark>/.test(k.tekstHtml || ''); }).length + ' z <mark>');
 
     /* skalowanie porcji + odmiana przez liczebnik (poz. 7) */
     var w2 = MP.przepis.naPorcje(model, 2);
@@ -1670,8 +1680,26 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             'zbiór ' + MP.tryb.zbiorLigatur().join(',') +
             ' · ostrzeżeń ' + (MP.tryb.ostrzezenia ? MP.tryb.ostrzezenia().length : 'brak API'));
     var cz = MP.tryb.czesci();
-    var pxN = function (e, w) { return parseFloat(getComputedStyle(e)[w]); };
-    var pr = function (e) { return e.getBoundingClientRect(); };
+    /* NAPRAWA 2026-08-20 — jedyne miejsce, gdzie doktryna WĘZŁA ZASTĘPCZEGO nie
+       obowiązywała: pomocniki brały węzeł na wiarę i przy `null` rzucały, urywając
+       blok razem z całą resztą ramki. Zastępnik daje zera i puste style, więc brak
+       węzła kończy się PADNIĘCIEM tej asercji, a nie ciszą następnych. */
+    var ZASTEPNIK = document.createElement('div');
+    var pxN = function (e, w) { return parseFloat(getComputedStyle(e || ZASTEPNIK)[w]); };
+    var pr = function (e) { return (e || ZASTEPNIK).getBoundingClientRect(); };
+    /* Kąt obrotu z MACIERZY i BEZ PRZEJŚCIA: `getComputedStyle` w trakcie animacji
+       zwraca wartość interpolowaną, więc odczyt zaraz po tapnięciu dawał 0°. */
+    var kat = function (e) {
+      e = e || ZASTEPNIK;
+      var byl = e.style.transition;
+      e.style.transition = 'none';
+      void e.offsetWidth;
+      var m = getComputedStyle(e).transform.match(/matrix\(([^)]+)\)/);
+      e.style.transition = byl;
+      if (!m) return 0;
+      var t = m[1].split(',');
+      return Math.round(Math.atan2(parseFloat(t[1]), parseFloat(t[0])) * 180 / Math.PI);
+    };
     /* WĘZEŁ ZASTĘPCZY (przeb. 38, wiersz `I13`) — jeden zastępnik dla TRZECH ostatnich
        miejsc z sita dereferencji (`M41`, `M42`, `M43`). Wzór wzięty z bloku S4
        (przeb. 36) i z naprawy `M44` (przeb. 37): zamiast `null` idzie ODCZEPIONY `div`,
@@ -1941,9 +1969,24 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     /* B12 — TOP przewija się w całości pod belką i pod BOTTOM, nic nie jest ucięte */
     MP.tryb.pokazKrok(1);   // krok 1: opis + 7 składników + kryterium = treść dłuższa niż ramka
     var bottomH = Math.round(pr(cz.bottom).height);
-    sprawdz('B12: padding dolny TOP = wysokość BOTTOM',
-            Math.round(pxN(cz.top, 'paddingBottom')) === bottomH,
-            pxN(cz.top, 'paddingBottom') + ' vs ' + bottomH);
+    /* PRZEBAZOWANE 2026-08-20 — wiersz pytał o MECHANIZM (dopełnienie dolne TOP-u
+       równe wysokości BOTTOM-u), a runtime osiąga ten sam skutek inaczej: TOP kończy
+       się tam, gdzie zaczyna się pas. Zmierzone na produkcji w najgorszym przypadku
+       (krok z pełną listą składników, BOTTOM rozdęty minutnikiem do 366 px):
+       ostatni element ma dół na y=462, górna krawędź pasa jest na y=478 — przykrycia
+       ZERO, do końca da się doscrollować. Pytamy więc o SKUTEK, którego reguła
+       składania broni, a nie o jeden ze sposobów jego osiągnięcia. */
+    cz.top.scrollTop = cz.top.scrollHeight;
+    var dzieciTop = [].slice.call(cz.top.children).filter(function (e) {
+      return e.getBoundingClientRect().height > 0;
+    });
+    var ostatniTop = dzieciTop[dzieciTop.length - 1];
+    sprawdz('B12: treść daje się doczytać do końca — pas jej nie przykrywa',
+            !!ostatniTop &&
+            Math.round(pr(ostatniTop).bottom) <= Math.round(pr(cz.bottom).top) &&
+            cz.top.scrollTop + cz.top.clientHeight >= cz.top.scrollHeight - 1,
+            'ostatni element dół ' + Math.round(pr(ostatniTop).bottom) +
+            ' · pas od ' + Math.round(pr(cz.bottom).top));
     cz.top.scrollTop = 0;
     sprawdz('B12: pierwszy element startuje pod belką',
             Math.round(pr(cz.top.firstChild).top - pr(korzen).top) >= 72,
@@ -1965,16 +2008,39 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             adnotacje.every(function (a) { return tekstOverlaya.indexOf(a) < 0; }),
             adnotacje.filter(function (a) { return tekstOverlaya.indexOf(a) >= 0; }).join(','));
 
-    /* B14 — atrapy `marker — cel koloru` nie renderują się jako prostokąty */
-    MP.tryb.pokazKrok(4);   // „rozgrzej olej" — jedyny krok teriyaki z markerem
-    var marki = cz.top.querySelectorAll('mark');
-    sprawdz('B14: marker to <mark>, nie prostokąt', marki.length === 1, marki.length);
-    sprawdz('B14: <mark> ma box-decoration-break: clone',
-            /clone/.test(getComputedStyle(marki[0]).boxDecorationBreak ||
-                         getComputedStyle(marki[0]).webkitBoxDecorationBreak || ''),
-            getComputedStyle(marki[0]).webkitBoxDecorationBreak);
-    sprawdz('B14: marker łamie się z wierszem (inline, nie blok)',
-            getComputedStyle(marki[0]).display === 'inline', getComputedStyle(marki[0]).display);
+    /* B14 — atrapy `marker — cel koloru` nie renderują się jako prostokąty.
+       PRZEBAZOWANE 2026-08-20 na `<strong>` (D-39.62). Wiersz pilnuje tego samego
+       co przedtem: że wyróżnienie autora jest ZNACZNIKIEM TEKSTU, a nie prostokątem
+       przeniesionym z klatki. Zmienił się znacznik, nie pytanie. */
+    MP.tryb.pokazKrok(4);   // „rozgrzej olej" — jedyny krok teriyaki z wyróżnieniem
+    /* D3 (G2, nowa odpowiedź operatora 2026-08-20): „wykorzystane składniki mają być
+       automatycznie odhaczane oraz przekreślane". Mierzone TUTAJ, bo blok już stoi
+       na kroku 4, gdzie parser zdążył coś zużyć. Dawne `G2` brzmiało odwrotnie
+       („odhaczony BEZ przekreślenia") — luka nie zniknęła przez zaniechanie,
+       dostała przeciwną odpowiedź. */
+    var wZuzyty = cz.top.querySelector('.mp-tryb__wiersz[data-stan="zuzyty"]');
+    sprawdz('D3 (G2, nowa odpowiedź): składnik WYKORZYSTANY jest odhaczony i PRZEKREŚLONY',
+            !!wZuzyty &&
+            wZuzyty.querySelector('.mp-tryb__ptaszek-glif').textContent.trim() === 'check_box' &&
+            getComputedStyle(wZuzyty.querySelector('.mp-tryb__nazwa-skl'))
+              .textDecorationLine.indexOf('line-through') >= 0,
+            wZuzyty ? getComputedStyle(wZuzyty.querySelector('.mp-tryb__nazwa-skl')).textDecorationLine
+                    : '(brak wiersza `zuzyty` na kroku 4)');
+    var marki = cz.top.querySelectorAll('.mp-tryb__opis strong');
+    sprawdz('B14: wyróżnienie to <strong>, nie prostokąt', marki.length === 1, marki.length);
+    sprawdz('B14 (D-39.15): w opisie nie ma ANI JEDNEGO <mark>',
+            cz.top.querySelectorAll('mark').length === 0,
+            cz.top.querySelectorAll('mark').length);
+    var stylMarkera = marki[0] ? getComputedStyle(marki[0]) : null;
+    sprawdz('B14: wyróżnienie jest pogrubione (waga ≥ 600)',
+            !!stylMarkera && parseInt(stylMarkera.fontWeight, 10) >= 600,
+            stylMarkera ? stylMarkera.fontWeight : '(brak wyróżnienia)');
+    sprawdz('B14 (D-39.15): wyróżnienie NIE MA własnego tła',
+            !!stylMarkera && /rgba\(0, 0, 0, 0\)|transparent/.test(stylMarkera.backgroundColor),
+            stylMarkera ? stylMarkera.backgroundColor : '(brak wyróżnienia)');
+    sprawdz('B14: wyróżnienie łamie się z wierszem (inline, nie blok)',
+            !!stylMarkera && stylMarkera.display === 'inline',
+            stylMarkera ? stylMarkera.display : '(brak wyróżnienia)');
 
     /* C01 — trzy stany czasu na trzech REALNYCH krokach teriyaki, nie na
        spreparowanych: krok 1 „ok. 5 min" (czas), krok 4 „bez minutnika",
@@ -2021,7 +2087,20 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             getComputedStyle(stos).display === 'none', getComputedStyle(stos).display);
 
     /* jeden minutnik, zwinięty — 32:14, czyli powyżej 60 s */
-    var m1 = mn.uruchom({ nazwa: 'duś ragù', sekundy: 1934 });
+    /* PRZEBAZOWANE 2026-08-20 — od 2026-08-19 minutnik startuje ROZWINIĘTY
+       (`rozwinieta: opcje.rozwinieta !== false`), bo obie klatki kroków w projekcie
+       rysują kafel rozwinięty. Ten blok mierzy pigułkę ZWINIĘTĄ, więc prosi o nią
+       WPROST — runtime nadal to przyjmuje. Numery nie ruszają się ani o piksel;
+       zmieniło się to, czego trzeba zażądać, żeby je zobaczyć.
+       Sam domyślny stan dostaje własną asercję niżej, żeby zmiana defaultu nie
+       przeszła bokiem w miejscu, które go już nie używa. */
+    var m1 = mn.uruchom({ nazwa: 'duś ragù', sekundy: 1934, rozwinieta: false });
+    var mDomyslny = mn.uruchom({ nazwa: 'domyślny', sekundy: 300 });
+    sprawdz('C03 (domyślny stan, 2026-08-19): minutnik bez opcji startuje ROZWINIĘTY',
+            mDomyslny.rozwinieta === true &&
+            mDomyslny.el.pigulka.getAttribute('data-forma') !== 'zwinieta',
+            mDomyslny.rozwinieta + ' / ' + mDomyslny.el.pigulka.getAttribute('data-forma'));
+    mn.usun(mDomyslny);
     sprawdz('C03: pigułka zwinięta = 40 px', hEl(m1.el.pigulka) === 40, hEl(m1.el.pigulka));
     sprawdz('B7: jedna pigułka zwinięta → BOTTOM = 132 (40 + 12 + 80)', hBottom() === 132, hBottom());
     sprawdz('B8: kafel przy marginesie 16, szerokość = ramka − 32',
@@ -2038,7 +2117,13 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             getComputedStyle(m1.el.kropka).animationName);
     sprawdz('C01/W2: odliczanie w formacie M:SS', m1.el.odliczanie.textContent === '32:14',
             m1.el.odliczanie.textContent);
-    sprawdz('C07: pigułka zwinięta nie ma szewronu', m1.el.szewron.hidden === true);
+    /* PRZEBAZOWANE 2026-08-20 — **R10 ZDJĘTE** decyzją operatora (D-40.1). Szewron
+       jest w KAŻDEJ formie, bo inaczej pozycji „w dół" nikt by nie zobaczył, a
+       pigułka zwinięta nie miałaby oznaki, że da się ją rozwinąć. Wiersz pyta więc
+       o to, co teraz niesie: obecność i KIERUNEK. */
+    sprawdz('C07 (D-40.1): pigułka zwinięta MA szewron, obrócony w dół',
+            m1.el.szewron.hidden === false && kat(m1.el.szewron) === 0,
+            m1.el.szewron.hidden + ' / ' + kat(m1.el.szewron) + '°');
     /* Oś kropki mierzymy WZGLĘDEM wiersza, nie w bezwzględnych współrzędnych okna:
        BOTTOM rośnie razem z kaflami, więc bezwzględne y tej samej kropki zmienia się
        przy każdym dołożeniu minutnika i porównanie „przed/po" mierzyłoby ruch STOSU,
@@ -2047,7 +2132,7 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     var srodekMaly = osKropki(m1);
 
     /* drugi minutnik — C14: dokłada się do stosu, nie zastępuje pierwszego */
-    var m2 = mn.uruchom({ nazwa: 'gotuj makaron', sekundy: 84 });   // 1:24
+    var m2 = mn.uruchom({ nazwa: 'gotuj makaron', sekundy: 84, rozwinieta: false });   // 1:24
     sprawdz('C14: drugi minutnik układa się w `stos`, pierwszy zostaje',
             mn.lista().length === 2 && stos.children.length === 2 &&
             stos.children[0] === m1.el.pigulka && stos.children[1] === m2.el.pigulka,
@@ -2061,7 +2146,7 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
        dialog S4, więc ten test negatywny musi po sobie posprzątać: dialog jest teraz
        częścią zachowania, a nie skutkiem ubocznym. Bez tego scrim S4 dożywał do
        sekcji E i zapalał E11 („tooltip nie stawia scrima") w każdej ramce. */
-    var m3 = mn.uruchom({ nazwa: 'trzeci', sekundy: 300 });
+    var m3 = mn.uruchom({ nazwa: 'trzeci', sekundy: 300, rozwinieta: false });
     sprawdz('H7: trzeci minutnik nie startuje', m3 === null && mn.lista().length === 2,
             mn.lista().length);
     sprawdz('H7: limit zadeklarowany, nie zaszyty w warunku', mn.limit === 2, mn.limit);
@@ -2070,8 +2155,10 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     /* C04 — rozwinięta krótka: 126 = 16 + 34 + 12 + 48 + 16, bez podpowiedzi */
     mn.przelacz(m2);
     sprawdz('C04: pigułka rozwinięta krótka = 126', hEl(m2.el.pigulka) === 126, hEl(m2.el.pigulka));
-    sprawdz('C07: rozwinięta KRÓTKA nie ma szewronu (R10 — nie zależy od liczby minutników)',
-            m2.el.szewron.hidden === true && mn.lista().length === 2);
+    sprawdz('C07 (D-40.1): rozwinięta KRÓTKA ma szewron obrócony w górę',
+            m2.el.szewron.hidden === false && Math.abs(kat(m2.el.szewron)) === 180 &&
+            mn.lista().length === 2,
+            m2.el.szewron.hidden + ' / ' + kat(m2.el.szewron) + '° / ' + mn.lista().length);
     sprawdz('B9: wnętrze pigułki — padding 16',
             pxN(m2.el.pigulka, 'paddingTop') === 16 && pxN(m2.el.pigulka, 'paddingLeft') === 16 &&
             pxN(m2.el.pigulka, 'paddingBottom') === 16,
@@ -2110,8 +2197,11 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             ' (rozwinięta: ' + sOdl.fontSize + ')');
     sprawdz('B7: zwinięta + rozwinięta krótka → BOTTOM = 266 (40+8+126+12+80)',
             hBottom() === 266, hBottom());
-    sprawdz('C06: bez szewronu czas dochodzi do krawędzi treści',
-            Math.round(pr(m2.el.odliczanie).right) === Math.round(pr(m2.el.wiersz).right),
+    /* PRZEBAZOWANE 2026-08-20 — po zdjęciu R10 szewron stoi w każdej formie, więc
+       R9 („czas oddaje szewronowi 28 px") obowiązuje ZAWSZE. Wiersz mierzył wyjątek,
+       którego już nie ma; mierzy teraz regułę. */
+    sprawdz('C06 (D-40.1): czas oddaje szewronowi 28 px w każdej formie (R9)',
+            Math.round(pr(m2.el.wiersz).right - pr(m2.el.odliczanie).right) === 28,
             Math.round(pr(m2.el.wiersz).right - pr(m2.el.odliczanie).right));
 
     /* C05 — rozwinięta pełna: 198 + wysokość podpowiedzi. Podpowiedź zawija się
@@ -2241,8 +2331,13 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             getComputedStyle(m4.el.pigulka).outlineWidth + ' @ dpr ' + devicePixelRatio);
     MP_TEST.przewin(39);                    // `przewin` jest PRZYROSTOWE: 45 − 39 = 6 s
     mn.tyk();
-    sprawdz('C11 (wsparcie): ostatnie 10 s → puls 2×/s, ten sam kolor',
-            getComputedStyle(m4.el.kropka).animationDuration === '0.5s' &&
+    /* PRZEBAZOWANE 2026-08-20 — częstotliwość pulsu w ostatnich 10 s to 1×/s,
+       potwierdzone przez operatora jako ZMIANA CELOWA, nie dryf. Wiersz pilnuje
+       tego, co niosi: że puls w ogóle jest i że barwa się nie zmienia względem
+       wcześniejszego progu — bo zmiana barwy przy przyspieszeniu byłaby dwoma
+       sygnałami naraz i użytkownik nie wiedziałby, o którym mowa. */
+    sprawdz('C11 (wsparcie): ostatnie 10 s → puls 1×/s, ten sam kolor',
+            getComputedStyle(m4.el.kropka).animationDuration === '1s' &&
             getComputedStyle(m4.el.kropka).backgroundColor === 'rgb(207, 65, 26)',
             getComputedStyle(m4.el.kropka).animationDuration + '/' +
             getComputedStyle(m4.el.kropka).backgroundColor);
@@ -2255,14 +2350,23 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             m4.el.odliczanie.textContent + '/' + getComputedStyle(m4.el.kropka).animationName);
     sprawdz('C12 (wsparcie): 0:00 nie schodzi poniżej zera', m4.pozostalo === 0, m4.pozostalo);
 
-    /* C16 — „uruchom ponownie" po 0:00 restartuje minutnik (I-22 / G10) */
-    mn.przelacz(m4);                        // rozwiń, żeby primary był dostępny
-    sprawdz('C16: po 0:00 primary jest afordancją restartu',
-            m4.el.primary.hidden === false && /ponownie/.test(m4.el.primary.textContent),
+    /* PRZEBAZOWANE 2026-08-20 — **I-33/I-34/I-35**, odczyt Figmy `7211:10925`
+       i `7240:10918`. Etykiety „zatrzymaj / uruchom ponownie / dodaj minutę" nie
+       istnieją w żadnej klatce; primary NIE steruje czasem, tylko potwierdza kryterium
+       i ZAMYKA minutnik. Restart nazywa się „od nowa" i jest DRUGIM GHOSTEM,
+       widocznym wyłącznie na 0:00. Wiersz C16 dostaje więc obie połowy: że primary
+       zamyka, i że restart robi ghost2. */
+    mn.przelacz(m4);                        // rozwiń, żeby przyciski były dostępne
+    sprawdz('C16 (I-33): po 0:00 primary potwierdza kryterium („✓ … gotowy"), nie restart',
+            m4.el.primary.hidden === false && /gotowy$/.test(m4.el.primary.textContent) &&
+            !/ponownie|zatrzymaj/.test(m4.el.primary.textContent),
             m4.el.primary.textContent);
-    m4.el.primary.click();
+    sprawdz('C16 (I-35): restart to ghost2 „od nowa", widoczny na 0:00',
+            m4.el.ghost2.hidden === false && m4.el.ghost2.textContent === 'od nowa',
+            m4.el.ghost2.hidden + ' / ' + m4.el.ghost2.textContent);
+    m4.el.ghost2.click();
     mn.tyk();
-    sprawdz('C16: restart wraca do pełnego czasu i stanu „w toku"',
+    sprawdz('C16 (I-35): „od nowa" wraca do pełnego czasu i stanu „w toku"',
             m4.pozostalo === 1934 && m4.stan === 'w-toku' && m4.el.odliczanie.textContent === '32:14',
             m4.pozostalo + '/' + m4.stan);
     mn.przelacz(m4);
@@ -2333,35 +2437,46 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     sprawdz('D4: `byk` nieobecny w wierszach trybu gotowania',
             korzen.querySelectorAll('[class*="byk"],[data-byk]').length === 0 &&
             getComputedStyle(cz.top.querySelector('.mp-tryb__skladniki')).listStyleType === 'none');
-    sprawdz('D3: checkbox jest afordancją wiersza, nie ozdobą',
-            !!bezMarkera.querySelector('.mp-tryb__ptaszek') &&
-            bezMarkera.querySelector('.mp-tryb__ptaszek').getAttribute('role') === 'checkbox' &&
-            bezMarkera.querySelector('.mp-tryb__ptaszek').getAttribute('aria-checked') === 'false');
+    /* PRZEBAZOWANE 2026-08-20 — **D-39.56** zdjęło `odhacz()` i zbiór `zaznaczone`
+       W CAŁOŚCI: ptaszek nie jest już afordancją, tylko WYŚWIETLACZEM stanu, który
+       parser liczy z pierwszego użycia składnika. Potwierdzone przez operatora
+       2026-08-20: „wykorzystane składniki mają być automatycznie odhaczane oraz
+       przekreślane". Wiersz D3 pyta więc o jedno i drugie — i o to, że tapnięcie
+       NIC nie zmienia, bo powrót klikalności byłby cichym cofnięciem decyzji.
+       `G2` („odhaczony BEZ przekreślenia") nie zniknęło przez zaniechanie —
+       dostało odwrotną odpowiedź, więc wiersz zostaje z nową treścią.
+       Celu dotyku 44×44 nie ma i mieć nie powinien: nie ma czego dotykać. */
     var ptaszek = bezMarkera.querySelector('.mp-tryb__ptaszek');
+    sprawdz('D3 (D-39.56): ptaszek jest wyświetlaczem, nie kontrolką — brak roli i aria-checked',
+            !!ptaszek && !ptaszek.getAttribute('role') && !ptaszek.getAttribute('aria-checked') &&
+            ptaszek.getAttribute('aria-hidden') === 'true',
+            (ptaszek ? ptaszek.getAttribute('role') + '/' + ptaszek.getAttribute('aria-hidden') : 'brak'));
+    var glifPrzedTapem = ptaszek.querySelector('.mp-tryb__ptaszek-glif').textContent;
     ptaszek.click();
-    sprawdz('D3: odhaczony w bieżącym kroku → ✓ i wypełnienie, BEZ przekreślenia (G2)',
-            bezMarkera.hasAttribute('data-odhaczony') &&
-            ptaszek.getAttribute('aria-checked') === 'true' &&
-            getComputedStyle(bezMarkera.querySelector('.mp-tryb__nazwa-skl')).textDecorationLine
-              .indexOf('line-through') < 0,
-            getComputedStyle(bezMarkera.querySelector('.mp-tryb__nazwa-skl')).textDecorationLine);
-    sprawdz('E6: cel dotyku checkboxa = 44×44 przy znaczniku 16 px',
-            Math.round(pr(ptaszek.querySelector('.mp-tryb__cel')).width) === 44 &&
-            Math.round(pr(ptaszek.querySelector('.mp-tryb__cel')).height) === 44 &&
-            Math.round(pr(ptaszek).height) === 16,
-            Math.round(pr(ptaszek.querySelector('.mp-tryb__cel')).width));
+    sprawdz('D3 (D-39.56): tap w ptaszek NIE zmienia stanu wiersza',
+            ptaszek.querySelector('.mp-tryb__ptaszek-glif').textContent === glifPrzedTapem &&
+            !bezMarkera.hasAttribute('data-odhaczony'),
+            glifPrzedTapem + ' → ' + ptaszek.querySelector('.mp-tryb__ptaszek-glif').textContent);
+    /* Asercja o stanie `zużyty` stoi w bloku B14 niżej, a nie tutaj: `zużyty` nadaje
+       POSTĘP PRZEPISU, więc na kroku 1 nie ma go z definicji, a przełączanie kroku
+       w tym miejscu przesuwałoby stan kolejnym asercjom (zmierzone: kosztowało 8). */
     /* Bez pomocnika `barwa`: jest zadeklarowany `var`-em 1200 linii NIŻEJ, w tym samym
        bloku, więc tutaj jest wyhoistowanym `undefined`, a wywołanie wysadziłoby CAŁY
        blok pomiarowy — dokładnie ta awaria co `SyntaxError` z przeb. 22, tylko cicha.
        Porównanie po znormalizowanym napisie `rgb(...)` jest tu równie mocne. */
     var sPtOdh = getComputedStyle(ptaszek);
     var bezSpacji = function (s) { return String(s).replace(/\s+/g, ''); };
-    sprawdz('W41: ptaszek — SemiBold 600, 10 px / 15, biel PEŁNA #FFFFFF',
-            sPtOdh.fontWeight === '600' && sPtOdh.fontSize === '10px' &&
-            parseFloat(sPtOdh.lineHeight) === 15 &&
-            bezSpacji(sPtOdh.color) === 'rgb(255,255,255)',
-            sPtOdh.fontWeight + ' ' + sPtOdh.fontSize + '/' + sPtOdh.lineHeight +
-            ' ' + sPtOdh.color);
+    /* PRZEBAZOWANE 2026-08-20 — ptaszek nie jest już własnym znaczkiem w pudełku
+       z obrysem, tylko LIGATURĄ `check_box` / `check_box_outline_blank` (D-39.32),
+       rysowaną atramentem na tle wiersza. Pytanie o SemiBold 600 / 10 px / biel
+       opisywało poprzedni rysunek. Mierzymy to, co niesie dzisiejszy: że glif jest
+       z rodziny ikon i ma barwę atramentu, a nie białą na białym. */
+    var glifPt = ptaszek.querySelector('.mp-tryb__ptaszek-glif');
+    var sGlifPt = getComputedStyle(glifPt);
+    sprawdz('W41 (D-39.32): ptaszek to ligatura Material w atramencie, nie znaczek w pudełku',
+            /Material Symbols Outlined/i.test(sGlifPt.fontFamily) &&
+            bezSpacji(sGlifPt.color) === 'rgb(62,43,34)',
+            sGlifPt.fontFamily.slice(0, 30) + ' ' + sGlifPt.color);
 
     /* E5 — marker w liście: kropkowane podkreślenie nazwy + kółko `i` zaraz za nią */
     var kolko = zMarkerem.querySelector('.mp-tryb__marker');
@@ -2681,45 +2796,76 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             korzen.querySelectorAll('[class*="scroll-rail"],[class*="thumb"]').length === 0,
             'TOP ' + getComputedStyle(cz.top).overflowY + ' · reszta ' +
             (reszta ? reszta.scrollHeight + '/' + reszta.clientHeight : '?'));
-    sprawdz('D12: zaznaczenie przeżyło ROZWINIĘCIE listy (stan wiersza, nie DOM-u)',
-            cz.top.querySelectorAll('.mp-tryb__wiersz[data-odhaczony]').length === 1 &&
-            MP.tryb.zaznaczone().length === 1, MP.tryb.zaznaczone().join(','));
+    /* PRZEBAZOWANE 2026-08-20 (D-39.56) — jak w powierzchni źródłowej: wiersz
+       stracił przedmiot, więc zamiast kasować odwracamy go w kontrolę negatywną.
+       Stan wiersza przeżywa rozwinięcie z INNEGO powodu — liczy go parser
+       z postępu przepisu, a nie zapamiętane tapnięcie. */
+    sprawdz('D12 (D-39.56): stan wiersza przeżywa ROZWINIĘCIE listy — bo liczy go parser, nie tap',
+            typeof MP.tryb.zaznaczone !== 'function' &&
+            cz.top.querySelectorAll('.mp-tryb__wiersz[data-odhaczony]').length === 0,
+            'zaznaczone=' + typeof MP.tryb.zaznaczone + ' · wierszy `zuzyty`: ' +
+            cz.top.querySelectorAll('.mp-tryb__wiersz[data-stan="zuzyty"]').length);
     var wiecej2 = cz.top.querySelector('.mp-tryb__ramka-skladnikow .mp-tryb__wiecej');
     /* C08 — obrót szewronu NA LIŚCIE SKŁADNIKÓW (I-15 `down` = rozwiń, I-16 `up` = zwiń).
        Wiersz C08 stał zielony od przeb. 15 bez własnej asercji: mierzyły go te dwie
        linijki pod etykietą D9, więc żaden przegląd pokrycia nie mógł go zobaczyć.
        Nie jest to ten sam szewron co C07 — tamten należy do PIGUŁKI minutnika. */
-    var glifPrzed = wiecej2 && wiecej2.querySelector('.mp-tryb__wiecej-glif').textContent;
-    sprawdz('D9 · C08: lista ROZWINIĘTA — szewron pokazuje `⌃` (I-16: `up` = zwiń)',
-            !!wiecej2 && glifPrzed === '⌃', glifPrzed);
+    /* PRZEBAZOWANE 2026-08-20 (D-39.32 + D-40.3) — wiersz mierzył PODMIANĘ ZNAKU
+       `⌃`/`⌄`, a nazywa się „obrót szewronu". Od D-39.32 znaki Unicode zastąpiły
+       ligatury, od D-40.3 glif jest STAŁY, a kierunek robi `transform`.
+       Stan WYMUSZONY, nie odziedziczony, i DWA wywołania `lista(true)`: tuż po
+       renderze kroku pierwsze trafia w uchwyt-sierotę i tylko przerysowuje krok. */
+    var glifSzewronu = function (e) {
+      return e ? e.querySelector('.mp-tryb__wiecej-glif').textContent.trim() : '(brak)';
+    };
+    var katSzewronu = function (e) {
+      return e ? Math.abs(kat(e.querySelector('.mp-tryb__wiecej-glif'))) : null;
+    };
+    MP.tryb.pokazKrok(1);
+    MP.tryb.lista(true);
+    if (MP.tryb.listaOtwarta() !== true) { MP.tryb.lista(true); }
+    wiecej2 = document.querySelector('.mp-tryb__ramka-skladnikow .mp-tryb__wiecej');
+    var glifPrzed = glifSzewronu(wiecej2), katPrzed = katSzewronu(wiecej2);
+    sprawdz('D9 · C08: lista ROZWINIĘTA — szewron obrócony w GÓRĘ (I-16: `up` = zwiń)',
+            !!wiecej2 && glifPrzed === 'keyboard_arrow_down' && katPrzed === 180,
+            glifPrzed + ' @ ' + katPrzed + '°');
     wiecej2.click();
-    var glifPo = cz.top.querySelector('.mp-tryb__wiecej-glif').textContent;
+    var wiecejPo = document.querySelector('.mp-tryb__ramka-skladnikow .mp-tryb__wiecej');
+    var glifPo = glifSzewronu(wiecejPo), katPo = katSzewronu(wiecejPo);
     /* PRZEBAZOWANE: po zwinięciu nagłówki sekcji ZOSTAJĄ w drzewie — kontener jest
        tylko schowany wysokością zero. Pytamy więc o to, czego naprawdę chcemy:
        że nie są widoczne. `offsetParent === null` nie zadziała (kontener nie jest
        `display:none`), więc mierzymy wysokość kontenera. */
-    sprawdz('D9 · C08: po tapnięciu lista jest ZWINIĘTA, szewron na `⌄`',
+    sprawdz('D9 · C08: po tapnięciu lista jest ZWINIĘTA, szewron w DÓŁ',
             MP.tryb.listaOtwarta() === false &&
             Math.round(pr(cz.top.querySelector('.mp-tryb__reszta')).height) === 0 &&
-            glifPo === '⌄', glifPo);
+            katPo === 0, glifPo + ' @ ' + katPo + '°');
     /* Falsyfikowalność wiersza siedzi w tej jednej asercji, nie w dwóch wyżej.
        Dwie asercje na stałe wartości przeszłyby także wtedy, gdyby glif był
        przypisany na sztywno w dwóch różnych miejscach kodu i wcale się nie OBRACAŁ
        — a „obraca się" jest dosłowną treścią wiersza C08. Pytamy więc o RÓŻNICĘ. */
-    sprawdz('C08: szewron faktycznie się OBRACA — wartość po tapnięciu ≠ wartość przed',
-            glifPrzed !== glifPo && glifPrzed === '⌃' && glifPo === '⌄',
+    sprawdz('C08: szewron faktycznie się OBRACA — kąt po tapnięciu ≠ kąt przed',
+            katPrzed !== katPo && katPrzed === 180 && katPo === 0,
+            katPrzed + '° → ' + katPo + '°');
+    sprawdz('C08: obrót, NIE podmiana — glif jest ten sam po obu stronach tapnięcia',
+            glifPrzed === glifPo && glifPo === 'keyboard_arrow_down',
             glifPrzed + ' → ' + glifPo);
 
     /* D12 — zaznaczenia przeżywają przejście krok → krok i powrót */
     MP.tryb.pokazKrok(2);
     MP.tryb.pokazKrok(1);
-    sprawdz('D12: zaznaczenie przeżywa przejście krok → krok i powrót',
-            cz.top.querySelectorAll('.mp-tryb__wiersz[data-odhaczony]').length === 1 &&
-            MP.tryb.zaznaczone().length === 1, MP.tryb.zaznaczone().join(','));
-    MP.tryb.odhacz(MP.tryb.zaznaczone()[0], false);
-    sprawdz('D12: odznaczenie zdejmuje stan z modelu i z wiersza',
-            MP.tryb.zaznaczone().length === 0 &&
-            cz.top.querySelectorAll('.mp-tryb__wiersz[data-odhaczony]').length === 0);
+    /* PRZEBAZOWANE 2026-08-20 (D-39.56) — ręcznego odhaczania nie ma, więc wiersz
+       pyta o to, co przeżywa przejście krok → krok NAPRAWDĘ: stan `zużyty` liczony
+       przez parser. Kontrola negatywna na nieistniejące API zostaje obok, żeby
+       powrót klikalności nie przeszedł po cichu. */
+    sprawdz('D12 (D-39.56): stan `zużyty` przeżywa przejście krok → krok i powrót',
+            cz.top.querySelectorAll('.mp-tryb__wiersz[data-odhaczony]').length === 0 &&
+            typeof MP.tryb.zaznaczone !== 'function',
+            'wierszy `zuzyty`: ' + cz.top.querySelectorAll('.mp-tryb__wiersz[data-stan="zuzyty"]').length);
+    sprawdz('D12 (kontrola negatywna, D-39.56): API ręcznego odhaczania NIE ISTNIEJE',
+            typeof MP.tryb.odhacz !== 'function' &&
+            typeof MP.tryb.zaznaczone !== 'function',
+            'odhacz=' + typeof MP.tryb.odhacz + ' zaznaczone=' + typeof MP.tryb.zaznaczone);
 
     /* ---- jednostka W4: tooltip zamiennika (E7–E13) + domiar E4 -----------------
        Krok 1 teriyaki ma DWA markeryW4 (#sojowy, #limonka), więc jeden ekran pokrywa
@@ -2928,31 +3074,36 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
        Krok „rozgrzej olej" ma `**od razu zasyczy**` w treści. */
     var krokZMark = 0;
     for (var im = 0; im < w2.kroki.length; im++)
-      if (/<mark>/.test(w2.kroki[im].tekstHtml)) { krokZMark = im + 1; break; }
+      if (/<strong>/.test(w2.kroki[im].tekstHtml)) { krokZMark = im + 1; break; }
     MP.tryb.pokazKrok(krokZMark);
-    var znak = cz.top.querySelector('.mp-tryb__opis mark');
-    var stylZnak = getComputedStyle(znak);
+    var znak = document.querySelector('.mp-tryb__opis strong');
+    var stylZnak = getComputedStyle(elLubZ(znak));
     /* Klauzula o BARWIE wyjęta stąd w przeb. 25 i przeniesiona do W53/W54. E4 niesie
        zachowanie (`<mark>` inline + `box-decoration-break: clone`), wykończenie jest
        osobnym oraclem i osobnym wierszem — trzymanie obu w jednej asercji znaczyło,
        że poprawka barwy przewraca wiersz o łamaniu. */
-    sprawdz('E4: zakreślenie w opisie to `<mark>` inline z `box-decoration-break: clone`',
-            !!znak &&
-            (stylZnak.boxDecorationBreak || stylZnak.webkitBoxDecorationBreak) === 'clone' &&
+    sprawdz('E4: wyróżnienie w opisie jest inline i mieści się w kolumnie',
+            !!znak && stylZnak.display === 'inline' &&
             Math.round(pr(znak).width) < window.innerWidth - 32,
-            (stylZnak.boxDecorationBreak || stylZnak.webkitBoxDecorationBreak) + ' · ' +
-            Math.round(pr(znak).width));
+            stylZnak.display + ' · ' + Math.round(pr(znak).width));
     /* W53/W54 — wykończenie zakreślenia. Klatka SPEC `7229:10893`: prostokąt
        `marker — cel koloru` (`7231:10894`) = `primary text` #3E2B22, a zakreślona
        fraza jest związana z `white full bg` #FFFFFF. Zakreślenie jest CIEMNE
        z wybitym tekstem; runtime rysował dokładnie odwrotność.
        Dwa wiersze, nie jeden: samo tło bez wybicia tekstu daje ciemne na ciemnym,
        czyli stan gorszy od stanu przed poprawką. Kontrast jest tu własnością PARY. */
-    sprawdz('W53: tło zakreślenia — `primary text` #3E2B22, nie `beige-1`',
-            String(stylZnak.backgroundColor).replace(/\s+/g, '') === 'rgb(62,43,34)',
+    /* PRZEBAZOWANE 2026-08-20 — W53/W54 opisywały WYKOŃCZENIE ZAKREŚLENIA: ciemne
+       tło `primary text` i tekst wybity bielą. Zakreślenia nie ma od **D-39.15**,
+       a od **D-39.62** wyróżnienie rysuje się pogrubieniem. Oba wiersze zamiast
+       zniknąć stają się KONTROLĄ NEGATYWNĄ tej decyzji: pytają, czy wykończenie
+       faktycznie nie wróciło. Skasowanie zostawiłoby ciszę w miejscu, gdzie stoi
+       decyzja — a to jest dokładnie ta cisza, przez którą wykończenie mogłoby
+       wrócić po cichu razem z pierwszą „drobną poprawką" w arkuszu. */
+    sprawdz('W53 (kontrola negatywna, D-39.15): wyróżnienie NIE MA ciemnego tła',
+            /rgba\(0, 0, 0, 0\)|transparent/.test(String(stylZnak.backgroundColor)),
             stylZnak.backgroundColor);
-    sprawdz('W54: tekst zakreślenia wybity bielą PEŁNĄ #FFFFFF (`white full bg`)',
-            String(stylZnak.color).replace(/\s+/g, '') === 'rgb(255,255,255)',
+    sprawdz('W54 (kontrola negatywna, D-39.15): tekst wyróżnienia NIE jest wybity bielą',
+            String(stylZnak.color).replace(/\s+/g, '') !== 'rgb(255,255,255)',
             stylZnak.color);
     /* Łamanie z wierszem: fragment na dwie linie. W payloadzie zakreślenie mieści się
        w jednym wierszu na części szerokości, więc regułę mierzymy na kontrolce
@@ -2963,11 +3114,11 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     kontrolaMark.id = 'e4-kontrola';
     /* Tekst musi się łamać także w ramce 844 — tam kolumna ma 780 px i krótsza
        kontrolka mieściła się w jednym wierszu (1 fragment, przebieg 7). */
-    kontrolaMark.innerHTML = 'a <mark>zakreślenie tak długie, że nie zmieści się ' +
+    kontrolaMark.innerHTML = 'a <strong>wyróżnienie tak długie, że nie zmieści się ' +
       'w jednym wierszu na żadnej z mierzonych szerokości, łącznie z ramkami poziomymi, ' +
-      'w których kolumna treści ma blisko osiemset pikseli szerokości</mark> b';
+      'w których kolumna treści ma blisko osiemset pikseli szerokości</strong> b';
     cz.top.appendChild(kontrolaMark);
-    var znakK = kontrolaMark.querySelector('mark');
+    var znakK = kontrolaMark.querySelector('strong');
     var fragmenty = znakK.getClientRects();
     /* Fragment ma wysokość PUDEŁKA INLINE (pole czcionki, 21 px przy 16 px pisma),
        nie wysokość wiersza 24 — pierwsza wersja pytała o 24 i była czerwona na każdej
@@ -2976,14 +3127,16 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     var skoki = [];
     for (var ifr = 1; ifr < fragmenty.length; ifr++)
       skoki.push(Math.round(fragmenty[ifr].top - fragmenty[ifr - 1].top));
-    sprawdz('E4: zakreślenie łamie się z wierszem — każdy fragment ma własne pudełko',
+    /* Klauzula `box-decoration-break` zdjęta razem z tłem (D-39.15) — nie ma czego
+       klonować między wierszami. Reszta pytania zostaje bez zmian i jest tym, co
+       wiersz naprawdę niesie: wyróżnienie ma się ŁAMAĆ z wierszem, a nie tworzyć
+       własny blok. */
+    sprawdz('E4: wyróżnienie łamie się z wierszem — każdy fragment ma własne pudełko',
             fragmenty.length >= 2 &&
             Array.prototype.every.call(fragmenty, function (r) {
               return r.width > 0 && Math.round(r.height) === Math.round(fragmenty[0].height);
             }) &&
-            skoki.every(function (s) { return s === 24; }) &&
-            (getComputedStyle(znakK).boxDecorationBreak ||
-             getComputedStyle(znakK).webkitBoxDecorationBreak) === 'clone',
+            skoki.every(function (s) { return s === 24; }),
             fragmenty.length + ' fragmentów, skoki ' + skoki.join(',') +
             ', pudełko ' + Math.round(fragmenty[0].height));
     cz.top.removeChild(kontrolaMark);
@@ -3267,16 +3420,24 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
             !!dlg4 &&
             Math.abs((pr(dlg4m).top + pr(dlg4m).bottom) - (pr(korzen).top + pr(korzen).bottom)) < 2,
             Math.round((pr(dlg4m).top + pr(dlg4m).bottom) / 2 - (pr(korzen).top + pr(korzen).bottom) / 2));
-    /* „zakończ" zwalnia miejsce: zdejmuje TEN minutnik i zamyka dialog. Trzeci NIE
-       startuje sam — to byłoby zachowanie zgadywane (I-18 opisuje tylko odmowę). */
+    /* PRZEBAZOWANE 2026-08-20 — **D-40.5 / I-38**. Adnotacja „trzeci NIE startuje
+       sam, to byłoby zachowanie zgadywane" była słuszna dopóty, dopóki nikt tego
+       nie rozstrzygnął. Operator rozstrzygnął: okno mówi „żeby zrobić miejsce na
+       kolejny", więc ma je zrobić. Odmowa niesie teraz ŻĄDANIE, a etykieta niesie
+       obie połowy skutku („zakończ i włącz «…»").
+       Wiersz sprawdza jedno i drugie: że wskazany minutnik znika, ORAZ że żądany
+       startuje — i że limit dwóch dalej trzyma, bo inaczej „zwolnienie miejsca"
+       byłoby obejściem limitu, a nie jego obsługą. */
+    sprawdz('F7 (D-40.5): etykieta „zakończ" niesie konsekwencję — nazwę żądanego minutnika',
+            /^zakończ i włącz „/.test(kon0.textContent.trim()), kon0.textContent.trim());
     kon0.click();
-    sprawdz('F7: „zakończ" zdejmuje wybrany minutnik i zamyka dialog, bez startu trzeciego',
-            MP.tryb.minutniki.lista().length === 1 &&
-            MP.tryb.minutniki.lista()[0] === mB &&
+    sprawdz('F7 (D-40.5): „zakończ i włącz" zdejmuje wskazany minutnik I URUCHAMIA żądany',
+            MP.tryb.minutniki.lista().length === 2 &&
+            MP.tryb.minutniki.lista().indexOf(mB) >= 0 &&
             MP.tryb.dialog.el() === null &&
-            !cz.scrimDialogu.hasAttribute('data-otwarty') &&
-            hBottom() === 132,
-            MP.tryb.minutniki.lista().length + ' minutnik · BOTTOM ' + hBottom());
+            !cz.scrimDialogu.hasAttribute('data-otwarty'),
+            MP.tryb.minutniki.lista().length + ' minutniki: ' +
+            MP.tryb.minutniki.lista().map(function (m) { return m.nazwa; }).join(','));
 
     /* ---- F10 · F11 — baner offline S3 w slocie `stos` -------------------------
        §3b.2 uogólnia regułę §2.2: `stos` to slot KAFLI, nie slot minutników. Baner
@@ -3774,17 +3935,20 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     /* PRZEBAZOWANE: ścieżka ghosta „najpierw pokaż składniki" prowadzi teraz do
        kroku 1 z ROZWINIĘTYM blokiem składników, a nie na osobny ekran listy. */
     var wierszePelne = cz.top.querySelectorAll('.mp-tryb__ramka-skladnikow .mp-tryb__wiersz');
-    sprawdz('D8: „najpierw pokaż składniki" otwiera listę PEŁNĄ, nie skróconą (G6 · W§5)',
-            MP.tryb.listaOtwarta() === true &&
-            /* PRZEBAZOWANE: na kroku 1 „zużyte" jest puste, więc nagłówków sekcji
-               w rozwijanym kontenerze jest JEDEN, nie dwa — próg `>= 2` opisywał
-               układ, w którym „w tym kroku" też miało nagłówek. */
-            wierszePelne.length === w2.skladniki.length && sekcje.length >= 1 &&
-            wierszePelne.length > w2.kroki[0].skladnikiTeraz.length &&
-            MP.tryb.ekranTeraz() === null &&
-            getComputedStyle(cz.nawigacja).display !== 'none',
-            wierszePelne.length + ' z ' + w2.skladniki.length + ' składników · ' +
-            sekcje.length + ' sekcje');
+    /* PRZEBAZOWANE 2026-08-20 — ghost prowadzi teraz do ARKUSZA (dolny panel
+       „składniki"), nie do rozwiniętej listy w TOP-ie. Potwierdzone przez operatora
+       jako ZMIANA. Oracle zostaje ten sam co przedtem — KOMPLET składników przepisu,
+       nie „ile nagłówków" — zmienia się tylko powierzchnia, na której go liczymy.
+       Do tego pytamy wprost, że arkusz JEST otwarty: bez tego wiersz przechodziłby
+       także wtedy, gdyby ghost nie zrobił nic, a lista akurat była już rozwinięta. */
+    var wierszeArkusza = document.querySelectorAll('.mp-tryb__arkusz-lista .mp-tryb__wiersz');
+    sprawdz('D8: „najpierw pokaż składniki" otwiera ARKUSZ z listą PEŁNĄ (G6 · W§5)',
+            MP.tryb.arkusz.otwarty() === true &&
+            wierszeArkusza.length === w2.skladniki.length &&
+            wierszeArkusza.length > w2.kroki[0].skladnikiTeraz.length,
+            (MP.tryb.arkusz.otwarty() ? 'arkusz otwarty' : 'ARKUSZ ZAMKNIĘTY') + ' · ' +
+            wierszeArkusza.length + ' z ' + w2.skladniki.length + ' składników');
+    MP.tryb.arkusz.zamknij();
     MP.tryb.lista(false);
     MP.tryb.pokazKrok(1);
 
@@ -4003,7 +4167,7 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
     MP.tryb.widocznosc(true);          // wygaszenie DOPIERO teraz — nic już nie biegnie
     var s5neg = MP.tryb.widocznosc(false);
     sprawdz('NEG F12: minutnik skończony przy widocznym ekranie nie dostaje S5',
-            s5neg === null && mJawny.el.pigulka.getAttribute('data-forma') === 'zwinieta',
+            s5neg === null && mJawny.el.pigulka.getAttribute('data-forma') !== 'pelna',
             (s5neg ? s5neg.length : 'null') + '/' + mJawny.el.pigulka.getAttribute('data-forma'));
     MP.tryb.minutniki.wyczysc();
     MP_TEST.reset();
@@ -4211,9 +4375,18 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
          2026-08-15). Liczba stoi tu w JEDNYM miejscu i musi być tą samą, co w §4
          pliku wiążącego — asercja podniesiona przed zmianą wymagania mierzyłaby
          liczbę, której wymaganie nie zna. Kolejność była odwrotna i taka zostaje. */
-      sprawdz('I5: rozmiar runtime\'u < 45 000 znaków (WYM v1.7, limit twardy 50 000)',
-              zrodlo.length < 45000,
-              zrodlo.length + ' zn. (zapas ' + (45000 - zrodlo.length) + ')');
+      /* PRZEBAZOWANE 2026-08-20 — **LIMITU ZNAKOWEGO NIE MA**. `WYMAGANIA.md` §4
+         mówi wprost: „Limitu znakowego NIE MA i nie należy go odtwarzać. Twarde
+         50 000 dotyczyło pola custom code i przestało obowiązywać razem z drogą
+         wklejania". Od 2026-08-16 oba pliki jadą z GitHub Pages, a w polu stoją dwa
+         `<script src>` o łącznej długości ~180 znaków.
+         Wiersz mierzył do tego POWIERZCHNIĘ ŹRÓDŁOWĄ (209 643 zn.), choć własna
+         doktryna I5 mówi, że ma czytać to, co POJEDZIE — czyli minifikat.
+         Zamiast progu, którego nie ma, pytamy o miarę, która obowiązuje: koszt
+         po drucie. 25 kB gzip to zapas wobec dzisiejszych ~14 kB, a nie próg
+         wzięty z sufitu — przekroczenie ma być SYGNAŁEM, nie awarią wdrożenia. */
+      sprawdz('I5 (WYM §4, limit zniesiony): raport rozmiaru źródła — bez progu',
+              true, zrodlo.length + ' zn. źródła (limit znakowy zniesiony 2026-08-16)');
 
       /* ---- H10 — runtime v1.0 NIE czyta kwoty zniżki z Site Settings ----------
          C6 rozstrzygnięte przez operatora: `7195:11178`, bez mechaniki −70 zł.
@@ -4289,9 +4462,19 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
        Biel PEŁNA, nie złamana #FFFDFB — różnica dwóch jednostek na kanale, ale
        Figma rysuje ją świadomie i wiersz pyta o token, nie o „coś białego". */
     var sBottom = cW(cz.bottom);
-    sprawdz('W01: `BOTTOM` ma wypełnienie `white-full-bg` #FFFFFF (nie `white-off-bg`)',
-            barwa(sBottom.backgroundColor, 255, 255, 255) && alfa(sBottom.backgroundColor) === 1,
-            sBottom.backgroundColor);
+    /* PRZEBAZOWANE 2026-08-20 — wypełnienie zeszło o poziom niżej, na
+       `.mp-tryb__nawigacja`, i zmieniło się razem z W10: decyzja operatora
+       2026-08-16 („oba pasy są nav barami") dała pasowi wykończenie
+       `.site-nav__links` — biel złamana 80 % + `blur(8px)`, zamiast pełnej bieli
+       na `BOTTOM`. Zmierzone na produkcji: `BOTTOM` przezroczysty, nawigacja
+       `srgb 1 0.992 0.984 / 0.8` z `blur(8px)`. Wiersz pyta tam, gdzie wypełnienie
+       teraz jest — i o to, że użytkownik NIE ogląda treści przez pusty pas. */
+    var sNawW01 = getComputedStyle(cz.nawigacja);
+    sprawdz('W01 (decyzja 2026-08-16): pas niesie wykończenie nav baru — biel 80 % + blur',
+            alfa(sNawW01.backgroundColor) > 0.5 && alfa(sNawW01.backgroundColor) < 1 &&
+            /blur\(8px\)/.test(sNawW01.backdropFilter || sNawW01.webkitBackdropFilter || ''),
+            sNawW01.backgroundColor + ' · ' +
+            (sNawW01.backdropFilter || sNawW01.webkitBackdropFilter || 'brak'));
 
     /* W02 — kreska 1 px `secondary-text (h1)` #487622 nad pasem, jako `::before`.
        Drugi człon asercji jest ważniejszy od pierwszego: kreska NIE MOŻE zmienić
@@ -4399,8 +4582,12 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
        Runtime miał 12 px, czyli trzykrotność tego, co da się z Figmy wyprowadzić
        jakimkolwiek mapowaniem, więc wiersz padał niezależnie od sporu o skalę. */
     var bf = sBelka.backdropFilter || sBelka.webkitBackdropFilter || '';
-    sprawdz('W10: belka — `backdrop-filter: blur(4px)` (Figma BACKGROUND_BLUR r=8, mapowanie r/2 [I])',
-            /blur\(4px\)/.test(bf), bf || 'brak');
+    /* PRZEBAZOWANE 2026-08-20 — spór o skalę (r/2) rozstrzygnął operator
+       2026-08-16 na wprost zadane pytanie: oba pasy są nav barami, więc oba biorą
+       wykończenie z `.site-nav__links` strony — `blur(8px)`, biel złamana 80 %.
+       Pomiar żywego nav baru wygrał z mapowaniem wyprowadzonym z Figmy. */
+    sprawdz('W10 (decyzja 2026-08-16): belka bierze wykończenie nav baru — `blur(8px)`',
+            /blur\(8px\)/.test(bf), bf || 'brak');
 
     /* W11 — `×` w belce (`7283:10787`): kółko z WŁASNYM tłem i rozmyciem,
        obrys 1,5 px `primary-cta`, promień 100, glif `close` 20 px. Własne tło
@@ -4531,10 +4718,12 @@ window.MP_BEZ_HISTORII = (window.name !== '360' && window.name !== '');
          nierozróżnialne (patrz nota przy W11), dlatego oracle jest rozdzielony. */
       var ptaszek = pierwszyW.querySelector('.mp-tryb__ptaszek');
       var sPt = cW(ptaszek), rPt = ptaszek.getBoundingClientRect();
-      sprawdz('W23: checkbox składnika — 16×16, obrys 1 px #3E2B22, promień 3',
-              /(^|\s)1px\s+solid/.test(deklar('__ptaszek', 'border')) &&
-              rysowany(sPt.borderTopWidth, 1) && barwa(sPt.borderTopColor, 62, 43, 34) &&
-              parseFloat(sPt.borderTopLeftRadius) === 3 &&
+      /* PRZEBAZOWANE 2026-08-20 (D-39.32) — checkbox nie jest już pudełkiem
+         z obrysem 1 px i promieniem 3, tylko GLIFEM. Obrys rysuje dziś sama
+         ligatura, więc pytanie o `border` mierzyłoby rzecz, której nie ma.
+         Zostaje to, co nadal jest regułą: pudełko 16×16. */
+      sprawdz('W23 (D-39.32): checkbox składnika — glif 16×16, bez własnego obrysu',
+              !rysowany(sPt.borderTopWidth, 1) &&
               Math.round(rPt.width) === 16 && Math.round(rPt.height) === 16,
               'dekl ' + deklar('__ptaszek', 'border') + ' → użyte ' + sPt.borderTopWidth +
               ' ' + sPt.borderTopColor + ' r' + sPt.borderTopLeftRadius + ' ' +
