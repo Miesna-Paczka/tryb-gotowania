@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>MATRYCA — tryb gotowania</title>
+
+<!--
+  harness/matrix.html — matryca szerokości łańcucha `tryb-gotowania-embed`.
+
+  Dlaczego iframe'y, a nie `resize_window`: desktopowy Chrome nie zejdzie oknem
+  poniżej ~500 px, a mierzymy 320–480. Media queries i `orientation` WEWNĄTRZ
+  iframe'u odpowiadają na wymiar iframe'u, a `position: fixed` overlaya wiąże się
+  z viewportem iframe'u — więc jeden zrzut łapie kilka szerokości naraz.
+
+  Powierzchnie POZA tą matrycą (STAN.md, przebieg 2):
+   · `nojs.html` — pola kartowe czytelne bez JS (wiersz A8),
+   · `prog.html` — próg 499/500 px dla przycisku startu (G07 / H8).
+-->
+
+<style>
+  :root{--tlo:#12100e;--panel:#1c1915;--ok:#3ddc84;--zle:#ff6b5e;--tekst:#eee}
+  html,body{margin:0;background:var(--tlo);color:var(--tekst);
+            font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
+  header{position:sticky;top:0;z-index:5;background:var(--panel);padding:10px 14px;
+         border-bottom:1px solid #333}
+  header b{font-size:15px}
+  #podsumowanie.ok{color:var(--ok)} #podsumowanie.zle{color:var(--zle)}
+  #szczegoly{margin:6px 0 0;padding-left:18px;max-height:160px;overflow:auto}
+  #szczegoly li{color:var(--zle)}
+  .rzad{display:flex;gap:14px;padding:14px;align-items:flex-start;overflow-x:auto}
+  .komorka{flex:0 0 auto}
+  .etykieta{padding:0 0 4px;font-size:12px;color:#aaa}
+  .etykieta .stan{font-weight:700}
+  .etykieta .stan.ok{color:var(--ok)} .etykieta .stan.zle{color:var(--zle)}
+  iframe{border:1px solid #444;background:#fff;display:block}
+  h2{font-size:13px;margin:14px 14px 0;color:#aaa;text-transform:uppercase;letter-spacing:.08em}
+</style>
+</head>
+<body>
+
+<header>
+  <b>MATRYCA — jednostka 1 (harness)</b>
+  <span id="podsumowanie">ładowanie…</span>
+  <ul id="szczegoly"></ul>
+</header>
+
+<h2>portret · 780 px wysokości</h2>
+<div class="rzad" id="portret"></div>
+
+<h2>landscape · scrim „obróć telefon"</h2>
+<div class="rzad" id="poziome"></div>
+
+<script>
+/* Szerokości z „Powierzchni pomiaru" w STAN.md. `nazwa` trafia do `window.name`
+   ramki i wraca w postMessage, więc wynik da się przypisać bez czytania
+   contentWindow (file:// bywa nieprzezroczyste między ramkami). */
+var RAMKI = [
+  { nazwa: '320', w: 320, h: 780, gdzie: 'portret' },
+  { nazwa: '360', w: 360, h: 780, gdzie: 'portret' },
+  { nazwa: '390', w: 390, h: 780, gdzie: 'portret' },
+  { nazwa: '440', w: 440, h: 780, gdzie: 'portret' },
+  { nazwa: '480', w: 480, h: 780, gdzie: 'portret' },
+  { nazwa: '844x390', w: 844, h: 390, gdzie: 'poziome' },
+  { nazwa: '667x375', w: 667, h: 375, gdzie: 'poziome' }
+];
+
+var wyniki = Object.create(null);
+/* HARNESS-ONLY — pieczęć przemiaru. Pułapka złapana w przebiegu 14: po edycji
+   runtime'u matryca mierzyła STARY plik z cache'a HTTP i raportowała dokładnie tę
+   samą liczbę znaków co przed zmianą, czyli odpowiadała pewnie i nie na to pytanie.
+   Jedna pieczęć na całe drzewo: `matrix.html` przekazuje ją ramkom, ramki doklejają
+   ją do tagów `<script>`, więc runtime i parser przychodzą świeże w KAŻDYM przemiarze,
+   a nie tylko wtedy, gdy ktoś pamiętał o twardym przeładowaniu.                     */
+window.MP_PIECZEC = String(Date.now());
+
+window.MP_MATRYCA = { ramki: RAMKI, wyniki: wyniki, gotowe: false, pieczec: MP_PIECZEC };
+
+RAMKI.forEach(function (r) {
+  var kom = document.createElement('div');
+  kom.className = 'komorka';
+  kom.innerHTML = '<div class="etykieta" id="et-' + r.nazwa + '">' +
+                  r.w + ' × ' + r.h + ' · <span class="stan">…</span></div>';
+  var f = document.createElement('iframe');
+  f.src = 'fixture.html?pieczec=' + MP_PIECZEC;
+  f.name = r.nazwa;
+  f.width = r.w; f.height = r.h;
+  f.setAttribute('title', 'fixture ' + r.nazwa);
+  kom.appendChild(f);
+  document.getElementById(r.gdzie).appendChild(kom);
+});
+
+window.addEventListener('message', function (e) {
+  var d = e.data;
+  if (!d || !d.mpHarness) return;
+  var nazwa = d.nazwa || String(d.mpHarness.szerokosc);
+  wyniki[nazwa] = d.mpHarness;
+
+  var et = document.getElementById('et-' + nazwa);
+  if (et) {
+    var s = et.querySelector('.stan');
+    s.textContent = d.mpHarness.ok ? 'OK' : 'BŁĄD';
+    s.className = 'stan ' + (d.mpHarness.ok ? 'ok' : 'zle');
+  }
+  odswiez();
+});
+
+function odswiez() {
+  var klucze = Object.keys(wyniki);
+  var zle = klucze.filter(function (k) { return !wyniki[k].ok; });
+  var bledyKonsoli = klucze.reduce(function (n, k) { return n + wyniki[k].konsola.length; }, 0);
+  var el = document.getElementById('podsumowanie');
+  var komplet = klucze.length === RAMKI.length;
+  el.textContent = '— ' + (klucze.length - zle.length) + '/' + RAMKI.length +
+                   ' ramek OK · błędów konsoli: ' + bledyKonsoli +
+                   (komplet ? '' : ' · czekam na ' + (RAMKI.length - klucze.length));
+  el.className = (komplet && !zle.length) ? 'ok' : (zle.length ? 'zle' : '');
+
+  var ul = document.getElementById('szczegoly');
+  ul.innerHTML = zle.map(function (k) {
+    var w = wyniki[k];
+    var a = w.asercje.filter(function (x) { return !x.ok; })
+             .map(function (x) { return x.nazwa + (x.detal ? ' → ' + x.detal : ''); });
+    var c = w.konsola.map(function (x) { return x.poziom + ': ' + x.tresc; });
+    return '<li>' + k + ': ' + a.concat(c).join(' ; ') + '</li>';
+  }).join('');
+
+  window.MP_MATRYCA.gotowe = komplet;
+}
+
+/* ---- G10: powrót do portretu zdejmuje scrim BEZ utraty stanu -----------------
+   Rotacji nie da się zmierzyć wewnątrz ramki: `orientation` odpowiada na wymiar
+   ramki, a ramka sama siebie nie przewymiaruje. Mierzy więc RODZIC — zmiana
+   `width`/`height` iframe'a jest dla treści dokładnie tym samym zdarzeniem, co
+   obrót telefonu, bo media query pyta o viewport, nie o urządzenie.
+
+   Kryterium „bez utraty stanu" jest tym, czego przeładowanie by nie przeżyło:
+   numer kroku, liczba i pozostały czas minutników, zaznaczone składniki oraz
+   TOŻSAMOŚĆ węzła overlaya (przemontowanie zerwałoby minutniki).                */
+/* ---- F4: systemowy „wstecz" wychodzi z overlaya (I-09 · WYM §3) --------------
+   Mierzy RODZIC i mierzy w JEDNEJ ramce. Powód zmierzony w przebiegu 8: historia
+   sesji jest WSPÓLNA dla ramki i dokumentu nadrzędnego (`history.length` rodzica
+   rośnie razem z ramką), więc pięć ramek robiących `back()` naraz mieszałoby się
+   w jednej historii. Pozostałe ramki mają `MP_BEZ_HISTORII = true`.
+
+   Trawersja jest asynchroniczna — stąd Promise. Po pomiarze wracamy do stanu
+   zastanego: `back()` zdejmuje NASZ wpis, więc pozycja w historii jest ta sama,
+   co przed sondą. `history.length` zostaje o 1 dłuższa i to jest nieusuwalne —
+   przeglądarka nie ma API na skrócenie historii; kolejny `pushState` z tej samej
+   pozycji nadpisze wpis „do przodu", więc długość nie rośnie z każdym pomiarem. */
+window.MP_MATRYCA.f4 = function () {
+  var ramka = function (n) {
+    return Array.prototype.find.call(document.querySelectorAll('iframe'),
+                                     function (x) { return x.name === n; });
+  };
+  var f = ramka('360');
+  if (!f) return Promise.resolve({ ok: false, powod: 'brak ramki 360' });
+  var w = f.contentWindow;
+  var inna = ramka('320').contentWindow;
+  var r = { dlugoscPrzed: history.length };
+
+  r.wlaczonaTu = w.MP.tryb.historia.wlaczona();
+  r.wylaczonaObok = !inna.MP.tryb.historia.wlaczona();
+
+  return odsacz().then(pomiar);
+
+  /* Blok samosprawdzenia otwiera i zamyka overlay kilka razy w JEDNEJ turze pętli
+     zdarzeń, a `history.back()` jest asynchroniczny — więc sync-owe `pushState`
+     wyprzedzają swoje `back()` i zostawiają po sobie wpisy `{mpTryb}`. Produkcja
+     tego nie robi (między zamknięciem a otwarciem zawsze mija tura), ale sonda
+     musi mieć czystą linię bazową, bo inaczej pyta „czy wpis zniknął" na historii,
+     w której leżą cudze takie same wpisy. Zdejmujemy je najpierw — co przy okazji
+     spełnia regułę „nie zostawiaj historii dłuższej, niż zastałeś" lepiej niż
+     samo `back()` po pomiarze. Limit kroków i kontrola URL-a rodzica pilnują,
+     żeby cofanie nie wyszło poza wpisy same-document i nie zabrało matrycy. */
+  function odsacz() {
+    var url = location.href, krokow = 0;
+    function dalej() {
+      if (krokow >= 6) return Promise.resolve();
+      if (!(w.history.state && w.history.state.mpTryb === true)) return Promise.resolve();
+      if (location.href !== url) return Promise.resolve();
+      krokow++;
+      return new Promise(function (res) {
+        var t = setTimeout(res, 400);
+        w.addEventListener('popstate', function raz() {
+          w.removeEventListener('popstate', raz);
+          clearTimeout(t); setTimeout(res, 0);
+        });
+        w.history.back();
+      }).then(dalej);
+    }
+    return dalej().then(function () { r.odsaczonych = krokow; });
+  }
+
+  function pomiar() {
+  r.stanBazowy = !!(w.history.state && w.history.state.mpTryb === true);
+  w.MP.tryb.zamknij();                       // czysty start, gdyby coś zostało otwarte
+  w.MP.tryb.otworz(w.MP_HARNESS.widok, { krok: 3 });
+  r.wpisPoOtwarciu = w.MP.tryb.historia.wpis();
+  r.otwartyPrzed = w.MP.tryb.korzen().hasAttribute('data-otwarty');
+  r.dlugoscPoPushu = history.length;
+  /* Oracle POZYCJI, nie długości. `history.length` po pierwszym pomiarze już nie
+     rośnie (kolejny push nadpisuje wpis „do przodu"), więc przyrost długości
+     mierzyłby to, czy sonda biegnie pierwszy raz — a nie to, o co pyta wiersz.
+     Stan wpisu jest natomiast jednoznaczny: nasz albo nie nasz. */
+  r.stanPoPushu = !!(w.history.state && w.history.state.mpTryb === true);
+  /* Kontrola, że ramka nie zabrała ze sobą rodzica: URL matrycy ma zostać ten sam. */
+  r.urlRodzicaPrzed = location.href;
+
+  return new Promise(function (res) {
+    var czas = setTimeout(function () { domknij('popstate nie przyszedł w 2000 ms'); }, 2000);
+    function naPop() { setTimeout(function () { domknij(''); }, 0); }
+    function domknij(powod) {
+      clearTimeout(czas);
+      w.removeEventListener('popstate', naPop);
+      r.powod = powod;
+      r.otwartyPo = w.MP.tryb.korzen().hasAttribute('data-otwarty');
+      r.wpisPo = w.MP.tryb.historia.wpis();
+      r.urlRodzicaPo = location.href;
+      r.ramkaZyje = !!w.MP_HARNESS.wynik && w.MP_HARNESS.wynik.asercje.length > 0;
+      r.asercjiWRamce = w.MP_HARNESS.wynik ? w.MP_HARNESS.wynik.asercje.length : 0;
+      r.dlugoscPo = history.length;
+      r.stanPo = !!(w.history.state && w.history.state.mpTryb === true);
+      r.ok = !powod &&
+             r.wlaczonaTu === true && r.wylaczonaObok === true &&
+             r.stanBazowy === false &&          // ← linia bazowa czysta
+             r.wpisPoOtwarciu === true && r.stanPoPushu === true &&
+             r.stanPo === false &&              // ← nasz wpis zdjęty z historii
+             r.otwartyPrzed === true &&
+             r.otwartyPo === false &&           // ← „wstecz" ZAMKNĄŁ overlay
+             r.wpisPo === false &&              // ← i nie został po nas wpis
+             r.urlRodzicaPo === r.urlRodzicaPrzed &&
+             r.ramkaZyje === true;              // ← ramka się nie przeładowała
+      res(r);
+    }
+    w.addEventListener('popstate', naPop);
+    w.history.back();                          // ← „systemowy wstecz"
+  });
+  }
+};
+
+window.MP_MATRYCA.g10 = function () {
+  var f = Array.prototype.find.call(document.querySelectorAll('iframe'),
+                                    function (x) { return x.name === '844x390'; });
+  if (!f) return { ok: false, powod: 'brak ramki poziomej' };
+  var w = f.contentWindow, cz = w.MP.tryb.czesci();
+  var widoczny = function () { return w.getComputedStyle(cz.scrim).display !== 'none'; };
+
+  w.MP.tryb.otworz(w.MP_HARNESS.widok, { krok: 4 });
+  w.MP.tryb.minutniki.wyczysc();
+  var m = w.MP.tryb.minutniki.uruchom({ nazwa: 'duś ragù', sekundy: 1934 });
+  w.MP.tryb.odhacz('skrobia-ziemniaczana', true);
+  var przed = {
+    scrim: widoczny(), korzen: w.MP.tryb.korzen(), krok: cz.etykieta.textContent,
+    minutnikow: w.MP.tryb.minutniki.lista().length, pozostalo: m.pozostalo,
+    zaznaczone: w.MP.tryb.zaznaczone().join(',')
+  };
+  f.width = 390; f.height = 844;                     // ← „obrót" do portretu
+  var poObrocie = {
+    scrim: widoczny(), korzen: w.MP.tryb.korzen(), krok: cz.etykieta.textContent,
+    minutnikow: w.MP.tryb.minutniki.lista().length, pozostalo: m.pozostalo,
+    zaznaczone: w.MP.tryb.zaznaczone().join(','),
+    szerokoscTresci: Math.round(cz.top.getBoundingClientRect().width)
+  };
+  f.width = 844; f.height = 390;                     // ← i z powrotem, żeby matryca została matrycą
+  var wrocil = widoczny();
+  w.MP.tryb.minutniki.wyczysc();
+  w.MP.tryb.odhacz('skrobia-ziemniaczana', false);
+
+  return {
+    ok: przed.scrim === true && poObrocie.scrim === false && wrocil === true &&
+        poObrocie.korzen === przed.korzen && poObrocie.krok === przed.krok &&
+        poObrocie.minutnikow === przed.minutnikow &&
+        poObrocie.pozostalo === przed.pozostalo &&
+        poObrocie.zaznaczone === przed.zaznaczone && poObrocie.zaznaczone !== '' &&
+        poObrocie.szerokoscTresci === 390,
+    przed: przed, po: poObrocie, scrimWrocil: wrocil
+  };
+};
+
+/* ---- C10 · C11 · C12: puls kropki mierzony NA BIEGNĄCEJ ANIMACJI ------------
+   Dlaczego nie GIF-em, mimo że plan mówił „GIF": GIF odpowiada na pytanie „czy
+   coś się rusza i mniej więcej jak szybko". Przy nagraniu ~10 fps rozróżnienie
+   1×/s od 2×/s jest kwestią policzenia kilku klatek na oko — a to jest gorszy
+   przyrząd niż zegar samej animacji. Web Animations API daje `currentTime`
+   BIEGNĄCEJ animacji z dokładnością do milisekundy, więc pytanie „czy puls ma
+   1 s czy 0,5 s okresu" dostaje odpowiedź dokładną zamiast przybliżonej.
+
+   Zastrzeżenie, przez które te wiersze były czerwone, jest jednak prawdziwe
+   i musi zostać zamknięte, a nie obejście: `getComputedStyle(...).animationDuration`
+   mówi TYLKO, co jest zadeklarowane. Asercje „(wsparcie)" w `fixture.html` mierzą
+   właśnie to i dlatego same nie wystarczały. Ta sonda dokłada brakującą połowę —
+   DOWÓD, ŻE ANIMACJA BIEGNIE: `currentTime` odczytany dwa razy, w odstępie
+   zmierzonym `performance.now()`, musi przyrosnąć o tyle samo, co zegar ścienny.
+   Animacja zadeklarowana, ale wstrzymana albo zdławiona, przyrostu nie da —
+   i to jest jedyny stan, którego stary przyrząd nie odróżniał od poprawnego.
+
+   Dławienie kart w tle jest tu realnym ryzykiem (przebieg 6 uznał je za powód
+   nieusuwalny), więc sonda mierzy je WPROST: `visibilityState` i porównanie
+   przyrostu animacji z `performance.now()`. Jeśli karta jest zdławiona, wynik
+   będzie czerwony Z POMIARU i z nazwanym powodem, a nie czerwony z założenia.
+
+   Pięć ramek portretowych naraz na JEDNYM czekaniu: oczekiwanie jest wspólne,
+   odczyty są per ramka, więc pokrycie 5× nie kosztuje pięciu przystanków.       */
+window.MP_MATRYCA.c1012 = function () {
+  var CEL = ['320', '360', '390', '440', '480'];
+  var ramki = CEL.map(function (n) {
+    return Array.prototype.find.call(document.querySelectorAll('iframe'),
+                                     function (x) { return x.name === n; });
+  }).filter(Boolean);
+  if (ramki.length !== CEL.length) {
+    return Promise.resolve({ ok: false, powod: 'brak ramek portretowych: ' +
+                             ramki.length + '/' + CEL.length });
+  }
+
+  var CZEKANIE = 1300;          // > 1 okres pulsu 1 s i > 2 okresy pulsu 0,5 s
+  var TOLERANCJA = 200;         // ms rozjazdu animacji względem zegara ściennego
+  var wynik = { widocznosc: document.visibilityState, ukryta: document.hidden, ramki: {} };
+
+  /* Odczyt jednej kropki: i deklaracja (computed), i stan BIEGNĄCEJ animacji. */
+  function czytaj(w, m) {
+    var k = m.el.kropka;
+    var cs = w.getComputedStyle(k);
+    var a = k.getAnimations()[0] || null;
+    return {
+      stanMinutnika: m.stan,
+      deklarowanyOkres: cs.animationDuration,
+      nazwaAnimacji: cs.animationName,
+      kolorKropki: cs.backgroundColor,
+      szerokoscKropki: parseFloat(cs.width),
+      wysokoscKropki: parseFloat(cs.height),
+      obrysPigulki: w.getComputedStyle(m.el.pigulka).outlineWidth,
+      kolorObrysu: w.getComputedStyle(m.el.pigulka).outlineColor,
+      jestAnimacja: !!a,
+      playState: a ? a.playState : null,
+      okresEfektu: a ? a.effect.getTiming().duration : null,
+      iteracje: a ? a.effect.getTiming().iterations : null,
+      currentTime: a ? a.currentTime : null
+    };
+  }
+
+  /* Ustawienie ramki: świeży minutnik 32:14, zegar przewinięty tak, żeby zostało
+     45 s — czyli stan `ostatnia-minuta`. Overlay otwarty, bo kropka żyje w BOTTOM. */
+  var konteksty = ramki.map(function (f) {
+    var w = f.contentWindow;
+    w.MP.tryb.otworz(w.MP_HARNESS.widok, { krok: 3 });
+    w.MP.tryb.minutniki.wyczysc();
+    w.MP_TEST.reset();
+    var m = w.MP.tryb.minutniki.uruchom({ nazwa: 'duś ragù', sekundy: 1934 });
+    w.MP_TEST.przewin(1934 - 45);
+    w.MP.tryb.minutniki.tyk();
+    return { nazwa: f.name, w: w, m: m };
+  });
+
+  function faza(etykieta, przygotuj) {
+    return function () {
+      konteksty.forEach(function (k) { if (przygotuj) przygotuj(k); });
+      var t0 = performance.now();
+      konteksty.forEach(function (k) { k[etykieta] = { a: czytaj(k.w, k.m) }; });
+      return new Promise(function (res) { setTimeout(res, CZEKANIE); }).then(function () {
+        var scienny = performance.now() - t0;
+        konteksty.forEach(function (k) {
+          k[etykieta].b = czytaj(k.w, k.m);
+          k[etykieta].scienny = scienny;
+        });
+      });
+    };
+  }
+
+  return faza('c10')()
+    .then(faza('c11', function (k) {
+      k.w.MP_TEST.przewin(39);            // 45 − 39 = 6 s → `koncowka`
+      k.w.MP.tryb.minutniki.tyk();
+    }))
+    .then(function () {
+      /* C12 nie potrzebuje czekania: pytanie brzmi „czy puls WYGASZONY", a brak
+         animacji jest stanem, nie zdarzeniem w czasie. Czekanie zostawiłoby
+         dodatkowo pole na złudzenie, że mierzymy „czy nie ruszył ponownie". */
+      konteksty.forEach(function (k) {
+        k.w.MP_TEST.przewin(11);          // 6 − 11 → po czasie
+        k.w.MP.tryb.minutniki.tyk();
+        k.c12 = { a: czytaj(k.w, k.m),
+                  odliczanie: k.m.el.odliczanie.textContent,
+                  pozostalo: k.m.pozostalo };
+      });
+    })
+    .then(function () {
+      konteksty.forEach(function (k) {
+        var r = { nazwa: k.nazwa };
+
+        /* wspólny test „biegnie": przyrost animacji nadąża za zegarem ściennym */
+        var biegnie = function (f) {
+          if (!f.a.jestAnimacja || !f.b.jestAnimacja) return { ok: false, powod: 'brak animacji' };
+          var d = f.b.currentTime - f.a.currentTime;
+          return {
+            ok: f.a.playState === 'running' && f.b.playState === 'running' &&
+                d > 0 && Math.abs(d - f.scienny) <= TOLERANCJA,
+            przyrost: Math.round(d), scienny: Math.round(f.scienny)
+          };
+        };
+
+        var b10 = biegnie(k.c10), b11 = biegnie(k.c11);
+
+        r.c10 = {
+          ok: k.c10.a.stanMinutnika === 'ostatnia-minuta' &&
+              k.c10.a.szerokoscKropki === 12 && k.c10.a.wysokoscKropki === 12 &&
+              k.c10.a.kolorKropki === 'rgb(207, 65, 26)' &&
+              k.c10.a.okresEfektu === 1000 &&          // ← okres BIEGNĄCEJ animacji
+              k.c10.a.deklarowanyOkres === '1s' &&
+              k.c10.a.iteracje === Infinity &&
+              kreska(1.5, k.c10.a.obrysPigulki) &&
+              k.c10.a.kolorObrysu === 'rgb(207, 65, 26)' &&
+              b10.ok,
+          pulsNaSekunde: k.c10.a.okresEfektu ? 1000 / k.c10.a.okresEfektu : null,
+          biegnie: b10, odczyt: k.c10.a
+        };
+
+        r.c11 = {
+          ok: k.c11.a.stanMinutnika === 'koncowka' &&
+              k.c11.a.okresEfektu === 500 &&           // ← 2×/s na biegnącej animacji
+              k.c11.a.deklarowanyOkres === '0.5s' &&
+              k.c11.a.kolorKropki === k.c10.a.kolorKropki &&   // „ten sam kolor"
+              k.c11.a.szerokoscKropki === k.c10.a.szerokoscKropki &&
+              b11.ok,
+          pulsNaSekunde: k.c11.a.okresEfektu ? 1000 / k.c11.a.okresEfektu : null,
+          eskalacjaTempem: k.c10.a.okresEfektu === 2 * k.c11.a.okresEfektu,
+          eskalacjaNieBarwa: k.c11.a.kolorKropki === k.c10.a.kolorKropki,
+          biegnie: b11, odczyt: k.c11.a
+        };
+
+        r.c12 = {
+          ok: k.c12.a.stanMinutnika === 'zero' &&
+              k.c12.a.jestAnimacja === false &&        // ← puls ZDJĘTY, nie tylko niewidoczny
+              k.c12.a.nazwaAnimacji === 'none' &&
+              k.c12.a.szerokoscKropki === 12 && k.c12.a.wysokoscKropki === 12 &&
+              k.c12.odliczanie === '0:00' && k.c12.pozostalo === 0,
+          odczyt: k.c12.a, odliczanie: k.c12.odliczanie
+        };
+
+        wynik.ramki[k.nazwa] = r;
+
+        /* sprzątanie — matryca ma zostać matrycą */
+        k.w.MP.tryb.minutniki.wyczysc();
+        k.w.MP_TEST.reset();
+        k.w.MP.tryb.zamknij();
+      });
+
+      var nazwy = Object.keys(wynik.ramki);
+      ['c10', 'c11', 'c12'].forEach(function (w) {
+        wynik[w] = nazwy.every(function (n) { return wynik.ramki[n][w].ok; });
+      });
+      wynik.ok = wynik.c10 && wynik.c11 && wynik.c12;
+      wynik.ramekZmierzonych = nazwy.length;
+      return wynik;
+    });
+
+  /* Reguła docinania kresek do siatki pikseli urządzenia — ta sama, co w fixture:
+     Chrome bierze floor(deklarowane × dpr), ale nie mniej niż 1 piksel urządzenia. */
+  function kreska(deklarowane, zmierzone) {
+    return Math.round(parseFloat(zmierzone) * devicePixelRatio) ===
+           Math.max(1, Math.floor(deklarowane * devicePixelRatio));
+  }
+};
+
+/* ---- C10 · C11 · C12 przyrządem PRZEWIJANYM (przebieg 18) -------------------
+   Po co drugi przyrząd na te same wiersze. `c1012()` mierzy animację BIEGNĄCĄ:
+   `currentTime` odczytany dwa razy musi przyrosnąć jak zegar ścienny. To jest
+   właściwy pomiar i zostaje — ale wymaga niezminimalizowanego okna, bo w karcie
+   ukrytej `document.timeline` stoi (potwierdzone siedem razy, ostatnio dziś:
+   `performance.now()` +5 232 ms wobec `document.timeline` +0 ms). Przez sześć
+   przebiegów oznaczało to, że o wierszach C10/C11 nie wiadomo NIC poza tym, co
+   zadeklarowane w CSS.
+
+   Ten przyrząd nie czeka na zegar — USTAWIA go. `animation.currentTime = t`
+   działa w karcie ukrytej, a `getComputedStyle` zwraca po takim ustawieniu
+   RZECZYWIŚCIE WYLICZONY `transform`. Zamiast pytać „jaki okres jest
+   zadeklarowany" (`animationDuration`) albo „jaki okres ma efekt"
+   (`effect.getTiming().duration` — oba to odczyty deklaracji), pytamy: „jakie
+   wartości silnik animacji WYPRODUKUJE, gdy przewinąć go po kolei przez okres".
+   Odpowiedzią jest podpis: dziewięć próbek co 125 ms w oknie 1 000 ms.
+
+     puls 1×/s  →  1, 0.9, 0.8, 0.7, 0.6, 0.7, 0.8, 0.9, 1     (jeden cykl)
+     puls 2×/s  →  1, 0.8, 0.6, 0.8, 1,   0.8, 0.6, 0.8, 1     (dwa cykle)
+
+   Eskalacja tempem jest tu widoczna WPROST — dwa cykle zamiast jednego w tym
+   samym oknie czasu, przy identycznym kolorze — a nie wyprowadzona z dwóch
+   liczb w polu `duration`.
+
+   CZEGO TEN PRZYRZĄD NIE MIERZY, i to jest zmierzone, nie założone (kontrola
+   negatywna, przebieg 18, ramka 320):
+
+     animation-duration: 2s     → podpis się ZMIENIA (1, 0.953, 0.9, …)  ✔ czuły
+     animation-name: none       → brak animacji, przyrząd zgłasza brak    ✔ czuły
+     animation-play-state:paused→ podpis IDENTYCZNY, zmienia się wyłącznie
+                                  `playState`                             ✘ ŚLEPY
+
+   Przewijanie działa tak samo na animacji wstrzymanej, więc sam podpis nie
+   odróżnia „biegnie" od „stoi". Dlatego wiersz zdaje TYLKO w parze z drugim
+   warunkiem: `playState !== 'paused'`. `playState` jest znanym kłamcą w JEDNĄ
+   stronę — w karcie ukrytej mówi `running`, choć zegar stoi (przeb. 12 i 17) —
+   ale kontrola wyżej pokazuje, że wstrzymanie JAWNE raportuje uczciwie. Jako
+   oracle jednostronny nadaje się więc do falsyfikacji („czy strona zatrzymała
+   animację"), nie do potwierdzenia („czy przeglądarka ją tyka").
+
+   Zostaje zatem dokładnie jedna dziura: czy UA sam przesuwa zegar w karcie
+   WIDOCZNEJ. To jest własność przeglądarki, nie embedu, i tylko ona wymaga
+   okna od użytkownika. Czy wiersz ma tę dziurę obejmować — D-18.1.
+   Ten przyrząd nie przemalowuje wierszy; dostarcza pomiar pod
+   obie odpowiedzi.                                                          */
+window.MP_MATRYCA.c1012seek = function () {
+  var CEL = ['320', '360', '390', '440', '480'];
+  var PROBKI = [0, 125, 250, 375, 500, 625, 750, 875, 1000];
+  var OCZ10 = '1,0.9,0.8,0.7,0.6,0.7,0.8,0.9,1';
+  var OCZ11 = '1,0.8,0.6,0.8,1,0.8,0.6,0.8,1';
+  var AKCENT = 'rgb(207, 65, 26)';
+
+  function kreska2(d, z) {
+    return Math.round(parseFloat(z) * devicePixelRatio) ===
+           Math.max(1, Math.floor(d * devicePixelRatio));
+  }
+  function skala(cs) {
+    var m = (cs.transform || '').match(/matrix\(([^)]+)\)/);
+    return m ? Math.round(parseFloat(m[1].split(',')[0]) * 1000) / 1000 : cs.transform;
+  }
+  /* Przewinięcie jest ODWRACALNE: zapamiętujemy `currentTime` i wracamy na nie,
+     żeby sonda nie zostawiała minutnika w cudzym miejscu okresu.               */
+  function podpis(w, k) {
+    var a = k.getAnimations()[0];
+    if (!a) return { brak: true };
+    var przed = a.currentTime, out = [];
+    for (var i = 0; i < PROBKI.length; i++) {
+      a.currentTime = PROBKI[i];
+      out.push(skala(w.getComputedStyle(k)));
+    }
+    a.currentTime = przed;
+    var cs = w.getComputedStyle(k);
+    return { podpis: out.join(','), okresEfektu: a.effect.getTiming().duration,
+             deklarowanyOkres: cs.animationDuration, playState: a.playState,
+             kolor: cs.backgroundColor, szer: parseFloat(cs.width),
+             wys: parseFloat(cs.height) };
+  }
+
+  var ramki = CEL.map(function (n) {
+    return Array.prototype.find.call(document.querySelectorAll('iframe'),
+                                     function (x) { return x.name === n; });
+  }).filter(Boolean);
+  if (ramki.length !== CEL.length) {
+    return { ok: false, powod: 'brak ramek portretowych: ' + ramki.length + '/' + CEL.length };
+  }
+
+  var wynik = { przyrzad: 'seek', widocznosc: document.visibilityState,
+                dpr: devicePixelRatio, probki: PROBKI, ramki: {} };
+
+  ramki.forEach(function (f) {
+    var w = f.contentWindow;
+    w.MP.tryb.otworz(w.MP_HARNESS.widok, { krok: 3 });
+    w.MP.tryb.minutniki.wyczysc();
+    w.MP_TEST.reset();
+    var m = w.MP.tryb.minutniki.uruchom({ nazwa: 'duś ragù', sekundy: 1934 });
+
+    w.MP_TEST.przewin(1934 - 45);                  // 45 s → `ostatnia-minuta`
+    w.MP.tryb.minutniki.tyk();
+    var k = m.el.kropka, pig = m.el.pigulka;
+    var a10 = podpis(w, k), st10 = m.stan;
+    var obrys = w.getComputedStyle(pig).outlineWidth;
+    var kolorObrysu = w.getComputedStyle(pig).outlineColor;
+
+    w.MP_TEST.przewin(39);                         // 6 s → `koncowka`
+    w.MP.tryb.minutniki.tyk();
+    var a11 = podpis(w, k), st11 = m.stan;
+
+    w.MP_TEST.przewin(11);                         // po czasie → `zero`
+    w.MP.tryb.minutniki.tyk();
+    var c12 = { stan: m.stan, animacji: k.getAnimations().length,
+                nazwa: w.getComputedStyle(k).animationName,
+                odliczanie: m.el.odliczanie.textContent };
+
+    var r = { nazwa: f.name };
+    r.c10 = {
+      ok: st10 === 'ostatnia-minuta' && a10.podpis === OCZ10 &&
+          a10.okresEfektu === 1000 && a10.deklarowanyOkres === '1s' &&
+          a10.playState !== 'paused' &&
+          a10.kolor === AKCENT && a10.szer === 12 && a10.wys === 12 &&
+          kreska2(1.5, obrys) && kolorObrysu === AKCENT,
+      cykliW1000ms: 1000 / a10.okresEfektu, odczyt: a10,
+      obrysPigulki: obrys, kolorObrysu: kolorObrysu
+    };
+    r.c11 = {
+      ok: st11 === 'koncowka' && a11.podpis === OCZ11 &&
+          a11.okresEfektu === 500 && a11.deklarowanyOkres === '0.5s' &&
+          a11.playState !== 'paused' &&
+          a11.kolor === a10.kolor && a11.szer === a10.szer,
+      cykliW1000ms: 1000 / a11.okresEfektu,
+      eskalacjaTempem: a10.okresEfektu === 2 * a11.okresEfektu,
+      eskalacjaNieBarwa: a11.kolor === a10.kolor, odczyt: a11
+    };
+    r.c12 = {
+      ok: c12.stan === 'zero' && c12.animacji === 0 && c12.nazwa === 'none' &&
+          c12.odliczanie === '0:00',
+      odczyt: c12
+    };
+    wynik.ramki[f.name] = r;
+
+    /* sprzątanie — matryca ma zostać matrycą (jak w `c1012`) */
+    w.MP.tryb.minutniki.wyczysc();
+    w.MP_TEST.reset();
+    w.MP.tryb.zamknij();
+  });
+
+  var nazwy = Object.keys(wynik.ramki);
+  ['c10', 'c11', 'c12'].forEach(function (n) {
+    wynik[n] = nazwy.every(function (x) { return wynik.ramki[x][n].ok; });
+  });
+  wynik.ok = wynik.c10 && wynik.c11 && wynik.c12;
+  wynik.ramekZmierzonych = nazwy.length;
+  return wynik;
+};
+
+/* Kontrola negatywna przyrządu przewijanego — uruchamiana osobno, bo mutuje
+   style i musi po sobie posprzątać. Zwraca cztery werdykty; przyrząd wolno
+   uznać za mierzący dopiero wtedy, gdy `reagujeNaOkres` i `reagujeNaBrak` są
+   prawdą, a `slepyNaPauze` jest prawdą ŚWIADOMIE (patrz komentarz wyżej).     */
+window.MP_MATRYCA.c1012seekKontrola = function () {
+  var PROBKI = [0, 125, 250, 375, 500, 625, 750, 875, 1000];
+  function skala(cs) {
+    var m = (cs.transform || '').match(/matrix\(([^)]+)\)/);
+    return m ? Math.round(parseFloat(m[1].split(',')[0]) * 1000) / 1000 : cs.transform;
+  }
+  var f = Array.prototype.find.call(document.querySelectorAll('iframe'),
+                                    function (x) { return x.name === '320'; });
+  if (!f) return { ok: false, powod: 'brak ramki 320' };
+  var w = f.contentWindow;
+  w.MP.tryb.otworz(w.MP_HARNESS.widok, { krok: 3 });
+  w.MP.tryb.minutniki.wyczysc();
+  w.MP_TEST.reset();
+  var m = w.MP.tryb.minutniki.uruchom({ nazwa: 'duś ragù', sekundy: 1934 });
+  w.MP_TEST.przewin(1934 - 45);
+  w.MP.tryb.minutniki.tyk();
+  var k = m.el.kropka;
+
+  function sig() {
+    var a = k.getAnimations()[0];
+    if (!a) return { brak: true };
+    var p = a.currentTime, o = [];
+    for (var i = 0; i < PROBKI.length; i++) { a.currentTime = PROBKI[i]; o.push(skala(w.getComputedStyle(k))); }
+    a.currentTime = p;
+    return { podpis: o.join(','), okres: a.effect.getTiming().duration, playState: a.playState };
+  }
+
+  var bazowy = sig();
+  k.style.animationDuration = '2s';        var kOkres = sig();  k.style.animationDuration = '';
+  k.style.animationPlayState = 'paused';   var kPauza = sig();  k.style.animationPlayState = '';
+  k.style.animationName = 'none';          var kBrak  = sig();  k.style.animationName = '';
+  var powrot = sig();
+
+  w.MP.tryb.minutniki.wyczysc();
+  w.MP_TEST.reset();
+  w.MP.tryb.zamknij();
+
+  return {
+    bazowy: bazowy, kontrolaOkres: kOkres, kontrolaPauza: kPauza, kontrolaBrak: kBrak,
+    powrot: powrot,
+    reagujeNaOkres: bazowy.podpis !== kOkres.podpis,
+    reagujeNaBrak: !!kBrak.brak,
+    slepyNaPauze: bazowy.podpis === kPauza.podpis,
+    pauzaWidocznaWplayState: kPauza.playState === 'paused',
+    wracaDoBazy: bazowy.podpis === powrot.podpis
+  };
+};
+
+/* ============ INWARIANT ODLEGŁOŚCI — sonda rodzica (przeb. 21) ===============
+   STAN.md 0aa: odstępy są NIEZMIENNE wobec szerokości, skaluje się wyłącznie
+   kolumna treści. Ramka eksportuje `MP_HARNESS.wynik.odleglosci`; ta sonda robi
+   jedyną rzecz, której ramka zrobić nie może — porównuje pięć ramek między sobą.
+
+   Wynik jest asymetryczny celowo: `rozne` to lista defektów, `kolumny` to
+   KONTROLA DODATNIA. Gdyby kolumny treści też wyszły równe, sonda mierzyłaby
+   pięć kopii tej samej ramki, a nie pięć szerokości — i „zero rozjazdów"
+   znaczyłoby wtedy dokładnie nic.                                             */
+window.inwariantOdleglosci = function () {
+  var CEL = ['320', '360', '390', '440', '480'];
+  var ramki = CEL.map(function (n) {
+    return Array.prototype.find.call(document.querySelectorAll('iframe'),
+                                     function (x) { return x.name === n; });
+  }).filter(Boolean);
+  if (ramki.length !== CEL.length) {
+    return { ok: false, powod: 'brak ramek portretowych: ' + ramki.length + '/' + CEL.length };
+  }
+
+  var dane = {}, kolumny = {}, braki = [];
+  ramki.forEach(function (f) {
+    var w = f.contentWindow;
+    var y = w.MP_HARNESS && w.MP_HARNESS.wynik;
+    if (!y || !y.odleglosci || y.odleglosci.blad) {
+      braki.push(f.name + (y && y.odleglosci ? ': ' + y.odleglosci.blad : ': brak eksportu'));
+      return;
+    }
+    dane[f.name] = y.odleglosci;
+    kolumny[f.name] = y.kolumnaTresci;
+  });
+  if (braki.length) { return { ok: false, powod: 'ramki bez pomiaru', braki: braki }; }
+
+  var klucze = Object.keys(dane['360']);
+  var rozne = [], zgodne = 0;
+  klucze.forEach(function (k) {
+    var wartosci = CEL.map(function (n) { return dane[n][k]; });
+    /* Wzorcem jest 360 — szerokość klatki Figmy (STAN.md 0aa), nie mediana
+       i nie 320. Mediana ukryłaby rozjazd, w którym trzy ramki mylą się zgodnie. */
+    var wzor = dane['360'][k];
+    if (wartosci.every(function (v) { return v === wzor; })) { zgodne++; }
+    else {
+      rozne.push({ wlasnosc: k, wzor360: wzor,
+                   zmierzone: CEL.map(function (n, i) { return n + '=' + wartosci[i]; }).join(' ') });
+    }
+  });
+
+  /* Kontrola dodatnia: kolumna treści MA się różnić i MA wynosić szerokość − 32. */
+  var kolumnyOk = CEL.every(function (n) { return kolumny[n] === parseInt(n, 10) - 32; });
+  var kolumnyRozne = new Set(CEL.map(function (n) { return kolumny[n]; })).size === CEL.length;
+
+  return {
+    ok: rozne.length === 0 && kolumnyOk && kolumnyRozne,
+    wlasnosciZgodnych: zgodne, wlasnosciWszystkich: klucze.length,
+    rozne: rozne,
+    kolumny: CEL.map(function (n) { return n + '→' + kolumny[n]; }).join(' '),
+    kolumnyOk: kolumnyOk, kolumnyRozne: kolumnyRozne
+  };
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+[meta]
+nazwa: makaron azjatycki z ligawą wołową
+slug: makaron-azjatycki-z-ligawa
+porcje-bazowe: 2
+liczba-porcji: 2 porcje
+waga-porcji: 471
+czas-minuty: 25
+item: 6a919eed6022c4041ee46643
+
+[zajawka]
+Ligawa pokrojona w bardzo cienkie plastry w poprzek włókien, smażona 2–3 minuty na mocnym ogniu i zdejmowana z patelni, zanim zdąży się ściąć. Wrzucamy ją z powrotem dopiero na koniec, do makaronu z marchewką, imbirem i sosem sojowym, tak by się w nim ogrzała, ale nie smażyła (bo nie chcemy, by z krwistej wołowiny wyszedł… kapeć).
+
+[skladniki]
+#ligawa     300 g ligawy wołowej  @ligawa
+#makaron    200 g makaronu udon
+#marchewka  1 marchewka
+#dymka      2 {cebula dymka|cebule dymki|cebul dymek|cebuli dymki}
+#sojowy     3 łyżki sosu sojowego
+#sezamowy   1 łyżka oleju sezamowego
+#olej       1 łyżka oleju do smażenia
+#czosnek    1 ząbek czosnku
+#imbir      1 łyżeczka startego świeżego imbiru
+#sezam      1 łyżeczka sezamu
+#chili      chili do smaku
+
+[kroki]
+== pokrój mięso w cienkie plastry
+czas: ok. 6 min
+skladniki: ligawa
+Wyjmij Ligawę z lodówki na kwadrans przed krojeniem, osusz ją i potnij w poprzek włókien na plastry cienkie na dwa, trzy milimetry. W poprzek, bo ligawa ma długie, mocne włókna i pokrojona wzdłuż zostaje twarda niezależnie od tego, jak krótko ją smażysz.
+
+== ugotuj makaron
+minutnik: 8:00 makaron
+kryterium: nitka przegryziona w połowie nie ma w środku jaśniejszego rdzenia
+Nastaw wodę i ugotuj makaron zgodnie z czasem z opakowania, a po odcedzeniu przelej go zimną wodą. Czas z opakowania jest wiążący, bo makaron udon i ryżowy różnią się pod tym względem dwukrotnie.
+
+== pokrój warzywa
+czas: ok. 6 min
+skladniki: marchewka, dymka, czosnek, imbir
+Marchewkę potnij w cienkie słupki, dymkę posiekaj, oddzielając białą część od zielonej, a czosnek i imbir posiekaj bardzo drobno. Zielona część dymki idzie na koniec, na wierzch, więc odłóż ją osobno.
+
+== usmaż mięso na mocnym ogniu
+minutnik: 3:00 mięso
+kryterium: plastry są brązowe na brzegach, a w środku nadal różowe
+skladniki: olej
+Rozgrzej olej w woku albo dużej patelni, aż zacznie leciutko dymić, rozłóż plastry w jednej warstwie i przerzuć je raz. Zaraz potem zdejmij mięso na talerz: dosmaży się jeszcze na końcu, przy makaronie, a przetrzymane teraz zrobi się twarde.
+
+== podsmaż warzywa
+minutnik: 3:00 warzywa
+kryterium: marchewka zmiękła na brzegach, ale zostaje sprężysta, a czosnek pachnie i nie zbrązowiał
+skladniki: chili
+Na tę samą patelnię wrzuć marchewkę, białą część dymki, czosnek, imbir i chili, i mieszaj bez przerwy. Nie dolewaj tłuszczu: został po mięsie i to w nim jest cały smak, którego sam świeży olej nie da.
+
+== połącz makaron z sosem
+czas: ok. 4 min
+skladniki: makaron, sojowy, sezamowy
+Dorzuć odcedzony makaron, wlej sos sojowy i olej sezamowy i przerzuć wszystko szczypcami, aż sos rozejdzie się równo. Olej sezamowy wchodzi na końcu i tylko na chwilę: podgrzewany dłużej traci aromat, przez który się go dodaje.
+
+== wróć z mięsem i podaj
+czas: ok. 2 min
+skladniki: sezam
+Wrzuć plastry mięsa razem z sokiem, który z nich wypłynął na talerzu, przerzuć całość dwa razy i od razu zdejmij patelnię z ognia. Rozłóż na miski, posyp sezamem i zieloną częścią dymki.
+
+[wskazowka]
+dlaczego mięso zdejmujemy z patelni tak szybko?
+Bo ligawa jest chudym mięsem z dużą ilością tkanki łącznej i ma dwa sensowne stany: krótko smażona i różowa w środku albo duszona godzinami. Wszystko pomiędzy jest twarde. Trzy minuty na mocnym ogniu dają skórkę i zostawiają środek różowy, a powrót na patelnię tylko ogrzewa mięso w sosie.
+
+od czego zależy, czy makaron się nie sklei?
+Od przelania zimną wodą zaraz po odcedzeniu. Makaron udon i ryżowy oddają dużo skrobi, a ta w cieple działa jak klej; zimna woda ją zmywa i zatrzymuje gotowanie. Bez tego kroku nitki zbiją się w bryłę, zanim trafią na patelnię.
+
+[co-mozesz-zmienic]
+#makaron
+krótko: makaronem ryżowym, w tej samej ilości
+czym zastąpić makaron udon?
+Makaronem ryżowym, w tej samej ilości. Ryżowy jest cieńszy i gotuje się krócej, część rodzajów wystarczy zalać wrzątkiem, więc czas bierz z opakowania, nie z tego przepisu.
+
+#imbir
+krótko: ½ łyżeczki imbiru mielonego
+nie mam świeżego imbiru, czy mielony wystarczy?
+Wystarczy, ale daj o połowę mniej, czyli pół łyżeczki. Mielony jest ostrzejszy i mniej cytrusowy, więc dorzuć go razem z czosnkiem, a nie wcześniej, bo w gorącym tłuszczu szybko gorzknieje.
+
+[przechowywanie]
+jak przechowywać i odgrzewać makaron z ligawą?
+W lodówce: do 2 dni w szczelnym pojemniku. W zamrażarce: ugotowanego makaronu nie mrozimy, bo po rozmrożeniu rozpada się na papkę; jeśli chcesz coś zamrozić, zrób to z samym mięsem i sosem, najlepsza jakość do 2–3 miesięcy. Odgrzewanie: na patelni na mocnym ogniu przez dwie minuty, z łyżką wody; w mikrofalówce mięso dojdzie i zrobi się twarde.
+
+[wartosci-odzywcze]
+energia: 577 kJ / 137 kcal; tłuszcz: 3,5 g; kwasy tłuszczowe nasycone: 0,7 g; węglowodany: 15 g; cukry: 1,5 g; błonnik: 1,4 g; białko: 10 g; sól: 0,67 g
+
+[wartosci-porcja]
+energia: 2716 kJ / 644 kcal; tłuszcz: 16 g; kwasy tłuszczowe nasycone: 3,1 g; węglowodany: 72 g; cukry: 7,2 g; błonnik: 6,7 g; białko: 48 g; sól: 3,1 g

@@ -1,0 +1,84 @@
+[meta]
+nazwa: pieczona golonka z indyka z warzywami
+slug: pieczona-golonka-z-indyka-z-warzywami
+porcje-bazowe: 3
+liczba-porcji: 3 porcje
+waga-porcji: 479
+czas-minuty: 135
+item: 6a904e87f582c0f9b994263a
+
+[zajawka]
+Dwie golonki z indyka natarte oliwą, majerankiem i słodką papryką, upieczone na warstwie marchwi, pietruszki i ziemniaków. Godzina w lodówce przed pieczeniem nie jest opcjonalna: w tym czasie sól wchodzi w mięso głębiej niż na milimetr. Warzywa leżą pod mięsem nieprzypadkowo. Doprawiają się tym, co z niego skapuje przez całe pieczenie.
+
+[skladniki]
+#golonka     900 g golonki z indyka   @golonka-z-indyka
+#marchew     3 marchewki
+#pietruszka  2 {pietruszka korzeniowa|pietruszki korzeniowe|pietruszek korzeniowych|pietruszki korzeniowej}
+#cebula      1 {duża cebula|duże cebule|dużych cebul|dużej cebuli}
+#ziemniaki   600 g ziemniaków
+#czosnek     4 ząbki czosnku
+#oliwa       3 łyżki oliwy z oliwek
+#majeranek   1 łyżeczka majeranku
+#papryka     1 łyżeczka słodkiej papryki
+#sol         sól do smaku
+#pieprz      pieprz do smaku
+
+[kroki]
+== natrzyj golonki
+czas: ok. 5 min
+skladniki: golonka, oliwa, sol, pieprz, majeranek, papryka
+Osusz Golonki z indyka papierowym ręcznikiem, a potem natrzyj je oliwą, solą, pieprzem, majerankiem i słodką papryką, wcierając przyprawy także pod fałdy skóry. Na mokrej skórze przyprawy zsuwają się razem z wilgocią i zostają na dnie naczynia zamiast na mięsie.
+
+== odstaw do lodówki
+czas: min. 1 h
+Przełóż natarte golonki do lodówki i zostaw je odkryte. Godzina to dolna granica, przy której sól zdąży przejść przez skórę; przez noc będzie jeszcze lepiej, a skóra dodatkowo przeschnie i mocniej się zrumieni.
+
+== przygotuj warzywa
+czas: ok. 15 min
+skladniki: marchew, pietruszka, cebula, ziemniaki, czosnek
+Obierz marchew, pietruszkę, cebulę i ziemniaki, a potem potnij je na duże kawałki, mniej więcej na dwa kęsy. Drobna kostka rozpadłaby się w papkę, zanim mięso dojdzie – warzywa mają tu spędzić w piekarniku tyle samo czasu co golonki.
+
+== zalej oliwą i ułóż golonki
+Przełóż warzywa do naczynia żaroodpornego, dorzuć czosnek w łupinach, skrop resztą oliwy i wymieszaj ręką. Golonki ułóż na wierzchu, skórą do góry, tak żeby nie dotykały się bokami – tam, gdzie się stykają, skóra zostanie blada i miękka.
+
+== piecz w 200 stopniach
+minutnik: 30:00 golonka
+kryterium: skóra jest napięta, sucha w dotyku i zaczęła brązowieć na wypukłościach
+Wstaw naczynie do piekarnika nagrzanego do 200°C, bez przykrycia. Ten pierwszy, gorący etap rumieni skórę; gdyby cała pieczeń szła w niższej temperaturze, golonki byłyby miękkie, ale blade.
+
+== zmniejsz temperaturę i dopiecz
+minutnik: 1:10:00 golonka
+kryterium: mięso przy kości puszcza się widelcem bez oporu, a sok wypływający z nakłucia jest przezroczysty
+Zmniejsz temperaturę do 180°C i piecz dalej, polewając mięso sokami z dna co jakiś czas. Jeśli warzywa zaczną się przypiekać za mocno, przykryj sam ich brzeg folią – mięso zostaw odkryte, inaczej skóra zmięknie.
+
+== polej i podaj
+czas: ok. 3 min
+Przełóż golonki na deskę, a warzywa na półmisek. Sosy z dna naczynia zbierz łyżką i polej nimi mięso tuż przed podaniem: to w nich jest wszystko, co wytopiło się ze skóry przez cały czas pieczenia.
+
+[wskazowka]
+po co polewać mięso sokami w trakcie pieczenia?
+Wilgoć nie wchodzi przy tym do środka mięsa, wbrew temu, co się o polewaniu mówi. Zmienia się tylko powierzchnia: chłodniejsza i wilgotniejsza skóra rumieni się wolniej i równiej, a tłuszcz wytapia się z niej do końca zamiast przypalać.
+
+czy warto marynować dłużej niż godzinę?
+Tak, i najwięcej zyskujesz przez pierwszą noc. Sól przechodzi w głąb mięsa powoli, więc po godzinie doprawiona jest głównie warstwa przy skórze, a po kilkunastu godzinach – całe włókna przy kości.
+
+[co-mozesz-zmienic]
+#pietruszka
+krótko: selerem korzeniowym albo dodatkową marchewką
+czym zastąpić pietruszkę korzeniową?
+Kawałkiem selera korzeniowego, w tej samej wadze, albo po prostu dodatkową marchewką. Seler jest wyraźniejszy i lekko gorzkawy, więc daj go mniej niż pietruszki; marchew pójdzie w drugą stronę i osłodzi całość.
+
+#golonka
+krótko: Podudziem z indyka, ta sama metoda i te same temperatury
+to samo pieczenie zadziała na inny element indyka?
+Podudzie z indyka zachowuje się tu prawie identycznie: ta sama skóra do zrumienienia, ta sama kość i ten sam układ temperatur. Przy Skrzydle z indyka skróć drugi etap mniej więcej o połowę, bo mięsa jest tam znacznie mniej.
+
+[przechowywanie]
+jak przechowywać i odgrzewać pieczoną golonkę z indyka?
+Odkrój mięso od kości, przełóż je razem z warzywami do szczelnego pojemnika w ciągu 1–2 godzin od wyjęcia z piekarnika i trzymaj w lodówce do 2 dni. W zamrażarce: najlepsza jakość do 2–3 miesięcy, najlepiej w porcjach i zalane sokami z pieczenia. Odgrzewaj pod przykryciem w piekarniku nagrzanym do 160°C, z łyżką wody na dnie, żeby mięso nie wyschło.
+
+[wartosci-odzywcze]
+energia: 570 kJ / 136 kcal; tłuszcz: 6,3 g; kwasy tłuszczowe nasycone: 1,2 g; węglowodany: 9,7 g; cukry: 2,7 g; błonnik: 1,7 g; białko: 9,2 g; sól: 0,34 g
+
+[wartosci-porcja]
+energia: 2730 kJ / 652 kcal; tłuszcz: 30 g; kwasy tłuszczowe nasycone: 5,8 g; węglowodany: 47 g; cukry: 13 g; błonnik: 8 g; białko: 44 g; sól: 1,7 g

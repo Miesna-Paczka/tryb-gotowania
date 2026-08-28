@@ -1,0 +1,86 @@
+[meta]
+nazwa: dorsz czarny w sosie cytrynowo-maślanym
+slug: dorsz-czarny-w-sosie-cytrynowo-maslanym
+porcje-bazowe: 2
+liczba-porcji: 2 porcje
+waga-porcji: 252
+czas-minuty: 20
+item: 6a9049cae555b6dc1bf5ded8
+
+[zajawka]
+Wbrew nazwie, dorsz czarny... nie jest dorszem, ale zawiera podobnie mało tłuszczu. Dlatego, by go nie przesuszyć, stworzyliśmy przepis na dorsza smażonego w oliwie, podawanego w sosie z masła, soku i skórki z cytryny. Gdy ryba jest gotowa, ściągasz ją na talerz, a z tego, co przywarło do patelni, przygotowujesz pyszny, cytrynowy sos.
+
+[skladniki]
+#dorsz    375 g polędwic z dorsza czarnego   @dorsz-czarny-poledwice
+#maka     2 łyżki mąki pszennej
+#oliwa    2 łyżki oliwy z oliwek
+#maslo    40 g masła
+#cytryna  ½ cytryny
+#czosnek  1 ząbek czosnku
+#bulion   100 ml bulionu warzywnego lub wody
+#natka    1 łyżka posiekanej natki pietruszki lub koperku
+#sol      sól do smaku
+#pieprz   pieprz do smaku
+
+[kroki]
+== przygotuj rybę
+czas: ok. 3 min
+skladniki: dorsz, sol, pieprz, maka
+Osusz polędwice papierowym ręcznikiem, dopraw je solą i pieprzem, a potem oprósz z obu stron mąką. Osuszanie nie jest formalnością: na mokrej rybie mąka rozchodzi się w kleik i zamiast skórki dostajesz klej.
+
+== usmaż spód
+minutnik: 4:00 spód
+kryterium: brzeg polędwicy jest złoty, a podważona łopatką odchodzi od dna bez oporu
+skladniki: oliwa
+Rozgrzej oliwę na średnim ogniu i połóż polędwice tą stroną, która ma leżeć na wierzchu w talerzu. Nie przesuwaj ich po patelni – polędwica puszcza dno dopiero wtedy, gdy spód zdąży się zrumienić, a szarpana wcześniej zostawia na patelni połowę siebie.
+
+== obróć i dosmaż
+minutnik: 4:00 wierzch
+kryterium: mięso jest matowe na wskroś i rozdziela się na płaty pod naciskiem widelca
+Obróć polędwice łopatką, dosmaż drugą stronę i przełóż rybę na talerz. Dorsz czarny jest chudy i minuty za długo nie wybacza, więc zdejmij go dokładnie wtedy, gdy środek dopiero co przestał być szklisty.
+
+== rozpuść masło z czosnkiem
+minutnik: 0:30 czosnek
+kryterium: masło jest spienione i pachnie orzechowo, a czosnek nigdzie nie zbrązowiał
+skladniki: maslo, czosnek
+Na tej samej patelni rozpuść masło i przeciśnij do niego czosnek. Masło ma być spienione, nie brązowe: w brązowym czosnek przypala się szybciej, niż zdążysz zdjąć patelnię z ognia.
+
+== zredukuj sos
+minutnik: 3:00 sos
+kryterium: sos pokrywa dno cienką warstwą i spływa z łopatki wolno, jedną strugą
+skladniki: bulion, cytryna
+Wlej bulion i sok z połówki cytryny, a potem trzymaj sos na średnim ogniu. Woda odparowuje, a wszystko, co przywarło do dna po smażeniu ryby, schodzi w tym czasie do sosu i tam zostaje.
+
+== wróć rybę na patelnię
+minutnik: 1:00 ryba
+kryterium: ryba jest gorąca w środku, a sos oblepia ją równo z wierzchu
+skladniki: natka
+Wsyp otartą skórkę cytrynową i posiekaną natkę, włóż polędwice z powrotem na patelnię i polewaj je sosem łyżką. Skórka idzie na sam koniec, bo cytrynowy zapach pochodzi z jej olejków, a te ulatniają się przy dłuższym gotowaniu.
+
+[wskazowka]
+po co oprószać rybę mąką?
+Mąka robi dwie rzeczy naraz. Przy smażeniu tworzy cienką warstwę, pod którą delikatne mięso wysycha wolniej, a to, co z niej zostanie na dnie patelni, zagęszcza potem sos.
+
+dlaczego ryba przywiera do patelni?
+Najczęściej przez zbyt zimną patelnię albo przez zbyt wczesne ruszanie. Rozgrzej oliwę, aż zacznie się marszczyć, połóż polędwice i zostaw je w spokoju: zrumieniony spód odchodzi od dna sam, a bladego nie oderwiesz, choćbyś podważał go pięć razy.
+
+[co-mozesz-zmienic]
+#dorsz
+krótko: Łososiem atlantyckim albo Pstrągiem tęczowym
+ten sam sos pasuje do innej ryby?
+Do Łososia atlantyckiego i do Pstrąga tęczowego, w tej samej ilości. Oba mają znacznie więcej własnego tłuszczu niż dorsz czarny, więc na patelni wybaczą więcej, a masło z cytryną ma się z czym połączyć. Przy zbliżonej grubości płata czas smażenia zostaje ten sam.
+
+#cytryna
+krótko: sokiem z butelki, ale bez skórki sos wyjdzie tylko kwaśny
+mam tylko sok z cytryny w butelce – wystarczy?
+Do samego sosu tak, w tej samej ilości. Ale skórki z butelki nie zetrzesz, a większość cytrynowego zapachu pochodzi właśnie z niej: bez skórki sos wyjdzie kwaśny, tylko że nie cytrynowy.
+
+[przechowywanie]
+jak przechowywać i odgrzewać dorsza w sosie cytrynowo-maślanym?
+Przełóż ostudzoną rybę razem z sosem do szczelnego pojemnika w ciągu 1–2 godzin od zdjęcia z ognia i trzymaj w lodówce do 2 dni. Mrożenia tego dania nie polecamy: sos na maśle rozwarstwia się po rozmrożeniu, a ryba traci zwartość. Odgrzewaj krótko i pod przykryciem, na małym ogniu, polewając rybę sosem.
+
+[wartosci-odzywcze]
+energia: 712 kJ / 171 kcal; tłuszcz: 12 g; kwasy tłuszczowe nasycone: 4,9 g; węglowodany: 1,7 g; cukry: 0,3 g; błonnik: 0,4 g; białko: 13 g; sól: 0,61 g
+
+[wartosci-porcja]
+energia: 1792 kJ / 430 kcal; tłuszcz: 31 g; kwasy tłuszczowe nasycone: 12 g; węglowodany: 4,3 g; cukry: 0,8 g; błonnik: 0,9 g; białko: 32 g; sól: 1,5 g

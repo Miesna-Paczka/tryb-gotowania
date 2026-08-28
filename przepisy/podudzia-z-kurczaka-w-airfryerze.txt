@@ -1,0 +1,92 @@
+[meta]
+nazwa: podudzia z kurczaka pieczone w airfryerze
+slug: podudzia-z-kurczaka-w-airfryerze
+porcje-bazowe: 2
+liczba-porcji: 2 porcje
+waga-porcji: 597
+czas-minuty: 60
+item: 6a919eed6022c4041ee4664b
+
+[zajawka]
+Podudzia w marynacie z miodu, ketchupu i chilli, podawane z ziemniakami, marchewką, papryką, cebulą i cukinią. Miód z ketchupem determinują smak skórki – cukier z obu karmelizuje się bowiem pod wpływem gorącego powietrza. Marynowanie zaczyna się dwie godziny wcześniej, toteż nie wliczamy go do czasu przygotowania.
+
+[skladniki]
+#podudzia   510 g podudzi z kurczaka  @podudzia-z-kurczaka
+#ziemniaki  400 g ziemniaków
+#marchewka  2 marchewki
+#papryka    1 {czerwona papryka|czerwone papryki|czerwonych papryk|czerwonej papryki}
+#cebula     1 cebula
+#cukinia    125 g cukinii
+#czosnek    3 ząbki czosnku
+#oliwa      1 łyżka oliwy do warzyw
+#miod       1 łyżka miodu
+#chilli     =1 łyżeczka płatków chilli
+#ketchup    1 łyżeczka ketchupu
+#olej       1 łyżka oleju
+#czosnek2   2 ząbki czosnku do marynaty
+#papryka2   =1 łyżeczka papryki słodkiej
+#tymianek   =½ łyżeczki tymianku
+#sol        sól do smaku
+#pieprz     pieprz do smaku
+
+[kroki]
+== wymieszaj marynatę i natrzyj podudzia
+czas: ok. 6 min
+skladniki: podudzia, miod, chilli, ketchup, olej, czosnek2, papryka2, tymianek, sol, pieprz
+Osusz Podudzia z kurczaka papierowym ręcznikiem, a w miseczce rozmieszaj miód, ketchup, olej, przeciśnięty czosnek, słodką paprykę, płatki chilli, tymianek, pół łyżeczki soli i pieprz. Natrzyj mięso marynatą ze wszystkich stron, także pod skórą.
+
+== odstaw podudzia do lodówki
+czas: min. 2 h
+Przykryj miskę i wstaw ją do lodówki na co najmniej dwie godziny, a najlepiej na całą noc. Ten czas nie liczy się do czasu przygotowania: sól potrzebuje go, żeby wejść w mięso, a nie zostać na skórze.
+
+== pokrój warzywa
+czas: ok. 10 min
+skladniki: ziemniaki, marchewka, papryka, cebula, cukinia, czosnek
+Ziemniaki potnij na kawałki wielkości orzecha włoskiego, marchewkę w grube plasterki, paprykę na duże kawałki, cebulę w ósemki, a cukinię w półplasterki; ząbki czosnku zostaw w całości. Ziemniaki i marchewka są tu najtwardsze, więc kroj je najmniejsze z całego zestawu.
+
+== dopraw warzywa oliwą
+czas: ok. 3 min
+skladniki: oliwa, sol, pieprz
+Przełóż warzywa do miski, polej oliwą, oprósz solą i pieprzem i wymieszaj ręką, żeby tłuszcz pokrył każdy kawałek. Warzywo bez tłuszczu wysycha w gorącym powietrzu, zamiast się przypiec.
+
+== upiecz podudzia
+minutnik: 24:00 podudzia
+kryterium: skórka jest rumiana i napięta, a sok wypływający po nakłuciu przy kości jest przezroczysty
+Rozgrzej airfryer do 200°C, ułóż podudzia luźno w koszu i obróć je w połowie. Cukier z miodu i ketchupu ciemnieje szybciej niż mięso dochodzi, więc od dwudziestej minuty zaglądaj do kosza.
+
+== upiecz warzywa
+minutnik: 16:00 warzywa
+kryterium: ziemniaki dają się przebić widelcem bez oporu, a brzegi cebuli i papryki są ciemne
+Wyjmij mięso, przełóż warzywa do kosza i piecz je w tej samej temperaturze, przemieszawszy raz w połowie. Jeśli kosz jest mały, zrób to w dwóch partiach i licz czas dla każdej osobno.
+
+== podaj prosto z kosza
+czas: ok. 2 min
+Rozłóż warzywa na talerzach, połóż na nich podudzia i polej wszystko sokami z dna kosza. Mięso odpoczywało przez cały czas pieczenia warzyw, więc jest już gotowe do jedzenia.
+
+[wskazowka]
+dlaczego mięso i warzywa pieką się osobno, skoro to jedno danie?
+Bo potrzebują innego czasu i tej samej przestrzeni. Podudzia w 200°C dochodzą 24 minuty, warzywa 16, a airfryer działa tylko wtedy, gdy powietrze może krążyć wokół każdego kawałka. Wrzucone razem odbiorą sobie tę przestrzeń i zaczną parować. Przy okazji warzywa pieką się potem na tłuszczu, który został po mięsie, a mięso odpoczywa dokładnie tyle, ile trzeba.
+
+marynata przypaliła się, a mięso zostało surowe – co poprawić?
+Zejść z temperaturą o dwadzieścia stopni i dodać pięć minut, albo natrzeć podudzia marynatą tylko od spodu, a wierzch posmarować w połowie pieczenia. Miód i ketchup to prawie sam cukier, a cukier w 200°C ciemnieje szybciej niż piecze się mięso.
+
+[co-mozesz-zmienic]
+#podudzia
+krótko: piekarnik 200°C, 35–40 min
+nie mam airfryera, jak upiec to w piekarniku?
+Nagrzej piekarnik do 200°C z termoobiegiem i piecz podudzia 35 do 40 minut na kratce, z blachą pod spodem. Warzywa wsuń na osobnej blasze na ostatnie 25 minut; w piekarniku obie rzeczy zmieszczą się naraz, bo miejsca jest więcej niż w koszu.
+
+#ketchup
+krótko: łyżeczką koncentratu pomidorowego i szczyptą cukru
+czym zastąpić ketchup w marynacie?
+Łyżeczką koncentratu pomidorowego ze szczyptą cukru. Ketchup jest tu połączeniem kwasu, cukru i pomidora, więc sam koncentrat bez cukru da kolor, ale nie da karmelizacji.
+
+[przechowywanie]
+jak przechowywać i odgrzewać podudzia z warzywami?
+W lodówce: do 2 dni w szczelnym pojemniku, mięso i warzywa razem. W zamrażarce: samo mięso, najlepsza jakość do 2–3 miesięcy; pieczone ziemniaki i cukinia po rozmrożeniu wychodzą wodniste. Odgrzewanie: w airfryerze w 170°C przez 5 do 7 minut, żeby skórka wróciła do chrupkości.
+
+[wartosci-odzywcze]
+energia: 463 kJ / 110 kcal; tłuszcz: 4,5 g; kwasy tłuszczowe nasycone: 0,8 g; węglowodany: 9,4 g; cukry: 4,4 g; błonnik: 1,9 g; białko: 6,9 g; sól: 0,54 g
+
+[wartosci-porcja]
+energia: 2765 kJ / 659 kcal; tłuszcz: 27 g; kwasy tłuszczowe nasycone: 4,7 g; węglowodany: 56 g; cukry: 26 g; błonnik: 11 g; białko: 41 g; sól: 3,2 g

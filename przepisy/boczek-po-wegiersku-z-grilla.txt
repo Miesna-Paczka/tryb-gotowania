@@ -1,0 +1,66 @@
+[meta]
+nazwa: boczek po węgiersku z grilla
+slug: boczek-po-wegiersku-z-grilla
+porcje-bazowe: 2
+liczba-porcji: 2–3 porcje
+waga-porcji: 300
+czas-minuty: 25
+
+[zajawka]
+Grube plastry boczku w paprykowej marynacie, z grilla, podane z pieczywem, musztardą, ogórkiem kiszonym i surową czerwoną cebulą. W marynacie jest cukier, więc kolor łapie szybciej niż samo mięso i dlatego żar ma tu być średni, nigdy najmocniejszy. Kwaśny ogórek i ostra cebula są przeciwwagą dla tłuszczu, a nie dodatkiem do wyboru.
+
+[skladniki]
+#boczek     270 g boczku po węgiersku  @boczek-po-wegiersku
+#ogorki     2 {ogórek kiszony|ogórki kiszone|ogórków kiszonych|ogórka kiszonego}
+#cebula     ½ {czerwona cebula|czerwone cebule|czerwonych cebul|czerwonej cebuli}
+#musztarda  2 łyżki musztardy
+#pieczywo   świeże pieczywo
+#natka      natka pietruszki
+
+[kroki]
+== pokrój boczek w grube plastry
+czas: ok. 3 min
+skladniki: boczek
+Jeśli Boczek po węgiersku przyszedł w kawałku, potnij go w plastry grubości mniej więcej centymetra. Rozmroź go wcześniej do końca: zmrożony środek zostanie surowy pod przypieczoną marynatą.
+
+== rozgrzej grill
+czas: ok. 5 min
+Rozpal grill i doprowadź go do średniego żaru, takiego, nad którym utrzymasz dłoń przez cztery, pięć sekund. Nad mocnym żarem cukry z marynaty przypalą się, zanim tłuszcz w boczku zdąży się wytopić.
+
+== grilluj z obu stron
+minutnik: 9:00 boczek
+kryterium: marynata jest ciemna i lśniąca, a tłuszcz w plastrze zrobił się szklisty zamiast białego
+Ułóż plastry na ruszcie i obróć je mniej więcej w połowie, licząc od czterech do pięciu minut na stronę. Na patelni zajmuje to tyle samo, na średnim ogniu, a w piekarniku na kratce w 200°C od 15 do 18 minut z obróceniem w połowie.
+
+== pokrój dodatki
+czas: ok. 5 min
+skladniki: ogorki, cebula, natka
+Czerwoną cebulę potnij w cienkie piórka, ogórki kiszone w plasterki, a natkę posiekaj. Cebula idzie na stół surowa i tak ma zostać: jej ostrość robi tu tę samą robotę co kwas ogórka.
+
+== podaj z pieczywem
+czas: ok. 3 min
+skladniki: musztarda, pieczywo
+Rozłóż gorące plastry na desce, obok postaw musztardę, ogórki i cebulę, a pieczywo pokrój w grube kromki. Posyp wszystko natką tuż przed podaniem, bo na gorącym mięsie zwiędnie w kilkanaście sekund.
+
+[wskazowka]
+dlaczego marynata paprykowa wymaga słabszego żaru niż zwykły boczek?
+Bo zawiera cukier, a cukier karmelizuje się w znacznie niższej temperaturze niż ta, w której rumieni się mięso. Nad mocnym żarem wierzch zrobi się czarny i gorzki w dwie minuty, podczas gdy tłuszcz wewnątrz plastra będzie jeszcze biały i twardy. Średni żar daje obu procesom ten sam czas.
+
+jak podać ten boczek, żeby nie był po prostu tłusty?
+Zestawem kontrastów, i on jest tu przepisem, nie sugestią. Kwas ogórka kiszonego, ostrość surowej czerwonej cebuli i musztarda przecinają tłuszcz, a pieczywo go zbiera. Sam boczek na talerzu przestaje smakować po trzech kęsach.
+
+[co-mozesz-zmienic]
+#ogorki
+krótko: piklami z papryki, w tej samej ilości
+czym zastąpić ogórki kiszone?
+Piklami z papryki albo marynowaną papryczką, w tej samej ilości. Trzymaj się kierunku węgierskiego: potrzebny jest kwas, nie słodycz, więc ogórki konserwowe będą tu słabsze.
+
+[przechowywanie]
+jak przechowywać i odgrzewać boczek po węgiersku?
+W lodówce: do 2 dni w szczelnym pojemniku, wystudzony przed zamknięciem. W zamrażarce: najlepsza jakość do 1–2 miesięcy, przełożony papierem do pieczenia. Odgrzewanie: na suchej patelni na średnim ogniu przez 2 do 3 minut z każdej strony; marynata przypala się szybko, więc nie zostawiaj patelni bez nadzoru.
+
+[wartosci-odzywcze]
+energia: 913 kJ / 219 kcal; tłuszcz: 14 g; kwasy tłuszczowe nasycone: 5,9 g; węglowodany: 16 g; cukry: 2,9 g; błonnik: 1,6 g; białko: 7,3 g; sól: 1,9 g
+
+[wartosci-porcja]
+energia: 2736 kJ / 657 kcal; tłuszcz: 41 g; kwasy tłuszczowe nasycone: 18 g; węglowodany: 47 g; cukry: 8,8 g; błonnik: 4,9 g; białko: 22 g; sól: 5,7 g

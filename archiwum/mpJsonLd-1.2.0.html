@@ -1,0 +1,182 @@
+<script>
+/* mpJsonLd 1.2.0 — emituje Recipe JSON-LD dla strony przepisu.
+   Zrodlo: MP.dane + MP.model (ladunek z GitHub Pages). Gdy ladunku nie ma,
+   sklada to samo z serwerowych list [data-mp-skladniki-html] i [data-mp-kroki-html].
+*/
+(function () {
+  var ID = 'mp-jsonld';
+  if (document.getElementById(ID)) return;
+
+  function el(s) { return document.querySelector(s); }
+  function txt(s) { var e = el(s); return e ? e.textContent.trim() : ''; }
+  function meta(n) {
+    var e = document.querySelector('meta[name="' + n + '"],meta[property="' + n + '"]');
+    return e ? e.content : '';
+  }
+  function liczba(s) { var m = String(s).replace(',', '.').match(/-?\d+(\.\d+)?/); return m ? parseFloat(m[0]) : null; }
+
+  /* "klucz: wartosc; klucz: wartosc" -> mapa */
+  function pary(s) {
+    var out = {};
+    String(s || '').split(';').forEach(function (kawalek) {
+      var t = kawalek.trim(), i = t.indexOf(':');
+      if (i > 0) out[t.slice(0, i).trim().toLowerCase()] = t.slice(i + 1).trim();
+    });
+    return out;
+  }
+  function gramy(v) {
+    var n = liczba(v);
+    return n === null ? null : (Math.round(n * 100) / 100) + ' g';
+  }
+
+  function odzywcze(zrodlo, waga) {
+    var p = pary(zrodlo), n = { '@type': 'NutritionInformation' }, cokolwiek = false;
+    var kcal = p['energia'] && p['energia'].match(/(\d+(?:[.,]\d+)?)\s*kcal/i);
+    if (kcal) { n.calories = liczba(kcal[1]) + ' kcal'; cokolwiek = true; }
+    var mapa = {
+      'tłuszcz': 'fatContent',
+      'kwasy tłuszczowe nasycone': 'saturatedFatContent',
+      'węglowodany': 'carbohydrateContent',
+      'cukry': 'sugarContent',
+      'błonnik': 'fiberContent',
+      'białko': 'proteinContent'
+    };
+    Object.keys(mapa).forEach(function (k) {
+      var g = p[k] && gramy(p[k]);
+      if (g) { n[mapa[k]] = g; cokolwiek = true; }
+    });
+    /* sol != sod. schema.org oczekuje sodu; przelicznik ustawowy to sol = sod x 2,5 */
+    var sol = liczba(p['sól']);
+    if (sol !== null) { n.sodiumContent = (Math.round((sol / 2.5) * 100) / 100) + ' g'; cokolwiek = true; }
+    if (waga) n.servingSize = waga + ' g';
+    return cokolwiek ? n : null;
+  }
+
+  /* Kolejnosc ma znaczenie: najwiekszy obraz na stronie to zdjecie PRODUKTU
+     w szynie (recipe-rail__photo, 1024 px), a nie danie (recipe-hero__img, 860 px).
+     Heurystyka rozmiaru wybieralaby wiec zly obraz. Klasa hero jest rozstrzygajaca. */
+  function zdjecie() {
+    var kandydat = el('.recipe-hero__img') || el('[class*="recipe-hero"] img');
+    if (!kandydat) {
+      var slug = location.pathname.replace(/\/+$/, '').split('/').pop();
+      var img = [].slice.call(document.images);
+      kandydat = img.filter(function (i) { return (i.currentSrc || i.src || '').indexOf(slug) > -1; })[0]
+        || img.filter(function (i) { return i.naturalWidth > 400; })
+              .sort(function (a, b) { return b.naturalWidth - a.naturalWidth; })[0];
+    }
+    if (!kandydat) return null;
+    return (kandydat.currentSrc || kandydat.src || '').split('?')[0] || null;
+  }
+
+  /* Pierwszy .caption na stronie to okruszki nawigacyjne, nie byline.
+     Bierzemy pierwszy wezel liscia, ktory faktycznie parsuje sie na sensowna date. */
+    function dataIso() {
+    var e = el('[data-mp-data-iso]');
+    if (e) return e.getAttribute('data-mp-data-iso');
+    var w = [].slice.call(document.querySelectorAll('time[datetime]'));
+    for (var i = 0; i < w.length; i++) {
+      var dt = new Date(w[i].getAttribute('datetime'));
+      if (!isNaN(dt.getTime())) return dt.toISOString().slice(0, 10);
+    }
+    var PL = ['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
+    var kand = [].slice.call(document.querySelectorAll('[class*="caption"],time'));
+    for (var j = 0; j < kand.length; j++) {
+      var k = kand[j]; if (k.children.length) continue;
+      var t = k.textContent.trim();
+      if (t.length < 6 || t.length > 40) continue;
+      var mpl = t.match(/^(\d{1,2})\s+([a-ząćęłńóśźż]+)\s+(\d{4})/i);
+      if (mpl) { var ix = PL.indexOf(mpl[2].toLowerCase());
+        if (ix > -1) return mpl[3] + '-' + ('0' + (ix + 1)).slice(-2) + '-' + ('0' + mpl[1]).slice(-2); }
+      var d = new Date(t), rok = d.getFullYear();
+      if (!isNaN(d.getTime()) && rok >= 2020 && rok <= 2100) return d.toISOString().slice(0, 10);
+    }
+    return null;
+  }
+
+  function zListy(sel) {
+    var e = el(sel); if (!e) return [];
+    return [].slice.call(e.querySelectorAll('li')).map(function (li) {
+      /* klon bez <a>: link produktowy doklejalby " - w Miesnej Paczce" do skladnika */
+      var k = li.cloneNode(true);
+      [].slice.call(k.querySelectorAll('a')).forEach(function (a) { a.parentNode.removeChild(a); });
+      return k.textContent.replace(/\s+/g, ' ').replace(/[\s\u2013\u2014-]+$/, '').trim();
+    }).filter(Boolean);
+  }
+
+  /* Sciezka DOM jest AWARYJNA, nie rownorzedna: listy serwerowe stoja w DOM-ie od
+     pierwszej klatki, wiec bez tej bramki fallback wygrywalby wyscig z ladunkiem
+     zawsze -- i blok wychodzilby bez totalTime i recipeYield, ktore zyja tylko w
+     ladunku. Zmierzone 2026-08-20: 16 z 16 stron zbudowanych z DOM-u. */
+  var start = Date.now();
+  function wolnoZDom() {
+    /* Sygnalem "loader bedzie" jest element w DOM-ie, nie window.MP.ladunek:
+       skrypt ze stopki startuje przed mpLadunek, wiec obiekt jeszcze nie istnieje
+       i warunek "brak loadera" otwieralby furtke przy kazdym wczytaniu. */
+    if (!el('[data-mp-ladunek]')) return true;             // strona faktycznie bez loadera
+    var L = window.MP && window.MP.ladunek;
+    if (L && /^blad|^brak/.test(L.stan || '')) return true; // loader zglosil porazke
+    return (Date.now() - start) > 12000;                    // ostatnia deska ratunku
+  }
+
+  function zbuduj() {
+    var D = (window.MP && window.MP.dane) || null;
+    var M = (window.MP && window.MP.model) || null;
+    if ((!D || !M) && !wolnoZDom()) return false;
+
+    var skladniki = M && M.skladniki && M.skladniki.length
+      ? M.skladniki.map(function (s) { return s.tresc; }).filter(Boolean)
+      : zListy('[data-mp-skladniki-html]');
+
+    var kroki = M && M.kroki && M.kroki.length
+      ? M.kroki.map(function (k) { return { tytul: k.tytul || '', tekst: k.tekst || '' }; })
+      : zListy('[data-mp-kroki-html]').map(function (t) { return { tytul: '', tekst: t }; });
+
+    if (!skladniki.length || !kroki.length) return false;
+
+    var kanon = (el('link[rel=canonical]') || {}).href || location.href;
+    var nazwa = (D && D.nazwa) || txt('h1') || document.title;
+    var minuty = D ? liczba(D['czas-minuty']) : null;
+    var porcje = D ? liczba(D['porcje-bazowe']) : null;
+    var waga = D ? liczba(D['waga-porcji']) : null;
+
+    var r = {
+      '@context': 'https://schema.org',
+      '@type': 'Recipe',
+      name: nazwa,
+      url: kanon,
+      mainEntityOfPage: { '@type': 'WebPage', '@id': kanon },
+      author: { '@type': 'Organization', name: 'Mięsna Paczka', url: 'https://miesnapaczka.pl' },
+      publisher: { '@type': 'Organization', name: 'Mięsna Paczka', url: 'https://miesnapaczka.pl' },
+      recipeIngredient: skladniki,
+      recipeInstructions: kroki.map(function (k, i) {
+        var s = { '@type': 'HowToStep', text: k.tekst, url: kanon + '#krok-' + (i + 1) };
+        if (k.tytul) s.name = k.tytul;
+        return s;
+      })
+    };
+
+    var opis = meta('description'); if (opis) r.description = opis;
+    var foto = zdjecie(); if (foto) r.image = [foto];
+    if (minuty) { r.totalTime = 'PT' + Math.round(minuty) + 'M'; }
+    if (porcje) { r.recipeYield = String(Math.round(porcje)); }
+    var d = dataIso(); if (d) { r.datePublished = d; r.dateModified = d; }
+    var n = odzywcze(D ? D['wartosci-porcja'] : txt('[data-mp-porcja]'), waga || liczba(txt('[data-mp-waga]')));
+    if (n) r.nutrition = n;
+
+    var s = document.createElement('script');
+    s.type = 'application/ld+json';
+    s.id = ID;
+    s.textContent = JSON.stringify(r);
+    document.head.appendChild(s);
+    window.mpJsonLd = { wersja: '1.2.0', zrodlo: M ? 'ladunek' : 'dom', skladnikow: skladniki.length, krokow: kroki.length };
+    return true;
+  }
+
+  function sprobuj() { try { return zbuduj(); } catch (e) { return false; } }
+
+  if (!sprobuj()) {
+    var t = 0, id = setInterval(function () { t += 200; if (sprobuj() || t >= 20000) clearInterval(id); }, 200);
+    document.addEventListener('mp:model', function () { if (sprobuj()) clearInterval(id); });
+  }
+})();
+</script>

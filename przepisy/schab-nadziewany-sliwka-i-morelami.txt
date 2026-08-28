@@ -1,0 +1,77 @@
+[meta]
+nazwa: schab nadziewany śliwką i morelami
+slug: schab-nadziewany-sliwka-i-morelami
+porcje-bazowe: 4
+liczba-porcji: 4–5 porcji
+waga-porcji: 219
+czas-minuty: 100
+item: 6a904ee9be931792b881d6e0
+
+[zajawka]
+Schab przecięty wzdłuż na kieszeń, nafaszerowany paskami suszonych śliwek, moreli i czosnkiem, związany i pieczony w całości. Schab jest najchudszym wykrojem wieprzowiny i nie ma w sobie tłuszczu, który ratowałby go przy dziesięciu minutach za długo. Lepiej więc celować w 72°C w środku niż w liczbę na zegarze. Suszone owoce oddają wilgoć do wnętrza pieczeni i przecinają słodyczą smak, który sam z siebie jest dość neutralny.
+
+[skladniki]
+#schab      900 g schabu w kawałku   @schab-na-pieczen
+#sliwki     80 g suszonych śliwek
+#morele     80 g suszonych moreli
+#czosnek    3 ząbki czosnku
+#olej       2 łyżki oleju
+#majeranek  suszony majeranek
+#sol        sól do smaku
+#pieprz     pieprz do smaku
+
+[kroki]
+== pokrój owoce i czosnek
+czas: ok. 5 min
+skladniki: sliwki, morele, czosnek
+Potnij suszone śliwki i morele wzdłuż, na paski grubości mniej więcej ołówka, a czosnek posiekaj drobno. Paski, a nie kostka: przez wąską kieszeń w mięsie da się je wsunąć palcem, a kostka rozsypie się przy pierwszej próbie.
+
+== zrób kieszeń w schabie
+czas: ok. 4 min
+skladniki: schab
+Połóż Schab w kawałku na desce i natnij go wzdłuż, głęboko, tworząc kieszeń, albo przeciągnij przez środek długi, cienki nóż i poszerz otwór. Prowadź nóż środkiem grubości i **nie przebijaj mięsa na wylot**, bo farsz wypłynie każdym otworem, którym mu na to pozwolisz.
+
+== nafaszeruj schab
+czas: ok. 6 min
+Wsuwaj paski owoców i czosnek do kieszeni naprzemiennie, dopychając je palcem albo trzonkiem łyżki. Nie nabijaj kieszeni na siłę: przepełniona rozerwie mięso w piekarniku, gdy włókna się skurczą, a wtedy całe nadzienie wyląduje na blasze.
+
+== zwiąż i natrzyj
+czas: ok. 6 min
+skladniki: olej, sol, pieprz, majeranek
+Zwiąż pieczeń sznurkiem kuchennym co kilka centymetrów, a potem natrzyj ją olejem, solą, pieprzem i majerankiem. Wiązanie ma tu zamknąć kieszeń, a nie uformować kształt, więc wystarczy kilka pętli i szczególnie mocna nad samym nacięciem.
+
+== piecz w 180 stopniach
+minutnik: 1:07:00 schab
+kryterium: termometr wbity w najgrubsze miejsce pokazuje 72°C, a sok z nakłucia jest przezroczysty
+Wstaw schab do piekarnika nagrzanego do 180°C i co jakiś czas polewaj go sosem zbierającym się na dnie. Chudy schab przechodzi ze soczystego w suchy w kilka minut, więc pierwszy pomiar zrób wyraźnie przed upływem tego czasu.
+
+== odstaw przed krojeniem
+minutnik: 10:00 odpoczynek
+kryterium: na desce pod pieczenią zbiera się cienka obwódka soku, a nie kałuża
+Przełóż pieczeń na deskę i zostaw ją w spokoju, nieprzykrytą. Krojona prosto z piekarnika odda sok na deskę zamiast zatrzymać go we włóknach, a przy tak chudym mięsie każda łyżka tego soku jest widoczna w smaku.
+
+[wskazowka]
+skąd wiadomo, że schab jest gotowy, jeśli nie mam termometru?
+Z soku i z oporu. Nakłuj pieczeń w najgrubszym miejscu cienkim nożem: sok ma wypłynąć przezroczysty, bez różowej smugi, a nóż wchodzić bez wyraźnego oporu w środku. To metoda mniej dokładna niż termometr i przy chudym schabie trafia zwykle o kilka minut za późno, więc sprawdzaj wcześniej, niż podpowiada zegar.
+
+dlaczego nie wolno nadziewać kieszeni zbyt mocno?
+Bo mięso w piekarniku się kurczy, a nadzienie nie. Ciasno nabita kieszeń rozerwie schab wzdłuż nacięcia, farsz wypłynie na blachę i zamiast pieczeni z owocami w środku zostanie zwykła pieczeń obok przypieczonych śliwek.
+
+[co-mozesz-zmienic]
+#morele
+krótko: samymi śliwkami albo suszonymi figami, w tej samej wadze
+nie mam suszonych moreli, co zamiast?
+Podwój śliwki albo weź suszone figi, w tej samej wadze. Morele są tu kwaśniejsze i jaśniejsze od śliwek, więc na samych śliwkach nadzienie wyjdzie ciemniejsze i słodsze; figi trafiają gdzieś pomiędzy, ale mają drobne pestki, które niektórym przeszkadzają.
+
+nie mam termometru do mięsa, da się bez niego?
+Da się, ale przy schabie jest to najdroższa rzecz, jaką można sobie tu odmówić. Termometr kosztuje mniej niż dwie takie pieczenie, a chudy schab między 72 a 80 stopniami zamienia się z soczystego w suchy bez żadnego widocznego sygnału na zewnątrz. Bez niego zostaje test soku ze wskazówki wyżej.
+
+[przechowywanie]
+jak przechowywać i odgrzewać schab nadziewany?
+Schłodź pieczeń w całości i przełóż ją do szczelnego pojemnika w ciągu 1–2 godzin od wyjęcia z piekarnika; w lodówce trzyma do 2 dni, a krojona na zimno w cienkie plastry smakuje wtedy jak wędlina. W zamrażarce: najlepsza jakość do 2–3 miesięcy, w plastrach przełożonych papierem. Odgrzewaj w piekarniku w 150°C, pod folią i z łyżką sosu z pieczenia, bo chudy schab odgrzewany na sucho wysycha w kilka minut.
+
+[wartosci-odzywcze]
+energia: 787 kJ / 187 kcal; tłuszcz: 5,5 g; kwasy tłuszczowe nasycone: 1 g; węglowodany: 8,2 g; cukry: 6,9 g; błonnik: 1,5 g; białko: 25 g; sól: 0,77 g
+
+[wartosci-porcja]
+energia: 1722 kJ / 408 kcal; tłuszcz: 12 g; kwasy tłuszczowe nasycone: 2,2 g; węglowodany: 18 g; cukry: 15 g; błonnik: 3,4 g; białko: 54 g; sól: 1,7 g

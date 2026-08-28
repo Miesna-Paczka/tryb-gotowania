@@ -1,0 +1,82 @@
+[meta]
+nazwa: szynka nadziewana żurawiną
+slug: szynka-nadziewana-zurawina
+porcje-bazowe: 6
+liczba-porcji: 6–8 porcji
+waga-porcji: 148
+czas-minuty: 90
+item: 6a919eed6022c4041ee46639
+
+[zajawka]
+Szynka nacięta wzdłuż na całej długości, wypełniona suszoną żurawiną, związana sznurkiem i pieczona w stu siedemdziesięciu stopniach. Wychodzi nam wędlina (a nie pieczeń na ciepło), więc kroimy ją dopiero po całonocnym odpoczynku w lodówce.
+
+[skladniki]
+#szynka     975 g szynki wieprzowej  @szynka
+#zurawina   80 g suszonej żurawiny
+#czosnek    3 ząbki czosnku
+#olej       2 łyżki oleju
+#majeranek  majeranek
+#papryka    papryka słodka
+#kolendra   kolendra mielona
+#sol        sól do smaku
+#pieprz     pieprz do smaku
+
+[kroki]
+== zetrzyj marynatę z czosnku i przypraw
+czas: ok. 5 min
+skladniki: czosnek, olej, majeranek, papryka, kolendra, sol, pieprz
+Przeciśnij czosnek przez praskę i rozmieszaj go z olejem, majerankiem, słodką papryką, kolendrą, solą i pieprzem na gęstą pastę. Olej jest tu nośnikiem: bez niego przyprawy zostaną w miseczce zamiast przywrzeć do mięsa.
+
+== natnij szynkę wzdłuż
+czas: ok. 5 min
+skladniki: szynka
+Połóż Szynkę na desce i natnij ją wzdłuż długiego boku, prowadząc nóż głęboko, ale nie przecinając mięsa na wylot. Kanał ma sięgać mniej więcej do dwóch trzecich grubości; przecięty na wylot rozejdzie się przy pieczeniu i żurawina wypłynie.
+
+== napełnij kanał żurawiną
+czas: ok. 5 min
+skladniki: zurawina
+Wciśnij suszoną żurawinę w kanał równą warstwą, od jednego końca do drugiego, dociskając ją palcami. Rozłóż ją równo, bo w miejscu, gdzie jej zabraknie, plaster wyjdzie bez charakterystycznego paska.
+
+== zwiąż szynkę sznurkiem
+czas: ok. 8 min
+Obwiąż szynkę sznurkiem kuchennym co trzy, cztery centymetry, ściągając każdą pętlę tak, żeby brzegi nacięcia zeszły się ze sobą. Zaczynaj od środka i idź ku obu końcom, wtedy mięso nie przesuwa się pod ręką.
+
+== natrzyj mięso i odstaw do lodówki
+czas: min. 2 h
+Rozprowadź marynatę po całej powierzchni szynki, także między pętlami sznurka, i wstaw ją do lodówki na co najmniej dwie godziny, a najlepiej na całą noc. Ten czas nie liczy się do czasu przygotowania: sól potrzebuje go, żeby wejść w mięso, a nie zostać na nim.
+
+== piecz do siedemdziesięciu pięciu stopni
+minutnik: 1:05:00 szynka
+kryterium: termometr w najgrubszym miejscu pokazuje od 72 do 75°C, a sok wypływający po wyjęciu igły jest przezroczysty
+Nastaw piekarnik na 170°C i wstaw szynkę do naczynia żaroodpornego. Licz od 60 do 75 minut na każdy kilogram mięsa, a przy pieczeni cięższej niż kilogram sprawdzaj temperaturę wcześniej, niż każe rachunek.
+
+== ostudź, a potem schłodź w lodówce
+czas: ok. 15 min
+Zostaw szynkę na blacie, aż przestanie parować, potem przełóż ją do lodówki i zostaw na kilka godzin, a najlepiej do następnego dnia. Ten czas nie liczy się do czasu przygotowania i nie da się go pominąć: ciepła wędlina rozpada się pod nożem, zimna daje się kroić na cienkie plastry.
+
+== zdejmij sznurek i pokrój
+czas: ok. 5 min
+Rozetnij i zdejmij wszystkie pętle sznurka, a potem kroj szynkę w poprzek nacięcia, ostrym nożem, na plastry grubości dwóch, trzech milimetrów. W poprzek, bo tylko wtedy w każdym plastrze znajdzie się pasek żurawiny.
+
+[wskazowka]
+dlaczego szynki nie wolno kroić od razu po upieczeniu?
+Bo w gorącym mięsie białka są jeszcze rozluźnione i nóż je rozrywa zamiast ciąć. Po kilku godzinach w lodówce ta sama pieczeń trzyma kształt i schodzi z noża plastrami cienkimi na dwa milimetry. To jest różnica między pieczenią a wędliną, i robi ją wyłącznie czas.
+
+po co wiązać szynkę sznurkiem, skoro nacięcie i tak jest głębokie?
+Sznurek robi dwie rzeczy naraz. Ściąga brzegi nacięcia, więc żurawina zostaje w środku zamiast wypłynąć na dno naczynia, a przy okazji wyrównuje grubość całej pieczeni. Równa grubość znaczy, że mięso dochodzi wszędzie w tym samym czasie, a nie na końcach szybciej niż w środku.
+
+[co-mozesz-zmienic]
+#zurawina
+krótko: suszonymi śliwkami, w tej samej ilości
+czym zastąpić suszoną żurawinę?
+Suszonymi śliwkami albo morelami, w tej samej ilości. Śliwki są słodsze i mniej kwaśne, więc kontrast z solą będzie łagodniejszy; wtedy warto dołożyć do marynaty pół łyżeczki startej skórki z cytryny.
+
+[przechowywanie]
+jak przechowywać szynkę nadziewaną żurawiną?
+W lodówce: do 5 dni w kawałku, zawinięta w papier do pieczenia, i do 3 dni pokrojona w plastry. W zamrażarce: najlepsza jakość do 1–2 miesięcy, zamrożona w kawałku, bo plastry po rozmrożeniu wychodzą suche. Odgrzewanie: ta wędlina jest do jedzenia na zimno i odgrzewanie odbiera jej to, po co powstała.
+
+[wartosci-odzywcze]
+energia: 738 kJ / 176 kcal; tłuszcz: 5,1 g; kwasy tłuszczowe nasycone: 1 g; węglowodany: 6,4 g; cukry: 6,1 g; błonnik: 0,9 g; białko: 25 g; sól: 0,99 g
+
+[wartosci-porcja]
+energia: 1093 kJ / 260 kcal; tłuszcz: 7,6 g; kwasy tłuszczowe nasycone: 1,5 g; węglowodany: 9,5 g; cukry: 9,1 g; błonnik: 1,3 g; białko: 38 g; sól: 1,5 g

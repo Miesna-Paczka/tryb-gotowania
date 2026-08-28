@@ -1,0 +1,76 @@
+# Bramka repozytorium dla źródeł przepisów.
+#
+# Istnieje po to, żeby zdanie „w repozytorium każde takie uszkodzenie jest
+# jednolinijkowym diffem w PR-ze" było prawdziwe także wtedy, gdy nikt nie
+# pamiętał o uruchomieniu skryptu. Uszkodzenia z 2026-08-19 były CICHE — wyszły
+# przypadkiem, przy regeneracji — więc jedyną obroną jest kontrola, której nie
+# trzeba sobie przypomnieć.
+#
+# Czego tu NIE MA: porównania z żywym CMS-em. Wymaga sekretu z tokenem Webflow
+# i jest osobną decyzją (handoff §7.4).
+name: lancuch-html
+
+on:
+  push:
+    paths: ['przepisy/**', 'dane/**', 'lancuch-html/**', 'narzedzia/suchy-bieg-generatora.mjs',
+            'przepis-parser.js', 'odmiana-node.mjs', 'narzedzia/suchy-bieg-listy-serwerowej.mjs',
+            '.github/workflows/lancuch-html.yml']
+  pull_request:
+    paths: ['przepisy/**', 'dane/**', 'lancuch-html/**', 'narzedzia/suchy-bieg-generatora.mjs',
+            'przepis-parser.js', 'odmiana-node.mjs', 'narzedzia/suchy-bieg-listy-serwerowej.mjs',
+            '.github/workflows/lancuch-html.yml']
+
+jobs:
+  bramka:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Najpierw dowód, że bramka umie zaświecić na czerwono. Bramka, która
+      # przechodzi na wszystkim, nie jest bramką, tylko dekoracją.
+      - name: suchy bieg — czy kontrole łapią uszkodzenia
+        run: node narzedzia/suchy-bieg-generatora.mjs
+
+      - name: walidacja źródeł
+        run: node lancuch-html/generuj-html.mjs --sucho
+
+      # Ładunki w dane/ mają być zcommitowane i zgodne z regeneracją — inaczej
+      # push zostawia na Pages plik, do którego CMS nie ma jak wskazać.
+      # `jsonld/` musi tu stac obok `dane/`, bo blok Recipe jest osobnym wyjsciem
+      # tego samego zrodla i ma osobny generator. Bez niego rozjazd bloku ze zrodlem
+      # przechodzil bramke i mogl wjechac do CMS przy najblizszym wypchnij-do-cms.mjs.
+      # Sam `git diff` nie wystarczy: katalog trzeba najpierw ZREGENEROWAC, inaczej
+      # diff porownuje zacommitowane pliki z samymi soba i milczy zawsze.
+      - name: regeneracja bez zmian w drzewie roboczym
+        run: |
+          node lancuch-html/generuj-html.mjs
+          node lancuch-html/generuj-jsonld.mjs
+          git diff --exit-code -- dane/ przepisy/ lancuch-html/jsonld/ \
+            || { echo '::error::dane/ albo lancuch-html/jsonld/ rozjezdza sie z przepisy/ — uruchom generuj-html.mjs i generuj-jsonld.mjs, zacommituj wynik'; exit 1; }
+
+      # Strona przepisu pokazuje listę składników DWA RAZY: raz wyrenderowaną przez
+      # Webflow z `skladniki-html` (to widzi crawler bez JS), raz zbudowaną
+      # w przeglądarce przez parser (to widzi człowiek). Przy porcjach bazowych
+      # muszą być identyczne — rozjazd to podmiana treści pod crawlerem.
+      - name: lista serwerowa zgodna z parserem
+        run: node narzedzia/suchy-bieg-listy-serwerowej.mjs
+
+      # To repo jest PUBLICZNE i serwowane przez Pages, wiec kazdy plik w drzewie
+      # jest pobieralny z URL-a. Ten krok pilnuje wylacznie sladow narzedzia,
+      # ktore wolno nazwac na glos. Pelny skaner tresci wewnetrznych mieszka
+      # w repozytorium zamknietym, bo jego lista wzorcow sama bylaby ujawnieniem.
+      - name: brak sladow narzedzia agenta
+        run: |
+          if git ls-files | grep -q '^\.claude/'; then
+            echo '::error::.claude/ nie moze stac w publicznym repo'; exit 1; fi
+          if git grep -qiE 'claude\.ai/code/session|Co-Authored-By:[[:space:]]*Claude' -- . ':!.github/workflows/lancuch-html.yml'; then
+            echo '::error::slad sesji albo naglowek wspolautorstwa w tresci plikow'; exit 1; fi
+          if git log --format='%B' | grep -qiE 'claude\.ai/code/session|Co-Authored-By:[[:space:]]*Claude'; then
+            echo '::error::slad sesji albo naglowek wspolautorstwa w komunikacie commita'; exit 1; fi
+          echo 'brak sladow'
+
+      - name: porównanie z odciskiem
+        run: node lancuch-html/porownaj.mjs

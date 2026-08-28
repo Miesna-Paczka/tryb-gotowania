@@ -1,0 +1,86 @@
+# Stan przebiegu łańcucha — runtime, nigdy nie wersjonowany.
+# Blokada jest oceniana po znaczniku czasu w pierwszej linii, więc w repozytorium
+# byłaby zawsze nieaktualna i zawsze konfliktowa.
+LOCK
+LOCK.*
+
+# Blokada Chrome mieszka w Claude\_runtime\ i jest poza tym repo — tu tylko przypomnienie.
+
+node_modules/
+.DS_Store
+Thumbs.db
+
+# Artefakty sond, nie treść repozytorium. `.proba-rm-*` to pliki-świadki próby
+# `rm` (uprawnienie do usuwania w tym katalogu jest wyłączone, więc sondy nie da
+# się po sobie sprzątnąć); `_katalog_tmp.js` zostawiła pierwsza wersja narzędzia
+# `sprawdz-katalog-mutacji.py`, zanim zaczęła podawać kod do `node` strumieniem.
+.proba-rm-*
+harness/_katalog_tmp.js
+
+# artefakty sond renam/rm
+.test-rename-*
+
+# ---------------------------------------------------------------------------
+# DOKUMENTY MIĘDZYŁAŃCUCHOWE — nie należą do tego repozytorium.
+# Zasada: handoff należy wypisać z repo, ten i każdy inny.
+#
+# Kryterium jest jedno i da się je zastosować bez namysłu: **czy adresatem jest
+# inna sesja/łańcuch, czy ten embed?** Handoff, handback, CR i delta to KORESPONDENCJA
+# — powstają raz, są czytane raz przez kogoś innego i po dostarczeniu nie opisują
+# już żadnego stanu. Repo ma nieść stan trybu gotowania, a nie archiwum poczty.
+#
+# Trafiały tu, bo powstają w tym katalogu roboczym — czyli z powodu mechaniki
+# narzędzia, nie z powodu przynależności. To jest dokładnie ten rodzaj przyczyny,
+# który trzeba unieszkodliwić fizycznie, a nie zapamiętać.
+#
+# Od 2026-08-24 dokumenty opisujące TEN embed też są wypisane z tego repozytorium,
+# ale z innego powodu i do innego miejsca: mieszkają w niejawnym
+# `Miesna-Paczka/tryb-gotowania-dokumentacja`. Powód nie jest już porządkowy, tylko
+# taki, że to repozytorium jest publiczne — Pages serwuje z niego `dane/*.json`, więc
+# wszystko, co tu wpadnie, ląduje na otwartym hoście. Wzorce niżej istnieją po to,
+# żeby powrót tych plików wymagał świadomego `git add -f`, a nie zwykłej nieuwagi.
+#
+# UWAGA: sam wpis tutaj nie wypisuje plików już śledzonych — do tego potrzebny jest
+# jednorazowy `git rm --cached`. Ignorowanie działa dopiero od chwili, gdy plik
+# przestanie być w indeksie.
+# ---------------------------------------------------------------------------
+HANDOFF*.md
+HANDBACK*.md
+CR--*.md
+DELTA--*.md
+
+# Dokumentacja embeda — przeniesiona do niejawnego repo (patrz blok wyżej).
+WYMAGANIA.md
+PAKIET-INTEGRACYJNY.md
+GEOMETRIA.md
+INTERAKCJE.md
+MATRYCA.md
+REJESTR-LUK.md
+DEPLOY.md
+STAN.md
+PATCH--WYMAGANIA-*.md
+propozycje/
+ROZJAZD-KONTRAKTU-PRZEPISOW.md
+archiwum/README.md
+lancuch-html/README.md
+lancuch-html/jsonld-zniwa/README.md
+
+# Materiał promptowy łańcucha — też nie stan embeda.
+# Kopie promptu i propozycje jego zmian opisują, JAK pracuje sesja, a nie CO robi
+# tryb gotowania. Mają zresztą własny dom: `git\tech\lancuchy\` trzyma SZABLON-PROMPTU,
+# PROTOKOL-ARBITRAZU i REJESTR-ZASOBOW — czyli prompt jako klasę, nie jako instancję.
+# Kopia promptu sprzed konkretnego przebiegu jest migawką instancji i starzeje się
+# w tym samym tempie, w jakim traci znaczenie.
+# `PROPOZYCJA-*` celowo szeroko: propozycja jest z definicji pismem do kogoś,
+# a nie opisem stanu. Gdy zostanie przyjęta, jej treść i tak trafia do dokumentu,
+# który stan opisuje.
+PROMPT-KOPIA-*.md
+PROPOZYCJA-*.md
+
+# Artefakt roboczy trybu --przez-mcp: payload do zapisu w CMS. Powstaje z plikow
+# zrodlowych przy kazdym uruchomieniu, wiec w repo bylby czwarta kopia tej samej
+# tresci — i jedyna, ktora moglaby sie zestarzec po cichu.
+payload-cms.json
+
+# katalog roboczy sesji — sondy jednorazowe, nie artefakt
+.tmp/

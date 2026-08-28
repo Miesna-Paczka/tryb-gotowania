@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>MUTACJA — czy asercje potrafią spaść</title>
+
+<!--
+  harness/mutacja.html — powierzchnia POZA matrycą szerokości, wzorowana na
+  `pokrycie.html`. Zakładana w przebiegu 35, pozycja nr 1 kolejki z przeb. 34.
+
+  PYTANIE: czy wiersz, który stoi zielony, MA STAN, w którym by spadł.
+
+  Dlaczego to nie jest to samo, co pokrycie ani co sito składniowe.
+  · Pokrycie (`I8`) pyta, czy o wiersz ktoś w ogóle pyta. Nie pyta, czy pytanie
+    ma sens.
+  · Sito składniowe (przeb. 34) pyta, czy warunek ma operator porównania.
+    Znalazło 12 wywołań na 286, dwa wzmocniło — i z definicji NIE ZNAJDZIE
+    `80 === 0 + 80`, bo tam operator jest.
+  · Mutacja psuje mierzoną WŁASNOŚĆ na żywej powierzchni i sprawdza, czy asercja
+    spada. Asercja, która przy zepsutej własności nie spadła, jest opisem.
+
+  Mechanika. Blok pomiarowy fixture'a biegnie RAZ, przy wczytaniu, i trzyma stan
+  w domknięciu — przemierzyć go nie sposób bez przebudowy. Mutacja per asercja
+  wymaga więc świeżego dokumentu na mutację, czyli dokładnie ramki. Ta strona
+  ładuje fixture N+1 razy: raz bez mutacji (linia bazowa) i raz na każdą mutację
+  z katalogu, wszystkie pod JEDNĄ pieczęcią — inaczej różnica opisywałaby dwie
+  epoki cache'u, nie dwa stany produktu.
+
+  Mutacje mieszkają w fixture (blok `MP_MUTACJA`), bo muszą wejść PRZED blokiem
+  pomiarowym i psuć produkt: arkusz runtime'u albo publiczną funkcję parsera.
+  Mutacja dotykająca `sprawdz()` albo etykiet mierzyłaby samą siebie.
+
+  TRZY WERDYKTY I ICH RÓŻNICA — bo dwa z nich wyglądają podobnie, a znaczą co
+  innego:
+  · ZABITA — cel spadł. Wiersz jest falsyfikowalny. To jest wynik dobry.
+  · TAUTOLOGIA — cel PRZEŻYŁ, choć inne asercje spadły, czyli mutacja weszła
+    i produkt jest zepsuty, a wiersz tego nie widzi. To jest znalezisko.
+  · ZERO EFEKTU — nie spadło NIC. To NIE jest zdanie o wierszu, tylko o mutacji:
+    selektor nie trafił, funkcji nie było, mutacja nie tknęła produktu. Wliczenie
+    tego do tautologii byłoby fałszywym alarmem tej samej klasy co „zero padnięć
+    na wierszu, o który się nie pyta".
+
+  Wszystkie ramki mają nazwy inne niż '360', więc dostają `MP_BEZ_HISTORII = true`
+  — porównanie jest like-for-like. Ta strona nie mierzy liczb bezwzględnych.
+
+  Parametry: `?plik=min` mierzy powierzchnię zminifikowaną (artefakt), domyślnie
+  pełną (źródło). Obie mają ten sam katalog mutacji.
+-->
+
+<style>
+  :root{--tlo:#12100e;--panel:#1c1915;--ok:#3ddc84;--zle:#ff6b5e;--uwaga:#ffc857;--tekst:#eee}
+  html,body{margin:0;background:var(--tlo);color:var(--tekst);
+            font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
+  header{position:sticky;top:0;z-index:5;background:var(--panel);padding:10px 14px;
+         border-bottom:1px solid #333}
+  header b{font-size:15px}
+  #podsumowanie.ok{color:var(--ok)} #podsumowanie.zle{color:var(--zle)}
+  table{border-collapse:collapse;width:100%;font-size:12px;margin:0}
+  th,td{border-bottom:1px solid #333;padding:5px 8px;text-align:left;vertical-align:top}
+  th{color:#aaa;font-weight:normal}
+  td.w-zabita{color:var(--ok)} td.w-tautologia{color:var(--zle)}
+  td.w-zero{color:var(--uwaga)} td.w-nieweszla{color:var(--uwaga)}
+  .rzad{display:flex;gap:10px;padding:12px;align-items:flex-start;overflow-x:auto}
+  .komorka{flex:0 0 auto}
+  .etykieta{padding:0 0 4px;font-size:11px;color:#aaa}
+  iframe{border:1px solid #444;background:#fff;display:block}
+</style>
+</head>
+<body>
+
+<header>
+  <b>MUTACJA — czy asercje potrafią spaść</b>
+  <span id="podsumowanie">ładowanie…</span>
+</header>
+
+<table id="tabela">
+  <thead><tr>
+    <th>mutacja</th><th>cel</th><th>werdykt</th><th>trafiona asercja / komentarz</th>
+    <th>uboczne</th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+
+<div class="rzad" id="rzad"></div>
+
+<script>
+/* Jedna pieczęć na wszystkie ramki — patrz nagłówek. */
+window.MP_PIECZEC = String(Date.now());
+
+var PLIK = /[?&]plik=min\b/.test(location.search) ? 'fixture-min.html' : 'fixture.html';
+var ETYKIETA_PLIKU = PLIK === 'fixture-min.html' ? 'ZMINIFIKOWANA (artefakt)' : 'PEŁNA (źródło)';
+
+/* Katalog jest DRUGIM egzemplarzem listy i to jest świadome: fixture zna mutacje,
+   ta strona zna ich CELE. Rozjazd między nimi wychodzi natychmiast jako „nieznana
+   mutacja" albo „ZERO EFEKTU", więc kopia nie może zestarzeć się po cichu. */
+var MUTACJE = [
+  { nazwa: 'M1-bottom-klamstwo',      cel: 'B26', celAsercja: 'publikuje ZMIERZON' },
+  { nazwa: 'M2-bottom-padding',       cel: 'B26', celAsercja: 'stos + pasek nawigacji' },
+  { nazwa: 'M3-hit-area',             cel: 'B10', celAsercja: 'B10: cel dotyku \u201e\u2190"' },
+  { nazwa: 'M4-pigulka-44',           cel: 'C03', celAsercja: 'pigułka zwinięta = 40' },
+  { nazwa: 'M5-mark-blok',            cel: 'B14', celAsercja: 'marker łamie się z wierszem' },
+  { nazwa: 'M6-badge-30',             cel: 'C01', celAsercja: 'stałą wysokość 26' },
+  { nazwa: 'M7-top-bez-dopelnienia',  cel: 'B12', celAsercja: 'padding dolny TOP' },
+  { nazwa: 'M8-naglowek-odbudowany',  cel: 'A9',  celAsercja: 'nagłówek sekcji nietknięty' },
+  /* Klasa druga (przeb. 35, jednostka 2): asercje o NIEOBECNOŚCI i o LICZBIE.
+     Batch pierwszy pytał, czy wiersz zauważy złą liczbę. Ten pyta, czy zauważy
+     rzecz, której nie powinno być — naturalne siedlisko tautologii, bo zero
+     z pustego selektora wygląda identycznie jak zero z czystego produktu. */
+  { nazwa: 'M9-adnotacja',            cel: 'B13', celAsercja: 'zero adnotacji projektanta' },
+  { nazwa: 'M10-wlasny-tor',          cel: 'B12', celAsercja: 'przewijanie natywne na TOP' },
+  { nazwa: 'M11-drugi-mark',          cel: 'B14', celAsercja: 'marker to <mark>, nie prostokąt' },
+  { nazwa: 'M12-iframe',              cel: 'B15', celAsercja: 'zero iframe' },
+  { nazwa: 'M13-stos-widoczny',       cel: 'B8',  celAsercja: 'znika w całości' },
+  { nazwa: 'M14-top-bez-gornego',     cel: 'B12', celAsercja: 'pierwszy element startuje pod belką' },
+  { nazwa: 'M15-cta-krotsze',         cel: 'B10', celAsercja: 'CTA wypełnia resztę wiersza' },
+  { nazwa: 'M16-overlay-absolute',    cel: 'B15', celAsercja: 'position fixed' },
+  /* Klasa trzecia (przeb. 36): CZAS i STAN. Oracle każdego z tych wierszy jest PARĄ
+     (stan, własność), a nie samą własnością — puls zależy od `data-stan`, barwa czasu
+     od pary (forma, stan), limit i trwałość od stanu sesji. Wiersz mierzący własność,
+     która w sąsiednich stanach ma tę samą wartość, przechodzi niezależnie od tego,
+     czy przejście między stanami w ogóle działa. Tego matryca szerokości nie widzi,
+     bo mierzy jeden moment naraz. */
+  { nazwa: 'M17-puls-koncowka-wolny', cel: 'C11', celAsercja: 'ostatnie 10 s \u2192 puls 2\u00d7/s' },
+  { nazwa: 'M18-puls-po-zerze',       cel: 'C12', celAsercja: '0:00 \u2192 puls wygaszony' },
+  { nazwa: 'M19-puls-minuta-szybki',  cel: 'C10', celAsercja: '\u2264 60 s \u2192 puls 1\u00d7/s' },
+  { nazwa: 'M20-puls-w-toku',         cel: 'C09', celAsercja: 'kropka \u201ew toku" jest statyczna' },
+  { nazwa: 'M21-zero-kolor-atrament', cel: 'W64', celAsercja: 'czas przy 0:00 \u2014 `primary-cta`' },
+  { nazwa: 'M22-limit-trzy',          cel: 'F7',  celAsercja: 'F7: trzeci minutnik nie startuje' },
+  { nazwa: 'M23-sesja-niema',         cel: 'F8',  celAsercja: 'S1 wznawia na zapisanym kroku' },
+  { nazwa: 'M24-historia-zawsze',     cel: 'F4',  celAsercja: 'overlay otwarty trzyma wpis' },
+  /* Klasa czwarta (przeb. 36, jednostka 5): DANE i PARSER. Najliczniejsza rodzina
+     TESTÓW NEGATYWNYCH całej matrycy — `H1`, `H2`, `H3`, `H5`, `H6`, `A4`, czyli
+     asercje o tym, czego robić NIE WOLNO. Test negatywny przechodzi także wtedy,
+     gdy nie mierzy niczego, więc jest najtańszy do napisania i najłatwiejszy do
+     przeoczenia; mutacja jest jedynym sposobem, żeby go o cokolwiek zapytać. */
+  { nazwa: 'M25-czas-skaluje',        cel: 'H3',  celAsercja: 'czas przepisu NIE skaluje si\u0119 z porcjami' },
+  { nazwa: 'M26-kroki-skaluja',       cel: 'H1',  celAsercja: 'liczba krok\u00f3w NIE skaluje si\u0119 z porcjami' },
+  { nazwa: 'M27-minutnik-skaluje',    cel: 'H2',  celAsercja: 'minutnik NIE skaluje si\u0119 z porcjami' },
+  { nazwa: 'M28-body-rosnie',         cel: 'H5',  celAsercja: 'runtime nie dok\u0142ada w\u0119z\u0142\u00f3w do body' },
+  { nazwa: 'M29-tytul-ruszony',       cel: 'H5',  celAsercja: 'runtime nie zmienia document.title' },
+  { nazwa: 'M30-klucz-ls-inny',       cel: 'H6',  celAsercja: 'runtime ma JEDEN nazwany klucz' },
+  { nazwa: 'M31-gramatura-mnozy',     cel: 'A10', celAsercja: '\u201e1 x 1,5 kg" nadal = 1500' },
+  { nazwa: 'M32-obcy-nosnik-wciagany', cel: 'A4', celAsercja: 'obcy `<script type="text/plain">` NIE jest wci\u0105gany' },
+  /* Klasa piąta (przeb. 37, jednostka 1): WEJŚCIE USZKODZONE i sanityzacja.
+     `A3`, `A11`, `A12` to wiersze o PARZE — mają ostrzegać wtedy i tylko wtedy,
+     gdy wejście jest zepsute. Taki wiersz da się zepsuć na dwa sposoby (cisza
+     i fałszywy alarm), a mutacja sprawdzająca jeden z nich nie mówi nic o drugim;
+     stąd `M33` i `M34` na tym samym wierszu, celujące w przeciwne asercje. */
+  { nazwa: 'M33-klucz-widmo-cichy',   cel: 'A3',  celAsercja: 'A3: #klucz bez odpowiednika \u2192 b\u0142\u0105d' },
+  { nazwa: 'M34-klucz-falszywy-alarm', cel: 'A3', celAsercja: 'A3 (nie fa\u0142szywuje)' },
+  { nazwa: 'M35-krotko-w-odpowiedzi', cel: 'A11', celAsercja: 'A11: kr\u00f3tko: nie wchodzi do odpowiedzi' },
+  { nazwa: 'M36-krotko-zmyslone',     cel: 'A11', celAsercja: 'A11: brak kr\u00f3tko: to nie b\u0142\u0105d' },
+  { nazwa: 'M37-pytanie-w-odpowiedzi', cel: 'A13', celAsercja: 'A13: odpowied\u017a zlepiona z wierszy, bez pytania w \u015brodku' },
+  { nazwa: 'M38-wpisy-sklejone',      cel: 'A13', celAsercja: 'A13: przechowywanie = 3 wpisy' },
+  { nazwa: 'M39-czas-kanoniczny-glusi', cel: 'A12', celAsercja: 'A12: brak czasu \u2192 ostrze\u017cenie' },
+  { nazwa: 'M40-tresc-serwerowa-zjedzona', cel: 'A9', celAsercja: 'A9: tre\u015b\u0107 serwerowa prze\u017cy\u0142a przekszta\u0142cenie' },
+  /* Klasa szósta (przeb. 37, jednostka 3): NIEOBECNOŚĆ WĘZŁA. Werdykt ZABITA jest
+     tu oczekiwany i mało ciekawy — ciekawa jest kolumna urwań i wiersz `I10`. */
+  { nazwa: 'M41-null-tooltip-zamknij', cel: 'E10', celAsercja: 'E10 / I-25: tap `\u00d7` zamyka tooltip' },
+  { nazwa: 'M42-null-dialog-link',    cel: 'F3',  celAsercja: 'F3: \u201ewyjd\u017a mimo to" zamyka overlay' },
+  { nazwa: 'M43-null-baner-akcja',    cel: 'F11', celAsercja: 'F11: \u201esprawd\u017a ponownie" zdejmuje baner' },
+  { nazwa: 'M44-null-meta-wartosc',   cel: 'A14', celAsercja: 'A14: pasek meta renderuje TRZY kolumny' }
+];
+
+var RAMKI = [{ nazwa: 'mut-BAZA', mutacja: 'BRAK' }].concat(
+  MUTACJE.map(function (m) { return { nazwa: 'mut-' + m.nazwa, mutacja: m.nazwa }; })
+);
+
+var wyniki = Object.create(null);
+window.MP_MUTACJE = { gotowe: false, pieczec: MP_PIECZEC, plik: PLIK, wyniki: wyniki, wynik: null };
+
+RAMKI.forEach(function (r) {
+  var kom = document.createElement('div');
+  kom.className = 'komorka';
+  kom.innerHTML = '<div class="etykieta">' + r.mutacja + '</div>';
+  var f = document.createElement('iframe');
+  f.src = PLIK + '?pieczec=' + MP_PIECZEC + '&mutacja=' + encodeURIComponent(r.mutacja);
+  f.name = r.nazwa;
+  f.width = 360; f.height = 620;
+  f.setAttribute('title', r.mutacja);
+  kom.appendChild(f);
+  document.getElementById('rzad').appendChild(kom);
+});
+
+/* Asercja o tej samej etykiecie potrafi paść kilka razy w jednym przebiegu
+   (`B16` ×3, `B21` ×2 — zmierzone w przeb. 34), więc porównujemy WIELOZBIÓR:
+   dla każdej etykiety liczbę wystąpień i liczbę padnięć. Etykieta „nowo padnięta"
+   to taka, która w linii bazowej nie padła ANI RAZU, a w mutancie padła choć raz.
+   Etykieta nieobecna w mutancie NIE jest padnięciem — blok mógł się urwać wcześniej
+   i to jest osobne zdanie, raportowane w kolumnie ubocznych jako `urwanie`. */
+function indeks(asercje) {
+  var m = Object.create(null);
+  asercje.forEach(function (a) {
+    var w = m[a.nazwa] || (m[a.nazwa] = { razem: 0, padlo: 0 });
+    w.razem++;
+    if (!a.ok) w.padlo++;
+  });
+  return m;
+}
+
+/* Komparator wydzielony, żeby dał się wywołać na danych PODSTAWIONYCH — bez tego
+   kontrola ujemna byłaby niewykonalna, a „cel spadł" znaczyłoby tylko tyle, że
+   coś zwróciło niepustą listę. */
+function noweUpadki(baza, mutant) {
+  var out = [];
+  Object.keys(mutant).forEach(function (n) {
+    if (mutant[n].padlo > 0 && (!baza[n] || baza[n].padlo === 0)) out.push(n);
+  });
+  return out.sort();
+}
+
+window.addEventListener('message', function (e) {
+  var d = e.data;
+  if (!d || !d.mpHarness || !d.nazwa) return;
+  if (d.nazwa.indexOf('mut-') !== 0) return;
+  wyniki[d.nazwa] = d.mpHarness;
+  if (RAMKI.every(function (r) { return wyniki[r.nazwa]; })) domknij();
+});
+
+function domknij() {
+  var B = wyniki['mut-BAZA'];
+  var iB = indeks(B.asercje);
+  var bazaPadniecia = B.asercje.filter(function (a) { return !a.ok; })
+                               .map(function (a) { return a.nazwa; });
+
+  var wiersze = MUTACJE.map(function (m) {
+    var M = wyniki['mut-' + m.nazwa];
+    var iM = indeks(M.asercje);
+    var nowe = noweUpadki(iB, iM);
+    var trafione = nowe.filter(function (n) { return n.indexOf(m.celAsercja) >= 0; });
+    var meta = M.mutacja || { nazwa: '?', zastosowana: false };
+    /* Etykiety celu, które w LINII BAZOWEJ istnieją, a w mutancie NIE PADŁY, bo
+       w ogóle nie zabrały głosu — blok pomiarowy urwał się wcześniej (wyjątek).
+       Bez tego rozróżnienia mutacja, która wywali blok przed asercją celu, wygląda
+       identycznie jak tautologia, a mówi coś zupełnie innego: nie „wiersz nie widzi
+       defektu", tylko „wiersz nie zdążył o nic zapytać". Zmierzone na `M23-sesja-niema`
+       w przeb. 36 — TAUTOLOGIA na wierszu, który dwie linie później okazał się
+       falsyfikowalny, gdy tylko przestał wybuchać. */
+    var celWBazie = Object.keys(iB).filter(function (n) { return n.indexOf(m.celAsercja) >= 0; });
+    var celWMutancie = Object.keys(iM).filter(function (n) { return n.indexOf(m.celAsercja) >= 0; });
+    var celNiemy = celWBazie.length > 0 && celWMutancie.length === 0;
+    var werdykt;
+    if (!meta.zastosowana)       werdykt = 'NIE WESZŁA';
+    else if (nowe.length === 0)  werdykt = 'ZERO EFEKTU';
+    else if (trafione.length)    werdykt = 'ZABITA';
+    else if (celNiemy)           werdykt = 'URWANIE';
+    else                         werdykt = 'TAUTOLOGIA';
+    return {
+      nazwa: m.nazwa, cel: m.cel, celAsercja: m.celAsercja, werdykt: werdykt,
+      zastosowana: !!meta.zastosowana, opis: meta.opis || '', blad: meta.blad || '',
+      trafione: trafione,
+      uboczne: nowe.filter(function (n) { return trafione.indexOf(n) < 0; }),
+      asercjiRazem: M.asercje.length,
+      urwanie: M.asercje.length < B.asercje.length
+        ? (B.asercje.length - M.asercje.length) + ' asercji mniej niż w bazie' : ''
+    };
+  });
+
+  /* KONTROLA DODATNIA — linia bazowa porównana sama ze sobą nie może dać ani
+     jednego nowego upadku. Łapie komparator krzyczący zawsze. */
+  var kd = noweUpadki(iB, indeks(B.asercje.slice())).length === 0;
+
+  /* KONTROLA UJEMNA — na KOMPARATORZE, nie na powierzchni. Podstawiamy mutanta
+     zrobionego z linii bazowej przez przewrócenie JEDNEJ asercji i żądamy, żeby
+     komparator zobaczył dokładnie ją. Bez tego cała strona mogłaby meldować
+     „ZABITA" osiem razy, będąc funkcją stałą. */
+  var pierwszaZielona = null;
+  for (var i = 0; i < B.asercje.length && !pierwszaZielona; i++) {
+    if (B.asercje[i].ok && iB[B.asercje[i].nazwa].padlo === 0) pierwszaZielona = B.asercje[i].nazwa;
+  }
+  var podstawiony = B.asercje.map(function (a) {
+    return a.nazwa === pierwszaZielona ? { nazwa: a.nazwa, ok: false } : a;
+  });
+  var ku = noweUpadki(iB, indeks(podstawiony));
+  var falsyfikowalny = ku.length === 1 && ku[0] === pierwszaZielona;
+
+  var wynik = {
+    pieczec: MP_PIECZEC, plik: PLIK,
+    bazaAsercji: B.asercje.length,
+    bazaPadniec: bazaPadniecia.length,
+    bazaPadnieciaNazwy: bazaPadniecia,
+    bazaKonsola: B.konsola.length,
+    bazaMutacja: (B.mutacja && B.mutacja.nazwa) || '(brak pola)',
+    wiersze: wiersze,
+    zabite: wiersze.filter(function (w) { return w.werdykt === 'ZABITA'; }).length,
+    tautologie: wiersze.filter(function (w) { return w.werdykt === 'TAUTOLOGIA'; })
+                       .map(function (w) { return w.nazwa + ' → ' + w.cel; }),
+    bezEfektu: wiersze.filter(function (w) { return w.werdykt === 'ZERO EFEKTU' ||
+                                                    w.werdykt === 'NIE WESZŁA' ||
+                                                    w.werdykt === 'URWANIE'; })
+                      .map(function (w) { return w.nazwa + ' (' + w.werdykt + ')'; }),
+    kontrolaDodatnia: kd,
+    falsyfikowalny: falsyfikowalny,
+    kontrolaUjemnaNa: pierwszaZielona,
+    /* Ramki, w których blok pomiarowy urwał się przed końcem. Werdykt mutacji może
+       być przy tym ZABITA — cel pada, zanim blok umrze — więc bez osobnej pozycji
+       urwanie jest niewidoczne w podsumowaniu, a liczba ubocznych padnięć staje się
+       nieporównywalna między powierzchniami (mówi o miejscu zgonu, nie o produkcie). */
+    urwania: wiersze.filter(function (w) { return !!w.urwanie; })
+                    .map(function (w) { return w.nazwa + ' — ' + w.urwanie; }),
+    /* `I12` (przeb. 37) — CEL JEDNOZNACZNY. Komparator szuka PODCIĄGU, więc cel
+       trafiający w kilka etykiet daje werdykt ZABITA, gdy padnie KTÓRAKOLWIEK
+       z nich — a to jest zdanie słabsze, niż wygląda, i nikt go nie widzi.
+       Zmierzone w przeb. 36: `M3` trafiał w `B10`, `E6` i `F7`, `M22` w `F7`
+       i `H7`; obie przechodziły jako zielone przez trzy przebiegi. Skrypt
+       `narzedzia/sprawdz-katalog-mutacji.py` to wypisywał, ale jako UWAGĘ, więc
+       nie było stanu, w którym cokolwiek by spadło. Tu jest — pozycja wchodzi
+       do `ok` strony, czyli zaostrzenie celu przestaje być kwestią czyjejś
+       uwagi przy czytaniu wydruku. */
+    celeWielokrotne: MUTACJE.filter(function (m) {
+      return Object.keys(iB).filter(function (n) { return n.indexOf(m.celAsercja) >= 0; }).length > 1;
+    }).map(function (m) {
+      return m.nazwa + ' → ' + Object.keys(iB).filter(function (n) {
+        return n.indexOf(m.celAsercja) >= 0;
+      }).map(function (n) { return n.split(':')[0]; }).join('+');
+    }),
+    ok: false
+  };
+  wynik.ok = wynik.zabite === MUTACJE.length && wynik.tautologie.length === 0 &&
+             wynik.bezEfektu.length === 0 && wynik.urwania.length === 0 &&
+             wynik.celeWielokrotne.length === 0 &&
+             kd === true && falsyfikowalny === true;
+
+  window.MP_MUTACJE.wynik = wynik;
+  window.MP_MUTACJE.gotowe = true;
+
+  var el = document.getElementById('podsumowanie');
+  el.textContent = '— ' + ETYKIETA_PLIKU + ' · zabitych ' + wynik.zabite + '/' + MUTACJE.length +
+                   ' · tautologii ' + wynik.tautologie.length +
+                   ' · bez efektu ' + wynik.bezEfektu.length +
+                   ' · urwań ' + wynik.urwania.length +
+                   ' · celów wielokrotnych ' + wynik.celeWielokrotne.length +
+                   ' · falsyfikowalny: ' + (falsyfikowalny ? 'tak' : 'NIE') +
+                   ' · baza: ' + wynik.bazaAsercji + ' asercji, ' + wynik.bazaPadniec + ' padnięć';
+  el.className = wynik.ok ? 'ok' : 'zle';
+
+  var klasa = { 'ZABITA': 'w-zabita', 'TAUTOLOGIA': 'w-tautologia',
+                'ZERO EFEKTU': 'w-zero', 'NIE WESZŁA': 'w-nieweszla',
+                'URWANIE': 'w-zero' };
+  document.querySelector('#tabela tbody').innerHTML = wiersze.map(function (w) {
+    return '<tr><td>' + w.nazwa + '</td><td>' + w.cel + '</td>' +
+           '<td class="' + klasa[w.werdykt] + '">' + w.werdykt + '</td>' +
+           '<td>' + (w.trafione.length ? w.trafione.join('<br>')
+                                       : (w.blad ? 'błąd: ' + w.blad : 'cel „' + w.celAsercja + '" NIE spadł')) +
+           (w.urwanie ? '<br>' + w.urwanie : '') + '</td>' +
+           '<td>' + w.uboczne.length + '</td></tr>';
+  }).join('');
+}
+</script>
+</body>
+</html>

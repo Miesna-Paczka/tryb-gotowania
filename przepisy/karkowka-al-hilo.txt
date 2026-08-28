@@ -1,0 +1,92 @@
+[meta]
+nazwa: karkówka Al Hilo pieczona w całości
+slug: karkowka-al-hilo
+porcje-bazowe: 4
+liczba-porcji: 4–5 porcji
+waga-porcji: 172
+czas-minuty: 110
+item: 6a9049cae555b6dc1bf5dedc
+
+[zajawka]
+Karkówka rozcięta jak książka, posmarowana czosnkiem, rozmarynem i wędzoną papryką, zwinięta z powrotem w roladę i związana sznurkiem. Bo "Al hilo" znaczy po hiszpańsku, ni mniej ni więcej, "na sznurku". Ciasne wiązanie – co półtora centymetra – trzyma warstwy mięsa razem, zamiast pozwolić im rozejść się w piekarniku. Rumienimy roladę dopiero na końcu, pod grillem, bo w niskiej temperaturze koloru nie zyska.
+
+[skladniki]
+#karkowka   900 g karkówki w kawałku   @karkowka-w-kawalku
+#czosnek    4 ząbki czosnku
+#rozmaryn   2 gałązki rozmarynu
+#tymianek   3 gałązki tymianku
+#chili      =½ łyżeczki płatków chili
+#papryka    1 łyżeczka słodkiej wędzonej papryki
+#woda       150 ml ciepłej wody
+#solsolanka 1 łyżeczka gruboziarnistej soli morskiej
+#sol        gruboziarnista sól morska do smaku
+#pieprz     świeżo mielony pieprz
+#sznurek    naturalny sznurek kuchenny
+
+[kroki]
+== rozpuść sól w wodzie
+czas: ok. 2 min
+skladniki: woda, solsolanka
+Wlej ciepłą wodę do kubka, wsyp czubatą łyżeczkę grubej soli i wrzuć rozgnieciony ząbek czosnku razem z małą gałązką rozmarynu. Zamieszaj i odstaw – zanim skończysz zwijać mięso, sól się rozpuści, a woda zdąży przejść zapachem.
+
+== rozłóż karkówkę jak książkę
+czas: ok. 5 min
+skladniki: karkowka
+Połóż Karkówkę w kawałku na desce i przetnij ją wzdłuż dłuższego boku, prowadząc nóż równolegle do blatu i **nie przecinając do końca**. Rozłóż mięso na płaski płat; jeśli gdzieś zostało grubsze, natnij je płytko od środka na zewnątrz, żeby wyrównać grubość.
+
+== przypraw i zwiń w roladę
+czas: ok. 5 min
+skladniki: czosnek, rozmaryn, tymianek, chili, papryka, sol, pieprz
+Wnętrze płata oprósz solą i pieprzem, a potem rozsmaruj po nim przeciśnięty czosnek, posiekane igiełki rozmarynu, listki tymianku, płatki chili i wędzoną paprykę. Zwiń mięso ciasno, zaczynając od dłuższego boku, tak żeby przyprawy zostały w środku, a nie wypadły przy pierwszym obrocie.
+
+== obwiąż roladę sznurkiem
+czas: ok. 8 min
+skladniki: sznurek
+Obwiąż roladę sznurkiem gęsto, co półtora do dwóch centymetrów, zaciskając każdą pętlę tak, żeby mięso lekko się pod nią wybrzuszyło. Luźne wiązanie rozejdzie się w piekarniku razem z warstwami mięsa i zamiast rolady wyjmiesz rozklejoną karkówkę.
+
+== piecz w niskiej temperaturze
+minutnik: 1:08:00 rolada
+kryterium: mięso jest sprężyste pod naciskiem, a sok z nakłucia w najgrubszym miejscu jest przezroczysty
+Rozgrzej piekarnik do 150–160°C w trybie góra-dół, ułóż roladę na kratce, a poziom niżej wsuń blachę wyłożoną folią. Smaruj mięso solanką co dwadzieścia parę minut: przy tak długim pieczeniu powierzchnia zdąży wyschnąć nawet w niskiej temperaturze, a słona woda temu zapobiega.
+
+== przypiecz pod grillem
+minutnik: 12:00 grill
+kryterium: wierzch jest ciemnobrązowy i błyszczący, a wystające włókna zaczynają chrupać
+Przełącz piekarnik na grill, ok. 230°C, i przypiekaj roladę, obracając ją w połowie. Kolor powstaje dopiero teraz i tylko dlatego, że mięso jest już upieczone – gdyby cała pieczeń szła w tej temperaturze, wierzch byłby czarny, a środek surowy.
+
+== odstaw przed krojeniem
+minutnik: 12:00 odpoczynek
+kryterium: pod roladą na desce zbiera się tylko cienka obwódka soku, a nie kałuża
+Przełóż roladę na deskę i zostaw ją w spokoju, nieprzykrytą. Krojona prosto z piekarnika wypuści sok na deskę zamiast zatrzymać go we włóknach, a różnica jest widoczna gołym okiem po pierwszym plastrze.
+
+== zdejmij sznurek i pokrój
+czas: ok. 3 min
+Przetnij nożyczkami każdą pętlę sznurka i ściągnij go z rolady, a potem pokrój mięso w grube plastry, prostopadle do kierunku zwijania. Cieńsze plastry rozpadną się na spirale, bo trzymał je właśnie sznurek.
+
+[wskazowka]
+po co obwiązywać karkówkę sznurkiem?
+Karkówka jest przerośnięta tłuszczem i zbudowana z kilku osobnych mięśni, które przy pieczeniu rozchodzą się na warstwy. Sznurek trzyma je razem, więc zamiast płaskiej, rozklejonej pieczeni wyjmujesz z piekarnika walec, który da się pokroić w równe plastry.
+
+dlaczego mięso ma odpocząć przed krojeniem?
+Bo w gorącym mięsie soki zbierają się przy środku i przy pierwszym nacięciu wypływają na deskę. Kilkanaście minut wystarczy, żeby rozeszły się z powrotem po włóknach, a plastry zostały wilgotne zamiast oddać wszystko desce.
+
+[co-mozesz-zmienic]
+#chili
+krótko: słodką papryką, w tej samej ilości
+nie chcę ostrego – czym zastąpić płatki chili?
+Dosyp po prostu drugie tyle wędzonej papryki albo pół łyżeczki słodkiej mielonej. Chili odpowiada tu wyłącznie za ostrość, a dym i kolor idą z papryki wędzonej, więc bez niego danie nic nie traci poza pikantnością.
+
+#sznurek
+krótko: siatką rzeźniczą, do kupienia u rzeźnika
+nie mam sznurka kuchennego – da się bez niego?
+Najbliższy zamiennik to siatka rzeźnicza, którą kupisz u rzeźnika razem z mięsem. Zwykłej nitki ani sznurka z tworzywa nie używaj: pierwsza przepali się w 230°C, a drugi w tej temperaturze mięknie i wtapia się w mięso.
+
+[przechowywanie]
+jak przechowywać i odgrzewać karkówkę Al Hilo?
+Pokrój roladę dopiero przed jedzeniem, a resztę schłodź w całości i przełóż do szczelnego pojemnika w ciągu 1–2 godzin od wyjęcia z piekarnika; w lodówce trzyma do 2 dni. W zamrażarce: najlepsza jakość do 2–3 miesięcy, najlepiej w plastrach przełożonych papierem. Odgrzewaj w piekarniku w 150°C, pod folią i z łyżką wody na dnie naczynia, bo na patelni plastry wysychają w minutę.
+
+[wartosci-odzywcze]
+energia: 976 kJ / 234 kcal; tłuszcz: 14 g; kwasy tłuszczowe nasycone: 5,4 g; węglowodany: 0,3 g; cukry: 0,1 g; błonnik: 0,8 g; białko: 25 g; sól: 1,2 g
+
+[wartosci-porcja]
+energia: 1675 kJ / 402 kcal; tłuszcz: 25 g; kwasy tłuszczowe nasycone: 9,2 g; węglowodany: 0,5 g; cukry: 0,1 g; błonnik: 1,4 g; białko: 44 g; sól: 2,1 g

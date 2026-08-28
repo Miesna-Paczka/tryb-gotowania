@@ -1,0 +1,97 @@
+[meta]
+nazwa: spaghetti bolognese z wołowiną
+slug: spaghetti-bolognese
+porcje-bazowe: 4
+liczba-porcji: 4 porcje
+waga-porcji: 606
+czas-minuty: 70
+item: 6a904ee9be931792b881d6e2
+
+[zajawka]
+Sos z mielonej wołowiny duszony w passacie z koncentratem, na podstawie z drobno pokrojonej cebuli, marchewki i selera naciowego, podany ze spaghetti wymieszanym prosto w garnku. Ta trójka warzyw to soffritto i jest w tym przepisie ważniejsza, niż wygląda: rozpuszcza się w sosie do niewidzialności i zostawia po sobie słodycz, której same pomidory nie mają. Makaron ląduje w sosie, a nie pod nim, bo dopiero wymieszany w garnku zbiera na siebie warstwę, zamiast pływać w kałuży.
+
+[skladniki]
+#wolowina  670 g wołowiny mielonej   @wolowina-mielona
+#makaron   320 g makaronu spaghetti
+#passata   700 g passaty pomidorowej
+#bulion    150 g bulionu wołowego
+#marchew   2 marchewki
+#seler     2 łodygi selera naciowego
+#cebula    1 {duża cebula|duże cebule|dużych cebul|dużej cebuli}
+#czosnek   3 ząbki czosnku
+#koncentrat 2 łyżki koncentratu pomidorowego
+#oliwa     2 łyżki oliwy z oliwek
+#oregano   1 łyżeczka oregano
+#bazylia   1 łyżeczka bazylii
+#cukier    =1 łyżeczka cukru
+#parmezan  parmezan do podania
+#sol       sól do smaku
+#pieprz    pieprz do smaku
+
+[kroki]
+== pokrój warzywa
+czas: ok. 10 min
+skladniki: cebula, marchew, seler, czosnek
+Pokrój cebulę, marchewkę i seler naciowy w naprawdę drobną kostkę, a czosnek posiekaj osobno i odłóż. Drobno, bo te warzywa mają zniknąć w sosie: przy grubszej kostce zostaną w nim kawałkami i zamiast bolognese wyjdzie gulasz z makaronem.
+
+== zeszklij soffritto
+minutnik: 7:00 warzywa
+kryterium: warzywa są miękkie i zmniejszyły objętość mniej więcej o jedną trzecią, a cebula jest szklista
+skladniki: oliwa
+Rozgrzej oliwę w dużym garnku i wrzuć cebulę, marchew oraz seler, mieszając co jakiś czas. Czosnek dodaj na ostatnie pół minuty: na rozgrzanym dnie brązowieje w kilkanaście sekund, a zbrązowiały zgorzknieje na cały garnek.
+
+== zrumień wołowinę
+minutnik: 9:00 wołowina
+kryterium: w mięsie nie ma już różowych grudek, a na dnie garnka zbierają się ciemne, przypieczone okruchy
+skladniki: wolowina
+Dodaj Mielone wołowe i rozdrabniaj je łopatką, dociskając do dna, aż rozpadnie się na drobne grudki. Nie mieszaj bez przerwy: mięso musi mieć chwilę kontaktu z gorącym dnem, żeby się zrumienić, a nie tylko zszarzeć.
+
+== podsmaż koncentrat
+minutnik: 2:00 koncentrat
+kryterium: koncentrat pociemniał z jasnoczerwonego na ceglasty i pachnie słodko, a nie kwaśno
+skladniki: koncentrat
+Wmieszaj koncentrat pomidorowy w mięso z warzywami i smaż całość, cały czas mieszając. Te dwie minuty na suchym dnie odbierają koncentratowi surową kwaśność i zamieniają ją w słodycz; wlany prosto do passaty zostałby ostry przez całe duszenie.
+
+== zalej i duś
+minutnik: 40:00 sos
+kryterium: sos zgęstniał, a przeciągnięta łyżka odsłania dno na moment, zanim się z powrotem zaleje
+skladniki: passata, bulion, oregano, bazylia, cukier, sol, pieprz
+Wlej passatę i bulion wołowy, dosyp oregano, bazylię, cukier, sól oraz pieprz i zejdź z ogniem do minimum. Mieszaj co kilka minut od dna: gęstniejący sos przywiera właśnie tam i przypala się, zanim cokolwiek zdążysz poczuć.
+
+== ugotuj makaron
+czas: ok. 10 min
+skladniki: makaron
+Nastaw duży garnek osolonej wody i ugotuj spaghetti al dente, o minutę krócej niż podaje opakowanie. Zrób to pod koniec duszenia sosu i **zostaw szklankę wody z gotowania**, bo jest gęsta od skrobi i przyda się przy łączeniu.
+
+== połącz makaron z sosem
+czas: ok. 2 min
+skladniki: parmezan
+Przełóż odcedzone spaghetti prosto do garnka z sosem i mieszaj przez chwilę, dolewając wody z gotowania, jeśli sos okaże się za gęsty. Podawaj od razu, z tartym parmezanem na wierzchu.
+
+[wskazowka]
+po co drobno kroić marchewkę i seler, skoro i tak się rozpadną?
+Właśnie po to, żeby się rozpadły. Drobna kostka rozpuszcza się w sosie przez czterdzieści minut duszenia i zostawia po sobie wyłącznie słodycz i gęstość; kostka wielkości grochu przetrwa ten czas w całości i będzie się czuć na zębach jako osobny składnik.
+
+po co podsmażać koncentrat pomidorowy przed wlaniem passaty?
+Bo koncentrat jest surowy i wyraźnie kwaśny. Dwie minuty na gorącym dnie karmelizują jego cukry i pogłębiają kolor, a ten sam koncentrat wlany prosto do płynu zostanie kwaśny do końca duszenia; czterdzieści minut na małym ogniu tego nie naprawi.
+
+[co-mozesz-zmienic]
+#seler
+krótko: pominąć albo dodać trzecią marchewkę
+nie mam selera naciowego, da się bez niego?
+Da się, choć sos będzie odrobinę płaski w tle. Seler naciowy wnosi tu słonawo-ziołową nutę, której ani marchew, ani cebula nie mają; jeśli chcesz coś w to miejsce, trzecia marchewka nadrobi objętość, a mała łyżeczka posiekanego lubczyku nadrobi kierunek smaku.
+
+#bulion
+krótko: wodą z łyżeczką koncentratu więcej
+czym zastąpić bulion wołowy?
+Wodą, w tej samej ilości, z dodatkową łyżeczką koncentratu pomidorowego. Bulion wnosi tu głównie sól i wywar mięsny, a mięsa w tym sosie i tak jest dużo, więc strata jest mniejsza, niż mogłoby się wydawać; pamiętaj tylko dosolić na końcu, bo bulion zwykle robił to za ciebie.
+
+[przechowywanie]
+jak przechowywać i odgrzewać spaghetti bolognese?
+Trzymaj sos i makaron osobno: sam sos w szczelnym pojemniku w lodówce do 2 dni, makaron do 24 godzin, schłodzony w ciągu godziny od odcedzenia. W zamrażarce: sam sos, najlepsza jakość do 2–3 miesięcy, w porcjach; ugotowanego spaghetti nie mroź, bo rozpada się po rozmrożeniu. Sos odgrzewaj w rondelku na małym ogniu, mieszając od dna, i dolej łyżkę wody, jeśli zgęstniał przez noc.
+
+[wartosci-odzywcze]
+energia: 584 kJ / 140 kcal; tłuszcz: 6,3 g; kwasy tłuszczowe nasycone: 2,5 g; węglowodany: 12 g; cukry: 2,6 g; błonnik: 1,5 g; białko: 8,1 g; sól: 0,49 g
+
+[wartosci-porcja]
+energia: 3538 kJ / 846 kcal; tłuszcz: 38 g; kwasy tłuszczowe nasycone: 15 g; węglowodany: 70 g; cukry: 16 g; błonnik: 9,2 g; białko: 49 g; sól: 3 g

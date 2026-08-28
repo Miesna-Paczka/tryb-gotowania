@@ -1,0 +1,82 @@
+[meta]
+nazwa: łosoś smażony w glazurze teriyaki
+slug: losos-w-glazurze-teriyaki
+porcje-bazowe: 2
+liczba-porcji: 2 porcje
+waga-porcji: 179
+czas-minuty: 15
+item: 6a904e87f582c0f9b9942636
+
+[zajawka]
+Łosoś smażony skórą do dołu, aż skórka zrobi się chrupiąca, i dopiero potem oblany glazurą z sosu sojowego, miodu, mirinu, czosnku i imbiru. Przez pierwsze minuty ryby się nie rusza. Przesunięta o centymetr skóra przykleja się do patelni i tam zostaje. Glazura wchodzi na zmniejszonym ogniu, bo miód przypala się szybciej, niż sos zdąży zgęstnieć.
+
+[skladniki]
+#losos       300 g łososia atlantyckiego   @losos-atlantycki
+#olej        1 łyżka oleju sezamowego lub zwykłego
+#soja        3 łyżki sosu sojowego
+#miod        1 łyżka miodu
+#mirin       1 łyżka mirin lub octu ryżowego
+#czosnek     1 ząbek czosnku
+#imbir       ½ łyżeczki startego imbiru
+#sezam       1 łyżeczka sezamu
+#szczypiorek 2 łyżki posiekanego szczypiorku
+
+[kroki]
+== wymieszaj glazurę
+czas: ok. 3 min
+skladniki: soja, miod, mirin, czosnek, imbir
+Zetrzyj czosnek i imbir na drobnej tarce, wymieszaj je w miseczce z sosem sojowym, miodem i mirinem i odstaw przy kuchence. Ścieraj, zamiast siekać: starty czosnek rozpuszcza się w sosie, a posiekany zostaje w nim kawałkami, które na patelni przypalą się pierwsze.
+
+== osusz łososia
+czas: ok. 1 min
+skladniki: losos
+Osusz porcje Łososia atlantyckiego papierowym ręcznikiem, ze szczególną uwagą po stronie skóry. Woda pod skórą najpierw musi odparować i dopiero potem cokolwiek się rumieni, więc mokra ryba spędza pierwszą minutę na parowaniu zamiast na smażeniu.
+
+== usmaż skórę
+minutnik: 4:30 skóra
+kryterium: brzeg skóry jest ciemnozłoty, a łosoś podważony łopatką odchodzi od patelni jednym ruchem
+skladniki: olej
+Rozgrzej olej na średnim ogniu, połóż łososia skórą do dołu i **nie ruszaj go**. Dociśnij rybę na chwilę łopatką na samym początku, żeby skóra przylgnęła do dna całą powierzchnią, a potem zostaw ją w spokoju do końca.
+
+== obróć i dosmaż
+minutnik: 2:30 łosoś
+kryterium: mięso przy brzegu jest matowe, a w najgrubszym miejscu wciąż lekko przezroczyste
+Obróć porcje na drugą stronę i dosmaż je krócej niż od strony skóry. Łosoś dochodzi jeszcze przez chwilę po zdjęciu z ognia, więc różowy środek na patelni jest tym, czego szukasz, a nie niedoróbką.
+
+== wlej glazurę
+minutnik: 1:30 glazura
+kryterium: sos ciągnie się za łyżką i oblepia rybę błyszczącą warstwą, zamiast spływać na dno
+Zmniejsz ogień do małego i dopiero wtedy wlej glazurę na patelnię, a potem polewaj nią rybę łyżką. Na dużym ogniu miód z sosu przypala się w kilkanaście sekund i cała glazura robi się gorzka, a tego nie da się odkręcić.
+
+== posyp i podaj
+czas: ok. 1 min
+skladniki: sezam, szczypiorek
+Przełóż łososia na talerze skórą do góry i polej resztą glazury z patelni. Posyp rybę sezamem i szczypiorkiem dopiero na talerzu: na patelni sezam wpadłby w sos i przestałby chrupać.
+
+[wskazowka]
+jak zrobić naprawdę chrupiącą skórę?
+Trzy rzeczy naraz: sucha skóra, rozgrzana patelnia i cierpliwość przez pierwsze minuty. Osusz rybę ręcznikiem, dociśnij ją łopatką na start, żeby nie wybrzuszyła się w środku, i nie podważaj skóry, dopóki nie odejdzie sama.
+
+dlaczego glazura nie wchodzi od razu na patelnię?
+Bo są w niej miód i sos sojowy, czyli cukier i sól, a cukier na dużym ogniu przypala się szybciej niż gęstnieje. Na małym ogniu woda z sosu odparowuje spokojnie i zostaje lepka warstwa, która oblepia rybę zamiast osiadać na dnie czarnym nalotem.
+
+[co-mozesz-zmienic]
+#mirin
+krótko: octem ryżowym z pół łyżeczki cukru
+czym zastąpić mirin?
+Łyżką octu ryżowego z pół łyżeczki cukru rozpuszczoną w nim do końca. Mirin jest słodkim winem ryżowym, więc sam ocet wniesie kwas, ale zabierze słodycz, przez którą glazura się w ogóle klei.
+
+#losos
+krótko: Pstrągiem tęczowym, w tej samej ilości
+zadziała inna ryba ze skórą?
+Pstrąg tęczowy pasuje tu najlepiej z Paczki: ma skórę, która się chrupie, i tłuste mięso, które znosi gorącą patelnię. Płaty pstrąga są cieńsze od porcji łososia, więc skróć smażenie po stronie skóry mniej więcej o minutę.
+
+[przechowywanie]
+jak przechowywać i odgrzewać łososia w glazurze teriyaki?
+Przełóż ostudzoną rybę do szczelnego pojemnika w ciągu 1–2 godzin od zdjęcia z patelni i trzymaj w lodówce do 2 dni. Mrożenia nie polecamy: łosoś po rozmrożeniu puszcza wodę i rozpada się na płaty, a chrupiąca skóra i tak przepada już pierwszej nocy w lodówce. Odgrzewaj krótko na patelni skórą do dołu, na średnim ogniu i bez przykrycia, bo pod pokrywką skóra rozmięknie do końca.
+
+[wartosci-odzywcze]
+energia: 941 kJ / 225 kcal; tłuszcz: 14 g; kwasy tłuszczowe nasycone: 2,7 g; węglowodany: 7 g; cukry: 6,7 g; błonnik: 0,6 g; białko: 18 g; sól: 1,6 g
+
+[wartosci-porcja]
+energia: 1687 kJ / 404 kcal; tłuszcz: 25 g; kwasy tłuszczowe nasycone: 4,8 g; węglowodany: 13 g; cukry: 12 g; błonnik: 1 g; białko: 32 g; sól: 2,9 g

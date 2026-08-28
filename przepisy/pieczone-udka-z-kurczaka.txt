@@ -1,0 +1,99 @@
+[meta]
+nazwa: pieczone udka z kurczaka w marynacie
+slug: pieczone-udka-z-kurczaka
+porcje-bazowe: 2
+liczba-porcji: 2–3 porcje
+waga-porcji: 712
+czas-minuty: 50
+item: 6a919eed6022c4041ee46633
+
+[zajawka]
+Udka natarte marynatą z musztardy, sosu sojowego i rozmarynu; marynowane co najmniej godzinę, a najlepiej przez noc. Pieczone najpierw w 200°C, by skórka nabrała chrupkości, a potem w 180°C – by mięso upiekło się na wskroś, także przy kości. Puree i warzywa ogarniesz równolegle, a na całość zejdzie Ci może 40–50 minut.
+
+[skladniki]
+#udka       980 g udek z kurczaka  @udka-z-kurczaka
+#musztarda  1 łyżka musztardy
+#sojowy     1 łyżka sosu sojowego
+#olej       1 łyżka oleju
+#papryka    =1 łyżeczka papryki słodkiej
+#rozmaryn   1 łyżeczka posiekanego świeżego rozmarynu
+#ziemniaki  500 g ziemniaków
+#maslo      35 g masła
+#mleko      70 ml mleka
+#warzywa    250 g warzyw sezonowych
+#sol        sól do smaku
+#pieprz     pieprz do smaku
+
+[kroki]
+== wymieszaj marynatę
+czas: ok. 5 min
+skladniki: musztarda, sojowy, olej, papryka, rozmaryn, sol, pieprz
+Posiekaj rozmaryn tak drobno, jak dasz radę, i rozmieszaj go w miseczce z musztardą, sosem sojowym, olejem, słodką papryką, solą i pieprzem. Rozmieszaj do gładkości, bo nierozprowadzona musztarda zostanie grudką na jednym udku, a drugie wyjdzie samym sosem sojowym.
+
+== natrzyj udka i wstaw do lodówki
+czas: min. 1 h
+skladniki: udka
+Osusz Udka z kurczaka papierowym ręcznikiem i natrzyj je marynatą ze wszystkich stron, także pod skórą, po czym wstaw je do lodówki na co najmniej godzinę. Ten czas nie liczy się do czasu przygotowania i warto dać mu więcej: po czterech godzinach albo po nocy sól z sosu sojowego jest już w mięsie, a nie tylko na nim.
+
+== rozgrzej piekarnik i ułóż udka
+czas: ok. 5 min
+Nastaw piekarnik na 200°C, grzanie góra i dół, a udka ułóż w naczyniu żaroodpornym skórą do góry, w jednej warstwie i luźno. Zsunięte razem będą się dusić we własnej parze i skóra zostanie blada.
+
+== piecz w dwustu stopniach
+minutnik: 18:00 udka
+kryterium: skóra jest napięta, sucha w dotyku i zaczyna się złocić na wypukłościach
+Wsuń naczynie na środkową półkę i nie otwieraj piekarnika przez cały ten czas. Wysoka temperatura na początku wysusza skórę, a dopiero sucha skóra się rumieni.
+
+== zmniejsz temperaturę i dopiecz
+minutnik: 20:00 udka
+kryterium: sok wypływający po nakłuciu przy kości jest przezroczysty, a mięso odchodzi od kości
+Zejdź z temperaturą do 180°C i piecz udka dalej, polewając je raz sokami z dna naczynia. Grubsze udka od piekarnika z górnym grzaniem mogą potrzebować dwóch, trzech minut więcej, więc sprawdzaj po kryterium, nie po zegarze.
+
+== ugotuj ziemniaki
+minutnik: 20:00 ziemniaki
+kryterium: nóż wchodzi w kostkę bez oporu i zsuwa się z niej sam
+skladniki: ziemniaki, sol
+Zrób to w czasie pieczenia. Ziemniaki obierz, pokrój na równe kostki wielkości mniej więcej orzecha włoskiego i wstaw do osolonej wody, licząc czas od zagotowania.
+
+== ugnieć puree
+czas: ok. 5 min
+skladniki: maslo, mleko, pieprz
+Odcedź ziemniaki, odparuj je chwilę w gorącym garnku, dodaj masło i podgrzane mleko, po czym ugnieć tłuczkiem. Zimne mleko schłodzi ziemniaki i puree wyjdzie kleiste zamiast puszystego.
+
+== ugotuj warzywa na parze
+minutnik: 10:00 warzywa
+kryterium: warzywa są jaskrawe i sprężyste, a widelec wchodzi w nie z lekkim oporem
+skladniki: warzywa
+Ułóż warzywa w sitku nad garnkiem z wrzątkiem i przykryj je. Sitko nie może dotykać wody, bo wtedy warzywa się gotują i tracą kolor.
+
+== podaj z sokami z pieczenia
+czas: ok. 3 min
+Nałóż na talerze puree i warzywa, połóż obok udka i polej wszystko sokami z dna naczynia. Sok jest tam najbardziej skoncentrowaną częścią marynaty i szkoda go zostawiać na blasze.
+
+[wskazowka]
+dlaczego piekarnik schodzi z dwustu stopni na sto osiemdziesiąt?
+Bo skóra i mięso przy kości potrzebują dwóch różnych rzeczy. Pierwsze osiemnaście minut w 200°C odparowuje wilgoć ze skóry i zaczyna ją rumienić, a niższa temperatura przez kolejne dwadzieścia minut pozwala dojść mięsu przy kości, zanim skóra przejdzie z rumianej w gorzką.
+
+jak sprawdzić, czy udka są gotowe, bez termometru?
+Nakłuj mięso najgrubszym końcem noża w najgrubszym miejscu, tuż przy kości. Sok, który wypłynie, ma być przezroczysty; różowy znaczy, że potrzeba jeszcze kilku minut.
+
+[co-mozesz-zmienic]
+#mleko
+krótko: ciepłą wodą, w tej samej ilości
+czym zastąpić mleko w puree?
+Ciepłą wodą z gotowania ziemniaków, w tej samej ilości. Puree wyjdzie mniej kremowe, ale woda ze skrobią wiąże je lepiej niż zwykła woda z kranu.
+
+#udka
+krótko: airfryer, 190°C, 20–24 min
+mam airfryer, czy udka wyjdą w nim tak samo?
+Wyjdą, i szybciej. Rozgrzej go do 190°C, ułóż udka skórą do góry i piecz 20 do 24 minut, obracając je w połowie. Skóra zrobi się bardziej chrupiąca niż w piekarniku, bo powietrze krąży wokół całego udka.
+
+[przechowywanie]
+jak przechowywać i odgrzewać pieczone udka z kurczaka?
+W lodówce: do 2 dni w szczelnym pojemniku, puree i warzywa osobno od mięsa. W zamrażarce: samo mięso, najlepsza jakość do 2–3 miesięcy; puree ziemniaczane zamraża się źle i po rozmrożeniu wychodzi wodniste. Odgrzewanie: udka w piekarniku w 180°C przez kilkanaście minut, żeby skóra wróciła do chrupkości, a puree w rondelku z łyżką mleka.
+
+[wartosci-odzywcze]
+energia: 653 kJ / 157 kcal; tłuszcz: 9,6 g; kwasy tłuszczowe nasycone: 2,9 g; węglowodany: 6,4 g; cukry: 1,2 g; błonnik: 1,1 g; białko: 11 g; sól: 0,48 g
+
+[wartosci-porcja]
+energia: 4649 kJ / 1114 kcal; tłuszcz: 69 g; kwasy tłuszczowe nasycone: 21 g; węglowodany: 46 g; cukry: 8,2 g; błonnik: 7,7 g; białko: 75 g; sól: 3,4 g

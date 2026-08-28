@@ -1,0 +1,76 @@
+[meta]
+nazwa: kotlety mielone z indyka z warzywami
+slug: kotlety-mielone-z-indyka
+porcje-bazowe: 3
+liczba-porcji: 3 porcje
+waga-porcji: 261
+czas-minuty: 35
+item: 6a904e87f582c0f9b9942630
+
+[zajawka]
+Kotlety z mielonego indyka wzbogacone startą cukinią i marchewką, spięte jajkiem i bułką tartą. Indyk jest chudy i sam z siebie wyszedłby suchy, więc wilgoć do środka wnoszą tu warzywa. Cukinię trzeba jednak odcisnąć, bo puszczona luzem rozrzedza masę tak, że kotlety rozpadają się na patelni, zanim zdążą się ściąć.
+
+[skladniki]
+#indyk    420 g mielonego z indyka   @mielone-z-indyka
+#cukinia  1 {mała cukinia|małe cukinie|małych cukinii|małej cukinii}
+#marchew  1 marchewka
+#cebula   1 cebula
+#jajko    1 jajko
+#bulka    4 łyżki bułki tartej
+#natka    2 łyżki natki pietruszki
+#olej     olej do smażenia
+#sol      sól do smaku
+#pieprz   pieprz do smaku
+
+[kroki]
+== zetrzyj warzywa
+czas: ok. 8 min
+skladniki: cukinia, marchew, cebula
+Zetrzyj cukinię i marchewkę na grubych oczkach tarki, a cebulę posiekaj drobno. Grube oczka są tu ważniejsze, niż wyglądają: startych na drobno warzyw nie widać w kotlecie, a woda z nich wychodzi ta sama.
+
+== odciśnij cukinię
+czas: ok. 2 min
+Weź startą cukinię w garść i wyciśnij z niej wodę nad zlewem, aż przestanie kapać. Mała cukinia potrafi oddać pół szklanki wody, a każda z tych łyżek trafiłaby prosto do masy i rozrzedziła ją do konsystencji, w której nic się nie klei.
+
+== wyrób masę
+czas: ok. 3 min
+skladniki: indyk, jajko, bulka, natka, sol, pieprz
+Przełóż Mielone z indyka do miski, dodaj odciśnięte warzywa, jajko, bułkę tartą i posiekaną natkę, dopraw solą oraz pieprzem i wymieszaj wszystko ręką. Jeśli masa nadal rozjeżdża się w dłoni, dosyp bułki tartej po łyżce i odczekaj chwilę po każdej, bo bułka wchłania wodę z opóźnieniem.
+
+== uformuj kotlety
+czas: ok. 5 min
+Zwilż dłonie zimną wodą i formuj kotlety grubości mniej więcej dwóch centymetrów, spłaszczając je na końcu. Mokre dłonie są jedyną rzeczą, która trzyma tę masę z dala od skóry; suche zabiorą połowę pierwszego kotleta.
+
+== usmaż partiami
+minutnik: 9:00 kotlety
+kryterium: kotlet jest rumiany po obu stronach, a przekrojony ma matowo biały środek bez różowych miejsc
+skladniki: olej
+Rozgrzej olej i kładź tyle kotletów, żeby zostawały między nimi odstępy, obracając je raz i licząc czas dla każdej partii osobno. Zamiast smażyć, możesz upiec kotlety w piekarniku nagrzanym do 190°C, na papierze i bez przykrycia.
+
+[wskazowka]
+po co odciskać startą cukinię?
+Bo cukinia to w ponad dziewięćdziesięciu procentach woda, a starta oddaje ją natychmiast. Nieodciśnięta rozrzedzi masę tak, że kotlety trzeba będzie ratować kolejnymi łyżkami bułki tartej, a wtedy zamiast mięsa z warzywami wyjdzie mięso z ciastem.
+
+dlaczego kotlety z indyka wychodzą suche?
+Bo mielone z indyka ma znacznie mniej tłuszczu niż wieprzowe, a to tłuszcz daje wrażenie soczystości. Warzywa nadrabiają część tej różnicy wilgocią, ale reszta zależy od patelni: kotlet trzymany minutę dłużej niż trzeba jest suchy niezależnie od tego, co jest w masie.
+
+[co-mozesz-zmienic]
+#cukinia
+krótko: startym ziemniakiem albo drugą marchewką
+czym zastąpić cukinię poza sezonem?
+Startym i odciśniętym ziemniakiem albo po prostu drugą marchewką. Ziemniak dodatkowo sklei masę skrobią, więc bułki tartej daj wtedy o łyżkę mniej; marchew jest słodsza i nie odda tyle wody, co cukinia, więc odciskanie odpada.
+
+#indyk
+krótko: Mielonym wieprzowym albo Mielonym wołowym, w tej samej ilości
+zadziała inne mięso mielone z Paczki?
+Mielone wieprzowe i Mielone wołowe pasują tu w tej samej ilości i oba są tłustsze od indyka, więc kotlety wyjdą soczystsze. Za to masa będzie luźniejsza, więc dodaj łyżkę bułki tartej więcej i smaż o minutę dłużej z każdej strony, bo tłustsze kotlety dochodzą wolniej.
+
+[przechowywanie]
+jak przechowywać i odgrzewać kotlety mielone z indyka?
+Przełóż ostudzone kotlety do szczelnego pojemnika w ciągu 1–2 godzin od zdjęcia z patelni i trzymaj w lodówce do 2 dni. W zamrażarce: najlepsza jakość do 2–3 miesięcy, przełożone papierem, żeby dały się wyjąć pojedynczo. Odgrzewaj pod przykryciem na małym ogniu, z łyżką wody na dnie patelni: chude mięso na suchej patelni wysycha szybciej, niż zdąży się nagrzać.
+
+[wartosci-odzywcze]
+energia: 604 kJ / 145 kcal; tłuszcz: 8 g; kwasy tłuszczowe nasycone: 1,5 g; węglowodany: 5 g; cukry: 2,2 g; błonnik: 1 g; białko: 13 g; sól: 0,68 g
+
+[wartosci-porcja]
+energia: 1577 kJ / 378 kcal; tłuszcz: 21 g; kwasy tłuszczowe nasycone: 4 g; węglowodany: 13 g; cukry: 5,7 g; błonnik: 2,7 g; białko: 33 g; sól: 1,8 g

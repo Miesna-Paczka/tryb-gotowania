@@ -1,0 +1,73 @@
+[meta]
+nazwa: paszteciki z pasztetem
+slug: paszteciki-z-pasztetem
+porcje-bazowe: 4
+liczba-porcji: 4 porcje
+waga-porcji: 118
+czas-minuty: 30
+item: 6a919eed6022c4041ee4663b
+
+[zajawka]
+Co wychodzi z połączenia ciasta francuskiego i pasztetu? Rzecz jasna: paszteciki! Gotowe już w pół godziny, bez większego wysiłku. Najlepsze jako dodatek do czerwonego barszczu albo na zimno, jako wytrawna, chrupiąca przekąska.
+
+[skladniki]
+#pasztet    230 g pasztetu z kurczaka  @pasztet-z-kurczaka
+#ciasto     1 {arkusz ciasta francuskiego|arkusze ciasta francuskiego|arkuszy ciasta francuskiego|arkusza ciasta francuskiego}
+#jajko      1 jajko
+#rozmaryn   suszony rozmaryn do posypania
+
+[kroki]
+== wyjmij ciasto i rozgrzej piekarnik
+czas: ok. 10 min
+skladniki: ciasto
+Wyjmij ciasto francuskie z lodówki i zostaw je na blacie, a w tym czasie nastaw piekarnik na 200°C z grzaniem góra i dół. Ciasto prosto z lodówki pęka przy rozwijaniu wzdłuż zagięć, a te dziesięć minut wystarczy, żeby dało się je rozłożyć płasko.
+
+== pokrój ciasto na prostokąty
+czas: ok. 4 min
+Rozwiń ciasto i potnij je ostrym nożem na prostokąty mniej więcej równej wielkości, po osiem na arkusz. Tnij jednym pociągnięciem: przygniecione brzegi sklejają warstwy i w tych miejscach ciasto nie wyrośnie.
+
+== nałóż pasztet
+czas: ok. 5 min
+skladniki: pasztet
+Na jednej połowie każdego prostokąta połóż gruby kawałek Pasztetu z kurczaka, zostawiając dokoła centymetr wolnego brzegu. Wolny brzeg jest tu jedynym miejscem, w którym ciasto się sklei, więc pasztet nie może na niego zachodzić.
+
+== złóż i zlep brzegi
+czas: ok. 4 min
+Złóż ciasto na pół, dociśnij brzegi opuszkami, a potem przejedź po nich zębami widelca na całej długości. Sam nacisk palców puszcza w cieple; ząbkowany brzeg trzyma, bo warstwy zaczepiają się o siebie.
+
+== posmaruj jajkiem i posyp rozmarynem
+czas: ok. 3 min
+skladniki: jajko, rozmaryn
+Roztrzep jajko widelcem i posmaruj nim wierzch każdego pasztecika, po czym posyp je suszonym rozmarynem. Nie rozlewaj jajka po brzegach: ścięte w piekarniku skleja warstwy i zatrzymuje wyrastanie dokładnie tam, gdzie ciasto ma się rozchylić.
+
+== piecz
+minutnik: 17:00 paszteciki
+kryterium: ciasto urosło dwukrotnie i jest równomiernie złociste, a spody odchodzą od papieru bez oporu
+Przełóż paszteciki na blachę wyłożoną papierem do pieczenia, w odstępach na dwa palce, i wsuń je do nagrzanego piekarnika. Odstępy są potrzebne, bo ciasto francuskie rośnie na boki tak samo jak w górę.
+
+== odczekaj przed podaniem
+czas: ok. 5 min
+Zostaw upieczone paszteciki na blasze na kilka minut. Pasztet w środku jest tuż po pieczeniu bardzo gorący i przez te kilka minut zdąży zejść do temperatury, w której da się go zjeść.
+
+[wskazowka]
+co zrobić, żeby ciasto francuskie wyrosło jak najwyżej?
+Włóż złożone paszteciki na dziesięć minut do lodówki, zanim trafią do piekarnika. Ciasto francuskie rośnie od pary, która powstaje z zimnego masła między warstwami; im większa różnica temperatur między ciastem a piekarnikiem, tym gwałtowniej ta para pracuje. Schłodzone ciasto ma też twardszy tłuszcz, więc warstwy nie zlewają się przy przekładaniu na blachę.
+
+dlaczego brzegi trzeba lepić widelcem, a nie samymi palcami?
+Bo w piekarniku ciasto rośnie także wzdłuż zlepienia i sam docisk palcami puszcza. Widelec wciska w brzeg regularne rowki, które zwiększają powierzchnię styku obu warstw.
+
+[co-mozesz-zmienic]
+#rozmaryn
+krótko: czarnuszką albo sezamem, w tej samej ilości
+czym zastąpić suszony rozmaryn?
+Czarnuszką, sezamem albo makiem, w tej samej ilości. Wszystkie trzymają się posmarowanego jajkiem ciasta tak samo dobrze, a różnią się tym, czy chcesz na wierzchu smak ziołowy, czy orzechowy.
+
+[przechowywanie]
+jak przechowywać i odgrzewać paszteciki z pasztetem?
+W lodówce: do 2 dni w szczelnym pojemniku, przełożone papierem do pieczenia. W zamrażarce: najlepsza jakość do 1–2 miesięcy, zamrożone pojedynczo na blasze i dopiero potem przesypane do woreczka. Odgrzewanie: w piekarniku w 180°C przez 6 do 8 minut, bo w mikrofalówce ciasto francuskie mięknie i przestaje być tym, po co się je robi.
+
+[wartosci-odzywcze]
+energia: 1401 kJ / 337 kcal; tłuszcz: 24 g; kwasy tłuszczowe nasycone: 8,9 g; węglowodany: 20 g; cukry: 0,3 g; błonnik: 1,4 g; białko: 10 g; sól: 1,1 g
+
+[wartosci-porcja]
+energia: 1658 kJ / 398 kcal; tłuszcz: 28 g; kwasy tłuszczowe nasycone: 11 g; węglowodany: 23 g; cukry: 0,4 g; błonnik: 1,7 g; białko: 12 g; sól: 1,3 g

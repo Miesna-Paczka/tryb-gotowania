@@ -1,0 +1,89 @@
+[meta]
+nazwa: tradycyjne zrazy wołowe
+slug: zrazy-wolowe
+porcje-bazowe: 3
+liczba-porcji: 3 porcje
+waga-porcji: 432
+czas-minuty: 130
+item: 6a919eed6022c4041ee46631
+
+[zajawka]
+Zrazy przygotowaliśmy z plastrów udźca, rozbitych na 0,5 cm, a następnie posmarowanych musztardą i nafaszerowanych – mieszanką boczku, ogórka kiszonego i cebuli. Danie o tyle wdzięczne, że sos robi się… sam, z tego, co zostaje na dnie garnka. Najlepiej łączy się z kluskami śląskimi lub kaszą.
+
+[skladniki]
+#wolowina  650 g udźca wołowego  @udziec-wolowy
+#boczek    100 g boczku wędzonego w plastrach
+#ogorki    2 {ogórek kiszony|ogórki kiszone|ogórków kiszonych|ogórka kiszonego}
+#cebula    1 {duża cebula|duże cebule|dużych cebul|dużej cebuli}
+#musztarda 2 łyżki musztardy
+#bulion    400 ml bulionu wołowego
+#olej      2 łyżki oleju
+#papryka   =½ łyżeczki papryki słodkiej
+#sol       sól do smaku
+#pieprz    pieprz do smaku
+
+[kroki]
+== pokrój i rozbij mięso
+czas: ok. 12 min
+skladniki: wolowina, sol, pieprz, papryka
+Udziec pokrój w poprzek włókien na plastry grubości mniej więcej centymetra, przełóż każdy między dwa arkusze folii i rozbij tłuczkiem na pół centymetra. Oprósz plastry z obu stron solą, pieprzem i słodką papryką.
+
+== posmaruj plastry musztardą
+czas: ok. 3 min
+skladniki: musztarda
+Rozprowadź po każdym plastrze cienką warstwę musztardy, po tej stronie, na którą położysz farsz. Nie kładź jej więcej, bo przy grubszej warstwie z gotowego sosu zostanie sam ostry smak.
+
+== pokrój farsz w słupki
+czas: ok. 8 min
+skladniki: boczek, ogorki, cebula
+Boczek, ogórki kiszone i cebulę potnij w słupki długości mniej więcej połowy szerokości plastra mięsa. Krótsze wysypią się przy zwijaniu, a dłuższe będą wystawać poza roladkę.
+
+== zawiń zrazy
+czas: ok. 10 min
+Na każdym plastrze ułóż porcję boczku, ogórka i cebuli przy węższym brzegu, zawiń ciasno w roladkę i zepnij wykałaczką albo obwiąż nicią kuchenną. Zwijaj mocno, bo luźna roladka rozwinie się w garnku i farsz wypadnie do sosu.
+
+== zrumień zrazy
+minutnik: 8:00 zrazy
+kryterium: roladki są brązowe na całej powierzchni, a na dnie garnka leży przyklejony rumiany osad
+skladniki: olej
+Rozgrzej olej w szerokim garnku na średnio wysokim ogniu i smaż roladki, obracając je co dwie minuty, aż zbrązowieją ze wszystkich stron. Rób to partiami i licz czas dla każdej osobno, bo w ciasnym garnku mięso zacznie się dusić i koloru nie złapie.
+
+== wlej bulion i duś pod przykryciem
+minutnik: 1:20:00 zrazy
+kryterium: mięso rozdziela się widelcem bez oporu, a nici albo wykałaczki dają się wyjąć jednym ruchem
+skladniki: bulion
+Ułóż wszystkie roladki ciasno obok siebie, wlej bulion tak, żeby sięgnął do dwóch trzecich ich wysokości, i przykryj garnek. Trzymaj tak mały ogień, żeby powierzchnia ledwie mrugała, i obróć roladki mniej więcej w połowie.
+
+== odkryj garnek i zredukuj sos
+minutnik: 10:00 sos
+kryterium: sos oblepia łyżkę i spływa z niej wolno, a na powierzchni zbiera się warstewka tłuszczu
+Zdejmij pokrywkę i gotuj dalej na tym samym małym ogniu, polewając roladki sosem co kilka minut. Sos gęstnieje tylko dzięki redukcji.
+
+== wyjmij wykałaczki i podaj
+czas: ok. 3 min
+Wyjmij z roladek wykałaczki albo zdejmij nici, przełóż zrazy na talerze i polej je sosem z garnka. Zrób to po chwili odpoczynku, bo gorące mięso trzyma się na wykałaczce mocniej i przy szarpnięciu rozwarstwia się.
+
+[wskazowka]
+po co rumienić zrazy, skoro i tak będą się dusić?
+Rumienienie robi dwie rzeczy naraz. Na powierzchni mięsa powstaje ciemna skórka o smaku, którego samo duszenie nie wytworzy, a na dnie garnka zostaje przyklejony osad, który rozpuści się w bulionie i stanie się całym sosem. Pominięty krok widać potem w kolorze: sos wychodzi blady i wodnisty.
+
+[co-mozesz-zmienic]
+#ogorki
+krótko: konserwowymi, w tej samej ilości
+mam tylko ogórki konserwowe, mogę ich użyć?
+Możesz, w tej samej ilości. Konserwowe są słodsze i łagodniejsze w kwasie, więc farsz wyjdzie mniej wyrazisty. Wtedy warto dołożyć do sosu łyżeczkę octu albo soku z cytryny na sam koniec.
+
+#bulion
+krótko: wodą z kostką bulionową, w tej samej ilości
+czym zastąpić bulion wołowy?
+Wodą z kostką bulionową, w tej samej ilości. Kostka bywa mocno posolona, więc przy niej dosalaj mięso ostrożniej, a sos spróbuj dopiero po redukcji.
+
+[przechowywanie]
+jak przechowywać i odgrzewać zrazy wołowe?
+W lodówce: do 2 dni w szczelnym pojemniku, razem z sosem, bo w nim mięso nie wysycha. W zamrażarce: najlepsza jakość do 2–3 miesięcy, zamrożone w porcjach. Odgrzewanie: w rondelku pod przykryciem na małym ogniu, z dwiema łyżkami wody, jeśli sos zgęstniał w lodówce.
+
+[wartosci-odzywcze]
+energia: 522 kJ / 125 kcal; tłuszcz: 7,7 g; kwasy tłuszczowe nasycone: 2,4 g; węglowodany: 1 g; cukry: 0,9 g; błonnik: 0,4 g; białko: 13 g; sól: 0,99 g
+
+[wartosci-porcja]
+energia: 2254 kJ / 541 kcal; tłuszcz: 33 g; kwasy tłuszczowe nasycone: 10 g; węglowodany: 4,3 g; cukry: 4 g; błonnik: 1,7 g; białko: 55 g; sól: 4,3 g

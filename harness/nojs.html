@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>BEZ JS — tryb gotowania</title>
+
+<!--
+  harness/nojs.html — powierzchnia „bez JavaScriptu" (wiersz matrycy A8).
+  Treść pól kartowych (`wskazowka`, `co-mozesz-zmienic`, `przechowywanie`) musi
+  być czytelna, gdy skrypt się nie wykona — parser jest wzbogaceniem, nie
+  warunkiem dostępu do treści.
+
+  Mechanizm: `sandbox` BEZ `allow-scripts` blokuje wykonanie skryptów w ramce.
+  Nie da się tego zrobić kolumną w matrycy szerokości, bo tam skrypt ma działać.
+  Efekt uboczny sandboxa: ramka jest w unikalnym originie i NIE wyśle
+  postMessage — ocena tej powierzchni jest wzrokowa (zrzut), nie asercyjna.
+-->
+
+<style>
+  html,body{margin:0;background:#12100e;color:#eee;
+            font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
+  header{padding:10px 14px;background:#1c1915;border-bottom:1px solid #333}
+  .rzad{display:flex;gap:14px;padding:14px;overflow-x:auto}
+  .etykieta{padding:0 0 4px;font-size:12px;color:#aaa}
+  iframe{border:1px solid #444;background:#fff;display:block}
+</style>
+</head>
+<body>
+
+<header><b>A8 — treść bez JS</b> · lewa ramka: skrypty zablokowane · prawa: kontrolna.
+Oceniamy wzrokowo: w lewej ramce trzy pola kartowe są czytelne jako SUROWY tekst
+(pytanie + odpowiedź, wpisy rozdzielone pustą linią — `white-space: pre-line`);
+w prawej te same wpisy stoją już jako osobne karty. Ta sama treść, inna forma —
+o to chodzi w server-visible.</header>
+
+<div class="rzad">
+  <div>
+    <div class="etykieta">390 px · <b>sandbox bez allow-scripts</b> (JS wyłączony)</div>
+    <iframe src="fixture.html" sandbox width="390" height="780" title="fixture bez JS"></iframe>
+  </div>
+  <div>
+    <div class="etykieta">390 px · kontrolna (JS włączony)</div>
+    <iframe src="fixture.html" name="kontrolna" width="390" height="780" title="fixture kontrolna"></iframe>
+  </div>
+</div>
+</body>
+</html>

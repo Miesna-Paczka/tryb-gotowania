@@ -1,0 +1,74 @@
+[meta]
+nazwa: nuggetsy z medalionów z indyka
+slug: nuggetsy-z-indyka
+porcje-bazowe: 2
+liczba-porcji: 2 porcje
+waga-porcji: 241
+czas-minuty: 30
+item: 6a904e87f582c0f9b9942638
+
+[zajawka]
+Medaliony z indyka pokrojone na kęsy, obtoczone w mące, jajku i panko, a potem usmażone na patelni. Panko to japońska bułka tarta o dużych, płatkowych okruchach: chłonie mniej tłuszczu od zwykłej i zostaje chrupiąca dłużej, także wtedy, gdy nuggetsy poczekają chwilę na talerzu. Indyk jest chudszy od kurczaka, więc smaży się krócej i łatwiej go przesuszyć, a nuggetsy schodzą z patelni wtedy, gdy panierka dopiero co się zezłociła.
+
+[skladniki]
+#indyk    420 g medalionów z indyka   @medaliony-z-filetu-indyka
+#jajka    2 jajka
+#panko    80 g bułki tartej panko
+#maka     50 g mąki pszennej
+#papryka  1 łyżeczka słodkiej papryki
+#olej     olej do smażenia
+#sol      sól do smaku
+#pieprz   pieprz do smaku
+
+[kroki]
+== pokrój i dopraw medaliony
+czas: ok. 5 min
+skladniki: indyk, sol, pieprz, papryka
+Pokrój Medaliony z indyka na kęsy wielkości mniej więcej dwóch kciuków i dopraw je solą, pieprzem oraz słodką papryką. Tnij równo: cieńszy kęs zdąży się przesuszyć, zanim grubszy dojdzie w środku, a smażą się w tej samej partii.
+
+== ustaw trzy miski
+czas: ok. 2 min
+skladniki: maka, jajka, panko
+Wsyp mąkę do pierwszej miski, roztrzep jajka w drugiej, a panko wsyp do trzeciej i ustaw je w tej kolejności obok siebie. Jedną rękę zostaw do suchych misek, drugą do jajka: inaczej po trzech kęsach będziesz mieć obie oblepione panierką.
+
+== obtocz nuggetsy
+czas: ok. 8 min
+Obtaczaj każdy kęs kolejno w mące, jajku i panko, a nadmiar mąki strząsaj przed jajkiem. Panko dociśnij palcami do mięsa, bo płatki są duże i luźno przylegająca warstwa odejdzie w oleju razem z jajkiem.
+
+== usmaż partiami
+minutnik: 5:00 nuggetsy
+kryterium: panierka jest złota i chrupie pod widelcem, a przekrojony kęs jest matowo biały na wskroś
+skladniki: olej
+Rozgrzej olej na patelni i kładź tyle nuggetsów, żeby leżały luźno w jednej warstwie, obracając je po połowie czasu i licząc czas dla każdej partii osobno. Zamiast patelni możesz użyć airfryera nagrzanego do 200°C; wtedy trzymaj w nim nuggetsy mniej więcej dwa razy dłużej i obróć je w połowie.
+
+== odsącz i podaj
+czas: ok. 2 min
+Przekładaj usmażone nuggetsy na kratkę albo na ręcznik papierowy i nie układaj ich w stos. W stosie para z dolnych kęsów skrapla się na górnych i chrupiąca panierka mięknie w kilka minut.
+
+[wskazowka]
+czym panko różni się od zwykłej bułki tartej?
+Panko powstaje z chleba bez skórki i ma postać dużych, lekkich płatków zamiast drobnego piasku. Płatki stykają się z olejem mniejszą powierzchnią, więc wchłaniają go mniej i po usmażeniu zostają wyraźnie chrupiące, a nie zbite w twardą skorupkę.
+
+dlaczego nie wolno zapełniać patelni?
+Bo każdy zimny kęs obniża temperaturę oleju, a w zbyt chłodnym oleju panierka nie ścina się od razu, tylko go w siebie wciąga. Efekt widać po pierwszym kęsie: zamiast chrupiącej skorupki jest tłusta, miękka warstwa, której już nic nie naprawi.
+
+[co-mozesz-zmienic]
+#panko
+krótko: zwykłą bułką tartą, w tej samej ilości
+czym zastąpić panko?
+Zwykłą bułką tartą, w tej samej ilości. Panierka wyjdzie z niej gładsza i twardsza zamiast chrupiąco-płatkowej, a smażąc na zwykłej bułce, trzymaj olej odrobinę chłodniejszy: drobne okruchy przypalają się szybciej niż płatki panko.
+
+#indyk
+krótko: Filetem z piersi indyka, pokrojonym samodzielnie
+zadziała zwykły filet z indyka?
+Filet z piersi indyka nadaje się tak samo, trzeba go tylko pokroić samodzielnie na kęsy podobnej wielkości. Medaliony mają tę przewagę, że są już wyrównane grubością, więc cała partia dochodzi w tym samym czasie.
+
+[przechowywanie]
+jak przechowywać i odgrzewać nuggetsy z indyka?
+Przełóż ostudzone nuggetsy do szczelnego pojemnika w ciągu 1–2 godzin od zdjęcia z patelni i trzymaj w lodówce do 2 dni. W zamrażarce: najlepsza jakość do 1–3 miesięcy, najlepiej rozłożone pojedynczo na blaszce i dopiero potem zsypane do woreczka. Odgrzewaj w piekarniku albo w airfryerze w 180°C, na kratce i bez przykrycia; w mikrofalówce panierka rozmięknie i już się nie podniesie.
+
+[wartosci-odzywcze]
+energia: 880 kJ / 210 kcal; tłuszcz: 9,1 g; kwasy tłuszczowe nasycone: 1,1 g; węglowodany: 8,2 g; cukry: 0,6 g; błonnik: 0,8 g; białko: 23 g; sól: 0,9 g
+
+[wartosci-porcja]
+energia: 2124 kJ / 506 kcal; tłuszcz: 22 g; kwasy tłuszczowe nasycone: 2,7 g; węglowodany: 20 g; cukry: 1,4 g; błonnik: 2 g; białko: 56 g; sól: 2,2 g

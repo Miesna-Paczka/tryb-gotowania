@@ -1,0 +1,20 @@
+{
+  "_opis": [
+    "Slownik autorow spoza redakcji. KLUCZ = dokladna wartosc pola `autor` w CMS.",
+    "Generator NIE ZGADUJE typu: wartosc spoza tego pliku i spoza listy redakcyjnej",
+    "zatrzymuje lancuch bledem. Powod: PlainText nie odroznia osoby od marki, a",
+    "`@type` wpisany na chybil trafil jest twierdzeniem nieprawdziwym o czyjejs",
+    "tozsamosci. Dopisanie autora ma byc swiadoma decyzja w PR-ze, nie domyslem.",
+    "`sameAs` jest opcjonalne - publiczny profil, ktory identyfikuje te osobe."
+  ],
+  "_redakcja": [
+    "",
+    "Mięsna Paczka"
+  ],
+  "autorzy": {
+    "male.nawyki": {
+      "typ": "Person",
+      "sameAs": "https://www.instagram.com/male.nawyki/"
+    }
+  }
+}

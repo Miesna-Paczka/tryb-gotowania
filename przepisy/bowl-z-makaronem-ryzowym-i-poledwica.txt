@@ -1,0 +1,84 @@
+[meta]
+nazwa: bowl z makaronem ryżowym i polędwicą wołową
+slug: bowl-z-makaronem-ryzowym-i-poledwica
+porcje-bazowe: 2
+liczba-porcji: 2 porcje
+waga-porcji: 414
+czas-minuty: 25
+item: 6a919eed6022c4041ee46649
+
+[zajawka]
+Makaron ryżowy ląduje na dnie, obok niego ogórek, kimchi i edamame, a na wierzchu: plastry usmażonej polędwicy. Każdy dodatek to inny smak – i inna temperatura podania. Najlepiej smakuje na świeżo, ale broni się też po nocy w lodówce.
+
+[skladniki]
+#poledwica  195 g polędwicy wołowej  @poledwica-wolowa
+#makaron    150 g makaronu ryżowego
+#ogorek     100 g świeżego ogórka
+#kimchi     100 g kimchi
+#edamame    80 g edamame
+#sojowy     2 łyżki sosu sojowego
+#sezam      1 łyżeczka sezamu
+#czarnuszka ½ łyżeczki czarnuszki
+#olej       1 łyżka oleju
+#sol        sól do smaku
+#pieprz     pieprz do smaku
+
+[kroki]
+== wyjmij mięso z lodówki
+czas: min. 30 min
+skladniki: poledwica
+Wyjmij Polędwicę wołową z lodówki na pół godziny przed smażeniem i osusz ją papierowym ręcznikiem. Ten czas nie liczy się do czasu przygotowania, ale bez niego środek zostanie zimny wtedy, gdy powierzchnia będzie już gotowa; sucha powierzchnia jest z kolei warunkiem tego, żeby mięso się przypiekło, a nie zaparowało.
+
+== ugotuj makaron ryżowy
+minutnik: 5:00 makaron
+kryterium: nitka daje się przegryźć bez oporu, ale nie rozpada się przy podnoszeniu
+skladniki: makaron
+Ugotuj albo zalej wrzątkiem makaron ryżowy zgodnie z instrukcją z opakowania, a po odcedzeniu przepłucz go zimną wodą. Czas z opakowania jest wiążący, bo makarony ryżowe różnią się grubością i część z nich wystarczy zalać.
+
+== pokrój ogórka i ugotuj edamame
+czas: ok. 5 min
+skladniki: ogorek, edamame
+Połowę ogórka potnij w cienkie plasterki albo słupki, a edamame zagotuj krótko w osolonej wodzie, jeśli kupiłeś je mrożone. Zrób to w czasie, gdy makaron mięknie.
+
+== usmaż polędwicę
+minutnik: 5:00 polędwica
+kryterium: powierzchnia jest ciemnobrązowa, a mięso naciśnięte palcem sprężynuje i wraca do kształtu
+skladniki: olej, sol, pieprz
+Rozgrzej patelnię do bardzo wysokiej temperatury, skrop mięso olejem, oprósz solą i pieprzem i smaż po dwie, dwie i pół minuty na stronę na medium rare albo po trzy minuty na medium. Olej idzie na mięso, nie na patelnię: na rozgrzanej suchej patelni zdążyłby się przypalić.
+
+== odstaw mięso i pokrój
+czas: ok. 6 min
+Przełóż polędwicę na deskę i zostaw ją na pięć minut, a potem pokrój w poprzek włókien na plastry grubości pół centymetra. Krojona od razu wypuści sok na deskę zamiast zatrzymać go w środku.
+
+== złóż miski
+czas: ok. 4 min
+skladniki: kimchi, sojowy, sezam, czarnuszka
+Nałóż makaron na dno misek, ułóż wokół niego ogórka, kimchi i edamame osobnymi kupkami, a na wierzchu rozłóż plastry polędwicy. Polej sosem sojowym, posyp sezamem i czarnuszką i podaj bez mieszania.
+
+[wskazowka]
+skąd wiadomo, kiedy polędwica jest medium rare, bez termometru?
+Naciśnij mięso opuszką palca w najgrubszym miejscu. Surowe jest miękkie i nie wraca do kształtu, medium rare sprężynuje i wraca powoli, dobrze wysmażone jest twarde i wraca natychmiast. Dwie i pół minuty na stronę na mocno rozgrzanej patelni to punkt wyjścia dla plastra grubego na trzy centymetry; przy cieńszym odejmij pół minuty.
+
+dlaczego dodatki w bowl leżą osobno, a nie razem?
+Bo każdy z nich ma inną temperaturę i inny kierunek smaku, a wymieszane uśredniają się do jednego. Zimny ogórek obok gorącego mięsa, kwaśne kimchi obok neutralnego makaronu, a jedzący co kęs decyduje, w jakich proporcjach je łączy. Wymieszany bowl przestaje być bowl i staje się sałatką.
+
+[co-mozesz-zmienic]
+#kimchi
+krótko: kiszoną kapustą z chilli, w tej samej ilości
+czym zastąpić kimchi?
+Kiszoną kapustą wymieszaną ze szczyptą płatków chilli i startym czosnkiem, w tej samej ilości. Nie będzie to kimchi, ale zapewni to samo: kwas z fermentacji i ostrość, które przecinają tłuszcz mięsa.
+
+#edamame
+krótko: zielonym groszkiem, w tej samej ilości
+nie mam edamame, czym je zastąpić?
+Mrożonym zielonym groszkiem albo bobem, w tej samej ilości, blanszowanym przez dwie minuty w osolonej wodzie. Chodzi tu o coś jędrnego i słodkiego obok kwaśnego kimchi, a nie o konkretny gatunek strączka.
+
+[przechowywanie]
+jak przechowywać składniki bowl z polędwicą?
+W lodówce: do 2 dni, każdy element w osobnym pojemniku, bo makaron chłonie sos sojowy i po dniu robi się słony. W zamrażarce: żadnego z tych składników nie mrozimy, ugotowany makaron ryżowy rozpada się po rozmrożeniu, a usmażona polędwica traci soczystość. Odgrzewanie: makaron przelej wrzątkiem, mięso zjedz na zimno, bo odgrzewane dojdzie do stopnia, w którym przestaje być różowe.
+
+[wartosci-odzywcze]
+energia: 408 kJ / 97 kcal; tłuszcz: 3 g; kwasy tłuszczowe nasycone: 0,6 g; węglowodany: 9,4 g; cukry: 0,8 g; błonnik: 1,1 g; białko: 7,5 g; sól: 0,84 g
+
+[wartosci-porcja]
+energia: 1688 kJ / 400 kcal; tłuszcz: 12 g; kwasy tłuszczowe nasycone: 2,4 g; węglowodany: 39 g; cukry: 3,4 g; błonnik: 4,5 g; białko: 31 g; sól: 3,5 g

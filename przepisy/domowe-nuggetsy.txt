@@ -1,0 +1,94 @@
+[meta]
+nazwa: domowe nuggetsy z kurczaka
+slug: domowe-nuggetsy
+porcje-bazowe: 3
+liczba-porcji: 3 porcje
+waga-porcji: 149
+czas-minuty: 30
+item: 6a57649e2c911147dc2602dd
+
+[zajawka]
+Nuggetsy z sieci fast food zawierają może 50-60% kurczaka. Nasze, domowe, smakują równie dobrze, a skład mają nieporównanie lepszy! Dla tradycjonalistów przygotowaliśmy nuggetsy smażone, zaś dla szukających zdrowych wyborów – chudszą wersję z piekarnika.
+
+[skladniki]
+#kurczak  330 g piersi z kurczaka @filet-z-piersi-kurczaka
+#maka  120 g mąki
+#bulka  120 g bułki tartej
+#jajka  2 jajka
+#parmezan  30 g startego parmezanu
+#olej  =200 ml oleju rzepakowego
+#majonez  3 łyżki majonezu
+#sol  1 łyżeczka soli
+#pieprz  2 łyżeczki pieprzu
+#czosnek  1 łyżeczka suszonego czosnku
+
+[kroki]
+== przygotuj panierkę
+czas: ok. 4 min
+skladniki: maka, jajka, bulka, parmezan, sol, pieprz, czosnek
+Rozstaw trzy miski: w pierwszej mąka, w drugiej roztrzepane jajka, w trzeciej bułka tarta, i do każdej wsyp po równo soli i pieprzu. Do bułki tartej dosyp jeszcze parmezan i suszony czosnek, a potem wymieszaj ją łyżką, żeby ser nie został w jednym miejscu.
+
+== pokrój kurczaka
+czas: ok. 4 min
+skladniki: kurczak
+Pierś pokrój w kostkę wielkości kęsa, o boku mniej więcej 2 cm.
+
+== obtocz w mące
+czas: ok. 3 min
+Osusz kostki papierowym ręcznikiem, obtocz każdą w mące i strząśnij nadmiar.
+
+== panieruj kostki
+czas: ok. 5 min
+Oprószone mąką kostki zanurzaj po jednej w jajku, obtaczaj w bułce tartej i dociskaj ją palcami, a potem układaj nuggetsy na drugim talerzu. Panieruj jedną ręką, a drugą trzymaj suchą.
+
+== rozgrzej olej
+czas: ok. 4 min
+skladniki: olej
+Wlej olej na patelnię tak, żeby pokrył dno na kilka milimetrów, rozgrzej go na pełnym ogniu, a obok ustaw sitko na talerzu, żeby tłuszcz miał gdzie ściekać. Wrzuć do środka odrobinę bułki tartej – kiedy **od razu zasyczy i obrośnie bąbelkami**, olej jest gotowy i możesz zejść z ogniem na średni.
+
+== usmaż pierwszą stronę
+minutnik: 2:00 kurczak
+kryterium: spód nuggetsów jest złoty i twardy, a panierka schodzi z patelni w całości – to połowa smażenia, nie koniec
+Wkładaj nuggetsy tak, żeby leżały luźno na patelni, w jednej warstwie i nie dotykały się bokami. Stłoczone schłodzą olej i zamiast się smażyć, zaczną go wciągać jak gąbki.
+
+== obróć i dosmaż
+minutnik: 3:00 kurczak
+kryterium: przekrojony nugget jest w środku matowo biały na wskroś, bez różowych i szklistych miejsc
+Obróć nuggetsy na drugą stronę, a przed zdjęciem partii przekrój największą sztukę na pół. Jeśli w środku jest jeszcze różowo albo szklisto, wróć całą partią na patelnię na kolejną minutę i przekrój następną sztukę.
+
+== odsącz i powtórz
+czas: ok. 7 min
+Zarumienione nuggetsy przekładaj na sitko, żeby tłuszcz ściekał na talerz pod spodem. Resztę usmaż tak samo, partia po partii, i każdą sprawdzaj tym samym przekrojem.
+
+== podaj
+czas: ok. 1 min
+skladniki: majonez
+Przełóż gorące nuggetsy na talerz i postaw majonez obok, w miseczce do maczania. Najlepiej smakują w ciągu pierwszych kilku minut po zdjęciu z patelni, więc nie czekaj z podaniem na ostatnią partię.
+
+[wskazowka]
+jak zrobić nuggetsy, żeby panierka nie odchodziła od mięsa?
+Osusz kostki papierowym ręcznikiem, zanim trafią do mąki, i strząśnij jej nadmiar. W bułce tartej dociskaj panierkę palcami – niezwiązana warstwa odejdzie w oleju razem z jajkiem.
+
+skąd wiadomo, że nuggetsy nie są w środku surowe?
+Z przekroju, nie z zegara. Panierka rumieni się szybciej niż dochodzi mięso, więc barwa z wierzchu niczego nie rozstrzyga – przekrojony nugget ma być matowo biały na wskroś, bez różowych i szklistych miejsc. Sprawdzaj każdą partię osobno: kolejne smażą się w gorętszym oleju i rumienią szybciej, choć w środku potrzebują tyle samo.
+
+[co-mozesz-zmienic]
+#olej
+krótko: Tak: w piekarniku 180°C, ok. 15 minut
+czy nuggetsy można upiec zamiast smażyć?
+Tak: nagrzej piekarnik do 180°C z grzaniem góra-dół, blachę wyłóż papierem posmarowanym łyżką oleju, ułóż obtoczone nuggetsy luźno i skrop je łyżeczką oleju z wierzchu. Piecz na środkowej półce około 15 minut i przewróć je po 7–8 minutach, ale przed wyjęciem blachy przekrój największą sztukę – ten czas jest przeniesiony z nuggetsów formowanych, więc nie jest tu dowodem.
+
+#parmezan
+krótko: grana padano albo twardym serem żółtym, w tej samej ilości
+czym zastąpić parmezan w panierce?
+Grana padano w tej samej ilości albo każdym twardym, dojrzewającym serem żółtym, startym na drobnych oczkach. Panierka będzie mniej słona, więc dosyp do bułki tartej szczyptę soli i spróbuj jej palcem, zanim zaczniesz panierować.
+
+[przechowywanie]
+jak przechowywać i odgrzewać nuggetsy?
+W lodówce: do 2 dni w szczelnym pojemniku, włóż je tam w ciągu 1–2 godzin od zdjęcia z patelni. W zamrażarce: najlepsza jakość do 1–3 mies. Odgrzewanie: w piekarniku 180°C, na kratce i bez przykrycia – panierka wraca wtedy do chrupkości, czego mikrofalówka nie zrobi.
+
+[wartosci-odzywcze]
+energia: 1250 kJ / 300 kcal; tłuszcz: 21 g; kwasy tłuszczowe nasycone: 2,3 g; węglowodany: 6,8 g; cukry: 0,6 g; błonnik: 0,7 g; białko: 20 g; sól: 0,65 g
+
+[wartosci-porcja]
+energia: 1861 kJ / 447 kcal; tłuszcz: 32 g; kwasy tłuszczowe nasycone: 3,4 g; węglowodany: 10 g; cukry: 0,9 g; błonnik: 1,1 g; białko: 30 g; sól: 0,97 g

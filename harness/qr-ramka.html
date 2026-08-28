@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR — ramka pomiarowa</title>
+
+<!--
+  harness/qr-ramka.html — powierzchnia pomiarowa wiersza I3 i testu negatywnego H4
+  (łańcuch `tryb-gotowania-embed`, jednostka 1 = harness).
+
+  Po co osobna powierzchnia, skoro matryca ma już siedem ramek:
+  matryca mierzy 320–480 portret i dwie poziome, czyli WYŁĄCZNIE poniżej progu
+  992 px. Blok QR renderuje się wyłącznie ≥ 992 px (spec §8), więc w matrycy nie
+  ma ani jednej ramki, w której bramka szerokości mogłaby się OTWORZYĆ. Skutek:
+  H4 („nie renderuje QR poniżej 992 px") przechodził na powierzchni, na której
+  nie mógł paść — a test, który nie może paść, nie mierzy niczego. Ta powierzchnia
+  dokłada 991 / 992 / 1024 i test-double biblioteki, żeby H4 stał się falsyfikowalny,
+  a I3 dostał pomiar zamiast lektury kodu.
+
+  Ramka ładuje SAM PARSER. Runtime (`tryb-gotowania.js`) nie ma ani jednego
+  wystąpienia „qr" (zmierzone `grep`em, przebieg 16) — QR mieszka w parserze
+  (`adresQR`, `rysujQR`), więc dokładanie runtime'u dokładałoby tu wyłącznie
+  hałasu i 83 kB do pobrania.
+
+  TO NIE JEST PAKIET INTEGRACYJNY. Wszystko oznaczone HARNESS-ONLY istnieje
+  wyłącznie na potrzeby pomiaru i NIE MOŻE trafić do embedu (poz. 10 inwentarza).
+-->
+
+<style>
+  /* Bez pasków przewijania — inaczej `matchMedia('(min-width: 992px)')` pyta
+     o viewport POMNIEJSZONY o pasek i ramka nominalnie 992-pikselowa odpowiada
+     „991". Bramka progowa mierzona na powierzchni z paskiem mierzy pasek. */
+  html,body{margin:0;padding:0;overflow:hidden;
+            background:#f6f1e7;color:#2b2118;
+            font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
+  .info{padding:8px 10px}
+  [data-mp-qr]{display:block;min-height:8px}
+</style>
+</head>
+<body>
+
+<div class="info" id="info">…</div>
+
+<!-- Kontrakt DOM, pozycja `[data-mp-qr]` — dosłownie jak w `fixture.html`
+     i w nagłówku `przepis-parser.js`. Runtime nie wymaga od szablonu nic ponad. -->
+<div data-mp-qr hidden></div>
+
+<script>
+/* HARNESS-ONLY — przechwycenie konsoli MUSI stać przed parserem. Do przebiegu 28
+   ramka mierzyła, CZY pojawia się ostrzeżenie `[MP] brak QrCreator`. Po wykonaniu
+   D-13.1 (wariant B) ostrzeżenia nie ma i mieć go nie może — biblioteka jest
+   wbudowana, więc gałąź „brak biblioteki" zniknęła razem ze strażnikiem. Dziennik
+   mierzy dziś rzecz odwrotną: że desktop NIE dostaje ani jednego wpisu. */
+(function () {
+  var dziennik = [];
+  ['error', 'warn'].forEach(function (poziom) {
+    var oryg = console[poziom].bind(console);
+    console[poziom] = function () {
+      dziennik.push({ poziom: poziom, tresc: Array.prototype.join.call(arguments, ' ') });
+      oryg.apply(null, arguments);
+    };
+  });
+  window.addEventListener('error', function (e) {
+    dziennik.push({ poziom: 'error', tresc: 'onerror: ' + (e.message || e.type) });
+  });
+  window.MP_QR_RAMKA = {
+    dziennik: dziennik,
+    wyczyscDziennik: function () { dziennik.length = 0; }
+  };
+})();
+</script>
+
+<script>
+/* HARNESS-ONLY — parser z pieczęcią przemiaru (mechanizm z przebiegu 14).
+   Bez pieczęci ramka mierzyłaby plik z cache'a HTTP po każdej edycji parsera
+   i raportowała to jako sukces. `document.write` zamiast tagu statycznego, żeby
+   kolejność wykonania została synchroniczna: parser, potem blok pomiarowy. */
+(function () {
+  var p = (location.search.match(/[?&]pieczec=([^&]*)/) || [])[1] || String(Date.now());
+  window.MP_PIECZEC = p;
+  document.write('<script src="../przepis-parser.js?pieczec=' + p + '"><\/script>');
+})();
+</script>
+
+<script>
+/* HARNESS-ONLY — powierzchnia sondy. Sama nic nie mierzy: rodzic (`qr.html`)
+   steruje, bo pomiar polega na PORÓWNANIU tej samej ramki przed i po wstrzyknięciu
+   test-double'a biblioteki, a to jest sekwencja, nie stan. */
+(function () {
+  var R = window.MP_QR_RAMKA;
+
+  R.szerokoscRamki = window.innerWidth;
+  R.pieczec = window.MP_PIECZEC;
+  R.parserZaladowany = !!(window.MP && window.MP.przepis && window.MP.przepis.rysujQR);
+  R.kontener = function () { return document.querySelector('[data-mp-qr]'); };
+
+  /* Stan kontenera opisany tak, żeby dało się odróżnić „nie narysowano nic"
+     od „narysowano coś innego niż SVG" — spec §8 wymaga biblioteki rysującej
+     DO SVG, a to jest cecha wyniku, nie deklaracji. */
+  R.stanKontenera = function () {
+    var el = R.kontener();
+    if (!el) return { jest: false };
+    var dziecko = el.firstElementChild;
+    return {
+      jest: true,
+      dzieci: el.children.length,
+      html: el.innerHTML.length,
+      tagDziecka: dziecko ? dziecko.tagName.toLowerCase() : null,
+      svg: !!el.querySelector('svg'),
+      canvas: !!el.querySelector('canvas'),
+      img: !!el.querySelector('img'),
+      ariaLabel: el.getAttribute('aria-label')
+    };
+  };
+
+  R.wyczyscKontener = function () {
+    var el = R.kontener();
+    if (!el) return;
+    el.innerHTML = '';
+    el.removeAttribute('aria-label');
+  };
+
+  /* TEST-DOUBLE biblioteki QR — ROLA ODWRÓCONA w przebiegu 28, obiekt ten sam.
+     Wcześniej dubler dostarczał bibliotekę, której nie było, żeby H4 mógł paść.
+     Dziś biblioteka jest wbudowana w parser, więc H4 jest falsyfikowalny bez niego,
+     a dubler odpowiada na inne pytanie — czy parser NADAL sięga do `window.QrCreator`.
+     Wstrzykujemy go i liczymy wywołania: **poprawny wynik to ZERO**. Każde wywołanie
+     znaczy, że artefakt zakłada zależność z globala, czyli dokładnie to, czego wiersz
+     I3 zabrania. Dubler przestał być podstawką i stał się pułapką na regres. */
+  R.wstawDubler = function () {
+    var wywolania = [];
+    window.QrCreator = {
+      render: function (cfg, el) {
+        wywolania.push({ text: cfg && cfg.text, size: cfg && cfg.size, ecLevel: cfg && cfg.ecLevel });
+        if (el) el.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'svg'));
+      },
+      MP_DUBLER: true
+    };
+    R.wywolaniaDublera = wywolania;
+    return wywolania;
+  };
+
+  R.zdejmijDubler = function () {
+    try { delete window.QrCreator; } catch (e) { window.QrCreator = undefined; }
+    return !window.QrCreator;
+  };
+
+  R.bibliotekaObecna = function () { return !!window.QrCreator; };
+
+  /* I3 — dwa pytania, które da się zadać tylko z wnętrza ramki.
+     `globalQr` musi zwracać 'undefined': biblioteka wbudowana mieszka w lokalnej
+     zmiennej parsera i NIE MA prawa pojawić się w `window`. Gdyby się pojawiła,
+     „dołączona" i „założona" przestałyby być rozróżnialne pomiarem.
+     `deklaracja` czyta zależność z DANYCH parsera — nazwa, wersja, licencja. */
+  R.globalQr = function () { return typeof window.QrCreator; };
+  R.deklaracja = function () {
+    return (window.MP && window.MP.przepis && window.MP.przepis.zaleznosci) || null;
+  };
+
+  R.mediaQuery = function () {
+    return !!(window.matchMedia && window.matchMedia('(min-width: 992px)').matches);
+  };
+
+  document.getElementById('info').textContent =
+    'ramka ' + R.szerokoscRamki + ' px · parser: ' + (R.parserZaladowany ? 'OK' : 'BRAK') +
+    ' · ≥992: ' + (R.mediaQuery() ? 'tak' : 'nie');
+
+  R.gotowa = true;
+  if (window.parent !== window) {
+    parent.postMessage({ mpQrRamka: { nazwa: window.name, szerokosc: R.szerokoscRamki,
+                                      parser: R.parserZaladowany, pieczec: R.pieczec } }, '*');
+  }
+})();
+</script>
+</body>
+</html>

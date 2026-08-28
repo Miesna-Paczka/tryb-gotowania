@@ -1,0 +1,101 @@
+[meta]
+nazwa: kotlety mielone z buraczkami i puree ziemniaczanym
+slug: kotlety-mielone-wieprzowe
+porcje-bazowe: 4
+liczba-porcji: 4 porcje
+waga-porcji: 533
+czas-minuty: 60
+item: 6a9049cae555b6dc1bf5dee0
+
+[zajawka]
+Wieprzowe kotlety mielone z podsmażoną cebulą w środku, obtoczone w bułce tartej, do tego puree ziemniaczane i zasmażane buraczki z odrobiną cukru i kwasu. Trzy rzeczy naraz na jednej kuchence, więc kolejność ma tu znaczenie większe niż zwykle: ziemniaki nastawiasz pierwsze, bo gotują się najdłużej i najlepiej znoszą czekanie. Cebula do masy idzie podsmażona i wystudzona, nigdy surowa, bo surowa puszcza wodę dopiero na patelni i rozluźnia kotlet od środka.
+
+[skladniki]
+#mieso      690 g wieprzowiny mielonej   @wieprzowina-mielona
+#cebula     1 cebula
+#jajko      1 jajko
+#bulka      70 g bułki tartej
+#obtoczenie bułka tarta do obtoczenia
+#olej       olej do smażenia
+#ziemniaki  800 g ziemniaków
+#maslo      50 g masła
+#mleko      80 ml mleka lub ciepłej wody
+#buraki     500 g gotowanych buraków
+#cebulka    1 {mała cebula|małe cebule|małych cebul|małej cebuli}
+#maslo2     1 łyżka masła
+#cukier     =1 łyżeczka cukru
+#cytryna    1 łyżka soku z cytryny
+#sol        sól do smaku
+#pieprz     pieprz do smaku
+
+[kroki]
+== nastaw ziemniaki
+czas: ok. 8 min
+skladniki: ziemniaki
+Obierz ziemniaki, pokrój je na równe kawałki i zalej osoloną wodą tak, żeby stała palec ponad nimi. Nastaw je pierwsze: gotują się najdłużej ze wszystkiego, a odcedzone spokojnie poczekają w garnku, dopóki nie będą potrzebne.
+
+== ugotuj ziemniaki
+minutnik: 20:00 ziemniaki
+kryterium: nóż wchodzi w największy kawałek bez oporu i wysuwa się, nie zabierając go ze sobą
+W czasie, gdy ziemniaki się gotują, zrób masę na kotlety i przygotuj buraczki. Garnek nie wymaga uwagi, więc to najlepsze dwadzieścia minut w całym tym przepisie.
+
+== podsmaż cebulę do kotletów
+minutnik: 5:00 cebula
+kryterium: kostki są miękkie i szkliste, bez surowej ostrości w zapachu
+skladniki: cebula
+Pokrój cebulę w drobną kostkę i podsmaż ją na łyżce oleju, a potem **odstaw do wystudzenia**. Ciepła cebula wrzucona do masy zacznie ścinać jajko, a surowa puści wodę dopiero na patelni i rozluźni kotlety od środka.
+
+== wyrób masę
+czas: ok. 3 min
+skladniki: mieso, jajko, bulka, sol, pieprz
+Przełóż Mielone wieprzowe do miski, dodaj wystudzoną cebulę, jajko i bułkę tartą, dopraw solą oraz pieprzem i wyrób masę ręką. Jeśli masa rozjeżdża się w dłoni, dosyp bułki tartej po łyżce i odczekaj chwilę po każdej, bo bułka wchłania wodę z opóźnieniem.
+
+== uformuj i obtocz kotlety
+czas: ok. 6 min
+skladniki: obtoczenie
+Formuj kotlety zwilżonymi dłońmi, a potem obtaczaj każdy w dodatkowej bułce tartej i strzepuj nadmiar. Warstwa ma być cienka: gruba odejdzie od kotleta w oleju i zostanie na patelni jako przypalona ścinka.
+
+== usmaż kotlety partiami
+minutnik: 11:00 kotlety
+kryterium: kotlet jest rumiany po obu stronach, a przekrojony ma szary, matowy środek bez różowych miejsc
+skladniki: olej
+Rozgrzej olej i kładź tyle kotletów, żeby zostawały między nimi odstępy, obracając je raz i licząc czas dla każdej partii osobno. Trzymaj średni ogień: na dużym bułka tarta zbrązowieje, zanim środek zdąży dojść, a te kotlety są grube.
+
+== zasmaż buraczki
+minutnik: 9:00 buraczki
+kryterium: buraki są gorące na wskroś, a na dnie patelni nie stoi już wolny sok
+skladniki: buraki, cebulka, maslo2, cukier, cytryna
+Zetrzyj ugotowane buraki na grubych oczkach, zeszklij małą cebulę na maśle i wrzuć do niej buraki razem z cukrem, solą, pieprzem i sokiem z cytryny. Cukier i kwas są tu parą, a nie dwoma dodatkami: cukier zaokrągla ziemistość buraka, a kwas nie pozwala całości zrobić się mdłą.
+
+== zrób puree i podaj
+czas: ok. 4 min
+skladniki: maslo, mleko
+Odcedź ziemniaki, wrzuć do nich masło, wlej ciepłe mleko i rozgnieć wszystko tłuczkiem na gładko. Mleko musi być ciepłe, a ziemniaki gorące: zimne mleko schładza skrobię i puree robi się kleiste zamiast puszystego.
+
+[wskazowka]
+dlaczego cebulę do kotletów trzeba podsmażyć i wystudzić?
+Bo surowa cebula ma w sobie wodę, którą odda dopiero w kontakcie z gorącym tłuszczem, czyli już w środku kotleta. Podsmażona oddaje ją wcześniej, na patelni; wystudzenie jest osobną sprawą, bo ciepła cebula zaczyna ścinać jajko, zanim zdążysz wyrobić masę.
+
+po co do buraczków cukier i kwas naraz?
+Bo działają na dwie różne rzeczy. Burak jest słodkawy i wyraźnie ziemisty; cukier wygładza tę ziemistość, a łyżka soku z cytryny albo octu odcina słodycz i sprawia, że całość nie robi się mdła. Bez kwasu buraczki są słodkie i płaskie, bez cukru wychodzą ostre i surowe w smaku.
+
+[co-mozesz-zmienic]
+#buraki
+krótko: burakami ugotowanymi samodzielnie, ok. 600 g surowych
+nie mam gotowanych buraków, co wtedy?
+Ugotuj ok. 600 g surowych, w skórkach i w całości, przez mniej więcej godzinę, a potem obierz je pod zimną wodą. Surowe buraki tracą przy gotowaniu ok. piętnastu procent wagi, więc bierz ich odpowiednio więcej, i zaplanuj tę godzinę osobno: do czterdziestu pięciu minut z belki się nie mieści.
+
+#mleko
+krótko: ciepłą wodą z gotowania ziemniaków
+czym zastąpić mleko w puree?
+Ciepłą wodą z gotowania ziemniaków, w tej samej ilości. Ma w sobie skrobię, więc puree wyjdzie gładsze, niż można się spodziewać, choć mniej kremowe niż na mleku; w obie strony ważniejsze jest to, żeby płyn był ciepły.
+
+[przechowywanie]
+jak przechowywać i odgrzewać kotlety mielone z dodatkami?
+Rozdziel wszystkie trzy części: kotlety, puree i buraczki do osobnych pojemników, schłodzone i zamknięte w ciągu 1–2 godzin, w lodówce do 2 dni. W zamrażarce: kotlety i buraczki, najlepsza jakość do 2–3 miesięcy; puree ziemniaczanego lepiej nie mrozić, bo po rozmrożeniu rozwarstwia się i robi wodniste. Kotlety odgrzewaj pod przykryciem z łyżką wody, buraczki w rondelku, a puree z dodatkiem odrobiny mleka, mieszając od dna.
+
+[wartosci-odzywcze]
+energia: 808 kJ / 194 kcal; tłuszcz: 12 g; kwasy tłuszczowe nasycone: 4,3 g; węglowodany: 12 g; cukry: 4 g; błonnik: 1,5 g; białko: 7,9 g; sól: 0,62 g
+
+[wartosci-porcja]
+energia: 4310 kJ / 1034 kcal; tłuszcz: 65 g; kwasy tłuszczowe nasycone: 23 g; węglowodany: 65 g; cukry: 21 g; błonnik: 7,8 g; białko: 42 g; sól: 3,3 g

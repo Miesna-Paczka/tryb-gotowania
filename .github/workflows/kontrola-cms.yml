@@ -1,0 +1,82 @@
+# Czy CMS niesie to, co repozytorium — sprawdzane na OPUBLIKOWANEJ stronie.
+#
+# DLACZEGO OSOBNY WORKFLOW, A NIE KROK W `lancuch-html`. Tamten jest bramką
+# repozytorium: pyta „czy to, co commituję, jest spójne", i musi być zielony
+# w chwili commitu. Ten pyta o co innego — „czy świat na zewnątrz nadążył" —
+# a odpowiedź brzmi „jeszcze nie" przez cały czas między redakcją pliku
+# a przebiegiem `wypchnij-do-cms.mjs` i publikacją. Zmieszanie tych dwóch pytań
+# w jednej bramce zrobiłoby z niej stałą czerwień, czyli dekorację. Ta lekcja
+# jest świeża: bramka `lancuch-html` stała czerwona 23 przebiegi z rzędu
+# (2026-08-23/24) i nikt się na niej nie zatrzymał.
+#
+# CO ZNACZY CZERWONE TUTAJ: repozytorium i strona rozjechały się. To nie jest
+# usterka kodu, tylko ZALEGŁA ROBOTA — najczęściej niewypchnięta redakcja.
+# Kroki naprawcze wypisuje sam job, na końcu.
+#
+# CZEGO TO NIE POTRZEBUJE: sekretu. Czyta publiczne strony i porównuje je
+# z regeneracją z repo. Nagłówek `lancuch-html.yml` mówi, że porównanie z żywym
+# CMS-em „wymaga sekretu z tokenem Webflow" — to prawda dla drogi przez API,
+# ale nieprawda dla tej: po renderze wszystko stoi w HTML-u.
+#
+# WEBFLOW NIE MOŻE ZAWOŁAĆ TEGO SAM. Webhooki Webflow przyjmują wyłącznie URL,
+# bez nagłówków, a `repository_dispatch` GitHuba wymaga `Authorization`. Trigger
+# `repository_dispatch` jest tu wystawiony na przyszłość: wystarczy przekaźnik
+# (funkcja bezserwerowa trzymająca token), żeby `site_publish` odpalał ten job
+# natychmiast. Dopóki go nie ma, rolę tę pełni harmonogram.
+name: kontrola-cms
+
+on:
+  # Redakcja źródła w repo — od tej chwili strona jest o krok w tyle.
+  push:
+    paths: ['przepisy/**', 'lancuch-html/**', 'przepis-parser.js', 'odmiana-node.mjs',
+            '.github/workflows/kontrola-cms.yml']
+  # Zmiana po stronie Webflow nie zostawia śladu w repo, więc łapie ją zegar.
+  #
+  # CO GODZINĘ, NIE CO SZEŚĆ. Rozważaliśmy przekaźnik Webflow → GitHub, żeby zejść
+  # do sekund. Nie jest wart czwartego bytu: kupuje wyłącznie opóźnienie, a jego
+  # własna awaria byłaby CICHA (skasowany worker, wygasły token, wyczerpany próg —
+  # nikt tego nie zauważy, bo nic nie sprawdza, czy przekaźnik żyje). Awaria zegara
+  # jest przynajmniej widoczna jako brak przebiegów w zakładce Actions.
+  # Minuta 17, nie 0: o pełnej godzinie GitHub kolejkuje najwięcej zadań i opóźnia je.
+  #
+  # PUŁAPKA, KTÓREJ NIE ZMIERZYŁEM, a która jest udokumentowanym zachowaniem GitHuba:
+  # harmonogram jest WYŁĄCZANY AUTOMATYCZNIE po 60 dniach bez aktywności
+  # w repozytorium. Zegar przestaje bić po cichu, a workflow nie umie zgłosić
+  # własnej nieobecności. Tutaj ryzyko jest małe, bo ta kontrola biegnie także przy
+  # pushu źródeł — ale jeśli repo kiedyś ucichnie na dwa miesiące, jedynym objawem
+  # będzie pusta lista przebiegów. Sprawdzenie kosztuje jedno spojrzenie w Actions.
+  schedule:
+    - cron: '17 * * * *'
+  # Na żądanie — „poproś mnie o bieg kontrolny".
+  workflow_dispatch:
+  # Dla ewentualnego przekaźnika Webflow → GitHub (patrz nagłówek).
+  repository_dispatch:
+    types: [webflow-opublikowano]
+
+jobs:
+  kontrola:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: blok Recipe na stronie zgodny z regeneracją
+        run: node narzedzia/zmierz-jsonld-na-stagingu.mjs
+
+      - name: pola HTML, mikroskładnia odżywcza i skalary z [meta]
+        run: node narzedzia/sprawdz-html-na-stronie.mjs
+
+      - name: co zrobić, gdy powyższe świeci na czerwono
+        if: failure()
+        run: |
+          echo "Repozytorium i opublikowana strona rozjechały się."
+          echo
+          echo "Najczęstsza przyczyna: źródło zredagowano, ale nie wypchnięto."
+          echo "  1. WEBFLOW_TOKEN=… node lancuch-html/wypchnij-do-cms.mjs --wykonaj"
+          echo "  2. publikacja stagingu (publishToWebflowSubdomain: true, customDomains: [])"
+          echo "  3. ten workflow ponownie — Actions → kontrola-cms → Run workflow"
+          echo
+          echo "Jeśli rozjazd zostaje po wypchnięciu i publikacji, to NIE jest zaległa"
+          echo "robota, tylko usterka. Wtedy: ROZJAZD-KONTRAKTU-PRZEPISOW.md, sekcja 5."

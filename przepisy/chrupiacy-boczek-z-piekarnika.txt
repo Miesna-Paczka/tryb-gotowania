@@ -1,0 +1,71 @@
+[meta]
+nazwa: chrupiący boczek z piekarnika
+slug: chrupiacy-boczek-z-piekarnika
+porcje-bazowe: 2
+liczba-porcji: 2–3 porcje
+waga-porcji: 124
+czas-minuty: 25
+item: 6a919eed6022c4041ee4663d
+
+[zajawka]
+Boczek pokrojony w grube plastry (ok. 1,5 cm), natarty czosnkiem z oliwą i tymiankiem, pieczony w 220°C. Naprawdę grube, bo dzięki temu plastry będą chrupkie z zewnątrz, a soczyste w środku. 25 minut w piekarniku i… gotowe!
+
+[skladniki]
+#boczek     350 g boczku wieprzowego  @boczek-wieprzowy
+#czosnek    2 ząbki czosnku
+#oliwa      1 łyżka oliwy z oliwek
+#tymianek   tymianek świeży lub suszony
+#sol        sól do smaku
+#pieprz     pieprz do smaku
+
+[kroki]
+== pokrój boczek w grube plastry
+czas: ok. 5 min
+skladniki: boczek
+Pokrój Boczek w plastry grubości mniej więcej półtora centymetra, prowadząc nóż w poprzek warstw tłuszczu i mięsa. Cieńsze skurczą się i wysuszą na wskroś, zanim krawędzie zdążą zbrązowieć.
+
+== natrzyj plastry czosnkiem z oliwą
+czas: ok. 4 min
+skladniki: czosnek, oliwa, tymianek, sol, pieprz
+Przeciśnij czosnek przez praskę, rozmieszaj go z oliwą, tymiankiem, solą i pieprzem i natrzyj tym każdy plaster ze wszystkich stron. Sól dawkuj oszczędnie, bo boczek wnosi już swoją.
+
+== rozgrzej piekarnik i ułóż plastry
+czas: ok. 3 min
+Nastaw piekarnik na 220°C i rozłóż plastry na blasze wyłożonej papierem do pieczenia, w odstępach, płasko, żaden na żadnym. Plaster leżący na plastrze zostanie w tym miejscu blady i miękki.
+
+== piecz z pierwszej strony
+minutnik: 11:00 boczek
+kryterium: wierzch jest złoty, a na blasze zebrała się warstwa wytopionego tłuszczu
+Wsuń blachę na środkową półkę nagrzanego piekarnika. Nie otwieraj go w tym czasie: przy każdym otwarciu temperatura spada o kilkadziesiąt stopni i tłuszcz przestaje się wytapiać.
+
+== obróć i dopiecz
+minutnik: 9:00 boczek
+kryterium: krawędzie plastrów są ciemne i twarde w dotyku, a środek nadal ustępuje pod naciskiem szczypiec
+Obróć plastry szczypcami i wsuń blachę z powrotem. Od tej chwili zaglądaj: przejście z chrupiących krawędzi w spalone zajmuje przy tej temperaturze dwie, trzy minuty.
+
+== odsącz i podaj
+czas: ok. 2 min
+Przełóż plastry na ręcznik papierowy na pół minuty, a potem od razu na talerze. Zostawione na gorącej blasze dochodzą dalej we własnym tłuszczu i tracą to, po co je pieczesz.
+
+[wskazowka]
+dlaczego akurat półtora centymetra, a nie cieniej?
+Bo chodzi o dwa różne stany w jednym plastrze. Krawędzie mają wyschnąć i zrobić się chrupiące, a środek ma zostać soczysty; przy plastrze cienkim na pół centymetra oba te miejsca dochodzą w tym samym momencie i cały plaster wychodzi twardy. Grubszy plaster daje krawędziom przewagę czasu nad środkiem.
+
+czy trzeba odlewać tłuszcz z blachy w trakcie pieczenia?
+Nie trzeba, i lepiej tego nie robić przy otwartym piekarniku. Wytopiony tłuszcz na dnie blachy pomaga dopiec spody plastrów, a po pieczeniu można zlać go do słoika i użyć np. do pieczonych ziemniaczków.
+
+[co-mozesz-zmienic]
+#tymianek
+krótko: majerankiem albo rozmarynem, w tej samej ilości
+czym zastąpić tymianek?
+Majerankiem albo rozmarynem, w tej samej ilości. Rozmaryn jest zdecydowanie mocniejszy, więc przy nim daj o połowę mniej, niż dałbyś tymianku.
+
+[przechowywanie]
+jak przechowywać i odgrzewać pieczony boczek?
+W lodówce: do 2 dni w szczelnym pojemniku, wystudzony do końca przed zamknięciem. W zamrażarce: najlepsza jakość do 1–2 miesięcy, przełożony papierem do pieczenia, żeby plastry dały się rozdzielić. Odgrzewanie: na suchej patelni albo w piekarniku w 200°C przez kilka minut; w mikrofalówce boczek robi się gumowaty.
+
+[wartosci-odzywcze]
+energia: 1781 kJ / 431 kcal; tłuszcz: 38 g; kwasy tłuszczowe nasycone: 13 g; węglowodany: 0,3 g; cukry: 0,1 g; błonnik: 0,9 g; białko: 22 g; sól: 0,96 g
+
+[wartosci-porcja]
+energia: 2199 kJ / 532 kcal; tłuszcz: 47 g; kwasy tłuszczowe nasycone: 16 g; węglowodany: 0,3 g; cukry: 0,1 g; błonnik: 1,1 g; białko: 27 g; sól: 1,2 g

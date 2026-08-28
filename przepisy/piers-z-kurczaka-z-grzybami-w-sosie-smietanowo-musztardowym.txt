@@ -1,0 +1,96 @@
+[meta]
+nazwa: pierś z kurczaka z grzybami w sosie śmietanowo-musztardowym
+slug: piers-z-kurczaka-z-grzybami-w-sosie-smietanowo-musztardowym
+porcje-bazowe: 4
+liczba-porcji: 4 porcje
+waga-porcji: 431
+czas-minuty: 30
+item: 6a57649e2c911147dc2602e1
+
+[zajawka]
+Pieczarki wrzucasz na suchą patelnię, bez kropli tłuszczu. Najpierw puszczą wodę, a rumienić zaczną się dopiero wtedy, gdy odparuje – oliwa dolana na starcie ten moment zamaskuje. Piersi kładziesz po nich i smażysz za krótko, przed gotowaniem w sosie ze śmietany 30% i łyżki francuskiej musztardy. Nic dziwnego, że wychodzą tak soczyste!
+
+[skladniki]
+#kurczak      660 g piersi z kurczaka   @filet-z-piersi-kurczaka
+#pieczarki    300 g pieczarek
+#cebula       1 {czerwona cebula|czerwone cebule|czerwonych cebul|czerwonej cebuli}
+#kasza        200 g prażonej kaszy gryczanej
+#oliwa        1 łyżka oliwy z oliwek
+#musztarda    1 łyżka musztardy francuskiej
+#smietana     60 ml śmietany 30%
+#woda         150 ml wody
+#sol          1 łyżeczka soli
+#pieprz       1 łyżeczka mielonego pieprzu
+#szczypiorek  1 pęczek szczypiorku (opcjonalnie)
+
+[kroki]
+== przypiecz pieczarki
+minutnik: 10:00 pieczarki
+kryterium: patelnia jest znowu sucha, a brzegi kawałków mają ciemnozłoty kolor
+skladniki: pieczarki
+Rozgrzej dużą patelnię na średnim ogniu, połam pieczarki na mniejsze kawałki i wrzuć je na sucho, bez tłuszczu. Mieszaj co dwie–trzy minuty: najpierw puszczą wodę i będą się w niej dusić, dopiero potem zaczną się rumienić.
+
+== nastaw wodę
+Wlej do garnka 250 ml wody na każde 100 g kaszy, dorzuć szczyptę soli i postaw pod przykryciem na dużym ogniu. Woda ma zdążyć się zagotować, zanim pieczarki będą gotowe.
+
+== pokrój cebulę
+skladniki: cebula, kurczak
+Obierz cebulę i pokrój ją w półokręgi, a dopiero potem weź się za mięso. Pierś z kurczaka potnij w poprzek włókien na paski szerokie na centymetr.
+
+== wsyp kaszę
+minutnik: 12:00 kasza
+kryterium: ziarna są miękkie w środku, a w garnku nie ma już wolnej wody
+skladniki: kasza
+Wsyp kaszę do wrzącej wody, zamieszaj raz i przykryj garnek, schodząc z ogniem do małego. Jeśli opakowanie kaszy podaje inny czas, trzymaj się jego – ten czas jest tu punktem odniesienia, nie wyrocznią.
+
+== dorzuć kurczaka
+minutnik: 5:00 kurczak
+kryterium: paski są białe z wierzchu, a cebula zmiękła – w środku mięso jest jeszcze surowe i dojdzie dopiero w sosie
+skladniki: oliwa
+Na patelnię z pieczarkami wlej oliwę, a zaraz po niej dorzuć cebulę i paski kurczaka – tyle, żeby leżały luźno – i mieszaj często.
+
+== wlej sos
+skladniki: musztarda, smietana, woda
+Dodaj musztardę, śmietanę i wodę, a potem mieszaj, aż musztarda rozejdzie się w sosie równomiernie i nie zostanie ani jedna jasna smuga.
+
+== zagotuj sos
+skladniki: sol, pieprz
+Podkręć ogień i doprowadź sos do wrzenia, a gdy **zacznie bulgotać na całej powierzchni**, od razu zejdź z ogniem tak nisko, żeby mrugał już tylko miejscami – to mniej więcej 40% mocy palnika. Dopraw solą i pieprzem, potem spróbuj: sosu jest mało, więc sól robi się w nim wyczuwalna szybciej, niż się spodziewasz.
+
+== duś sos
+minutnik: 8:00 sos
+kryterium: w przekroju mięso jest matowo białe na wskroś, a sos oblepia łyżkę i spływa z niej powoli
+Zostaw patelnię bez przykrycia i zamieszaj raz po czterech minutach – sos ma odparowywać przy leniwym mruganiu, bo długie, mocne wrzenie rozwarstwi nawet śmietanę 30%.
+
+== nałóż na talerze
+skladniki: szczypiorek
+Rozłóż kaszę na talerzach i przykryj ją kurczakiem razem z sosem. Posyp posiekanym szczypiorkiem, jeśli go masz.
+
+[wskazowka]
+dlaczego pieczarki idą najpierw na suchą patelnię?
+Bo zawierają mnóstwo wody, którą muszą stracić zanim zaczną się rumienić. Na suchej patelni widać dokładnie, kiedy ta woda odparowała – tłuszcz dolany na starcie tylko by ten moment zamaskował. Oliwę dolewasz później, razem z mięsem.
+
+co zrobić, żeby sos się nie zwarzył?
+Trzymaj się śmietany 30% i doprowadź sos do wrzenia tylko raz, na chwilę, a potem od razu zejdź z ogniem. Tłuszcz osłania białko przed kwasem z musztardy, ale nie w nieskończoność: rzadsza śmietana rozwarstwi się już przy pierwszym zagotowaniu, a 30% dopiero przy długim i mocnym.
+
+
+[co-mozesz-zmienic]
+#musztarda
+krótko: sarepską, ale o połowę mniej
+czym zastąpić musztardę francuską?
+Sarepską, ale daj jej o połowę mniej – jest wyraźnie ostrzejsza i łatwo nią zdominować śmietanę. Sos wyjdzie gładszy, bo odpadną ziarenka gorczycy.
+
+#smietana
+krótko: Tak, ale zahartuj ją i nie zagotowuj sosu
+mam w lodówce tylko śmietanę 18% – da radę?
+Tak, tylko nie wlewaj jej prosto z kubka. Wlej na patelnię najpierw samą musztardę z wodą, daj im się zagrzać przez pół minuty, potem wmieszaj kilka łyżek tego gorącego płynu do śmietany i dopiero taką wlej z powrotem. Sosu wtedy nie zagotowuj w ogóle – trzymaj go tuż pod wrzeniem i licz dwie–trzy minuty dłużej.
+
+[przechowywanie]
+jak przechowywać i odgrzewać kurczaka w sosie?
+W lodówce: do 2 dni w szczelnym pojemniku, włóż go tam w ciągu 1–2 godzin od zdjęcia z ognia, a kaszę trzymaj w osobnym pudełku. W zamrażarce: najlepsza jakość do 2–3 mies., a po rozmrożeniu zjedz danie w ciągu 24 godzin. Odgrzewanie: na patelni na małym ogniu i bez doprowadzania do wrzenia – zagotowany sos ze śmietaną 30% się rozwarstwi.
+
+[wartosci-odzywcze]
+energia: 437 kJ / 104 kcal; tłuszcz: 2,7 g; kwasy tłuszczowe nasycone: 0,9 g; węglowodany: 8,2 g; cukry: 0,6 g; błonnik: 1,2 g; białko: 11 g; sól: 0,43 g
+
+[wartosci-porcja]
+energia: 1883 kJ / 447 kcal; tłuszcz: 12 g; kwasy tłuszczowe nasycone: 3,7 g; węglowodany: 35 g; cukry: 2,5 g; błonnik: 5 g; białko: 49 g; sól: 1,9 g

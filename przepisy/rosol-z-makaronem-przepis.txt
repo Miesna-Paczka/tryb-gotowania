@@ -1,0 +1,73 @@
+[meta]
+nazwa: rosół z makaronem, marchewką i pietruszką
+slug: rosol-z-makaronem-przepis
+porcje-bazowe: 2
+liczba-porcji: 2–3 porcje
+waga-porcji: 600
+czas-minuty: 20
+
+[zajawka]
+Gotowy Rosół z Kurczaka i Indyka rozcieńczony wodą, z marchewką i korzeniem pietruszki ugotowanymi w nim na miękko, i z makaronem gotowanym osobno. Osobno, bo nitki wrzucone prosto do rosołu wypiją część płynu i wypuszczą do niego skrobię, a wtedy zamiast klarownej zupy zostaje mętny, gęstniejący wywar. Rosół jest już doprawiony fabrycznie, więc solisz go dopiero na końcu i dopiero po spróbowaniu.
+
+[skladniki]
+#rosol      400 g rosołu z kurczaka i indyka   @rosol-z-kurczaka-i-indyka
+#woda       500 ml wody
+#makaron    100 g makaronu nitki lub wermiszelu
+#marchew    1 marchewka
+#pietruszka 1 {korzeń pietruszki|korzenie pietruszki|korzeni pietruszki|korzenia pietruszki}
+#natka      2 łyżki posiekanej natki pietruszki
+#pieprz     kilka ziaren czarnego pieprzu
+#sol        sól do smaku
+
+[kroki]
+== zagotuj rosół z wodą
+czas: ok. 6 min
+skladniki: rosol, woda, pieprz
+Przelej Rosół z Kurczaka i Indyka do garnka, dolej wodę, wrzuć ziarna pieprzu i doprowadź całość do wrzenia. W czasie, gdy się nagrzewa, obierz i pokrój warzywa: nie ma sensu stać nad garnkiem.
+
+== pokrój marchew i pietruszkę
+skladniki: marchew, pietruszka
+Potnij marchewkę i korzeń pietruszki w cienkie, ukośne plasterki albo w słupki. Cienko i ukośnie, bo taki kształt ma większą powierzchnię i mięknie w kilkanaście minut zamiast w pół godziny.
+
+== ugotuj warzywa w rosole
+minutnik: 13:30 warzywa
+kryterium: plasterek marchewki daje się przeciąć brzegiem łyżki bez nacisku
+Wrzuć pokrojone warzywa do wrzącego rosołu i zejdź z ogniem tak, żeby zupa ledwo mrugała. Mocne wrzenie rozbija warzywa na strzępy i mąci rosół, a ten ma zostać przezroczysty.
+
+== ugotuj makaron osobno
+czas: ok. 8 min
+skladniki: makaron
+Nastaw drugi garnek osolonej wody i ugotuj w niej makaron według czasu z opakowania, a potem odcedź go. Zrób to w czasie, gdy gotują się warzywa; oba garnki stoją obok siebie i nie przeszkadzają sobie nawzajem.
+
+== złóż talerze
+czas: ok. 2 min
+skladniki: natka, sol
+Rozłóż makaron do głębokich talerzy, dołóż marchewkę z pietruszką, zalej gorącym rosołem i posyp posiekaną natką. Spróbuj przed dosoleniem: rosół z Paczki jest doprawiony fabrycznie i łatwo go tu przesolić.
+
+[wskazowka]
+dlaczego makaron gotuje się osobno?
+Z dwóch powodów naraz. Nitki wchłaniają płyn, więc w garnku ubywa rosołu, a jednocześnie oddają do niego skrobię, przez którą zupa mętnieje i gęstnieje; obie te rzeczy widać dopiero na drugi dzień, gdy makaron w resztce zupy pęcznieje do końca.
+
+jak nie przesolić rosołu z gotowego wywaru?
+Nie dosalaj go w garnku, tylko na talerzu, po spróbowaniu. Wywar z Paczki jest już doprawiony, a odparowanie w czasie gotowania warzyw dodatkowo zagęszcza to, co w nim jest, z solą włącznie.
+
+[co-mozesz-zmienic]
+#pietruszka
+krótko: kawałkiem selera albo drugą marchewką
+nie mam korzenia pietruszki, czym go zastąpić?
+Kawałkiem korzenia selera wielkości pietruszki albo po prostu drugą marchewką. Seler jest wyraźniejszy i lekko gorzkawy, więc daj go mniej; marchew pójdzie w słodycz, co przy klarownym rosole nie przeszkadza.
+
+#rosol
+krótko: Bulionem Kolagenowym z Kurczaka, w tej samej ilości
+zadziała bulion zamiast rosołu?
+Bulion Kolagenowy z Kurczaka, w tej samej ilości, da zupę gęstszą i bardziej treściwą, bo ma więcej żelującego kolagenu. Rosół jest za to klarowniejszy i lżejszy, więc wybór między nimi jest wyborem między esencją a przejrzystością, nie między lepszym a gorszym.
+
+[przechowywanie]
+jak przechowywać i odgrzewać rosół z makaronem?
+Trzymaj rosół i makaron w osobnych pojemnikach: rosół z warzywami w lodówce do 2 dni, makaron do 24 godzin, schłodzony w ciągu godziny od odcedzenia. W zamrażarce: sam rosół, najlepsza jakość do 2–3 miesięcy, w porcjach; makaronu nie mroź, bo po rozmrożeniu rozpada się na kaszkę. Odgrzewaj sam wywar w rondelku, a makaron zalej nim dopiero w talerzu.
+
+[wartosci-odzywcze]
+energia: 273 kJ / 65 kcal; tłuszcz: 2,6 g; kwasy tłuszczowe nasycone: 0,8 g; węglowodany: 6,7 g; cukry: 0,9 g; błonnik: 0,6 g; białko: 3,3 g; sól: 0,52 g
+
+[wartosci-porcja]
+energia: 1638 kJ / 391 kcal; tłuszcz: 16 g; kwasy tłuszczowe nasycone: 4,7 g; węglowodany: 40 g; cukry: 5,5 g; błonnik: 3,8 g; białko: 20 g; sól: 3,1 g

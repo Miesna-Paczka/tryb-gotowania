@@ -1,0 +1,97 @@
+[meta]
+nazwa: żurek z białą kiełbasą
+slug: zurek-z-biala-kielbasa
+porcje-bazowe: 4
+liczba-porcji: 4 porcje
+waga-porcji: 490
+czas-minuty: 30
+item: 6a904ee9be931792b881d6e6
+
+[zajawka]
+Żur na zakwasie żytnim, zabielany śmietaną, z białą kiełbasą gotowaną w całości. Kluczem do smaku jest tu rozcierany w dłoniach majeranek (suszony pachnie dopiero po skruszeniu listków!) i niska temperatura gotowania – zupa ma ledwie drgać, nigdy wrzeć. I pomimo tego: śmietanę wlewamy dopiero zahartowaną, bo zimna zważy się na kłaczki.
+
+[skladniki]
+#kielbasa   485 g białej kiełbasy   @biala-kielbasa
+#bulion     700 g bulionu kolagenowego z kurczaka
+#zakwas     400 ml zakwasu na żurek
+#smietana   150 ml śmietany 18%
+#jajka      4 jajka
+#cebula     1 cebula
+#chrzan     1 łyżka chrzanu tartego
+#maslo      1 łyżka masła lub oleju
+#laurowy    2 {liść laurowy|liście laurowe|liści laurowych|liścia laurowego}
+#ziele      4 ziarno ziela angielskiego
+#majeranek  1 łyżeczka majeranku
+#sol        sól do smaku
+#pieprz     świeżo mielony pieprz
+
+[kroki]
+== pokrój cebulę
+skladniki: cebula
+Obierz cebulę i pokrój ją w możliwie drobną kostkę. Żurek ma być gładki, a nie zawiesisty od warzyw, więc im drobniejsza kostka, tym mniej cebuli widać potem w talerzu.
+
+== zeszklij cebulę
+minutnik: 4:00 cebula
+kryterium: kostki są miękkie i lekko złociste, a z garnka nie czuć już surowej ostrości
+skladniki: maslo
+Rozgrzej masło w dużym garnku na średnim ogniu i wrzuć cebulę. Chcemy ją tylko zmiększyć, bez rumienienia – ciemna cebula jest gorzkawa, a w kwaśnym żurku goryczkę czuć tym wyraźniej.
+
+== włóż kiełbasę i zalej bulionem
+minutnik: 15:00 kiełbasa
+kryterium: osłonka jest równo napięta i nigdzie nie pękła, a wywar pachnie zielem angielskim
+skladniki: kielbasa, bulion, laurowy, ziele
+Wlej do garnka bulion kolagenowy, dorzuć liście laurowe i ziele angielskie, a Kiełbasę białą włóż w całości i **nie nakłuwaj jej**. Trzymaj mały ogień – przy mocnym wrzeniu osłonka pęka sama i cały sens nienakłuwania przepada.
+
+== ugotuj jajka
+minutnik: 10:00 jajka
+kryterium: po przekrojeniu żółtko jest matowe i zwarte na wskroś, bez wilgotnego środka
+skladniki: jajka
+W tym samym czasie nastaw drugi garnek i włóż jajka do wrzątku – zupa gotuje się bez nadzoru, więc oba naczynia spokojnie stoją obok siebie. Po tym czasie przełóż jajka do zimnej wody, bo w gorącej dochodzą dalej i żółtko robi się kredowe.
+
+== wmieszaj zakwas
+skladniki: zakwas
+Zakwas dokładnie wymieszaj w butelce, bo mąka opada na dno i bez wstrząśnięcia zostaje tam połowa kwasu. Wlewaj go do gorącej zupy powoli i cały czas mieszaj, próbując po drodze: zakwasy bywają różnie kwaśne i nie każdy trzeba zużyć do końca.
+
+== dopraw chrzanem i majerankiem
+minutnik: 6:00 żurek
+kryterium: ostrość chrzanu zeszła, a w zapachu wyraźnie stoi majeranek
+skladniki: chrzan, majeranek
+Wmieszaj tarty chrzan, a majeranek rozetrzyj między dłońmi i dopiero wtedy wsyp do garnka. Przez te kilka minut na małym ogniu ostrość chrzanu łagodnieje – wrzucony na sam koniec zostałby szczypiący w nosie.
+
+== zahartuj śmietanę
+czas: ok. 3 min
+skladniki: smietana
+Wlej śmietanę do miski i dolewaj do niej po łyżce gorącej zupy, mieszając, aż miska zrobi się ciepła w dotyku. Dopiero taką śmietanę wlej do garnka i podgrzej całość, nie doprowadzając już do wrzenia: w bulgocie zupa się zważy na kłaczki.
+
+== dopraw i podaj
+czas: ok. 2 min
+skladniki: sol, pieprz
+Posól i popieprz na sam koniec, po spróbowaniu – bulion i kiełbasa wnoszą razem sporo soli i łatwo tu przesolić. Wyjmij kiełbasę, pokrój ją w grube plastry i rozłóż do talerzy razem z połówkami jajek, a żurek nalej dopiero na to.
+
+[wskazowka]
+jak zagęścić żurek?
+Wsyp łyżkę mąki pszennej do śmietany, zanim ją zahartujesz, i rozetrzyj do gładkości. Mąka wsypana wprost do gorącej zupy zbije się w grudki, bo skrobia ścina się szybciej, niż zdążysz ją rozprowadzić.
+
+ile zakwasu wlać, skoro każdy smakuje inaczej?
+Zaczynasz od trzech czwartych butelki i próbujesz po każdej dolewce. Kwasowość zależy od producenta i od tego, jak długo zakwas stał, a raz wlanego kwasu już nie odejmiesz – da się go tylko rozcieńczyć bulionem albo wodą.
+
+[co-mozesz-zmienic]
+#chrzan
+krótko: chrzanem ze słoika, odsączonym z zalewy
+czym zastąpić świeżo tarty chrzan?
+Chrzanem ze słoika, w tej samej ilości, ale odsączonym z zalewy: zalewa jest octowa, a kwas w tej zupie pochodzi z zakwasu. Gotowy chrzan bywa łagodniejszy od świeżo tartego korzenia, więc spróbuj przed doprawieniem i w razie czego dodaj drugą łyżkę.
+
+#bulion
+krótko: Bulionem kolagenowym z indyka, w tej samej ilości
+czym zastąpić bulion kolagenowy z kurczaka?
+Bulionem kolagenowym z indyka, w tej samej ilości. Wywar z indyka jest odrobinę ciemniejszy i wyraźniejszy w smaku, więc żurek wyjdzie z niego mocniejszy, nie słabszy.
+
+[przechowywanie]
+jak przechowywać i odgrzewać żurek?
+Przełóż ostudzony żurek do szczelnego pojemnika w ciągu 1–2 godzin od zdjęcia z ognia i trzymaj w lodówce do 2 dni; jajka zostaw osobno, nieobrane, i zjedz do 7 dni. W zamrażarce: najlepsza jakość do 2–3 miesięcy, ale mroź zupę jeszcze przed zabieleniem, bo zamrożona śmietana rozwarstwia się przy odgrzewaniu. Odgrzewaj na małym ogniu, mieszając, i nie doprowadzaj do wrzenia.
+
+[wartosci-odzywcze]
+energia: 593 kJ / 143 kcal; tłuszcz: 12 g; kwasy tłuszczowe nasycone: 5 g; węglowodany: 1,7 g; cukry: 0,7 g; błonnik: 0,3 g; białko: 7 g; sól: 0,62 g
+
+[wartosci-porcja]
+energia: 2902 kJ / 700 kcal; tłuszcz: 59 g; kwasy tłuszczowe nasycone: 25 g; węglowodany: 8,5 g; cukry: 3,2 g; błonnik: 1,6 g; białko: 34 g; sól: 3 g

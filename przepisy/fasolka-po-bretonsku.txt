@@ -1,0 +1,88 @@
+[meta]
+nazwa: fasolka po bretońsku
+slug: fasolka-po-bretonsku
+porcje-bazowe: 4
+liczba-porcji: 4 porcje
+waga-porcji: 382
+czas-minuty: 55
+item: 6a904e87f582c0f9b994262e
+
+[zajawka]
+Fasolka po bretońsku to danie, którego nie da się zepsuć. Wystarczy wytopić boczek, podsmażyć na nim kiełbasę i cebulę, a potem dorzucić białą fasolę z puszki i zalać passatą. Wystarczy pół godziny na małym ogniu, i... obiad na kilka dni masz z głowy. Najlepiej smakuje z kromką świeżego chleba.
+
+[skladniki]
+#kielbasa    180 g kiełbasy wędzonej   @kielbasa-wedzona
+#boczek      150 g boczku wędzonego w kostce   @boczek-wedzony-w-kostce
+#fasola      2 puszki białej fasoli po 400 g
+#cebula      2 {biała cebula|białe cebule|białych cebul|białej cebuli}
+#czosnek     3 ząbki czosnku
+#passata     700 ml passaty pomidorowej
+#koncentrat  2 łyżeczki koncentratu pomidorowego
+#sol         sól do smaku
+#pieprz      pieprz do smaku
+
+[kroki]
+== pokrój składniki
+czas: ok. 5 min
+skladniki: kielbasa, cebula, czosnek
+Pokrój Kiełbasę wędzoną w plasterki grubości pół centymetra, cebule w drobną kostkę, a czosnek posiekaj albo przeciśnij przez praskę. Miej wszystko pod ręką przy patelni, bo od wytopienia boczku do zalania passatą mija kwadrans.
+
+== odsącz i przepłucz fasolę
+czas: ok. 2 min
+skladniki: fasola
+Przelej fasolę przez sitko i płucz ją pod bieżącą zimną wodą, aż przestanie się pienić. Zalewa z puszki jest mętna i słona, a sól wnoszą tu już boczek i kiełbasa.
+
+== wytop boczek
+minutnik: 6:00 boczek
+kryterium: kostki są rumiane i twarde, a na dnie patelni stoi klarowny, wytopiony tłuszcz
+skladniki: boczek
+Przełóż Boczek wędzony w kostce na **zimną** patelnię i dopiero wtedy włącz średni ogień. Na gorącej patelni boczek przypali się z wierzchu, zanim odda tłuszcz, a to on jest tu potrzebny: na nim usmaży się kiełbasa i cebula, i nic go w tym przepisie nie zastępuje.
+
+== podsmaż kiełbasę
+minutnik: 4:00 kiełbasa
+kryterium: plasterki lekko się zarumieniły
+Rozłóż plasterki Kiełbasy wędzonej na wytopionym tłuszczu i smaż je cztery minuty, obracając raz. Jest już uwędzona i upieczona, więc nie wymaga dodatkowej obróbki – chodzi tu tylko o podkręcenie smaku i uzyskanie chrupiącej skórki, kontrastującej z miękką fasolą.
+
+== zeszklij cebulę
+minutnik: 6:00 cebula
+kryterium: cebula jest miękka i szklista, bez surowej ostrości w smaku
+Dorzuć cebulę do kiełbasy i smaż całość kolejne sześć minut, mieszając co jakiś czas. Czosnek dodaj na ostatnie pół minuty: na tym rozgrzanym tłuszczu brązowieje w kilkanaście sekund, a zbrązowiały **gorzknieje** i tej goryczki nie da się już z sosu usunąć.
+
+== połącz i duś
+minutnik: 30:00 duszenie
+kryterium: sos oblepia fasolę i wraca wolno, gdy przeciągniesz łyżką po dnie
+skladniki: fasola, passata, koncentrat
+Przełóż całą zawartość patelni do garnka, razem z tłuszczem, dosyp odsączoną fasolę, a potem wmieszaj passatę i koncentrat. Po kwadransie **rozgnieć dwie chochle fasoli o ścianę garnka** i mieszaj dalej: skrobia z rozgniecionych ziaren zwiąże sos tak samo jak woda po gotowaniu suchej fasoli.
+
+== dopraw i podaj
+czas: ok. 2 min
+skladniki: sol, pieprz
+Posól i popieprz, a potem spróbuj jeszcze raz tuż przed podaniem. Boczek, kiełbasa i fasola z puszki wnoszą razem sporo soli, więc dosalaj po pół łyżeczki i próbuj po każdej. Podawaj ze świeżym chlebem, do wybierania sosu z talerza.
+
+[wskazowka]
+czy fasolę z puszki trzeba płukać?
+Warto, z dwóch powodów naraz. Zalewa niesie sól, której w tym daniu i tak nie brakuje, a do tego jest mętna od skrobi zmytej z ziaren i zabarwia sos na szarawo. Płukanie zabiera jedno i drugie, a kosztuje pół minuty.
+
+jak zagęścić sos bez wody po gotowaniu fasoli?
+Rozgnieceniem części fasoli. Skrobia, którą przy suchym ziarnie oddaje woda z garnka, siedzi też w samym ziarnie: dwie chochle rozgniecione o ścianę garnka wiążą sos tak samo. Jeśli po pół godzinie sos wciąż jest rzadki, rozgnieć trzecią i podnieś ogień na ostatnie pięć minut.
+
+[co-mozesz-zmienic]
+#fasola
+krótko: suchą fasolą jaś, 300 g, namoczoną przez noc
+da się zrobić na suchej fasoli jaś?
+Da się, tylko dzień wcześniej. 300 g suchej fasoli zalej zimną wodą na dwa palce ponad poziom ziaren, zostaw na noc, a potem gotuj godzinę do półtorej w świeżej wodzie, solą dopiero pod koniec. Wody po gotowaniu wtedy nie wylewaj: to w niej jest skrobia, która zwiąże sos, więc rozgniatanie fasoli robi się niepotrzebne.
+
+#boczek
+krótko: 2 łyżkami smalcu i szczyptą wędzonej papryki
+czym zastąpić boczek wędzony w kostce?
+Dwiema łyżkami smalcu i szczyptą wędzonej papryki. Stracisz chrupiące kostki, ale zapach wędzenia zostanie, a tłuszcz do usmażenia kiełbasy i cebuli skądś wziąć trzeba.
+
+[przechowywanie]
+jak przechowywać i odgrzewać fasolkę po bretońsku?
+Przełóż ostudzoną fasolkę do szczelnego pojemnika w ciągu 1–2 godzin od zdjęcia z ognia i trzymaj w lodówce do 4 dni. W zamrażarce: najlepsza jakość do 2–3 miesięcy, w porcjach. Odgrzewaj na małym ogniu, mieszając od dna, i dolej odrobinę wody, jeśli sos zgęstniał przez noc.
+
+[wartosci-odzywcze]
+energia: 522 kJ / 125 kcal; tłuszcz: 5,6 g; kwasy tłuszczowe nasycone: 2,4 g; węglowodany: 8,6 g; cukry: 3,1 g; błonnik: 3,5 g; białko: 7,6 g; sól: 1,1 g
+
+[wartosci-porcja]
+energia: 1991 kJ / 477 kcal; tłuszcz: 21 g; kwasy tłuszczowe nasycone: 9 g; węglowodany: 33 g; cukry: 12 g; błonnik: 13 g; białko: 29 g; sól: 4,1 g

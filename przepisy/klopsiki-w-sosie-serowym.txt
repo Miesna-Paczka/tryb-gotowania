@@ -1,0 +1,81 @@
+[meta]
+nazwa: klopsiki w sosie serowym
+slug: klopsiki-w-sosie-serowym
+porcje-bazowe: 2
+liczba-porcji: 2 porcje
+waga-porcji: 323
+czas-minuty: 20
+item: 6a919eed6022c4041ee46647
+
+[zajawka]
+Jeśli zależy Ci na ekstra serowym sosie, to przepis dla Ciebie. Cheddar daje tu intensywny smak, a ser topiony – gładkość. Klopsiki pieką się w airfryerze w czasie, gdy sos powstaje na patelni, więc od gorącego posiłku dzieli Cię zaledwie 20 minut.
+
+[skladniki]
+#klopsiki   245 g klopsików z kurczaka i wieprzowiny  @klopsiki-z-kurczaka-i-wieprzowiny
+#cebula     1 {mała cebula|małe cebule|małych cebul|małej cebuli}
+#maslo      1 łyżka masła
+#smietanka  200 ml śmietanki 30%
+#cheddar    80 g sera cheddar
+#topiony    80 g sera topionego
+#galka      =szczypta gałki muszkatołowej
+#natka      1 łyżka posiekanej natki pietruszki
+#sol        sól do smaku
+#pieprz     biały pieprz do smaku
+
+[kroki]
+== upiecz klopsiki
+minutnik: 11:00 klopsiki
+kryterium: powierzchnia jest równomiernie brązowa, a przekrojony klopsik jest w środku szary na wskroś
+skladniki: klopsiki
+Przełóż Klopsiki z kurczaka i wieprzowiny do airfryera i piecz je w 200°C, potrząsając koszem mniej więcej w połowie. Sos zrób w tym samym czasie, na patelni obok.
+
+== zeszklij cebulę na maśle
+minutnik: 5:00 cebula
+kryterium: kostki cebuli są przezroczyste i miękkie, ale nigdzie nie zbrązowiały
+skladniki: cebula, maslo
+Pokrój cebulę w drobną kostkę, rozpuść masło na patelni na małym ogniu i smaż ją, mieszając co pół minuty. Brązowa cebula zabarwi jasny sos i doda mu słodyczy, której nie ma w nim być.
+
+== rozpuść sery w śmietance
+czas: ok. 5 min
+skladniki: smietanka, cheddar, topiony
+Wlej śmietankę, zmniejsz ogień do najmniejszego, wsyp starty cheddar i pokrojony w kawałki ser topiony, po czym mieszaj, aż zniknie ostatnia grudka. Trzymaj mały ogień: w zbyt gorącej śmietance cheddar rozdziela się na nitki sera i wytopiony tłuszcz.
+
+== dopraw i rozrzedź sos
+czas: ok. 2 min
+skladniki: galka, sol, pieprz
+Dopraw sos solą, białym pieprzem i szczyptą gałki muszkatołowej, a jeśli jest zbyt gęsty, dolej dwie, trzy łyżki gorącej wody. Sól dawkuj ostrożnie: oba sery już ją mają i łatwo tu przesolić.
+
+== włóż klopsiki do sosu
+minutnik: 2:00 klopsiki w sosie
+kryterium: klopsiki są gorące w środku, a sos oblepia je równą warstwą
+Przełóż upieczone klopsiki na patelnię i przerzuć je raz w sosie. Trzymaj je tam krótko, bo sos serowy zostawiony na ogniu dalej gęstnieje i po chwili przestaje się rozlewać.
+
+== podaj posypane natką
+czas: ok. 2 min
+skladniki: natka
+Nałóż klopsiki z sosem na talerze i posyp je posiekaną natką pietruszki. Zieleń na jasnym sosie jest tu też praktyczna: pokazuje, gdzie kończy się sos, a zaczyna talerz.
+
+[wskazowka]
+dlaczego biały pieprz, a nie czarny?
+Bo w jasnym sosie czarny pieprz zostawia widoczne ciemne punkty, a jego smak jest ostrzejszy i bardziej ziemisty. Biały pochodzi z tego samego owocu pozbawionego owocni, jest łagodniejszy i ginie w kolorze.
+
+[co-mozesz-zmienic]
+#cheddar
+krótko: goudą albo emmentalerem, w tej samej ilości
+czym zastąpić cheddar?
+Goudą, emmentalerem albo dowolnym żółtym serem, który dobrze się topi, w tej samej ilości. Trzymaj się serów dojrzewających: młode sery typu mozzarella dają ciągnące się nitki zamiast gładkiego sosu.
+
+#topiony
+krótko: łyżeczką mąki i śmietanką, zamiast sera
+nie mam sera topionego, czym go zastąpić?
+Zrób zasmażkę: rozmieszaj łyżeczkę mąki z masłem, zanim wlejesz śmietankę, i dodaj 80 g więcej cheddara. Mąka przejmie rolę emulgatora, choć sos będzie odrobinę cięższy niż z serem topionym.
+
+[przechowywanie]
+jak przechowywać i odgrzewać klopsiki w sosie serowym?
+W lodówce: do 2 dni w szczelnym pojemniku, razem z sosem. W zamrażarce: najlepsza jakość do 2–3 miesięcy, choć sos serowy po rozmrożeniu jest ziarnisty i trzeba rozmieszać go trzepaczką na małym ogniu. Odgrzewanie: w rondelku na najmniejszym ogniu, z dwiema łyżkami mleka, mieszając bez przerwy; w mikrofalówce sos rozwarstwia się prawie zawsze.
+
+[wartosci-odzywcze]
+energia: 1189 kJ / 287 kcal; tłuszcz: 25 g; kwasy tłuszczowe nasycone: 12 g; węglowodany: 2,3 g; cukry: 2,3 g; błonnik: 0,2 g; białko: 13 g; sól: 0,99 g
+
+[wartosci-porcja]
+energia: 3838 kJ / 926 kcal; tłuszcz: 82 g; kwasy tłuszczowe nasycone: 40 g; węglowodany: 7,5 g; cukry: 7,4 g; błonnik: 0,7 g; białko: 42 g; sól: 3,2 g

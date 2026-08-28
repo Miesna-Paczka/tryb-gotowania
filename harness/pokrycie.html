@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>POKRYCIE — równość zbiorów obu powierzchni</title>
+
+<!--
+  harness/pokrycie.html — powierzchnia POZA matrycą szerokości, wzorowana na
+  `prog.html` i `qr.html`. Zakładana w przebiegu 34 na polecenie z „Następnego
+  kroku" przebiegu 33.
+
+  PYTANIE, na które ta strona odpowiada, i którego żadna z dwóch matryc nie umie
+  zadać samodzielnie: czy zbiór wierszy, o które PYTA powierzchnia pełna, jest
+  RÓWNY zbiorowi wierszy, o które pyta powierzchnia zminifikowana.
+
+  Dlaczego osobna strona, a nie asercja w fixture: fixture zna wyłącznie siebie,
+  a `matrix.html` i `matrix-min.html` to dwa różne dokumenty, które nigdy nie
+  widzą się nawzajem. Porównanie musi więc mieć własny dokument, który ładuje
+  OBIE powierzchnie same-origin, obok siebie, w tej samej chwili i pod tą samą
+  pieczęcią. Inaczej porównywałoby dwa pomiary z dwóch epok cache'u.
+
+  Dlaczego to nie jest trzeci egzemplarz prawdy: ta strona NIE zawiera listy
+  wierszy. Nie wie, ile ich ma być. Pyta wyłącznie o RÓWNOŚĆ dwóch zbiorów
+  liczonych w chwili wywołania `sprawdz()` po obu stronach — więc nie ma czego
+  utrzymywać ręcznie i nie ma czemu się rozjechać.
+
+  Rozjazd, którego ta strona pilnuje, wydarzył się naprawdę: przez dziesięć
+  przebiegów trzynaście wierszy (A14, A15, A16, B20, W32–W40) miało asercje
+  wyłącznie w `fixture.html`, a `matrix-min.html` meldował „ZERO padnięć"
+  o wierszach, o które nie pytał — i to na powierzchni, której artefakt
+  faktycznie pojedzie do embedu. Naprawiono w przeb. 33, nic poza czujnością
+  tego nie trzymało. Od teraz trzyma asercja.
+
+  OBIE ramki mają nazwy inne niż '360', więc obie dostają `MP_BEZ_HISTORII = true`
+  — porównanie jest like-for-like. Liczby bezwzględne mogą być przez to niższe
+  niż w matrycy; ta strona nie mierzy liczb, tylko RÓWNOŚĆ.
+-->
+
+<style>
+  :root{--tlo:#12100e;--panel:#1c1915;--ok:#3ddc84;--zle:#ff6b5e;--tekst:#eee}
+  html,body{margin:0;background:var(--tlo);color:var(--tekst);
+            font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
+  header{position:sticky;top:0;z-index:5;background:var(--panel);padding:10px 14px;
+         border-bottom:1px solid #333}
+  header b{font-size:15px}
+  #podsumowanie.ok{color:var(--ok)} #podsumowanie.zle{color:var(--zle)}
+  #szczegoly{margin:6px 0 0;padding-left:18px;max-height:220px;overflow:auto}
+  #szczegoly li{color:var(--zle)}
+  .rzad{display:flex;gap:14px;padding:14px;align-items:flex-start;overflow-x:auto}
+  .komorka{flex:0 0 auto}
+  .etykieta{padding:0 0 4px;font-size:12px;color:#aaa}
+  iframe{border:1px solid #444;background:#fff;display:block}
+</style>
+</head>
+<body>
+
+<header>
+  <b>POKRYCIE — pełna vs zminifikowana</b>
+  <span id="podsumowanie">ładowanie…</span>
+  <ul id="szczegoly"></ul>
+</header>
+
+<div class="rzad" id="rzad"></div>
+
+<script>
+/* Jedna pieczęć na obie ramki — inaczej jedna mogłaby przyjść z cache'u, a druga
+   świeża, i różnica zbiorów opisywałaby dwie epoki pliku, nie dwie powierzchnie. */
+window.MP_PIECZEC = String(Date.now());
+
+var RAMKI = [
+  { nazwa: 'pokrycie-pelna', plik: 'fixture.html',     etykieta: 'PEŁNA (źródło)' },
+  { nazwa: 'pokrycie-min',   plik: 'fixture-min.html', etykieta: 'ZMINIFIKOWANA (artefakt)' }
+];
+
+var wyniki = Object.create(null);
+window.MP_POKRYCIE = { gotowe: false, pieczec: MP_PIECZEC, wyniki: wyniki, wynik: null };
+
+RAMKI.forEach(function (r) {
+  var kom = document.createElement('div');
+  kom.className = 'komorka';
+  kom.innerHTML = '<div class="etykieta">' + r.etykieta + ' · 360 × 780</div>';
+  var f = document.createElement('iframe');
+  f.src = r.plik + '?pieczec=' + MP_PIECZEC;
+  f.name = r.nazwa;
+  f.width = 360; f.height = 780;
+  f.setAttribute('title', r.etykieta);
+  kom.appendChild(f);
+  document.getElementById('rzad').appendChild(kom);
+});
+
+/* Komparator wydzielony, bo musi dać się wywołać na danych PODSTAWIONYCH — bez
+   tego kontrola ujemna byłaby niewykonalna, a „zbiory równe" znaczyłoby tylko
+   tyle, że coś zwróciło pustą listę różnic. */
+function porownaj(a, b) {
+  var wA = Object.create(null), wB = Object.create(null), i;
+  for (i = 0; i < a.length; i++) wA[a[i]] = true;
+  for (i = 0; i < b.length; i++) wB[b[i]] = true;
+  var tylkoA = a.filter(function (x) { return !wB[x]; }).sort();
+  var tylkoB = b.filter(function (x) { return !wA[x]; }).sort();
+  return { tylkoA: tylkoA, tylkoB: tylkoB, rowne: tylkoA.length === 0 && tylkoB.length === 0 };
+}
+
+window.addEventListener('message', function (e) {
+  var d = e.data;
+  if (!d || !d.mpHarness || !d.nazwa) return;
+  wyniki[d.nazwa] = d.mpHarness;
+  if (wyniki['pokrycie-pelna'] && wyniki['pokrycie-min']) domknij();
+});
+
+/* Porównanie WIELOZBIORU etykiet — warstwa o klasę niżej niż zbiór identyfikatorów
+   wierszy. Zbiory mogą być równe, a powierzchnie i tak mierzyć różną liczbę razy:
+   zmierzone w przeb. 34, pełna 427 asercji wobec 432 na zminifikowanej.
+
+   Kierunki NIE są symetryczne i to jest cała treść tej reguły:
+   · asercja obecna w PEŁNEJ, a nieobecna w MIN = defekt twardy. Dokładnie ten stan
+     ukrywał się dziesięć przebiegów: artefakt jadący do embedu nie był o coś pytany,
+     a matryca meldowała „zero padnięć".
+   · asercja policzona w MIN częściej = DUPLIKAT, i jest dopuszczalny. Dwa egzemplarze
+     stoją w dwóch różnych stanach powierzchni, więc mierzą więcej, nie mniej (przeb. 33).
+     Raportujemy je co do nazwy, ale nie wywracamy na nich wyniku.
+
+   Listy nazw tu nie ma świadomie — reguła jest kierunkowa, więc nie wymaga rejestru
+   wyjątków, który trzeba by utrzymywać ręcznie i który zestarzałby się po cichu.     */
+function wielozbior(a) {
+  var m = Object.create(null);
+  a.forEach(function (x) { m[x.nazwa] = (m[x.nazwa] || 0) + 1; });
+  return m;
+}
+
+function domknij() {
+  var P = wyniki['pokrycie-pelna'], M = wyniki['pokrycie-min'];
+  var pP = (P.pokrycie || []).slice(), pM = (M.pokrycie || []).slice();
+  var r = porownaj(pP, pM);
+
+  var lP = wielozbior(P.asercje), lM = wielozbior(M.asercje);
+  var brakWMin = [], nadmiarWMin = [], tylkoWMin = [];
+  Object.keys(lP).forEach(function (n) {
+    if (!(n in lM)) brakWMin.push(n);
+  });
+  Object.keys(lM).forEach(function (n) {
+    if (!(n in lP)) tylkoWMin.push(n);
+    else if (lM[n] > lP[n]) nadmiarWMin.push(n + ' (' + lP[n] + '→' + lM[n] + ')');
+  });
+
+  /* KONTROLA UJEMNA — na komparatorze, nie na powierzchni. Podstawiamy zbiór
+     z jednym dorzuconym identyfikatorem i żądamy, żeby komparator to zobaczył.
+     Bez tego cała strona mogłaby meldować „równe", będąc funkcją stałą.
+     Identyfikator celowo taki, jakiego matryca nie ma prawa mieć. */
+  var ku = porownaj(pP.concat(['ZZ99-kontrola-ujemna']), pM);
+  var falsyfikowalny = ku.rowne === false &&
+                       ku.tylkoA.length === 1 && ku.tylkoA[0] === 'ZZ99-kontrola-ujemna';
+
+  /* Kontrola DODATNIA: zbiór porównany sam ze sobą ma być równy. Łapie komparator,
+     który zgłasza różnicę zawsze — czyli błąd przeciwny do poprzedniego. */
+  var kd = porownaj(pP, pP.slice());
+
+  /* Klucze sondy odległości po obu stronach. `wynik.odleglosci` jest obiektem
+     płaskim (klucz → liczba pikseli), więc zbiorem jest lista jego kluczy. */
+  var odlP = Object.keys((P && P.odleglosci) || {}).sort();
+  var odlM = Object.keys((M && M.odleglosci) || {}).sort();
+  var odlBrak = odlP.filter(function (k) { return odlM.indexOf(k) < 0; });
+  var odlNadmiar = odlM.filter(function (k) { return odlP.indexOf(k) < 0; });
+
+  var wynik = {
+    pieczec: MP_PIECZEC,
+    liczby: { pelna: pP.length, min: pM.length },
+    asercje: { pelna: P.asercje.length, min: M.asercje.length },
+    padniec: {
+      pelna: P.asercje.filter(function (a) { return !a.ok; }).length,
+      min:   M.asercje.filter(function (a) { return !a.ok; }).length
+    },
+    konsola: { pelna: P.konsola.length, min: M.konsola.length },
+    tylkoPelna: r.tylkoA,
+    tylkoMin: r.tylkoB,
+    rowne: r.rowne,
+    falsyfikowalny: falsyfikowalny,
+    kontrolaDodatnia: kd.rowne === true,
+    /* wielozbiór etykiet */
+    brakWMin: brakWMin,
+    nadmiarWMin: nadmiarWMin,
+    tylkoWMin: tylkoWMin,
+    /* ZBIÓR KLUCZY SONDY ODLEGŁOŚCI (przeb. 36, wiersz `I11`) — druga rzecz, o którą
+       ta strona może zapytać, a której nie umie zapytać nikt inny: `matrix.html`
+       i `matrix-min.html` są dwoma różnymi dokumentami i nigdy się nie widzą.
+       Inwariant 0aa mówi, że odstępy są niezmienne wobec szerokości — ale mierzony
+       na dwóch RÓŻNYCH zbiorach odległości mówi to o dwóch różnych rzeczach.
+       Kierunek jest twardy tak samo jak przy asercjach: artefakt nie ma prawa
+       mierzyć MNIEJ niż źródło, bo to artefakt jedzie na stronę. */
+    odleglosci: {
+      pelna: odlP.length, min: odlM.length,
+      brakWMin: odlBrak, tylkoWMin: odlNadmiar
+    },
+    ok: r.rowne === true && falsyfikowalny === true && kd.rowne === true &&
+        pP.length > 0 && pM.length > 0 &&
+        brakWMin.length === 0 &&     /* ← kierunek twardy: MIN nie może o coś NIE pytać */
+        odlBrak.length === 0         /* ← ten sam kierunek dla sondy odległości */
+  };
+
+  window.MP_POKRYCIE.wynik = wynik;
+  window.MP_POKRYCIE.gotowe = true;
+
+  var el = document.getElementById('podsumowanie');
+  el.textContent = '— ' + (wynik.ok ? 'ZBIORY RÓWNE' : 'ROZJAZD') +
+                   ' · pełna ' + wynik.liczby.pelna + ' · min ' + wynik.liczby.min +
+                   ' · odległości ' + wynik.odleglosci.pelna + '/' + wynik.odleglosci.min +
+                   ' · falsyfikowalny: ' + (falsyfikowalny ? 'tak' : 'NIE');
+  el.className = wynik.ok ? 'ok' : 'zle';
+
+  var pozycje = [];
+  wynik.tylkoPelna.forEach(function (x) { pozycje.push('wiersz tylko w PEŁNEJ: ' + x); });
+  wynik.tylkoMin.forEach(function (x) { pozycje.push('wiersz tylko w MIN: ' + x); });
+  wynik.brakWMin.forEach(function (x) { pozycje.push('DEFEKT — asercja NIEOBECNA w MIN: ' + x); });
+  wynik.tylkoWMin.forEach(function (x) { pozycje.push('asercja tylko w MIN: ' + x); });
+  wynik.nadmiarWMin.forEach(function (x) { pozycje.push('duplikat w MIN (dopuszczalny): ' + x); });
+  wynik.odleglosci.brakWMin.forEach(function (x) {
+    pozycje.push('DEFEKT — odległość mierzona TYLKO w źródle, nie w artefakcie: ' + x); });
+  wynik.odleglosci.tylkoWMin.forEach(function (x) {
+    pozycje.push('odległość tylko w MIN: ' + x); });
+  if (!falsyfikowalny) pozycje.push('KONTROLA UJEMNA NIE PRZESZŁA — komparator ślepy');
+  if (!wynik.kontrolaDodatnia) pozycje.push('KONTROLA DODATNIA NIE PRZESZŁA — komparator krzyczy zawsze');
+  document.getElementById('szczegoly').innerHTML =
+    pozycje.map(function (t) { return '<li>' + t + '</li>'; }).join('');
+}
+</script>
+</body>
+</html>

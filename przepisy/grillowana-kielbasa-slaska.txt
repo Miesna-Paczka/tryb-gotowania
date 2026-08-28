@@ -1,0 +1,63 @@
+[meta]
+nazwa: grillowana kiełbasa śląska
+slug: grillowana-kielbasa-slaska
+porcje-bazowe: 2
+liczba-porcji: 2 porcje
+waga-porcji: 205
+czas-minuty: 15
+item: 6a919eed6022c4041ee4664d
+
+[zajawka]
+Masz dobrą śląską? Nie nacinaj osłonki, bo nacięta kiełbasa wypuszcza soki na ruszt, gdzie zamieniają się w dym, a mięso staje się suche jak wiór. Nienaruszona osłonka pomaga zachować soczystość, dlatego nawet w trakcie pieczenia (albo szczególnie?) kiełbasę obraca się szczypcami – nigdy widelcem.
+
+[skladniki]
+#kielbasa   300 g kiełbasy śląskiej  @kielbasa-slaska
+#pieczywo   pieczywo do podania
+#musztarda  musztarda albo ketchup do podania
+
+[kroki]
+== wyjmij kiełbasę z lodówki
+czas: min. 15 min
+skladniki: kielbasa
+Wyjmij Kiełbasę śląską z lodówki na kwadrans przed grillowaniem i zostaw ją na talerzu w całości. Ten czas nie liczy się do czasu przygotowania, a chodzi w nim o to, żeby środek nie był lodowaty wtedy, gdy osłonka będzie już rumiana.
+
+== rozgrzej grill do średniego żaru
+czas: ok. 5 min
+Rozpal grill i poczekaj, aż żar zejdzie do średniego, takiego, nad którym utrzymasz dłoń przez cztery, pięć sekund. Zrób to w czasie, gdy kiełbasa dochodzi do temperatury pokojowej.
+
+== grilluj, obracając szczypcami
+minutnik: 13:00 kiełbasa
+kryterium: osłonka jest napięta, błyszcząca i równomiernie brązowa na całej długości, bez pęknięć
+Ułóż kiełbasę na ruszcie z dala od najmocniejszego żaru i obracaj ją co dwie, trzy minuty. **Obracaj wyłącznie szczypcami** i nie nakłuwaj osłonki: każde przebicie wypuszcza soki, które zostaną na węglach, a nie w kiełbasie.
+
+== odstaw na dwie minuty
+czas: ok. 2 min
+Zdejmij kiełbasę z rusztu na deskę i zostaw ją na dwie minuty przed pokrojeniem. Sok, który w cieple zebrał się przy osłonce, w tym czasie rozejdzie się z powrotem po całym przekroju.
+
+== podaj z pieczywem
+czas: ok. 2 min
+skladniki: pieczywo, musztarda
+Pokrój kiełbasę ukośnie na kawałki albo podaj ją w całości, obok postaw pieczywo i musztardę. Ukośne cięcie odsłania większą powierzchnię przekroju, więc kawałek lepiej nabiera sosu.
+
+[wskazowka]
+dlaczego kiełbasy nie wolno nacinać?
+Bo nacięcie robi dokładnie to, czego się po nim spodziewamy, tylko w drugą stronę. Osłonka trzyma w środku tłuszcz i wodę, które w cieple parują i utrzymują farsz wilgotnym; nacięta wypuszcza je na ruszt w pierwszych minutach. Nacinanie ma sens tylko przy kiełbasach o bardzo grubej, twardej osłonce, a śląska taką kiełbasą nie jest.
+
+kiełbasa pękła na grillu – co poszło nie tak?
+Za mocny żar. Przy wysokiej temperaturze woda w farszu paruje szybciej, niż osłonka zdąży się rozciągnąć, i pęka w najsłabszym miejscu. Odsuń kiełbasę od środka rusztu, tam gdzie żar jest słabszy, i wydłuż grillowanie o kilka minut, zamiast podkręcać ogień.
+
+[co-mozesz-zmienic]
+#kielbasa
+krótko: patelnia grillowa, 12–14 min
+nie mam grilla – jak go zastąpić?
+Na patelni grillowej rozgrzanej do średniej temperatury, przez 12 do 14 minut, obracając kiełbasę co dwie, trzy minuty. Zasada zostaje ta sama: żadnego nakłuwania i żadnego tłuszczu na patelni, bo kiełbasa wytopi swój własny.
+
+[przechowywanie]
+jak przechowywać i odgrzewać grillowaną kiełbasę śląską?
+W lodówce: do 2 dni w szczelnym pojemniku, wystudzona przed zamknięciem. W zamrażarce: najlepsza jakość do 1–2 miesięcy, choć po rozmrożeniu osłonka traci sprężystość. Odgrzewanie: na suchej patelni na średnim ogniu przez 3 do 4 minut, obracając; pokrojoną w plastry wystarczy podsmażyć minutę z każdej strony.
+
+[wartosci-odzywcze]
+energia: 1449 kJ / 348 kcal; tłuszcz: 24 g; kwasy tłuszczowe nasycone: 9,5 g; węglowodany: 19 g; cukry: 1,6 g; błonnik: 1,7 g; białko: 13 g; sól: 1,8 g
+
+[wartosci-porcja]
+energia: 2970 kJ / 713 kcal; tłuszcz: 50 g; kwasy tłuszczowe nasycone: 19 g; węglowodany: 40 g; cukry: 3,3 g; błonnik: 3,5 g; białko: 26 g; sól: 3,7 g

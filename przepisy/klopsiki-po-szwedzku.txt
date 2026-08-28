@@ -1,0 +1,80 @@
+[meta]
+nazwa: klopsiki wieprzowo-wołowe po szwedzku
+slug: klopsiki-po-szwedzku
+porcje-bazowe: 2
+liczba-porcji: 2–3 porcje
+waga-porcji: 251
+czas-minuty: 20
+item: 6a919eed6022c4041ee4663f
+
+[zajawka]
+Klopsików nie da się po szwedzku przygotować, ale da się je po szwedzku podać: z jasnym sosem śmietanowym i konfiturą borówkową. W naszym przepisie sos gotujesz na patelni, podczas gdy klopsiki pieką się w airfryerze, więc cały posiłek ogarniesz w 20 minut maks. Konfiturę polecamy obok, a nie w sosie, żeby go nie zdominowała.
+
+[skladniki]
+#klopsiki   245 g klopsików z wieprzowiny i wołowiny  @klopsiki-z-wieprzowiny-i-wolowiny
+#smietanka  200 ml śmietanki 30%
+#bulion     100 ml bulionu drobiowego
+#maslo      1 łyżka masła
+#konfitura  1 łyżka konfitury borówkowej
+#ziele      =szczypta ziela angielskiego mielonego
+#sol        sól do smaku
+#pieprz     biały pieprz do smaku
+
+[kroki]
+== upiecz klopsiki
+minutnik: 11:00 klopsiki
+kryterium: powierzchnia jest równomiernie brązowa, a przekrojony klopsik jest w środku szary na wskroś
+skladniki: klopsiki
+Przełóż Klopsiki z wieprzowiny i wołowiny do airfryera i piecz je w 200°C, potrząsając koszem mniej więcej w połowie. Sos zrób w tym samym czasie, na patelni obok.
+
+== rozpuść masło i wlej bulion
+minutnik: 2:00 bulion
+kryterium: na powierzchni bulionu pojawiają się pierwsze pęcherzyki przy brzegu patelni
+skladniki: maslo, bulion
+Rozpuść masło na patelni na małym ogniu, uważając, żeby nie zbrązowiało, i wlej bulion. Zbrązowiałe masło daje orzechowy posmak, który w jasnym sosie szwedzkim jest nie na miejscu.
+
+== wlej śmietankę i zredukuj
+minutnik: 5:00 sos
+kryterium: sos spływa z łyżki wolno i zostawia na niej cienką powłokę
+skladniki: smietanka
+Wlej śmietankę i gotuj sos na małym ogniu, mieszając co pół minuty. Ma oblewać klopsiki aksamitnie, a nie stać na talerzu jak budyń, więc zdejmij go z ognia wcześniej, niż podpowiada odruch.
+
+== dopraw sos
+czas: ok. 1 min
+skladniki: ziele, sol, pieprz
+Dopraw sos solą, białym pieprzem i szczyptą mielonego ziela angielskiego. Biały pieprz jest tu wyborem, nie kaprysem: czarny zostawiłby w jasnym sosie widoczne czarne punkty.
+
+== włóż klopsiki do sosu
+minutnik: 2:00 klopsiki w sosie
+kryterium: klopsiki są gorące w środku, a sos oblepia je równą warstwą
+Przełóż upieczone klopsiki na patelnię z sosem i przerzuć je raz, żeby pokryły się nim ze wszystkich stron. Zostaw je tam tylko na chwilę: dłużej w gorącym sosie zaczną oddawać mu swój tłuszcz.
+
+== podaj z konfiturą osobno
+czas: ok. 2 min
+skladniki: konfitura
+Nałóż klopsiki z sosem na talerze, a konfiturę borówkową postaw obok, w miseczce. Osobno, bo dodana do sosu rozpuści się w nim i zniknie, a jej rola polega właśnie na tym, żeby co kilka kęsów przeciąć słodyczą tłustą śmietankę.
+
+[wskazowka]
+jak sprawić, by sos się nie zwarzył?
+Trzymaj mały ogień od początku do końca i nie doprowadzaj sosu do wrzenia. Śmietanka 30% jest odporniejsza niż 18%, ale i ona rozdziela się na tłuszcz i wodę, jeśli zawrze. Jeśli w sosie pojawią się drobiny, zdejmij patelnię z ognia i rozmieszaj go trzepaczką, dolewając łyżkę zimnej śmietanki.
+
+[co-mozesz-zmienic]
+#konfitura
+krótko: konfiturą żurawinową, w tej samej ilości
+czym zastąpić konfiturę borówkową?
+Konfiturą żurawinową albo z czerwonej porzeczki, w tej samej ilości. Ważne jest, żeby była kwaśna, a nie tylko słodka: dżem truskawkowy da słodycz bez kontrastu i sos stanie się mdły.
+
+#bulion
+krótko: wodą z kostką bulionową, w tej samej ilości
+czym zastąpić bulion drobiowy?
+Wodą z kostką bulionową, w tej samej ilości. Kostka bywa mocno posolona, więc dopraw sos dopiero po redukcji, kiedy sól zdąży się w nim skoncentrować.
+
+[przechowywanie]
+jak przechowywać i odgrzewać klopsiki po szwedzku?
+W lodówce: do 2 dni w szczelnym pojemniku, razem z sosem. W zamrażarce: najlepsza jakość do 2–3 miesięcy, choć sos śmietanowy po rozmrożeniu bywa rozwarstwiony i trzeba go rozmieszać na ciepło. Odgrzewanie: w rondelku na małym ogniu, bez doprowadzania do wrzenia, z łyżką mleka albo śmietanki, jeśli sos zgęstniał.
+
+[wartosci-odzywcze]
+energia: 1122 kJ / 271 kcal; tłuszcz: 25 g; kwasy tłuszczowe nasycone: 12 g; węglowodany: 3,1 g; cukry: 3 g; błonnik: 0,1 g; białko: 8,4 g; sól: 0,98 g
+
+[wartosci-porcja]
+energia: 2816 kJ / 681 kcal; tłuszcz: 62 g; kwasy tłuszczowe nasycone: 31 g; węglowodany: 7,7 g; cukry: 7,5 g; błonnik: 0,2 g; białko: 21 g; sól: 2,4 g

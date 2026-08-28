@@ -1,0 +1,73 @@
+[meta]
+nazwa: pierogi z mięsem z karmelizowaną cebulką i sosem żurawinowym
+slug: pierogi-z-miesem-z-karmelizowana-cebulka-przepis
+porcje-bazowe: 2
+liczba-porcji: 2 porcje
+waga-porcji: 468
+czas-minuty: 25
+
+[zajawka]
+Pierogi z wołowiną ugotowane, a potem podsmażone na maśle razem z cebulą karmelizowaną powoli, i podane z konfiturą z żurawiny. Gotowanie i smażenie nie konkurują tu ze sobą: pierwsze doprowadza ciasto do miękkości, drugie robi z niego skórkę. Żurawina jest po to, żeby przeciąć tłustość farszu, więc trafia obok pierogów, a nie na nie.
+
+[skladniki]
+#pierogi   700 g pierogów z wołowiną   @pierogi-z-wolowina
+#cebula    1 {duża cebula|duże cebule|dużych cebul|dużej cebuli}
+#maslo     1 łyżka masła
+#zurawina  2 łyżki konfitury z żurawiny
+#sol       sól do osolenia wody
+#pieprz    pieprz do smaku
+
+[kroki]
+== pokrój i karmelizuj cebulę
+minutnik: 9:00 cebula
+kryterium: piórka są bursztynowe i zwiotczałe, a na dnie patelni nie ma już wilgoci
+skladniki: cebula, maslo
+Pokrój dużą cebulę w piórka, rozpuść masło na patelni i smaż ją na **małym** ogniu, mieszając co jakiś czas. Karmelizacja to nie to samo co zrumienienie: na dużym ogniu cebula przypali się na brzegach, zanim cukier w środku zdąży się rozłożyć i zbrązowieć równo.
+
+== zagotuj osoloną wodę
+skladniki: sol
+Nastaw duży garnek wody i posól ją, gdy tylko zacznie wrzeć. Zrób to w czasie, gdy karmelizuje się cebula, bo woda potrzebuje mniej więcej tyle samo czasu, a pierogi wchodzą dopiero do wrzątku.
+
+== ugotuj pierogi
+minutnik: 4:30 pierogi
+kryterium: ciasto na zakładce jest miękkie i nie ma już jaśniejszego, surowego paska
+skladniki: pierogi
+Wrzuć pierogi do wrzątku, zamieszaj raz drewnianą łyżką, żeby nie przywarły do dna, i **licz czas dopiero od chwili, gdy wypłyną**. Wypłynięcie znaczy tylko tyle, że ciasto się rozgrzało; farsz w środku potrzebuje jeszcze tych kilku minut.
+
+== podsmaż pierogi na cebuli
+minutnik: 4:00 pierogi
+kryterium: skórka jest złota i lekko chrupie, a pierogi nie kleją się do łopatki
+Wyjmuj pierogi łyżką cedzakową prosto na patelnię z cebulą i kładź tyle, żeby leżały luźno w jednej warstwie, obracając je raz i licząc czas dla każdej partii osobno. Odsączaj je pobieżnie, ale nie osuszaj: odrobina wody z gotowania miesza się z masłem i cebulą w rzadki sos, który oblepia ciasto.
+
+== dopraw i podaj
+czas: ok. 1 min
+skladniki: zurawina, pieprz
+Popieprz pierogi na patelni i przełóż je na talerze razem z całą cebulą. Konfiturę z żurawiny nałóż łyżką obok, a nie na wierzch: rozsmarowana po pierogach zamieni chrupiącą skórkę w lepką w kilkanaście sekund.
+
+[wskazowka]
+po co gotować pierogi, skoro i tak trafiają na patelnię?
+Bo patelnia grzeje z zewnątrz, a farsz jest w środku. Samo smażenie zrumieniłoby ciasto, zanim mięso w środku zdążyłoby się rozgrzać, a przy dłuższym smażeniu skórka zrobiłaby się twarda jak suchar, nim farsz doszedłby do temperatury.
+
+czym karmelizowana cebula różni się od zeszklonej?
+Czasem i temperaturą, nie techniką. Zeszklenie to kilka minut na średnim ogniu i cebula zostaje jasna i miękka; karmelizacja to kilkanaście minut na małym, w czasie których cukry z cebuli brązowieją i robi się z niej coś wyraźnie słodkiego.
+
+[co-mozesz-zmienic]
+#zurawina
+krótko: konfiturą z borówki brusznicy albo powidłami śliwkowymi
+czym zastąpić konfiturę z żurawiny?
+Konfiturą z borówki brusznicy, w tej samej ilości: jest równie cierpka i robi dokładnie to samo. Powidła śliwkowe też zadziałają, ale są słodsze i mniej kwaśne, więc dodaj do nich kilka kropli soku z cytryny, żeby wróciła ostrość, dla której ta konfitura tu w ogóle stoi.
+
+#cebula
+krótko: dwiema szalotkami, karmelizowanymi krócej
+mam tylko szalotki, wystarczą?
+Dwie szalotki zastąpią dużą cebulę, ale karmelizuj je krócej, bo są drobniejsze i mają mniej wody do odparowania. Wyjdą przy tym słodsze i łagodniejsze, co przy tłustym farszu wołowym nie jest wadą.
+
+[przechowywanie]
+jak przechowywać i odgrzewać pierogi z mięsem?
+Przełóż ostudzone pierogi razem z cebulą do szczelnego pojemnika w ciągu 1–2 godzin od zdjęcia z patelni i trzymaj w lodówce do 2 dni. W zamrażarce: najlepsza jakość do 2–3 miesięcy, ale mroź je ugotowane i nieodsmażone, rozłożone pojedynczo na blaszce, bo zlepione w bryłę rozerwą się przy rozdzielaniu. Odgrzewaj na patelni z odrobiną masła, na średnim ogniu, bo w mikrofalówce ciasto robi się gumowate.
+
+[wartosci-odzywcze]
+energia: 899 kJ / 215 kcal; tłuszcz: 8 g; kwasy tłuszczowe nasycone: 2,1 g; węglowodany: 19 g; cukry: 3,9 g; błonnik: 1,8 g; białko: 9,2 g; sól: 0,8 g
+
+[wartosci-porcja]
+energia: 4201 kJ / 1004 kcal; tłuszcz: 37 g; kwasy tłuszczowe nasycone: 10 g; węglowodany: 90 g; cukry: 18 g; błonnik: 8,4 g; białko: 43 g; sól: 3,8 g

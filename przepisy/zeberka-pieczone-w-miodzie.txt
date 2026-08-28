@@ -1,0 +1,71 @@
+[meta]
+nazwa: żeberka pieczone w miodzie, ketchupie i czosnku
+slug: zeberka-pieczone-w-miodzie
+porcje-bazowe: 3
+liczba-porcji: 3–4 porcje
+waga-porcji: 128
+czas-minuty: 120
+item: 6a904ee9be931792b881d6e4
+
+[zajawka]
+Żeberka natarte marynatą z miodu, ketchupu, czosnku i sosu sojowego, pieczone półtorej godziny pod folią i dopiero na końcu odkryte do zrumienienia. Te dwa etapy odpowiadają za co innego i żaden nie zastąpi drugiego. Pod folią mięso paruje we własnych sokach i odchodzi od kości; bez folii, w 220 stopniach, cukry z miodu i ketchupu ścinają się w lśniącą glazurę. Marynata potrzebuje jeszcze dwóch godzin w lodówce przed pieczeniem, więc to nie jest przepis na spontaniczny obiad.
+
+[skladniki]
+#zeberka   550 g żeberek   @zeberka
+#miod      3 łyżki miodu
+#ketchup   4 łyżki ketchupu
+#soja      2 łyżki sosu sojowego
+#czosnek   4 ząbki czosnku
+#olej      1 łyżka oleju
+#papryka   ostra papryka mielona
+#sol       sól do smaku
+#pieprz    pieprz do smaku
+
+[kroki]
+== wymieszaj marynatę
+czas: ok. 5 min
+skladniki: miod, ketchup, soja, czosnek, olej, papryka, sol, pieprz
+Przeciśnij czosnek przez praskę i wymieszaj go w miseczce z miodem, ketchupem, sosem sojowym, olejem, ostrą papryką, solą i pieprzem. Wymieszaj do gładkości: nierozprowadzony miód osiądzie na dnie i połowa żeberek zostanie natarta samym ketchupem.
+
+== natrzyj żeberka i wstaw do lodówki
+czas: min. 2 h
+skladniki: zeberka
+Natrzyj Żeberka marynatą z obu stron, wcierając ją także między kości, i wstaw je do lodówki na co najmniej dwie godziny. Ten czas nie liczy się do czasu przygotowania i nie da się go skrócić: sól z sosu sojowego potrzebuje go, żeby wejść w mięso głębiej niż na powierzchnię.
+
+== piecz pod folią
+minutnik: 1:30:00 żeberka
+kryterium: mięso przy kości daje się rozdzielić widelcem, a kość obraca się w nim luźno
+Ułóż żeberka w naczyniu żaroodpornym, przykryj je szczelnie folią aluminiową i wstaw do piekarnika nagrzanego do 160°C. Folia ma przylegać do brzegów naczynia, a nie do mięsa: pod nią zbiera się para, która przez półtorej godziny rozmiękcza tkankę łączną i odkleja mięso od kości.
+
+== zdejmij folię i zrumień
+minutnik: 17:00 glazura
+kryterium: wierzch jest ciemny i lśniący, a marynata na dnie ciągnie się za łyżką zamiast spływać
+Zdejmij folię, podkręć piekarnik do 220°C i piecz żeberka odkryte, polewając je raz albo dwa sosem z dna naczynia. Pilnuj ich od tej chwili: miód i ketchup to prawie sam cukier, a cukier w tej temperaturze przechodzi z lśniącego w spalony w ciągu dwóch minut.
+
+[wskazowka]
+dlaczego żeberka pieką się najpierw pod folią?
+Bo mięso przy kości trzyma się tkanką łączną, a ta rozpuszcza się dopiero w wilgotnym cieple i przy długim czasie. Pod folią zbiera się para z własnych soków mięsa i to ona wykonuje tę robotę; pieczenie od razu w wysokiej temperaturze dałoby żeberka przypieczone z wierzchu i twarde przy kości.
+
+czy dwie godziny marynowania naprawdę są konieczne?
+Konieczne nie, ale widoczne w smaku tak. Przez ten czas sól z sosu sojowego przechodzi w głąb mięsa, a nie tylko po nim spływa; przy krótszym marynowaniu doprawiona zostaje sama powierzchnia, a środek zostaje mdły. Przez noc będzie jeszcze lepiej.
+
+[co-mozesz-zmienic]
+#ketchup
+krótko: 4 łyżkami passaty z łyżeczką cukru i kroplą octu
+czym zastąpić ketchup w marynacie?
+Czterema łyżkami passaty pomidorowej z łyżeczką cukru i kilkoma kroplami octu. Ketchup jest tu trzema rzeczami naraz: pomidorem, cukrem i kwasem, więc zamiennik musi odtworzyć wszystkie trzy, inaczej glazura nie zgęstnieje tak samo i wyjdzie wyraźnie kwaśniejsza.
+
+#miod
+krótko: syropem klonowym albo melasą, w tej samej ilości
+czym zastąpić miód?
+Syropem klonowym albo melasą, w tej samej ilości. Oba karmelizują się podobnie i dają tę samą lśniącą warstwę; melasa jest przy tym wyraźnie ciemniejsza i lekko gorzkawa, więc żeberka wyjdą z niej mniej słodkie, za to głębsze w smaku.
+
+[przechowywanie]
+jak przechowywać i odgrzewać żeberka w miodzie?
+Przełóż ostudzone żeberka razem z sosem z dna naczynia do szczelnego pojemnika w ciągu 1–2 godzin od wyjęcia z piekarnika i trzymaj w lodówce do 2 dni. W zamrażarce: najlepsza jakość do 2–3 miesięcy, zalane sosem, żeby nie wyschły. Odgrzewaj pod folią w piekarniku nagrzanym do 160°C i zdejmij ją na ostatnie kilka minut, jeśli chcesz odzyskać lśniącą glazurę.
+
+[wartosci-odzywcze]
+energia: 1467 kJ / 350 kcal; tłuszcz: 25 g; kwasy tłuszczowe nasycone: 7 g; węglowodany: 17 g; cukry: 16 g; błonnik: 1,5 g; białko: 15 g; sól: 2 g
+
+[wartosci-porcja]
+energia: 1880 kJ / 449 kcal; tłuszcz: 31 g; kwasy tłuszczowe nasycone: 9 g; węglowodany: 21 g; cukry: 20 g; błonnik: 1,9 g; białko: 19 g; sól: 2,5 g

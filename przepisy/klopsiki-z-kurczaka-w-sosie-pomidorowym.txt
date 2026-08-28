@@ -1,0 +1,97 @@
+[meta]
+nazwa: klopsiki z kurczaka w sosie pomidorowym
+slug: klopsiki-z-kurczaka-w-sosie-pomidorowym
+porcje-bazowe: 2
+liczba-porcji: 2–3 porcje
+waga-porcji: 604
+czas-minuty: 40
+item: 6a919eed6022c4041ee46637
+
+[zajawka]
+Sos powstaje tu z warzyw upieczonych w airfryerze: papryki, pomidorów, cebuli i czosnku. Wychodzą przypieczone na brzegach, a po zblendowaniu ze śmietanką dają sos gęsty i słodki, bez cukru i bez godzin duszenia. Klopsiki wrzucamy dopiero na końcu.
+
+[skladniki]
+#klopsiki    245 g klopsików z kurczaka  @klopsiki-z-kurczaka
+#papryka     1 {czerwona papryka|czerwone papryki|czerwonych papryk|czerwonej papryki}
+#pomidory    2 {duży pomidor|duże pomidory|dużych pomidorów|dużego pomidora}
+#cebula      1 cebula
+#czosnek     4 ząbki czosnku
+#oliwa       1 łyżka oliwy z oliwek
+#smietanka   80 ml śmietanki 30%
+#bulion      100–150 ml bulionu kolagenowego z kurczaka
+#makaron     160 g makaronu
+#szczypiorek szczypiorek do posypania
+#sol         sól do smaku
+#pieprz      pieprz do smaku
+
+[kroki]
+== pokrój warzywa na sos
+czas: ok. 6 min
+skladniki: papryka, pomidory, cebula, czosnek
+Paprykę potnij na duże kawałki, pomidory przekrój na pół, cebulę na ćwiartki, a ząbki czosnku zostaw w łupinie. Wszystko idzie do blendera, więc kształt nie ma znaczenia, ale wielkość ma: drobne kawałki wyschną w gorącym powietrzu, zanim zdążą się przypiec.
+
+== upiecz warzywa
+minutnik: 17:00 warzywa
+kryterium: brzegi papryki i cebuli są ciemne, a pomidory zapadły się i puściły sok
+skladniki: oliwa
+Skrop warzywa oliwą, przełóż je do airfryera i piecz w 200°C. W piekarniku to samo zajmie ok. 25 minut w 220°C.
+
+== upiecz klopsiki
+minutnik: 11:00 klopsiki
+kryterium: powierzchnia jest równomiernie brązowa, a przekrojony klopsik jest w środku szary na wskroś
+skladniki: klopsiki
+Przełóż Klopsiki z kurczaka do pustego kosza i piecz je w 200°C, potrząsając koszem mniej więcej w połowie. Pieką się po warzywach, bo w jednym koszu obie rzeczy zabrałyby sobie przestrzeń, a klopsiki potrzebują jej najbardziej.
+
+== ugotuj makaron
+minutnik: 10:00 makaron
+kryterium: nitka przegryziona w połowie nie ma w środku jaśniejszego rdzenia
+skladniki: makaron, sol
+Zrób to w czasie pieczenia. Nastaw osoloną wodę i ugotuj makaron zgodnie z czasem z opakowania.
+
+== zblenduj sos
+czas: ok. 3 min
+skladniki: smietanka, pieprz
+Przełóż upieczone warzywa do blendera razem z sokiem z dna kosza, obierz upieczony czosnek z łupin, dodaj śmietankę, sól i pieprz i zmiksuj na gładko. Sok z dna jest najbardziej skoncentrowaną częścią tego sosu i bez niego wyjdzie on wyraźnie bledszy.
+
+== rozrzedź sos, jeśli trzeba
+czas: ok. 2 min
+skladniki: bulion
+Jeśli sos jest gęsty jak przecier, dolewaj bulion po trochu, mieszając za każdym razem. Dolewaj stopniowo, bo raz rozrzedzonego sosu nie da się już zagęścić bez odparowywania.
+
+== połącz i podgrzej
+minutnik: 3:00 klopsiki w sosie
+kryterium: sos paruje na brzegach garnka, a klopsiki są gorące w środku
+Przelej sos do garnka albo na patelnię, włóż do niego upieczone klopsiki i podgrzej całość na średnim ogniu. Nie gotuj sosu ze śmietanką na mocnym ogniu, bo się zwarzy.
+
+== podaj
+czas: ok. 2 min
+skladniki: szczypiorek
+Rozłóż makaron na talerze, nałóż na niego klopsiki z sosem i posyp wszystko posiekanym szczypiorkiem. Szczypiorek idzie na sam wierzch tuż przed podaniem, bo w gorącym sosie traci kolor w kilkanaście sekund.
+
+[wskazowka]
+dlaczego warzywa na sos idą do airfryera, a nie na patelnię?
+Bo w gorącym powietrzu odparowują wodę, zamiast się w niej dusić. Papryka i pomidory składają się w ponad dziewięćdziesięciu procentach z wody; na patelni ta woda zbiera się na dnie i warzywa gotują się we własnym soku, a w airfryerze uchodzi, więc na brzegach powstaje przypieczenie i cukry, których duszeniem nie da się uzyskać w kwadrans.
+
+sos wyszedł za gęsty albo za rzadki, co teraz?
+Za gęsty rozrzedza się bulionem, po dwie łyżki naraz, i to jest krok szósty przepisu. Za rzadki odparowuje się w garnku, bez pokrywki, na średnim ogniu, ale dopiero przed dodaniem klopsików: gotowane razem z sosem robią się suche.
+
+[co-mozesz-zmienic]
+#makaron
+krótko: 150 g suchego ryżu
+wolę ryż zamiast makaronu, ile go wziąć?
+Weź 150 g suchego ryżu zamiast 160 g makaronu i ugotuj go zgodnie z czasem z opakowania. Ryż wchłania więcej sosu niż makaron, więc przy nim warto zostawić sos odrobinę rzadszy.
+
+#smietanka
+krótko: śmietanką 18%, w tej samej ilości
+mam tylko śmietankę 18%, czy sos wyjdzie?
+Wyjdzie, w tej samej ilości, tylko rzadszy i mniej aksamitny. Śmietanka 18% łatwiej się też warzy, więc trzymaj ogień niżej i nie doprowadzaj sosu do wrzenia.
+
+[przechowywanie]
+jak przechowywać i odgrzewać klopsiki w sosie pomidorowym?
+W lodówce: do 2 dni w szczelnym pojemniku, makaron osobno od sosu. W zamrażarce: sam sos z klopsikami, najlepsza jakość do 2–3 miesięcy; ugotowanego makaronu nie mrozimy, bo po rozmrożeniu się rozpada. Odgrzewanie: w rondelku na małym ogniu, z dwiema łyżkami wody, jeśli sos zgęstniał; nie doprowadzaj go do wrzenia, żeby śmietanka się nie zwarzyła.
+
+[wartosci-odzywcze]
+energia: 521 kJ / 124 kcal; tłuszcz: 5,5 g; kwasy tłuszczowe nasycone: 2 g; węglowodany: 11 g; cukry: 2,6 g; błonnik: 1,5 g; białko: 6,5 g; sól: 0,43 g
+
+[wartosci-porcja]
+energia: 3143 kJ / 750 kcal; tłuszcz: 33 g; kwasy tłuszczowe nasycone: 12 g; węglowodany: 68 g; cukry: 15 g; błonnik: 8,8 g; białko: 39 g; sól: 2,6 g

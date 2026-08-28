@@ -1,0 +1,99 @@
+[meta]
+nazwa: krewetki w sosie słodko-kwaśnym na grzance
+slug: krewetki-w-sosie-slodko-kwasnym
+porcje-bazowe: 2
+liczba-porcji: 2 porcje
+waga-porcji: 291
+czas-minuty: 20
+item: 6a904e87f582c0f9b9942632
+
+[zajawka]
+Krewetki bananowe smażone z czosnkiem i pomidorkami koktajlowymi, oblane sosem z soi, miodu, octu ryżowego i koncentratu pomidorowego, a potem nałożone na grubą grzankę. Skrobia zagęszcza ten sos w kilkanaście sekund, a krewetki twardnieją równie szybko, więc od wlania sosu do talerza mija tu mniej czasu niż od talerza do stołu. Wszystko ma stać pokrojone i odmierzone przy patelni, zanim ją rozgrzejesz.
+
+[skladniki]
+#krewetki    225 g krewetek bananowych   @krewetki-bananowe
+#pomidorki   150 g pomidorków koktajlowych
+#czosnek     2 ząbki czosnku
+#oliwa       1 łyżka oliwy
+#chleb       2 {gruba kromka chleba|grube kromki chleba|grubych kromek chleba|grubej kromki chleba}
+#szczypiorek szczypiorek do podania
+#soja        3 łyżki sosu sojowego
+#miod        1 łyżka miodu
+#ocet        1 łyżka octu ryżowego
+#koncentrat  1 łyżeczka koncentratu pomidorowego
+#skrobia     ½ łyżeczki skrobi ziemniaczanej
+#woda        2 łyżki zimnej wody
+#chili       =szczypta chili
+#sol         sól do smaku
+#pieprz      pieprz do smaku
+
+[kroki]
+== wymieszaj sos
+czas: ok. 3 min
+skladniki: soja, miod, ocet, koncentrat, skrobia, woda
+Wymieszaj w miseczce sos sojowy, miód, ocet ryżowy i koncentrat pomidorowy, a skrobię rozrób osobno w dwóch łyżkach **zimnej** wody i dopiero wtedy wlej do reszty. Skrobia wsypana wprost do sosu albo rozrobiona w ciepłej wodzie zbije się w grudki, których nie da się już rozprowadzić.
+
+== przygotuj resztę
+czas: ok. 4 min
+skladniki: czosnek, pomidorki, szczypiorek
+Posiekaj czosnek, przekrój pomidorki na pół, posiekaj szczypiorek i ustaw wszystko przy kuchence razem z miseczką sosu. Od tej chwili nie będzie już momentu na szukanie czegokolwiek w lodówce.
+
+== podsmaż czosnek
+minutnik: 0:30 czosnek
+kryterium: czosnek pachnie i lekko syczy, ale jest wciąż jasny
+skladniki: oliwa
+Rozgrzej oliwę na patelni na średnim ogniu i wrzuć posiekany czosnek. Pilnuj go bez odchodzenia: na gorącej oliwie brązowieje w kilkanaście sekund, a zbrązowiały wnosi do sosu goryczkę.
+
+== dodaj pomidorki
+minutnik: 2:30 pomidorki
+kryterium: połówki zapadły się w środku i puściły sok, który zaczyna bulgotać na dnie
+Wrzuć przekrojone pomidorki na patelnię, przecięciem do dołu, i zostaw je bez mieszania. Sok, który z nich wyjdzie, jest częścią sosu, więc nie chodzi tu o zrumienienie, tylko o to, żeby się rozpadły.
+
+== usmaż krewetki
+minutnik: 5:00 krewetki
+kryterium: krewetki są różowe i zwinęły się w luźną literę C, a nie w ciasne kółko
+skladniki: krewetki, pieprz
+Rozłóż krewetki na patelni jedną warstwą, popieprz je i obróć po połowie czasu. Solą wstrzymaj się do końca: krewetki są solone fabrycznie, sos sojowy dokłada swoje i dosalanie na tym etapie robi się w ciemno.
+
+== wlej sos i zagęść
+minutnik: 1:30 sos
+kryterium: sos oblepia krewetki i spływa z nich wolno, zamiast spływać na dno patelni
+skladniki: chili, sol
+Zamieszaj sos jeszcze raz w miseczce, bo skrobia opadła na dno, wlej go na patelnię i mieszaj bez przerwy. Dorzuć szczyptę chili, zdejmij patelnię z ognia, gdy sos zacznie ciągnąć się za łyżką, i dopiero wtedy spróbuj, czy w ogóle trzeba solić.
+
+== podpiecz grzanki
+czas: ok. 3 min
+skladniki: chleb
+Podpiecz grube kromki na suchej patelni albo w tosterze, aż będą chrupiące na całej powierzchni. Grzanki możesz zrobić wcześniej, w czasie gdy smażą się krewetki – gotowy sos nie poczeka na chleb, a chleb na sos owszem.
+
+== złóż i podaj
+czas: ok. 1 min
+Nałóż krewetki z pomidorkami i sosem na grzanki, tak żeby sos ściekł po brzegach, i posyp wszystko szczypiorkiem. Podawaj od razu: grzanka pod mokrym sosem mięknie w kilka minut.
+
+[wskazowka]
+dlaczego krewetki robią się gumowate?
+Bo białko krewetki ścina się w kilkadziesiąt sekund i po przekroczeniu tego punktu już się nie rozluźni. Patrz na kształt, nie na zegar: luźna litera C znaczy gotowe, ciasne kółko znaczy o minutę za długo.
+
+po co rozrabiać skrobię w zimnej wodzie?
+Bo w ciepłej ziarenka skrobi pęcznieją natychmiast i zbijają się w grudki, zanim zdążysz je rozprowadzić. W zimnej wodzie rozchodzą się równo, a pęcznieją dopiero na patelni, gdzie masz je już rozmieszane w całym sosie.
+
+[co-mozesz-zmienic]
+#ocet
+krótko: octem jabłkowym albo białym winnym, w tej samej ilości
+czym zastąpić ocet ryżowy?
+Octem jabłkowym albo białym winnym, w tej samej ilości. Oba są ostrzejsze od ryżowego, więc spróbuj sosu przed wlaniem na patelnię i w razie czego dorzuć pół łyżeczki miodu, żeby wyrównać kwas.
+
+#chleb
+krótko: ryżem albo makaronem, jeśli wolisz danie na ciepło dłużej
+zamiast grzanki można podać to na czymś innym?
+Na ugotowanym ryżu albo na makaronie, jeśli danie ma stać na stole dłużej niż kilka minut. Grzanka jest tu dla kontrastu chrupkości z miękkimi krewetkami, ale pod sosem mięknie szybko, a ryż tego problemu nie ma.
+
+[przechowywanie]
+jak przechowywać i odgrzewać krewetki w sosie słodko-kwaśnym?
+Przełóż ostudzone krewetki z sosem do szczelnego pojemnika w ciągu 1–2 godzin i trzymaj w lodówce do 2 dni; grzanki trzymaj osobno, bo pod sosem rozmiękną do rana. Mrożenia nie polecamy: krewetka po rozmrożeniu jest wodnista i traci sprężystość, a sos ze skrobi rozwarstwia się. Odgrzewaj krótko na patelni, na średnim ogniu, i zdejmij z ognia, gdy tylko sos zacznie parować.
+
+[wartosci-odzywcze]
+energia: 498 kJ / 118 kcal; tłuszcz: 3,1 g; kwasy tłuszczowe nasycone: 0,5 g; węglowodany: 13 g; cukry: 4,6 g; błonnik: 1,5 g; białko: 8,2 g; sól: 2,1 g
+
+[wartosci-porcja]
+energia: 1452 kJ / 345 kcal; tłuszcz: 9 g; kwasy tłuszczowe nasycone: 1,4 g; węglowodany: 38 g; cukry: 14 g; błonnik: 4,4 g; białko: 24 g; sól: 6 g

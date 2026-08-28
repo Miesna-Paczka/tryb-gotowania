@@ -1,0 +1,88 @@
+[meta]
+nazwa: bulion kolagenowy wołowy na szpondrze
+slug: bulion-kolagenowy-na-szpondrze
+porcje-bazowe: 8
+liczba-porcji: ok. 3 litry, czyli 8 porcji
+waga-porcji: 375
+czas-minuty: 360
+item: 6a919eed6022c4041ee4664f
+
+[zajawka]
+Szponder z kością zalany zimną wodą i gotowany pięć, sześć godzin tak wolno, żeby ledwie mrugał. Kolagen z kości i tkanki łącznej rozpuszcza się w tym czasie w żelatynę, dlatego wystudzony bulion tężeje w lodówce – po tym właśnie poznasz, że wszystko poszło dobrze. Gotowany gwałtownie, przez ten sam czas, wychodzi mętny: bąble rozbijają tłuszcz i białko na drobiny, których się już nie pozbędziesz.
+
+[skladniki]
+#szponder   830 g szpondru wołowego z kością  @szponder
+#woda       3 l zimnej wody
+#marchewka  2 marchewki
+#pietruszka 1 {korzeń pietruszki|korzenie pietruszki|korzeni pietruszki|korzenia pietruszki}
+#seler      80 g selera korzeniowego
+#cebula     1 cebula
+#czosnek    2 ząbki czosnku
+#laurowy    2 liście laurowe
+#ziele      4 ziarna ziela angielskiego
+#pieprz     8 ziaren pieprzu
+#sol        sól do smaku
+
+[kroki]
+== zalej mięso zimną wodą
+czas: ok. 5 min
+skladniki: szponder, woda
+Przełóż Szponder do dużego garnka i zalej go zimną wodą tak, żeby przykryła mięso z zapasem. Zimną, nie gorącą: białko na powierzchni mięsa ścina się w gorącej wodzie od razu i zamyka drogę wszystkiemu, co miało przejść do wywaru.
+
+== doprowadź do wrzenia i zbierz szumowiny
+minutnik: 20:00 zagotowanie
+kryterium: powierzchnia jest czysta, a przy brzegach garnka nie zbiera się już szara piana
+Podgrzewaj garnek powoli na średnim ogniu i zbieraj łyżką cedzakową szarą pianę, która wypływa na wierzch. To ścięte białko z powierzchni mięsa; zostawione w garnku rozbije się później na drobiny i zmętni cały bulion.
+
+== opal cebulę na suchej patelni
+czas: ok. 5 min
+skladniki: cebula
+Przekrój cebulę na pół, połóż ją przekrojem na rozgrzanej suchej patelni i trzymaj, aż powierzchnia zrobi się ciemnobrązowa, prawie czarna. Przypalone cukry z cebuli dają bulionowi głęboki, bursztynowy kolor, którego żaden inny składnik tu nie wnosi.
+
+== obierz warzywa
+czas: ok. 8 min
+skladniki: marchewka, pietruszka, seler
+Obierz marchewki, korzeń pietruszki i kawałek selera korzeniowego, a potem potnij je na duże kawałki. Duże, bo po pięciu godzinach drobno pokrojone warzywa rozpadną się i przejdą przez sito razem z wywarem.
+
+== dodaj warzywa i przyprawy
+czas: ok. 3 min
+skladniki: czosnek, laurowy, ziele, pieprz
+Wrzuć do garnka marchew, pietruszkę, seler, opaloną cebulę, czosnek, liście laurowe, ziele angielskie i pieprz. Wszystko wchodzi teraz, po zebraniu szumowin, żeby nie zbierać ich razem z ziołami.
+
+== gotuj bardzo wolno
+minutnik: 5:30:00 bulion
+kryterium: mięso odchodzi od kości bez oporu, a płyn jest klarowny i ma bursztynowy kolor
+Zejdź z ogniem do minimum i gotuj bulion od pięciu do sześciu godzin, bez przykrycia albo z pokrywką uchyloną. Powierzchnia ma ledwie drgać, z jednym pęcherzykiem wypływającym raz na sekundę; mocniejsze bulgotanie zmętni wywar i nie skróci tego czasu ani o kwadrans.
+
+== dopraw i przecedź
+czas: ok. 10 min
+skladniki: sol
+Dopraw bulion solą, a potem przelej go przez gęste sito do drugiego garnka albo do słoików. Sól wchodzi na końcu, bo przez sześć godzin płyn odparował i to, co na początku byłoby w sam raz, teraz byłoby przesolone.
+
+[wskazowka]
+dlaczego bulion tężeje w lodówce i czy to znaczy, że jest za tłusty?
+Tężeje od żelatyny, nie od tłuszczu, i jest to jedyny widoczny dowód na to, że gotowanie było dostatecznie długie i dostatecznie wolne. Kolagen z kości i tkanki łącznej szpondru rozpuszcza się w wodzie dopiero po kilku godzinach i po wystudzeniu wiąże płyn w galaretę. Tłuszcz zbiera się osobno, jako biała warstwa na wierzchu, i można go zdjąć łyżką.
+
+co zrobić z mięsem, które zostało na sitku?
+Obrane z kości nadaje się do sałatki, do pierogów albo z powrotem do zupy. Oddało wywarowi część smaku, ale nie białko: wołowina po sześciu godzinach gotowania jest miękka i wciąż pełnowartościowa. Ta deklaracja żywieniowa opisuje sam przecedzony bulion, bez mięsa.
+
+[co-mozesz-zmienic]
+#seler
+krótko: dwiema łodygami selera naciowego
+czym zastąpić seler korzeniowy?
+Dwiema łodygami selera naciowego. Wnoszą ten sam kierunek smaku, choć są delikatniejsze i mniej słodkie, więc dorzuć wtedy o połowę więcej korzenia pietruszki.
+
+#pietruszka
+krótko: samą marchewką, o połowę więcej
+czym zastąpić korzeń pietruszki?
+Zwiększ ilość marchewki o połowę i dorzuć kilka gałązek natki. Bulion wyjdzie słodszy i mniej ziemisty, ale nadal będzie miał warzywne tło, które ma tu równoważyć wołowinę.
+
+[przechowywanie]
+jak przechowywać i odgrzewać bulion kolagenowy?
+W lodówce: do 2 dni w szczelnym pojemniku, z warstwą tłuszczu zostawioną na wierzchu, bo działa jak naturalna pokrywa. W zamrażarce: najlepsza jakość do 2–3 miesięcy, rozlany do mniejszych pojemników albo do foremek na lód. Odgrzewanie: w rondelku, doprowadzając do delikatnego wrzenia; z zamrażarki wystarczy przełożyć kostki wprost do gorącej wody.
+
+[wartosci-odzywcze]
+energia: 58 kJ / 14 kcal; tłuszcz: 0,9 g; kwasy tłuszczowe nasycone: 0,4 g; węglowodany: 0,3 g; cukry: 0,2 g; błonnik: 0,1 g; białko: 1,2 g; sól: 0,27 g
+
+[wartosci-porcja]
+energia: 217 kJ / 52 kcal; tłuszcz: 3,2 g; kwasy tłuszczowe nasycone: 1,5 g; węglowodany: 1 g; cukry: 0,8 g; błonnik: 0,4 g; białko: 4,5 g; sól: 1 g

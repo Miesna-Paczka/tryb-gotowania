@@ -1,0 +1,71 @@
+[meta]
+nazwa: boczek w cieście francuskim
+slug: boczek-w-ciescie-francuskim
+porcje-bazowe: 4
+liczba-porcji: 4 porcje
+waga-porcji: 98
+czas-minuty: 35
+item: 6a919eed6022c4041ee46645
+
+[zajawka]
+Ciasto francuskie posmarowane koncentratem pomidorowym, obłożone plastrami boczku, zwinięte, pokrojone w paski i skręcone w warkocze. Dzięki temu nie tylko wygląda, ale i ciasto rośnie w środku. Wychodzi przekąska na jedną blachę, najlepsza na świeżo – jeszcze ciepła.
+
+[skladniki]
+#boczek       100 g boczku wędzonego w plastrach  @boczek-wedzony-w-plastrach
+#ciasto       1 {rolka ciasta francuskiego|rolki ciasta francuskiego|rolek ciasta francuskiego|rolki ciasta francuskiego}
+#koncentrat   100 g koncentratu pomidorowego
+#bazylia      suszona bazylia
+#oregano      suszone oregano
+#sol          sól do smaku
+
+[kroki]
+== wyjmij ciasto i rozgrzej piekarnik
+czas: ok. 10 min
+skladniki: ciasto
+Wyjmij ciasto francuskie z lodówki i zostaw je na blacie, a w tym czasie nastaw piekarnik na 200°C z grzaniem góra i dół. Zimne ciasto pęka na zagięciach przy rozwijaniu i w tych miejscach nadzienie wypłynie.
+
+== posmaruj ciasto koncentratem
+czas: ok. 5 min
+skladniki: koncentrat, bazylia, oregano, sol
+Rozwiń ciasto i rozprowadź po nim cienką warstwę koncentratu pomidorowego, zostawiając centymetr wolnego brzegu, po czym posyp je bazylią i oregano. Sól dodaj bardzo oszczędnie albo wcale, bo boczek wnosi jej dość za dwoje.
+
+== ułóż boczek i zawiń ciasto
+czas: ok. 4 min
+skladniki: boczek
+Rozłóż plastry Boczku wędzonego ciasno obok siebie na całej powierzchni ciasta i zawiń je, nakładając jedną krawędź na drugą. Plastry mają się stykać, ale nie zachodzić na siebie: w podwójnej warstwie boczek zostanie miękki.
+
+== pokrój i skręć paski
+czas: ok. 5 min
+Potnij zawinięte ciasto razem z boczkiem na paski szerokości mniej więcej dwóch centymetrów, a każdy pasek chwyć za oba końce i skręć w spiralę, dwa albo trzy obroty. Skręcaj zdecydowanie: luźny zwój rozprostuje się w piekarniku i wyjdzie z niego płaski pasek.
+
+== piecz
+minutnik: 17:00 przekąski
+kryterium: ciasto jest złociste na całej długości spirali, także w zagłębieniach, a brzegi boczku zbrązowiały
+Przełóż spirale na blachę wyłożoną papierem do pieczenia, w odstępach na dwa palce, i wsuń blachę na środkową półkę. Odstępy są konieczne, bo skręcone paski rosną na boki mocniej niż proste.
+
+== odczekaj przed podaniem
+czas: ok. 4 min
+Zostaw przekąski na blasze na kilka minut, żeby ciasto zeszło z temperatury i przestało być kruche do rozpadania. Podawaj je ciepłe albo całkiem wystudzone, jedno i drugie działa.
+
+[wskazowka]
+po co w ogóle skręcać paski, skoro proste też się upieką?
+Skręcenie robi z płaskiego paska bryłę o dużej powierzchni. Gorące powietrze dochodzi wtedy między zwoje, więc ciasto rośnie i rumieni się także w środku, a nie tylko od góry i od spodu. Prosty pasek z tą samą ilością nadzienia zostaje w środku wilgotny.
+
+dlaczego koncentratu nie wolno rozsmarować grubo?
+Bo woda z pomidorów jest tu wrogiem ciasta francuskiego. Gruba warstwa nie zdąży odparować w siedemnaście minut i rozmoczy spód od środka, więc zamiast warstw dostaniesz zbitą, wilgotną blaszkę. Cienka warstwa daje ten sam smak, a ciasto wyrasta lepiej.
+
+[co-mozesz-zmienic]
+#koncentrat
+krótko: pesto, w tej samej ilości
+czym zastąpić koncentrat pomidorowy?
+Pesto albo gęstym sosem pomidorowym, w tej samej ilości. Pesto jest tłuste, nie wodniste, więc ryzyko rozmoczenia ciasta jest przy nim mniejsze; przy sosie pomidorowym odparuj go najpierw na patelni, żeby zgęstniał.
+
+[przechowywanie]
+jak przechowywać i odgrzewać boczek w cieście francuskim?
+W lodówce: do 2 dni w szczelnym pojemniku, choć ciasto francuskie mięknie już następnego dnia. W zamrażarce: najlepsza jakość do 1–2 miesięcy, zamrożone pojedynczo na blasze i dopiero potem przesypane do woreczka. Odgrzewanie: w piekarniku w 180°C przez 6 do 8 minut, nigdy w mikrofalówce.
+
+[wartosci-odzywcze]
+energia: 1666 kJ / 401 kcal; tłuszcz: 30 g; kwasy tłuszczowe nasycone: 12 g; węglowodany: 23 g; cukry: 3,4 g; błonnik: 2,8 g; białko: 8,4 g; sól: 1,1 g
+
+[wartosci-porcja]
+energia: 1631 kJ / 392 kcal; tłuszcz: 29 g; kwasy tłuszczowe nasycone: 12 g; węglowodany: 23 g; cukry: 3,3 g; błonnik: 2,7 g; białko: 8,2 g; sól: 1 g

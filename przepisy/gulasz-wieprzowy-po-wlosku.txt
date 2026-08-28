@@ -1,0 +1,97 @@
+[meta]
+nazwa: gulasz wieprzowy po włosku (spezzatino)
+slug: gulasz-wieprzowy-po-wlosku
+porcje-bazowe: 3
+liczba-porcji: 3–4 porcje
+waga-porcji: 565
+czas-minuty: 90
+item: 6a9049cae555b6dc1bf5deda
+
+[zajawka]
+Spezzatino to po włosku po prostu duszone mięso pokrojone na kęsy, a nazwa mówi o kształcie, nie o przyprawach. Kostki z szynki obtacza się w mące, rumieni partiami i dusi w białym winie z bulionem, aż sos zgęstnieje sam. Mąka z obtoczenia jest tu zagęszczaczem, więc żadnej zasmażki na końcu nie będzie.
+
+[skladniki]
+#mieso     760 g mięsa gulaszowego z szynki   @mieso-gulaszowe-z-szynki
+#maka      2–3 łyżki mąki pszennej
+#oliwa     4 łyżki oliwy z oliwek
+#wino      150 ml wytrawnego białego wina
+#bulion    400–500 ml gorącego bulionu drobiowego
+#cebula    1 cebula
+#marchew   1 marchewka
+#seler     1 łodyga selera naciowego
+#czosnek   2 ząbki czosnku
+#ziemniaki 300 g ziemniaków
+#rozmaryn  1 gałązka rozmarynu
+#sol       sól do smaku
+#pieprz    pieprz czarny do smaku
+
+[kroki]
+== osusz i obtocz mięso
+czas: ok. 6 min
+skladniki: mieso, maka, sol, pieprz
+Osusz kostki Gulaszowego z szynki papierowym ręcznikiem, dopraw je solą i pieprzem, obtocz w mące i strzepnij nadmiar. Mokre mięso w gorącej oliwie zacznie się dusić zamiast rumienić, a wtedy cały kolor sosu przepada już na starcie.
+
+== zrumień mięso partiami
+minutnik: 10:00 mięso
+kryterium: kostki są ciemnobrązowe z każdej strony, a na dnie garnka zostaje przypieczony osad
+skladniki: oliwa
+Rozgrzej oliwę w żeliwnym garnku i kładź tyle kostek, żeby leżały luźno i nie dotykały się bokami, licząc czas dla każdej partii osobno. Wyjmuj zrumienione mięso na talerz, a w czasie, gdy smaży się kolejna partia, pokrój warzywa.
+
+== pokrój warzywa
+skladniki: cebula, marchew, seler, ziemniaki
+Posiekaj drobno cebulę, marchewkę i seler naciowy, a ziemniaki pokrój w kostkę wielkości kęsa i odłóż osobno. Ziemniaki wchodzą do garnka dopiero pod koniec duszenia, więc do tego czasu trzymaj je w misce z zimną wodą, żeby nie sczerniały.
+
+== zeszklij warzywa
+minutnik: 6:00 warzywa
+kryterium: cebula jest szklista, a marchew i seler zmiękły na brzegach
+skladniki: czosnek
+Wrzuć posiekaną cebulę, marchew i seler na tłuszcz pozostały po mięsie i mieszaj co jakiś czas. Czosnek dodaj na ostatnią minutę: na rozgrzanym dnie brązowieje w kilkanaście sekund, a zbrązowiały zgorzknieje na cały garnek.
+
+== wlej wino i zeskrob dno
+minutnik: 2:30 wino
+kryterium: dno garnka jest czyste, a płyn stracił ostry zapach alkoholu
+skladniki: wino
+Włóż mięso z powrotem do garnka, wlej wino i zeskrob drewnianą łyżką wszystko, co przywarło do dna. Ten przypieczony osad jest najciemniejszym smakiem w całym daniu i wino jest jedyną rzeczą, która go stamtąd zabierze.
+
+== zalej bulionem i duś
+minutnik: 35:00 gulasz
+kryterium: mięso daje się przekłuć widelcem, ale jeszcze stawia opór
+skladniki: bulion, rozmaryn
+Włóż gałązkę rozmarynu i wlej gorący bulion, tyle, żeby prawie zakrywał mięso, a potem zejdź z ogniem do minimum i przykryj garnek. Bulion ma być gorący: zimny zbiłby temperaturę w garnku i mięso zaczęłoby duszenie od nowa.
+
+== dodaj ziemniaki
+minutnik: 25:00 ziemniaki
+kryterium: ziemniak rozpada się pod naciskiem widelca, a mięso rozchodzi się na włókna
+Odlej wodę z ziemniaków, wrzuć je do garnka i przykryj go z powrotem. Wchodzą tak późno nieprzypadkowo: gotowane od początku rozpadłyby się do końca, a ich skrobia zamieniłaby sos w kleik.
+
+== zredukuj sos i dopraw
+czas: ok. 8 min
+Zdejmij pokrywkę, podkręć ogień i gotuj gulasz bez przykrycia, aż sos zgęstnieje tak, jak lubisz. Wyjmij gałązkę rozmarynu, spróbuj i dopraw solą oraz pieprzem dopiero teraz, bo przy odparowanym sosie sól z bulionu robi się dwa razy wyraźniejsza.
+
+[wskazowka]
+po co obtaczać mięso w mące?
+Mąka robi dwie rzeczy naraz. Na patelni pomaga kostkom się zrumienić, a potem, już w sosie, rozpuszcza się i zagęszcza go od środka, więc nie trzeba na końcu ratować gulaszu zasmażką ani skrobią.
+
+dlaczego mięso rumieni się partiami, a nie całe naraz?
+Bo każda kostka wrzucona do garnka obniża temperaturę oleju, a zbite ciasno mięso puszcza wodę, w której zaczyna się dusić. Rumienienie wymaga suchej i gorącej powierzchni; przy zapełnionym garnku jej po prostu nie ma.
+
+[co-mozesz-zmienic]
+#wino
+krótko: 75 ml białego octu winnego z dolewką bulionu
+czym zastąpić białe wino?
+Połową tej ilości białego octu winnego, czyli ok. 75 ml, uzupełnioną bulionem do pełnej objętości. Ocet jest znacznie ostrzejszy w kwasie i nie ma słodyczy wina, więc sos wyjdzie wyraźniejszy; jeśli po redukcji okaże się za kwaśny, wyrównaj go szczyptą cukru.
+
+#mieso
+krótko: Gulaszowym z indyka, ale ze skróconym duszeniem
+zadziała inne mięso gulaszowe z Paczki?
+Gulaszowe z indyka pasuje, ale jest znacznie chudsze i dochodzi szybciej, więc skróć duszenie pod przykryciem mniej więcej o połowę i sprawdzaj wcześniej, bo przegotowane rozpada się we włóknach na sucho. Wieprzowina z szynki znosi tę godzinę bez szkody właśnie dlatego, że ma więcej tkanki łącznej.
+
+[przechowywanie]
+jak przechowywać i odgrzewać spezzatino?
+Przełóż ostudzony gulasz do szczelnego pojemnika w ciągu 1–2 godzin od zdjęcia z ognia i trzymaj w lodówce do 2 dni; na drugi dzień jest wyraźniejszy w smaku, bo mięso zdąży przejść sosem. W zamrażarce: najlepsza jakość do 2–3 miesięcy, choć ziemniaki po rozmrożeniu robią się sypkie, więc lepiej mrozić sam gulasz bez nich. Odgrzewaj pod przykryciem na małym ogniu, mieszając od dna, i dolej łyżkę bulionu, jeśli sos zgęstniał przez noc.
+
+[wartosci-odzywcze]
+energia: 450 kJ / 108 kcal; tłuszcz: 4,4 g; kwasy tłuszczowe nasycone: 0,8 g; węglowodany: 4,1 g; cukry: 1 g; błonnik: 0,7 g; białko: 11 g; sól: 0,63 g
+
+[wartosci-porcja]
+energia: 2544 kJ / 608 kcal; tłuszcz: 25 g; kwasy tłuszczowe nasycone: 4,4 g; węglowodany: 23 g; cukry: 5,5 g; błonnik: 3,9 g; białko: 62 g; sól: 3,5 g
