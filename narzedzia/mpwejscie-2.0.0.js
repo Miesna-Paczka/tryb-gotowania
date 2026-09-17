@@ -43,6 +43,7 @@
   'use strict';
   var WERSJA = '2.0.0';
   var PAMIEC = 'mp-ekran';                 /* sessionStorage: '1' = włączony */
+  var OPIS_ID = 'mp-wejscie-opis';         /* wiąże podtytuł z przyciskiem (aria-describedby) */
   var MQ = '(max-width: 479px)';           /* MUSI zgadzać się z @media dla .mp-wejscie */
 
   var api = navigator.wakeLock;
@@ -127,12 +128,20 @@
     b.className = 'mp-wejscie';
     b.setAttribute('role', 'switch');
     b.setAttribute('aria-checked', 'false');
+    /* `aria-describedby`, a nie sama treść przycisku: przy `role="switch"`
+       czytnik ogłasza NAZWĘ kontrolki i jej stan („tryb gotowania, przełącznik,
+       niezaznaczony"). Nazwa mówi, czym to jest; co robi, mówi dopiero podtytuł,
+       więc bez tego wiązania cała obietnica nie dociera do osoby, która nie
+       widzi ekranu. Dług zastany po 1.3.3, nie nowy — ale zamyka się jedną
+       linią, a druga okazja się nie trafi. */
+    b.setAttribute('aria-describedby', OPIS_ID);
     b.setAttribute('data-mp-wejscie', '');
 
     var t = document.createElement('span'); t.className = 'mp-wejscie__tresc';
     var h = document.createElement('span'); h.className = 'mp-wejscie__tytul body-large';
     h.textContent = 'tryb gotowania';
     var p = document.createElement('span'); p.className = 'mp-wejscie__podtytul caption';
+    p.id = OPIS_ID;
     p.textContent = 'ekran nie gaśnie, gdy masz zajęte ręce';
     t.appendChild(h); t.appendChild(p);
 
