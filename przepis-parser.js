@@ -3944,9 +3944,22 @@
   var ORIGIN_PROD = 'https://miesnapaczka.pl';
 
   /* Zawsze origin produkcyjny — inaczej kody wygenerowane na stagingu
-     prowadzą do *.webflow.io i nikt tego nie zauważy. */
+     prowadzą do *.webflow.io i nikt tego nie zauważy.
+
+     `?tryb=gotowanie` ZDJĘTE 2026-09-17 razem z trybem pełnoekranowym. Parametr
+     miał jednego czytelnika — runtime overlaya, który po nim rozpoznawał wejście
+     z kodu i otwierał tryb od razu. Bez runtime'u zostałby martwym ogonem adresu:
+     nie wskazuje niczego, a wygląda jak coś, co wskazuje.
+
+     Skrócenie o 15 znaków nie jest kosmetyką, tylko zyskiem czytelności kodu.
+     Adres przepisu waha się między 55 a 92 znakami, a pojemność QR przy korekcji
+     `M` skacze progami (v5 = 84 bajty / 37 modułów, v6 = 106 / 41). Policzone na
+     53 slugach w `przepisy/`: z parametrem 37 przepisów mieści się w v5, bez
+     parametru **48**. Moduł rośnie z ~2,1 do ~2,3 px CSS przy slocie 96 px —
+     a komentarz przy `QR_ROZMIAR` mówi wprost, że 2,1 px jest wartością graniczną
+     na wyświetlaczu 1×. Pilnuje tego `narzedzia/suchy-bieg-kodu-qr.mjs`. */
   function adresQR() {
-    return ORIGIN_PROD + location.pathname.replace(/\/$/, '') + '?tryb=gotowanie';
+    return ORIGIN_PROD + location.pathname.replace(/\/$/, '');
   }
 
   /* Rysuje QR do wskazanego kontenera biblioteką WBUDOWANĄ (patrz `QR` wyżej).
@@ -4219,6 +4232,18 @@
          podmieniać `Array.prototype.push`, czyli testować przez pułapkę. */
       podepnijProdukty: podepnijProdukty,
       zbierzPaczke: zbierzPaczke,
+      /* Wystawione WYŁĄCZNIE po to, żeby `narzedzia/suchy-bieg-kodu-qr.mjs` mógł
+         zapytać PRAWDZIWĄ bibliotekę o liczbę modułów, zamiast odtwarzać tabelę
+         pojemności QR po swojej stronie. Tabela przepisana do przyrządu byłaby
+         drugą kopią wiedzy, która rozjeżdża się cicho — a tu rozjazd oznaczałby
+         zieleń na kodzie, którego nie da się zeskanować. Bez DOM-u i bez
+         `matchMedia`, więc działa w Node. */
+      modulyKodu: function (tekst) {
+        var k = QR(0, 'M');
+        k.addData(String(tekst));
+        k.make();
+        return k.getModuleCount();
+      },
       /* `D-39.67` — wystawione, żeby `narzedzia/suchy-bieg-jednostek.js` mógł
          zaasertować NIEZMIENNIKI między tabelami, a nie tylko wyjście na przykładach.
          Bez tego literówka w kluczu `POŁÓWKOWE` przechodzi bezszelestnie: słowo
